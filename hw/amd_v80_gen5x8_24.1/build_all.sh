@@ -22,20 +22,21 @@
 set -Eeuo pipefail
 
 # Init
-DESIGN="amd_v80_gen5x8_24.1"
+DESIGN="ve2302_pcie_qdma_base"
+PRODUCT="rave"
 HW_DIR=$(realpath ./)
 FW_DIR=$(realpath ./../../fw/AMC)
 XSA=${XSA:-$(realpath ${HW_DIR})/build/${DESIGN}.xsa}
 
 # Step HW
-pushd ${HW_DIR}
-  mkdir -p ./build
-  vivado -source src/create_design.tcl -source src/build_design.tcl -mode batch -nojournal -log ./build/vivado.log
-popd
+#pushd ${HW_DIR}
+#  mkdir -p ./build
+#  vivado -source src/create_design.tcl -source src/build_design.tcl -mode batch -nojournal -log ./build/vivado.log
+#popd
 
 # Step FW
 pushd ${FW_DIR}
-  ./scripts/build.sh -os freertos10_xilinx -profile v80 -xsa $XSA
+  ./scripts/build.sh -os freertos10_xilinx -profile ${PRODUCT} -xsa $XSA
   cp -a ${FW_DIR}/build/amc.elf ${HW_DIR}/build
   # Takes in fpt.json and produces fpt.bin
 popd
@@ -43,14 +44,14 @@ popd
 
 # Step FPT
 pushd ${FW_DIR}/build
-  ../scripts/gen_fpt.py -f ../scripts/fpt.json
+  ../scripts/gen_fpt.py -f ../scripts/fpt_${PRODUCT}.json
   cp -a ${FW_DIR}/build/fpt.bin ${HW_DIR}/build
 popd
 
 # Step PDI combine
 # Generate PDI w/ bootgen
 pushd ${HW_DIR}
-  bootgen -arch versal -image ${HW_DIR}/fpt/pdi_combine.bif -w -o ${HW_DIR}/build/${DESIGN}_nofpt.pdi
+  bootgen -arch versal -image ${HW_DIR}/fpt/pdi_combine_${PRODUCT}.bif -w -o ${HW_DIR}/build/${DESIGN}_nofpt.pdi
 popd
 
 # final pdi generation

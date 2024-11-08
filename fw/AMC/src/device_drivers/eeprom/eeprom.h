@@ -41,7 +41,11 @@ typedef struct EEPROM_CFG
     uint8_t ucEepromSlaveAddress;       /* I2C Slave address of the device */
     uint8_t ucEepromAddressSize;        /* The number of bytes in the EEPROM register address */
     uint8_t ucEepromPageSize;           /* Eeprom page size */
+#ifdef PROFILE_RAVE
+    uint16_t ucEepromNumPages;          /* The number of page in Eeprom */
+#else
     uint8_t ucEepromNumPages;           /* The number of page in Eeprom */
+#endif
     uint8_t ucEepromDeviceIdAddress;    /* I2C Slave address for reaching the device id register */
     uint8_t ucEepromDeviceIdRegister;   /* Device ID register */
     uint16_t usEepromDeviceId;          /* The device id of eeprom */
@@ -58,6 +62,7 @@ typedef struct EEPROM_CFG
  */
 typedef enum EEPROM_VERSION
 {
+    EEPROM_VERSION_1_0 = 1,
     EEPROM_VERSION_3_0 = 30,
     EEPROM_VERSION_3_1,
     EEPROM_VERSION_4_0 = 40,
