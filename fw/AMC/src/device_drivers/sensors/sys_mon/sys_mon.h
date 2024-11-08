@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function declarations for the System Monitor
@@ -29,12 +29,25 @@
  */
 typedef enum SYS_MON_VOLTAGES_ENUM
 {
+#ifdef PROFILE_RAVE
+    SYS_MON_VOLTAGES_VCCAUX = 0,
+    SYS_MON_VOLTAGES_VCCSOC,
+    SYS_MON_VOLTAGES_VCCO302,
+    SYS_MON_VOLTAGES_VCCAUXPMC,
+    SYS_MON_VOLTAGES_VCCO500,
+    SYS_MON_VOLTAGES_VCCPMC,
+    SYS_MON_VOLTAGES_VCCPSFP,
+    SYS_MON_VOLTAGES_VCCPSLP,
+    SYS_MON_VOLTAGES_VPVN,
+    SYS_MON_VOLTAGES_VCCO703,
+    SYS_MON_VOLTAGES_VAUXCH0,
+    SYS_MON_VOLTAGES_VCCAUXSMON,
+#else
     SYS_MON_VOLTAGES_VCCAUX = 0,
     SYS_MON_VOLTAGES_VCCAUXSMON,
     SYS_MON_VOLTAGES_VCCAUXPMC,
-
+#endif
     MAX_SYS_MON_VOLTAGE
-
 } SYS_MON_VOLTAGES_ENUM;
 
 

@@ -2,7 +2,7 @@
 /*
  * ami_pcie.h - This file contains PCI reading/writing definitions.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_PCIE_H
@@ -44,6 +44,7 @@ enum AMI_PCIE_DEVICE_ID {
 	AMI_PCIE_DEVICE_ID_VCK5000_PF0	= 0x5048,
 	AMI_PCIE_DEVICE_ID_V80		= 0x50B4,
 	AMI_PCIE_DEVICE_ID_V80P		= 0x50BC,
+	AMI_PCIE_DEVICE_ID_RAVE		= 0x5700,
 };
 
 #define PCIE_VENDOR_ID          PCIE_VENDOR_ID_XILINX

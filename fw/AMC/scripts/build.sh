@@ -70,7 +70,7 @@ function print_help() {
     echo "-clean                  : remove all build files"
     echo "-clean_amc              : remove all AMC application build files (BSP untouched)"
     echo "-amc                    : only builds the AMC application (BSP untouched)"
-    echo "-profile <profile_name> : set the profile to build AMC for (v70/v80/Linux, etc)"
+    echo "-profile <profile_name> : set the profile to build AMC for (v70/v80/Linux/rave, etc)"
     echo "-os <os_name>           : set the OS (freertos10_xilinx, standalone, Linux, etc)"
     echo "-xsa <path_to_xsa>      : XSA to generate BSP from"
     echo "-freertos_debug         : sets FreeRTOSConfig.h stat debug flags"
@@ -79,10 +79,10 @@ function print_help() {
     echo "Any additional arguments are passed directly into CMAKE"
     echo
     echo "E.g.: To build from scratch:"
-    echo " ./scripts/build.sh -xsa /direct/path/to/example.xsa -os freertos10_xilinx -profile v80"
+    echo " ./scripts/build.sh -xsa /direct/path/to/example.xsa -os freertos10_xilinx -profile <v80|rave>"
     echo
     echo "E.g.: To build the application only:"
-    echo " ./scripts/build.sh -os freertos10_xilinx -profile v80 -amc"
+    echo " ./scripts/build.sh -os freertos10_xilinx -profile <v80|rave> -amc"
     echo
     echo "E.g.: To build application for Linux (profile will default to Linux):"
     echo " ./scripts/build.sh -os Linux -amc"
@@ -294,7 +294,7 @@ if  [ "$STATIC_ANALYSIS_DEBUG" == 1 ]; then
     # Static Analysis
     echo "=== Static Analysis ===" |& tee -a $BUILD_LOG
     SECTION_START=$SECONDS
-    if [ $PROFILE = "v80" ] || [ $PROFILE = "v70" ]; then
+    if [ $PROFILE = "v80" ] || [ $PROFILE = "v70" ] || [ $PROFILE = "rave" ]; then
         $SCRIPTS_DIR/cov_analysis.sh -b make amc
     elif [ $PROFILE = "Linux" ] || [ $OS = "Linux" ]; then
         $SCRIPTS_DIR/cov_analysis.sh -c gcc -b make amc

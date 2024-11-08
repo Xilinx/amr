@@ -65,15 +65,16 @@ else()
         set(OSAL_PATH "src/osal/src/freeRTOS/osal.c")
         set(FW_IF_PATH "src/fal/gcq/fw_if_gcq_amc.c")
         set(FW_I2C_PATH "src/device_drivers/i2c/aved/i2c.c")
-        set(FW_EMMC_PATH "src/device_drivers/emmc/aved/emmc.c")
         set(FW_SYS_MON_PATH "src/device_drivers/sensors/sys_mon/aved/sys_mon.c")
         set(FW_OSPI_PATH "src/device_drivers/ospi/aved/ospi.c")
         set(FW_IF_OSPI_PATH "src/fal/ospi/fw_if_ospi_amc.c")
         set(FW_IF_MUXED_DEVICE_PATH "src/fal/muxed_device/fw_if_muxed_device_amc.c")
         set(FW_IF_MUXED_DEVICE_DEBUG_PATH "src/fal/muxed_device/debug/fw_if_muxed_device_debug.c")
-        set(EEPROM_PATH "src/device_drivers/eeprom/aved/eeprom.c")
+        if((PROFILE MATCHES "^(v80)$") OR (PROFILE MATCHES "^(v70)$"))
+        set(FW_EMMC_PATH "src/device_drivers/emmc/aved/emmc.c")
         set(FW_IF_EMMC_PATH "src/fal/emmc/fw_if_emmc_amc.c")
         set(FW_IF_SMBUS_BLOCK_IO_PATH "src/fal/smbus/fw_if_smbus_block_io.c")
+        endif()
         set(NAME "amc.elf")
 
         if( FREERTOS_DEBUG )
@@ -103,7 +104,15 @@ else()
         set(PROFILE_DEBUG_MENU_PATH "src/profiles/v80/profile_debug_menu.c")
         add_definitions(-DOOB_ENABLED)
     else()
-        if(PROFILE MATCHES "^(v80*)$")
+        if(PROFILE MATCHES "^(rave)$")
+            include_directories(src/profiles/rave)
+            set(PROFILE "rave")
+            set(PROFILE_FAL_PATH "src/profiles/rave/profile_fal.c")
+            set(PROFILE_DEBUG_MENU_PATH "src/profiles/rave/profile_debug_menu.c")
+            set(EEPROM_PATH "src/device_drivers/eeprom/rave/eeprom.c")
+            add_definitions(-DPROFILE_RAVE)
+            add_definitions(-DOOB_ENABLED)
+        elseif(PROFILE MATCHES "^(v80*)$")
             include_directories(src/profiles/v80)
             set(PROFILE "v80")
             set(PROFILE_FAL_PATH "src/profiles/v80/profile_fal.c")
@@ -126,6 +135,7 @@ else()
             set(PROFILE "v80")
             set(PROFILE_FAL_PATH "src/profiles/v80/profile_fal.c")
             set(PROFILE_DEBUG_MENU_PATH "src/profiles/v80/profile_debug_menu.c")
+            set(EEPROM_PATH "src/device_drivers/eeprom/aved/eeprom.c")
             add_definitions(-DOOB_ENABLED)
         endif()
     endif()
@@ -151,8 +161,12 @@ else()
     find_library(XIL_LIB NAMES xil PATHS amc_bsp/psv_cortexr5_0/freertos10_xilinx_domain/bsp/psv_cortexr5_0/lib)
     find_library(XIL_FPGA NAMES xilfpga PATHS amc_bsp/psv_cortexr5_0/freertos10_xilinx_domain/bsp/psv_cortexr5_0/lib)
     find_library(XIL_MAILBOX NAMES xilmailbox PATHS amc_bsp/psv_cortexr5_0/freertos10_xilinx_domain/bsp/psv_cortexr5_0/lib)
+    if((PROFILE MATCHES "^(rave)$"))
+    find_library(XIL_XLOADER NAMES xilloader PATHS amc_bsp/psv_cortexr5_0/freertos10_xilinx_domain/bsp/psv_cortexr5_0/lib)
+    endif()
 
     #Include directories
+    include_directories(amc_bsp/include)
     include_directories(amc_bsp/psv_cortexr5_0/freertos10_xilinx_domain/bsp/psv_cortexr5_0/include)
     include_directories(amc_bsp/psv_cortexr5_0/freertos10_xilinx_domain/bsp/psv_cortexr5_0/lib)
     include_directories(src/common/include)
@@ -193,6 +207,8 @@ else()
         if((PROFILE MATCHES "^(v80)$") OR (PROFILE MATCHES "^(v70)$"))
             include_directories(src/device_drivers/ospi/debug)
             include_directories(src/device_drivers/emmc/debug)
+        elseif((PROFILE MATCHES "^(rave)$"))
+            include_directories(src/device_drivers/ospi/debug)
         endif()
         include_directories(src/osal/debug)
         include_directories(src/common/core_libs/pll/debug)
@@ -276,11 +292,13 @@ else()
     if(CMAKE_BUILD_TYPE MATCHES "^(Debug)$")
         if((PROFILE MATCHES "^(v80)$") OR (PROFILE MATCHES "^(v70)$"))
             target_sources(${NAME}
-                PRIVATE src/device_drivers/ospi/debug/ospi_debug.c
                 PRIVATE src/device_drivers/emmc/debug/emmc_debug.c
+                PRIVATE src/fal/emmc/debug/fw_if_emmc_debug.c
+                PRIVATE src/fal/smbus/debug/fw_if_smbus_debug.c
             )
         endif()
         target_sources(${NAME}
+                PRIVATE src/device_drivers/ospi/debug/ospi_debug.c
                 PRIVATE src/osal/debug/osal_debug.c
                 PRIVATE src/common/core_libs/pll/debug/pll_debug.c
                 PRIVATE src/common/core_libs/dal/debug/dal_debug.c
@@ -294,8 +312,6 @@ else()
                 PRIVATE src/fal/gcq/debug/fw_if_gcq_debug.c
                 PRIVATE src/fal/ospi/debug/fw_if_ospi_debug.c
                 PRIVATE ${FW_IF_MUXED_DEVICE_DEBUG_PATH}
-                PRIVATE src/fal/emmc/debug/fw_if_emmc_debug.c
-                PRIVATE src/fal/smbus/debug/fw_if_smbus_debug.c
                 PRIVATE src/proxy_drivers/ami/debug/ami_proxy_driver_debug.c
                 PRIVATE src/proxy_drivers/apc/debug/apc_proxy_driver_debug.c
                 PRIVATE src/proxy_drivers/axc/debug/axc_proxy_driver_debug.c
@@ -309,7 +325,11 @@ else()
 
     #linking libraries with executable
     if(OS MATCHES "^(FreeRTOS)$")
-        target_link_libraries(amc.elf "-Wl,-T -Wl,../src/lscript.ld" -Wl,--start-group,${XIL_LIB},${FREERTOS_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_FPGA},${XIL_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_MAILBOX},${XIL_LIB},-lgcc,-lc,--end-group)
+        if((PROFILE MATCHES "^(rave)$"))
+            target_link_libraries(amc.elf "-Wl,-T -Wl,../src/lscript.ld" -Wl,--start-group,${XIL_LIB},${FREERTOS_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_FPGA},${XIL_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_MAILBOX},${XIL_LIB},${XIL_XLOADER},-lgcc,-lc,--end-group)
+        else()
+            target_link_libraries(amc.elf "-Wl,-T -Wl,../src/lscript.ld" -Wl,--start-group,${XIL_LIB},${FREERTOS_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_FPGA},${XIL_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_MAILBOX},${XIL_LIB},-lgcc,-lc,--end-group)
+        endif()
         target_compile_definitions(amc.elf PRIVATE $<$<CONFIG:Debug>:DEBUG_PRINT> GCQ_MAX_INSTANCES=1)
     endif()
 

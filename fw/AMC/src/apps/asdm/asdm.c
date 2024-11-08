@@ -157,7 +157,11 @@
  */
 static inline int iSensorIsEnabled( void )
 {
+#ifdef PROFILE_RAVE
+	return FALSE;
+#else
     return TRUE;
+#endif
 }
 
 ASC_PROXY_DRIVER_SENSOR_DATA xTotalPowerData[ TOTAL_POWER_NUM_RECORDS ] =
@@ -1830,11 +1834,18 @@ static int iInitAsdm( uint8_t ucNumSensors )
                                     /* Populate SDR */
                                     if( AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER == iRepoIndex )
                                     {
-                                        iStatus = iPopulateSdr( i,
-                                                                ucRepoType,
-                                                                &xTotalPowerData[ i ],
-                                                                pxSdr,
-                                                                &usByteCount );
+                                        if (TRUE == xTotalPowerData[ i ].pxSensorEnabled())
+                                        {
+                                            iStatus = iPopulateSdr( i,
+                                                                    ucRepoType,
+                                                                    &xTotalPowerData[ i ],
+                                                                    pxSdr,
+                                                                    &usByteCount );
+                                        }
+                                        else
+                                        {
+                                            iStatus = OK;
+                                        }
                                     }
                                     else
                                     {
@@ -1848,11 +1859,18 @@ static int iInitAsdm( uint8_t ucNumSensors )
                                     /* Populate SDS */
                                     if( AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER == iRepoIndex )
                                     {
-                                        iStatus = iPopulateSds( i,
-                                                                ucRepoType,
-                                                                &xTotalPowerData[ i ],
-                                                                pxSds,
-                                                                &usByteCount );
+                                        if (TRUE == xTotalPowerData[ i ].pxSensorEnabled())
+                                        {
+                                            iStatus = iPopulateSds( i,
+                                                                    ucRepoType,
+                                                                    &xTotalPowerData[ i ],
+                                                                    pxSds,
+                                                                    &usByteCount );
+                                        }
+                                        else
+                                        {
+                                            iStatus = OK;
+                                        }
                                     }
                                     else
                                     {

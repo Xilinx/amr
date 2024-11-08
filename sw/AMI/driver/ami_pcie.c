@@ -2,7 +2,7 @@
 /*
  * ami_pcie.c - This file contains PCI reading/writing logic.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/device.h>
@@ -20,6 +20,7 @@ static enum AMI_PCIE_DEVICE_ID SUPPORTED_PCIE_DEVICE_ID[] = {
 	AMI_PCIE_DEVICE_ID_VCK5000_PF0,
 	AMI_PCIE_DEVICE_ID_V80,
 	AMI_PCIE_DEVICE_ID_V80P,
+	AMI_PCIE_DEVICE_ID_RAVE,
 };
 
 

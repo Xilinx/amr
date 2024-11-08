@@ -2,7 +2,7 @@
 /*
  * ami_pci_dbg.c - This file contains PCI debug/printing code.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include "ami_pci_dbg.h"
@@ -62,6 +62,9 @@ char *pcie_device_id_to_str(uint16_t id)
 	case AMI_PCIE_DEVICE_ID_V80P:
 		return "ALVEO V80P";
 	
+	case AMI_PCIE_DEVICE_ID_RAVE:
+		return "Rave";
+
 	default:
 		break;
 	}

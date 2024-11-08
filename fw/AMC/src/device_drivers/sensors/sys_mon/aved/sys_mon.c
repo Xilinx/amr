@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function implementations for the System Monnitor
@@ -246,6 +246,44 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
 
             switch( xVoltageType )
             {
+#ifdef PROFILE_RAVE
+            case SYS_MON_VOLTAGES_VCCAUX:
+                iMappedVType = VCCAUX;
+                break;
+            case SYS_MON_VOLTAGES_VCCSOC:
+                iMappedVType = VCCSOC;
+                break;
+            case SYS_MON_VOLTAGES_VCCO302:
+                iMappedVType = VCCO302;
+                break;
+            case SYS_MON_VOLTAGES_VCCAUXPMC:
+                iMappedVType = VCCAUXPMC;
+                break;
+            case SYS_MON_VOLTAGES_VCCO500:
+                iMappedVType = VCCO500;
+                break;
+            case SYS_MON_VOLTAGES_VCCPMC:
+                iMappedVType = VCCPMC;
+                break;
+            case SYS_MON_VOLTAGES_VCCPSFP:
+                iMappedVType = VCCPSFP;
+                break;
+            case SYS_MON_VOLTAGES_VCCPSLP:
+                iMappedVType = VCCPSLP;
+                break;
+            case SYS_MON_VOLTAGES_VPVN:
+                iMappedVType = VPVN;
+                break;
+            case SYS_MON_VOLTAGES_VCCO703:
+                iMappedVType = VCCO703;
+                break;
+            case SYS_MON_VOLTAGES_VAUXCH0:
+                iMappedVType = VAUXCH0;
+                break;
+            case SYS_MON_VOLTAGES_VCCAUXSMON:
+                iMappedVType = VCCAUXPMC;
+                break;
+#else
             case SYS_MON_VOLTAGES_VCCAUX:
                 iMappedVType = VCCAUX;
                 break;
@@ -255,6 +293,7 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
             case SYS_MON_VOLTAGES_VCCAUXPMC:
                 iMappedVType = VCCAUXPMC;
                 break;
+#endif
             default:
                 iMappedVType = SYS_MON_DEFAULT_V_TYPE;
                 break;

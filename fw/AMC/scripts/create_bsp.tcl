@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 # set workspace to current directory
@@ -13,11 +13,11 @@ puts "config os ==> $os"
 
 platform create -name "amc_bsp" -hw $xsa -proc "cips_pspmc_0_psv_cortexr5_0" -os $os 
 
-bsp config stdin cips_pspmc_0_psv_sbsauart_0
-bsp config stdout cips_pspmc_0_psv_sbsauart_0
+#bsp config stdin cips_pspmc_0_psv_sbsauart_0
+#bsp config stdout cips_pspmc_0_psv_sbsauart_0
 
-bsp setlib xilfpga
-bsp setlib xilmailbox
+bsp setlib -name xilfpga
+bsp setlib -name xilmailbox
 bsp getlibs
 
 platform generate 

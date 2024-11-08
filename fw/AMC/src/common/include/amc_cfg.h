@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the event definitions and the initialisation status
@@ -55,10 +55,13 @@
 
 #define AMC_CFG_AXC_PREREQUISITES ( ( uint64_t )( AMC_CFG_I2C_INITIALISED | \
                                                   AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ) )
-
+#if PROFILE_RAVE
+#define AMC_CFG_ASC_PREREQUISITES ( ( uint64_t )( AMC_CFG_I2C_INITIALISED ) )
+#else
 #define AMC_CFG_ASC_PREREQUISITES ( ( uint64_t )( AMC_CFG_I2C_INITIALISED |              \
                                                   AMC_CFG_MUXED_DEVICE_FAL_INITIALISED | \
                                                   AMC_CFG_AXC_INITIALISED ) )
+#endif
 
 #define AMC_CFG_AMI_PREREQUISITES ( ( uint64_t )( AMC_CFG_GCQ_FAL_INITIALISED ) )
 
