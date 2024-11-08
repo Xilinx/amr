@@ -18,7 +18,9 @@ platform create -name "amc_bsp" -hw $xsa -proc "cips_pspmc_0_psv_cortexr5_0" -os
 
 bsp setlib -name xilfpga
 bsp setlib -name xilmailbox
+bsp setlib -name xilloader
 bsp getlibs
+hsi set_property CONFIG.xloader_mode "client" [hsi::get_libs xilloader]
 
 platform generate 
 
