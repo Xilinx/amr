@@ -20,19 +20,30 @@
 # DEALINGS IN THE SOFTWARE.
 ############################################################
 set -Eeuo pipefail
+# Build
+# ./build_all.sh <Design name (xsa name without ext)> <product>
 
 # Init
-DESIGN?="ve2302_pcie_qdma_base"
-PRODUCT?="rave"
-HW_DIR=$(realpath ./)
-FW_DIR=$(realpath ./../../fw/AMC)
+DESIGN=${1:-"ve2302_pcie_qdma_base"}
+PRODUCT=${2:-"rave"}
+HW_DIR=$(realpath ./hw/amd_rave_gen3x4_24.2)
+FW_DIR=$(realpath ./fw/AMC)
+SW_DIR=$(realpath ./sw/AMI)
 XSA=${XSA:-$(realpath ${HW_DIR})/build/${DESIGN}.xsa}
 
+mkdir -p ${HW_DIR}/build
+
+if [ "$PRODUCT" == "v80" ]; then
+
 # Step HW
-#pushd ${HW_DIR}
-#  mkdir -p ./build
-#  vivado -source src/create_design.tcl -source src/build_design.tcl -mode batch -nojournal -log ./build/vivado.log
-#popd
+if [ "$PRODUCT" != "rave" ]; then
+    echo "${DESIGN}"
+    echo "${PRODUCT}"
+    pushd ${HW_DIR}
+        mkdir -p ./build
+        vivado -source src/create_design.tcl -source src/build_design.tcl -mode batch -nojournal -log ./build/vivado.log
+    popd
+fi
 
 # Step FW
 pushd ${FW_DIR}
@@ -51,8 +62,15 @@ popd
 # Step PDI combine
 # Generate PDI w/ bootgen
 pushd ${HW_DIR}
-  bootgen -arch versal -image ${HW_DIR}/fpt/pdi_combine_${PRODUCT}.bif -w -o ${HW_DIR}/build/${DESIGN}_nofpt.pdi
-popd
-
+  bootgen -arch versal -image ./fpt/pdi_combine_${PRODUCT}.bif -w -o ./build/OSPI_RAVE_nofpt.bin
 # final pdi generation
-${HW_DIR}/fpt/fpt_pdi_gen.py --fpt ${HW_DIR}/build/fpt.bin --pdi ${HW_DIR}/build/${DESIGN}_nofpt.pdi --output ${DESIGN}.pdi
+./fpt/fpt_pdi_gen.py --fpt ./build/fpt.bin --pdi ./build/OSPI_RAVE_nofpt.bin --output ./build/OSPI_RAVE_fpt.bin
+popd
+fi
+
+# Generate AMI
+pushd ${SW_DIR}
+echo "${SW_DIR}"
+  ./scripts/build.sh
+  ./scripts/gen_package.py -g -n -f
+popd

@@ -78,7 +78,7 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define NODE_ID				(0x18700000) /** PL Node ID to configure */
+#define PL_NODE_ID			(0x18700000) /** PL Node ID to configure */
 #define AMC_OUTPUT_LEVEL	( PLL_OUTPUT_LEVEL_WARNING )
 #define AMC_LOGGING_LEVEL	( PLL_OUTPUT_LEVEL_LOGGING )
 
@@ -986,7 +986,7 @@ static int iPlmGetUid(uint32_t* uuid)
         iStatus = XLoader_ClientInit(&LoaderClientInstance, &MailboxInstance);
         if (XST_SUCCESS == iStatus)
         {
-            iStatus = XLoader_GetImageInfo(&LoaderClientInstance, NODE_ID, &ImageInfo);
+            iStatus = XLoader_GetImageInfo(&LoaderClientInstance, PL_NODE_ID, &ImageInfo);
             if (XST_SUCCESS == iStatus)
             {
                 *uuid = ImageInfo.UID;
