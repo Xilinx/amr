@@ -80,9 +80,11 @@ static const char help_msg[] = \
 	"\tpcieinfo           View PCI-related information\r\n"
 	"\treload             Reload a device/devices\r\n"
 	"\teeprom_rd          Read data from the device EEPROM\r\n"
+#ifndef RAVE
 	"\teeprom_wr          Write data to the device EEPROM\r\n"
 	"\tmodule_byte_rd     Read data from a QSFP module\r\n"
 	"\tmodule_byte_wr     Write data to a QSFP module\r\n"
+#endif
 	"\tdebug_verbosity    Set the AMC debug level\r\n"
 ;
 
@@ -146,10 +148,14 @@ static const struct app_cmd_map commands[] = {
 	{ "device_boot",     &cmd_device_boot     },
 	{ "mfg_info",        &cmd_mfg_info        },
 	{ "eeprom_rd",       &cmd_eeprom_rd       },
+#ifndef RAVE
 	{ "eeprom_wr",       &cmd_eeprom_wr       },
+#endif
 	{ "cfgmem_fpt",      &cmd_cfgmem_fpt      },
+#ifndef RAVE
 	{ "module_byte_rd",  &cmd_module_byte_rd  },
 	{ "module_byte_wr",  &cmd_module_byte_wr  },
+#endif
 	{ "debug_verbosity", &cmd_debug_verbosity },
 };
 

@@ -33,8 +33,6 @@ XSA=${XSA:-$(realpath ${HW_DIR})/build/${DESIGN}.xsa}
 
 mkdir -p ${HW_DIR}/build
 
-if [ "$PRODUCT" == "v80" ]; then
-
 # Step HW
 if [ "$PRODUCT" != "rave" ]; then
     echo "${DESIGN}"
@@ -62,15 +60,14 @@ popd
 # Step PDI combine
 # Generate PDI w/ bootgen
 pushd ${HW_DIR}
-  bootgen -arch versal -image ./fpt/pdi_combine_${PRODUCT}.bif -w -o ./build/OSPI_RAVE_nofpt.bin
+  bootgen -arch versal -image ./fpt/pdi_combine_${PRODUCT}.bif -w -o ./build/OSPI_RAVE.bin
 # final pdi generation
-./fpt/fpt_pdi_gen.py --fpt ./build/fpt.bin --pdi ./build/OSPI_RAVE_nofpt.bin --output ./build/OSPI_RAVE_fpt.bin
+./fpt/fpt_pdi_gen.py --fpt ./build/fpt.bin --pdi ./build/OSPI_RAVE.bin --output ./build/OSPI_RAVE_fpt.bin
 popd
-fi
 
 # Generate AMI
 pushd ${SW_DIR}
 echo "${SW_DIR}"
-  ./scripts/build.sh
-  ./scripts/gen_package.py -g -n -f
+  ./scripts/build.sh -profile rave
+  ./scripts/gen_package_amr.py -g -n -f
 popd

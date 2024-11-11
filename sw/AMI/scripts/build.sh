@@ -14,6 +14,7 @@ DRIVER_ONLY=0
 APP_ONLY=0
 NO_VER=0
 NO_WORKSPACE=0
+PROFILE=""
 
 # Output files
 DRIVER_BIN="ami.ko"
@@ -57,6 +58,7 @@ function print_help() {
     echo "-app          : only builds the AMI API and ami_tool binary (driver untouched)"
     echo "-no_ver       : Don't execute the getVersion.sh script (useful for development)"
     echo "-no_workspace : Skip the workspace setup (the workspace setup is only needed during active development)"
+    echo "-profile      : Rave"
     echo
     echo "If no options are specified, the default behaviour is to clean and build everything"
     echo
@@ -87,7 +89,11 @@ function build_app() {
     echo "=== Executing application build process ==="
     SECTION_START=$SECONDS
     cd $API_DIR && make
-    cd $APP_DIR && make
+    if [ -z "${PROFILE}" ]; then
+        cd $APP_DIR && make
+    else
+        cd $APP_DIR && make PROFILE=${PROFILE}
+    fi
     cd ..
     # Check if the build succeeded
     if [[ (! -f "$API_DIR/build/$API_BIN") || (! -f "$APP_DIR/build/$APP_BIN") ]]; then
@@ -162,6 +168,11 @@ while [ $# -gt 0 ]; do
         ;;
     -no_workspace)
         NO_WORKSPACE=1
+        ;;
+    -profile)
+        # Build profile
+        PROFILE="$2"
+        shift
         ;;
     esac
     shift ### shift to next passed option ###

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
 
+PROFILE :=
 TARGET := ami_tool
 BUILD_DIR := ./build
 SRC_DIRS := ./
@@ -21,6 +22,9 @@ AMI_LIB_DIR := ../api/build
 AMI_LIB := ami
 
 CFLAGS := $(INC_FLAGS) -Wall -Werror
+ifneq ($(PROFILE), )
+	CFLAGS := $(CFLAGS) -D`echo $(PROFILE) | tr a-z A-Z`
+endif
 LDFLAGS := -L$(AMI_LIB_DIR) -l$(AMI_LIB) -lm -lpthread
 
 #
