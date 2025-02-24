@@ -2,7 +2,7 @@
 /*
  * ami_module.c - This file contains functions to read/write QSFP modules
  * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/types.h>

@@ -2,7 +2,7 @@
 /*
  * meta.c - This file contains utilities for printing AMI info/metadata
  * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/

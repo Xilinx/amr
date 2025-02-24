@@ -2,7 +2,7 @@
 /*
  * ami_pcie.h - This file contains PCI reading/writing definitions.
  *
- * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_PCIE_H
@@ -60,7 +60,7 @@ enum AMI_PCIE_DEVICE_ID {
 #define CAP_NOT_FOUND 0
 
 #define PCI_GPIO_RESET_OFFSET               (0x1040000)
-#define PCI_GPIO_RESET_BAR                  (0)
+#define PCI_GPIO_RESET_BAR                  (4)
 
 /* Command Register Offsets */
 #define  PCI_COMMAND_IO_OFFSET              0x0
@@ -750,20 +750,20 @@ typedef struct {
 
 typedef struct {
 	pcie_ext_header_struct	aer_header;
-	uint32_t		aer_uncorrectable_err_status_reg;
-	uint32_t		aer_uncorrectable_err_mask_reg;
-	uint32_t		aer_uncorrectable_err_sev_reg;
-	uint32_t		aer_correctable_err_status_reg;
-	uint32_t		aer_correctable_err_mask_reg;
-	uint32_t		aer_advanced_err_cap_cntrl_reg;
-	uint32_t		aer_header_log_reg[4];
-	uint32_t		aer_root_err_cmd_reg;
-	uint32_t		aer_root_err_status_reg;
-	uint32_t		aer_err_source_id_reg;
-	uint32_t		aer_first_tlp_prefix_log_reg;
-	uint32_t		aer_second_tlp_prefix_log_reg;
-	uint32_t		aer_third_tlp_prefix_log_reg;
-	uint32_t		aer_fourth_tlp_prefix_log_reg;
+	uint32_t	aer_uncorrectable_err_status_reg;
+	uint32_t	aer_uncorrectable_err_mask_reg;
+	uint32_t	aer_uncorrectable_err_sev_reg;
+	uint32_t	aer_correctable_err_status_reg;
+	uint32_t	aer_correctable_err_mask_reg;
+	uint32_t	aer_advanced_err_cap_cntrl_reg;
+	uint32_t	aer_header_log_reg[4];
+	uint32_t	aer_root_err_cmd_reg;
+	uint32_t	aer_root_err_status_reg;
+	uint32_t	aer_err_source_id_reg;
+	uint32_t	aer_first_tlp_prefix_log_reg;
+	uint32_t	aer_second_tlp_prefix_log_reg;
+	uint32_t	aer_third_tlp_prefix_log_reg;
+	uint32_t	aer_fourth_tlp_prefix_log_reg;
 } pcie_ext_cap_aer_struct;
 
 typedef struct {
@@ -785,12 +785,12 @@ typedef struct {
 
 typedef struct {
 	pcie_ext_header_struct	phy_16_gts_header;
-	uint32_t		phy_16_gts_cap_reg;
-	uint32_t		phy_16_gts_cntrl_reg;
-	uint32_t		phy_16_gts_status_reg;
-	uint32_t		phy_16_gts_local_parity_mismatch_status_reg;
-	uint32_t		phy_16_gts_first_data_parity_mismatch_status_reg;
-	uint32_t		phy_16_gts_second_data_parity_mismatch_status_reg;
+	uint32_t	phy_16_gts_cap_reg;
+	uint32_t	phy_16_gts_cntrl_reg;
+	uint32_t	phy_16_gts_status_reg;
+	uint32_t	phy_16_gts_local_parity_mismatch_status_reg;
+	uint32_t	phy_16_gts_first_data_parity_mismatch_status_reg;
+	uint32_t	phy_16_gts_second_data_parity_mismatch_status_reg;
 } pcie_ext_cap_phy_16_gts_struct;
 
 typedef struct {
@@ -959,10 +959,10 @@ int write_pcie_bar(struct pci_dev *dev, uint8_t bar_idx, uint64_t offset, uint32
 								      PCIE_CAP_MSI_MSG_CTRL_CONFIG_EN_MASK)
 #define get_pcie_cap_msi_msg_ctrl_mul_msg_cap(msi_config_status)     ((msi_config_status >> \
 								       PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_CAP_OFFSET)& \
-								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_CAP_MASK)                                                                    /* Max interrupt vectors the function is capable of supporting */
+								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_CAP_MASK)    /* Max interrupt vectors the function is capable of supporting */
 #define get_pcie_cap_msi_msg_ctrl_mul_msg_en(msi_config_status)      ((msi_config_status >> \
 								       PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_EN_OFFSET)& \
-								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_EN_MASK)                                                                    /* Num of Interrupt vectors the function is supporting */
+								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_EN_MASK)     /* Num of Interrupt vectors the function is supporting */
 #define get_pcie_cap_msi_msg_ctrl_64_bit_addr(msi_config_status)     ((msi_config_status >> \
 								       PCIE_CAP_MSI_MSG_CTRL_64_BIT_ADDR_OFFSET)& \
 								      PCIE_CAP_MSI_MSG_CTRL_64_BIT_ADDR_MASK)

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -27,22 +27,22 @@
 /******************************************************************************/
 
 #ifndef GCQ_MAX_INSTANCES
-#define GCQ_MAX_INSTANCES                       ( 4 )   /**< Default value, but can be overridden by build environmental variable  */
+#define GCQ_MAX_INSTANCES	( 4 )   /**< Default value, but can be overridden by build environmental variable  */
 #endif
 
 #ifdef __KERNEL__
-#define gcq_assert( x )                                                              \
-do {    if ( x ) break;                                                              \
-        printk(KERN_EMERG "### ASSERTION FAILED [GCQ Driver] %s: %s: %d: %s\n",      \
-               __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();               \
+#define gcq_assert( x )                                                         \
+do {    if ( x ) break;                                                         \
+        printk(KERN_EMERG "### ASSERTION FAILED [GCQ Driver] %s: %s: %d: %s\n", \
+               __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();          \
 } while ( 0 )
 
 #else
 #include <assert.h>
-#define gcq_assert( x ) assert( x )
+#define gcq_assert( x )	assert( x )
     
-#define likely( x )                             __builtin_expect( !!( x ), 1 )
-#define unlikely( x )                           __builtin_expect( !!( x ), 0 )
+#define likely( x )	__builtin_expect( !!( x ), 1 )
+#define unlikely( x )	__builtin_expect( !!( x ), 0 )
 #endif
 
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the ASDM (Alveo Data Store Model) implementation details
@@ -158,7 +158,7 @@
 static inline int iSensorIsEnabled( void )
 {
 #ifdef PROFILE_RAVE
-	return FALSE;
+    return FALSE;
 #else
     return TRUE;
 #endif

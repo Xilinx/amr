@@ -50,9 +50,11 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                 /*
                  * In consumer mode we don't perform a soft reset and the HW is owned by the producer
                  */
-                ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW, GCQ_HW_LOWER_32( ullRingAddr ) );
+                //ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW, GCQ_HW_LOWER_32( ullRingAddr ) );
+                ulValue = GCQ_HW_LOWER_32( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW ), ulValue );
-                ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
+                //ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
+                ulValue = GCQ_HW_UPPER_32 ( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH ), ulValue );
                 break;
 
@@ -61,12 +63,14 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                  * Performs a soft reset of all submission queue and completion queue registers.
                  * The reset field is self-clearing once set.
                  */
-                ulValue = pxGCQIOAccess->xGCQReadReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ) );
-                ulValue |= FIELD_SET( GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL_ENABLE_MASK, GCQ_INTERRUPT_CTRL_RESET );
-                pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ), ulValue );
-                ulValue = FIELD_SET( GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_LOW, GCQ_HW_LOWER_32 ( ullRingAddr ) );
+                //ulValue = pxGCQIOAccess->xGCQReadReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ) );
+                //ulValue |= FIELD_SET( GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL_ENABLE_MASK, GCQ_INTERRUPT_CTRL_RESET );
+                //pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ), ulValue );
+                //ulValue = FIELD_SET( GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_LOW, GCQ_HW_LOWER_32 ( ullRingAddr ) );
+                ulValue = GCQ_HW_LOWER_32 ( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_LOW ), ulValue );
-                ulValue = FIELD_SET( GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
+                //ulValue = FIELD_SET( GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
+                ulValue = GCQ_HW_UPPER_32 ( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_HIGH ), ulValue );
                 break;
 

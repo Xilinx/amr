@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains API definitions for HW accesses to GCQ IP.
@@ -37,7 +37,7 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
 
     {
         GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
-        uint32_t ulValue = 0;
+//        uint32_t ulValue = 0;
 
         /*
          * The high/low memory address are meant to be used to store the base address of
@@ -50,10 +50,12 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                 /*
                  * In consumer mode we don't perform a soft reset and the HW is owned by the producer
                  */
+#if 0
                 ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW, GCQ_HW_LOWER_32( ullRingAddr ) );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW ), ulValue );
                 ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH ), ulValue );
+#endif
                 break;
 
             case GCQ_MODE_TYPE_PRODUCER_MODE:
@@ -61,6 +63,7 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                  * Performs a soft reset of all submission queue and completion queue registers.
                  * The reset field is self-clearing once set.
                  */
+#if 0
                 ulValue = pxGCQIOAccess->xGCQReadReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ) );
                 ulValue |= FIELD_SET( GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL_ENABLE_MASK, GCQ_INTERRUPT_CTRL_RESET );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ), ulValue );
@@ -68,6 +71,7 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_LOW ), ulValue );
                 ulValue = FIELD_SET( GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_HIGH ), ulValue );
+#endif
                 break;
 
             default:

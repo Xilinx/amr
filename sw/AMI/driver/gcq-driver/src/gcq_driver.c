@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the GCQ driver.
@@ -439,8 +439,8 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                 ( *ppxGCQInstance )->pxGCQProducer = &( *ppxGCQInstance )->xGCQCq;
                 ( *ppxGCQInstance )->pxGCQConsumer = &( *ppxGCQInstance )->xGCQSq;
                 /* Set the producer address based on producer AXI register map */
-                ullCQProduced = ( ullBaseAddr + GCQ_PRODUCER_SQ_TAIL_POINTER );
-                ullSQProduced = ( ullBaseAddr + GCQ_PRODUCER_CQ_TAIL_POINTER );
+                ullSQProduced = ( ullBaseAddr + GCQ_PRODUCER_SQ_TAIL_POINTER );
+                ullCQProduced = ( ullBaseAddr + GCQ_PRODUCER_CQ_TAIL_POINTER );
             }
             else
             {
@@ -450,8 +450,8 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                 ( *ppxGCQInstance )->pxGCQProducer = &( *ppxGCQInstance )->xGCQSq;
                 ( *ppxGCQInstance )->pxGCQConsumer = &( *ppxGCQInstance )->xGCQCq;
                 /* Set the producer address based on consumer AXI register map */
-                ullCQProduced = ( ullBaseAddr + GCQ_CONSUMER_SQ_TAIL_POINTER );
-                ullSQProduced = ( ullBaseAddr + GCQ_CONSUMER_CQ_TAIL_POINTER );
+                ullSQProduced = ( ullBaseAddr + GCQ_CONSUMER_SQ_TAIL_POINTER );
+                ullCQProduced = ( ullBaseAddr + GCQ_CONSUMER_CQ_TAIL_POINTER );
             }
 
             /* Check if memory pointers are being used and override */
@@ -689,7 +689,7 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            int offset;
+            uint32_t offset;
             GCQ_DEBUG( "Read data from slot addr:0x%llx len:%ld\r\n", ullSlotAddr, ulDataLen );
 
             /* Process the data & populate the return buffer */
@@ -762,7 +762,7 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            int offset = 0;
+            uint32_t offset;
             GCQ_DEBUG( "Write data to slot addr:0x%llx len:%ld\r\n", ullSlotAddr, ulDataLen );
 
             for( offset = 0; offset < ulDataLen; offset += 4 )

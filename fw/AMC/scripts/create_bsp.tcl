@@ -11,7 +11,7 @@ puts "config xsa ==> $xsa"
 set os [lindex $argv 1]
 puts "config os ==> $os"
 
-platform create -name "amc_bsp" -hw $xsa -proc "cips_pspmc_0_psv_cortexr5_0" -os $os 
+platform create -name "amc_bsp" -hw $xsa -proc "cortexr5_0" -os $os 
 
 #bsp config stdin cips_pspmc_0_psv_sbsauart_0
 #bsp config stdout cips_pspmc_0_psv_sbsauart_0

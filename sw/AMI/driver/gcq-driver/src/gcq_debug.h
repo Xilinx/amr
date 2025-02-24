@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains definitions for the internal ring buffer implementation.
@@ -22,16 +22,16 @@
 #endif
 
 #ifndef GCQ_DEBUG_ENABLE
-#define GCQ_DEBUG_ENABLE                        ( 0 )   /**< Debug logging disabled by default */
+#define GCQ_DEBUG_ENABLE        ( 0 )   /**< Debug logging disabled by default */
 #endif
 #if GCQ_DEBUG_ENABLE
 #ifdef __KERNEL__
-#define GCQ_DEBUG( x... )                       {  printk( "[GCQ Driver] " x ); }
+#define GCQ_DEBUG( x... )       {  printk( "[GCQ Driver] " x ); }
 #else
-#define GCQ_DEBUG( x... )                       {  vOSAL_Printf( "[GCQ Driver] " x ); }
+#define GCQ_DEBUG( x... )       {  vOSAL_Printf( "[GCQ Driver] " x ); }
 #endif
 #else
-#define GCQ_DEBUG( x... )                       ( void ) ( 0 )
+#define GCQ_DEBUG( x... )       ( void ) ( 0 )
 #endif
 
 #endif /* _GCQ_DEBUG_H_ */

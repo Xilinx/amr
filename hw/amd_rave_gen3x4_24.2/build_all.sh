@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (c) Copyright 2024, Advanced Micro Devices, Inc.
+# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -31,11 +31,7 @@ FW_DIR=$(realpath ./../../fw/AMC)
 XSA=${XSA:-$(realpath ${HW_DIR})/${DESIGN}.xsa}
 
 # Step HW
-
 if [ "$PRODUCT" != "rave" ]; then
-    echo "${DESIGN}"
-    echo "${PRODUCT}"
-#    exit 0
     pushd ${HW_DIR}
         mkdir -p ./build
         vivado -source src/create_design.tcl -source src/build_design.tcl -mode batch -nojournal -log ./build/vivado.log

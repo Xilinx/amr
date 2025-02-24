@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF GCQ abstraction for AMC.
@@ -219,7 +219,6 @@ static inline uint32_t prvulReadMemReg32( uint64_t ullSrcAddr )
  * @param   error is the return code returned by the gcq driver
  *
  * @return  the mapped interface return code
- * 
  *
  */
 static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
@@ -256,7 +255,6 @@ static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
  * @param   xInterruptMode is the interface interrupt mode
  *
  * @return  the mapped gcq driver interrupt mode
- * 
  *
  */
 static GCQ_INTERRUPT_MODE_TYPE prvxMapInterruptMode( FW_IF_GCQ_INTERRUPT_MODE_TYPE xInterruptMode )

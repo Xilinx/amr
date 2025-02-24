@@ -133,6 +133,30 @@ static inline uint32_t prvulGetTrailingZeros( uint64_t ullValue )
 /**
  * Consumer  AXI Register Space
  */
+#if 1 //def RAVE
+#define GCQ_CONSUMER_CQ_TAIL_POINTER                             ( 0x0100 )
+#define GCQ_CONSUMER_CQ_TAIL_POINTER_MASK                        BITS( 31, 0 )       /* RW */
+
+#define GCQ_CONSUMER_CQ_INTERRUPT_REG                            ( 0x0004 )
+#define GCQ_CONSUMER_CQ_INTERRUPT_REG_INT_REG_MASK               BIT( 0 )            /* WO */
+#define GCQ_CONSUMER_CQ_INTERRUPT_REG_INT_STATUS_MASK            BIT( 1 )            /* RO */
+
+#define GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW                       ( 0x0108 )
+#define GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW_MASK                  BITS( 31, 0 )       /* RW */
+
+#define GCQ_CONSUMER_CQ_RESET_INTERRUPT_CTRL                     ( 0x000C )
+#define GCQ_CONSUMER_CQ_RESET_INTERRUPT_CTRL_ENABLE_MASK         BIT( 0 )            /* RW */
+#define GCQ_CONSUMER_CQ_RESET_INTERRUPT_CTRL_TYPE_MASK           BIT( 1 )            /* RW */
+#define GCQ_CONSUMER_CQ_RESET_INTERRUPT_CTRL_RESET_MASK          BIT( 31 )           /* WO */
+
+#define GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH                      ( 0x0110 )
+#define GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH_MASK                 BITS( 31, 0 )       /* RW */
+
+#define GCQ_CONSUMER_SQ_TAIL_POINTER                             ( 0x0000 )
+#define GCQ_CONSUMER_SQ_TAIL_POINTER_MASK                        BITS( 31, 0 )       /* RO */
+
+#else
+
 #define GCQ_CONSUMER_CQ_TAIL_POINTER                             ( 0x0000 )
 #define GCQ_CONSUMER_CQ_TAIL_POINTER_MASK                        BITS( 31, 0 )       /* RW */
 
@@ -153,6 +177,7 @@ static inline uint32_t prvulGetTrailingZeros( uint64_t ullValue )
 
 #define GCQ_CONSUMER_SQ_TAIL_POINTER                             ( 0x0100 )
 #define GCQ_CONSUMER_SQ_TAIL_POINTER_MASK                        BITS( 31, 0 )       /* RO */
+#endif
 
 #define GCQ_CONSUMER_SQ_INTERRUPT_REG                            ( 0x0104 )
 #define GCQ_CONSUMER_SQ_INTERRUPT_REG_INT_STATUS_MASK            BIT( 0 )            /* RO */

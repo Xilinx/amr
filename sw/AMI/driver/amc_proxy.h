@@ -2,7 +2,7 @@
 /*
  * amc_proxy.h - The AMC proxy layer used to abstract away the transport.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef _AMC_PROXY_H_
@@ -19,8 +19,8 @@
 /*****************************************************************************/
 /* Defines                                                                  */
 /*****************************************************************************/
-#define AMC_PROXY_REQUEST_SIZE	        (512)
-#define AMC_PROXY_RESPONSE_SIZE	        (16)
+#define AMC_PROXY_REQUEST_SIZE		(512)
+#define AMC_PROXY_RESPONSE_SIZE		(16)
 
 
 /*****************************************************************************/
@@ -48,10 +48,10 @@ typedef int (amc_proxy_event_callback)(uint8_t proxy_id, uint8_t event_id, void*
  * @AMC_PROXY_EVENT_RESPONSE_TIMEOUT: timeout event
  */
 enum amc_proxy_event {
-        AMC_PROXY_EVENT_RESPONSE_COMPLETE = 0,
-        AMC_PROXY_EVENT_RESPONSE_TIMEOUT,
+	AMC_PROXY_EVENT_RESPONSE_COMPLETE = 0,
+	AMC_PROXY_EVENT_RESPONSE_TIMEOUT,
 
-        MAX_AMC_PROXY_EVENT
+	MAX_AMC_PROXY_EVENT
 };
 
 /**
@@ -63,13 +63,13 @@ enum amc_proxy_event {
  * @AMC_PROXY_CMD_SENSOR_REQUEST_ALL_SDR: get all SDR
  */
 enum amc_proxy_cmd_sensor_request {
-        AMC_PROXY_CMD_SENSOR_REQUEST_UNKNOWN = -EINVAL,
-        AMC_PROXY_CMD_SENSOR_REQUEST_GET_SIZE = 0x1,
-        AMC_PROXY_CMD_SENSOR_REQUEST_GET_SDR,
-        AMC_PROXY_CMD_SENSOR_REQUEST_GET_SINGLE_SDR,
-        AMC_PROXY_CMD_SENSOR_REQUEST_ALL_SDR,
+	AMC_PROXY_CMD_SENSOR_REQUEST_UNKNOWN = -EINVAL,
+	AMC_PROXY_CMD_SENSOR_REQUEST_GET_SIZE = 0x1,
+	AMC_PROXY_CMD_SENSOR_REQUEST_GET_SDR,
+	AMC_PROXY_CMD_SENSOR_REQUEST_GET_SINGLE_SDR,
+	AMC_PROXY_CMD_SENSOR_REQUEST_ALL_SDR,
 
-        MAX_AMC_PROXY_CMD_SENSOR_REQUEST
+	MAX_AMC_PROXY_CMD_SENSOR_REQUEST
 };
 
 /**
@@ -87,19 +87,19 @@ enum amc_proxy_cmd_sensor_request {
  * @AMC_PROXY_CMD_SENSOR_REPO_ALL: get all
  */
 enum amc_proxy_cmd_sensor_repo {
-        AMC_PROXY_CMD_SENSOR_REPO_UNKNOWN = -EINVAL,
-        AMC_PROXY_CMD_SENSOR_REPO_GET_SIZE = 0,
-        AMC_PROXY_CMD_SENSOR_REPO_BDINFO,
-        AMC_PROXY_CMD_SENSOR_REPO_TEMP,
-        AMC_PROXY_CMD_SENSOR_REPO_VOLTAGE,
-        AMC_PROXY_CMD_SENSOR_REPO_CURRENT,
-        AMC_PROXY_CMD_SENSOR_REPO_POWER,
-        AMC_PROXY_CMD_SENSOR_REPO_TOTAL_POWER,
-        AMC_PROXY_CMD_SENSOR_REPO_QSFP,
-        AMC_PROXY_CMD_SENSOR_REPO_FPT,
-        AMC_PROXY_CMD_SENSOR_REPO_ALL,
+	AMC_PROXY_CMD_SENSOR_REPO_UNKNOWN = -EINVAL,
+	AMC_PROXY_CMD_SENSOR_REPO_GET_SIZE = 0,
+	AMC_PROXY_CMD_SENSOR_REPO_BDINFO,
+	AMC_PROXY_CMD_SENSOR_REPO_TEMP,
+	AMC_PROXY_CMD_SENSOR_REPO_VOLTAGE,
+	AMC_PROXY_CMD_SENSOR_REPO_CURRENT,
+	AMC_PROXY_CMD_SENSOR_REPO_POWER,
+	AMC_PROXY_CMD_SENSOR_REPO_TOTAL_POWER,
+	AMC_PROXY_CMD_SENSOR_REPO_QSFP,
+	AMC_PROXY_CMD_SENSOR_REPO_FPT,
+	AMC_PROXY_CMD_SENSOR_REPO_ALL,
 
-        MAX_AMC_PROXY_CMD_SENSOR_REPO
+	MAX_AMC_PROXY_CMD_SENSOR_REPO
 };
 
 /**
@@ -108,10 +108,10 @@ enum amc_proxy_cmd_sensor_repo {
  * @AMC_PROXY_CMD_RW_REQUEST_WRITE: write a value
 */
 enum amc_proxy_cmd_rw_request {
-        AMC_PROXY_CMD_RW_REQUEST_READ = 0,
-        AMC_PROXY_CMD_RW_REQUEST_WRITE,
+	AMC_PROXY_CMD_RW_REQUEST_READ = 0,
+	AMC_PROXY_CMD_RW_REQUEST_WRITE,
 
-        MAX_AMC_PROXY_CMD_RW_REQUEST
+	MAX_AMC_PROXY_CMD_RW_REQUEST
 };
 
 /******************************************************************************************/
@@ -128,11 +128,11 @@ enum amc_proxy_cmd_rw_request {
  * @address: the address of memory to be populated with response
  */
 struct amc_proxy_sensor_request {
-        enum amc_proxy_cmd_sensor_request req;
-        enum amc_proxy_cmd_sensor_repo repo;
-        uint32_t sensor_id;
-        uint32_t length;
-        uint64_t address;
+	enum amc_proxy_cmd_sensor_request req;
+	enum amc_proxy_cmd_sensor_repo repo;
+	uint32_t sensor_id;
+	uint32_t length;
+	uint64_t address;
 };
 
 /**
@@ -149,13 +149,13 @@ struct amc_proxy_sensor_request {
  * If partition is equal to `FPT_UPDATE_MAGIC`, will update the FPT.
  */
 struct amc_proxy_pdi_download_request {
-        uint32_t length;
-        uint64_t address;
-        uint32_t boot_device;
-        uint32_t partition;
-        uint16_t last_chunk;
-        uint16_t chunk;
-        uint16_t chunk_size;
+	uint32_t length;
+	uint64_t address;
+	uint32_t boot_device;
+	uint32_t partition;
+	uint16_t last_chunk;
+	uint16_t chunk;
+	uint16_t chunk_size;
 };
 
 /**
@@ -173,12 +173,12 @@ struct amc_proxy_pdi_download_request {
  * partition. This memory is not accessed by AMI.
  */
 struct amc_proxy_partition_copy_request {
-        uint32_t src_device;
-        uint32_t src_part;
-        uint32_t dest_device;
-        uint32_t dest_part;
-        uint32_t length;
-        uint64_t address;
+	uint32_t src_device;
+	uint32_t src_part;
+	uint32_t dest_device;
+	uint32_t dest_part;
+	uint32_t length;
+	uint64_t address;
 };
 
 /**
@@ -199,10 +199,10 @@ struct amc_proxy_hearbeat_request {
  * @offset: offset into the eeprom address space
  */
 struct amc_proxy_eeprom_rw_request {
-    enum amc_proxy_cmd_rw_request type;
-    uint64_t address;
-    uint8_t length;
-    uint8_t offset;
+	enum amc_proxy_cmd_rw_request type;
+	uint64_t address;
+	uint8_t length;
+	uint8_t offset;
 };
 
 /**
@@ -216,12 +216,12 @@ struct amc_proxy_eeprom_rw_request {
  * @length: number of bytes to read/write
  */
 struct amc_proxy_module_rw_request {
-        enum amc_proxy_cmd_rw_request type;
-        uint64_t address;
-        uint8_t device_id;
-        uint8_t page;
-        uint8_t offset;
-        uint8_t length;
+	enum amc_proxy_cmd_rw_request type;
+	uint64_t address;
+	uint8_t device_id;
+	uint8_t page;
+	uint8_t offset;
+	uint8_t length;
 };
 
 /**
@@ -236,13 +236,13 @@ struct amc_proxy_module_rw_request {
  * @link_ver_minor: GCQ minor version number
  */
 struct amc_proxy_identify_response {
-        uint8_t ver_major;
-        uint8_t ver_minor;
-        uint8_t ver_patch;
-        uint8_t local_changes;
-        uint16_t dev_commits;
-        uint8_t link_ver_major;
-        uint8_t link_ver_minor;
+	uint8_t ver_major;
+	uint8_t ver_minor;
+	uint8_t ver_patch;
+	uint8_t local_changes;
+	uint16_t dev_commits;
+	uint8_t link_ver_major;
+	uint8_t link_ver_minor;
 };
 
 /**
@@ -272,19 +272,19 @@ struct amc_proxy_heartbeat_response {
  * @timed_out: boolean indicating if this command timed out
  */
 struct amc_proxy_cmd_struct{
-	struct list_head        cmd_list;
-	struct completion       cmd_complete;
-        struct completion       cmd_complete_heartbeat;
-	uintptr_t               cmd_timeout_jiffies;
-	int                     cmd_rcode;
-       	uint16_t                cmd_cid;
-       	uint64_t                cmd_response;
-        uint32_t                cmd_response_code;
-       	void                    *cmd_arg;
-        FW_IF_CFG               *cmd_fw_if_gcq;
-        bool                    cmd_suppress_dbg;
-        uint32_t                cmd_opcode;
-        bool                    timed_out;
+	struct list_head	cmd_list;
+	struct completion	cmd_complete;
+	struct completion	cmd_complete_heartbeat;
+	uintptr_t		cmd_timeout_jiffies;
+	int			cmd_rcode;
+	uint16_t		cmd_cid;
+	uint64_t		cmd_response;
+	uint32_t		cmd_response_code;
+	void			*cmd_arg;
+	FW_IF_CFG		*cmd_fw_if_gcq;
+	bool			cmd_suppress_dbg;
+	uint32_t		cmd_opcode;
+	bool			timed_out;
 };
 
 

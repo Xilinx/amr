@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the main entry point for the Alveo Managment Controller
@@ -111,6 +111,7 @@ typedef enum AMC_TASK_PRIOS
 
 } AMC_TASK_PRIOS;
 
+extern int iPlmGetUid(uint32_t* uuid);
 
 /******************************************************************************/
 /* EVL Callback Declarations                                                  */
@@ -368,28 +369,28 @@ static void vTaskFuncMain( void )
              ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucGcqFalInitialised             %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_CREATED         ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED         ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucEmmcFalInitialised            %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucOspiFalInitialised            %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_CREATED        ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucSmbusFalInitialised           %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED       ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED       ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucMuxedDeviceFalCreated         %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_CREATED     ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_CREATED     ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucGcqFalCreated                 %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED             ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_CREATED             ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucEmmcFalCreated                %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_CREATED            ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_CREATED            ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucOspiFalCreated                %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED            ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_CREATED            ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucSmbusFalCreated               %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_CREATED           ? "TRUE" : "FALSE" ) );
@@ -969,7 +970,7 @@ static int iInitProxies( void )
 /**
  * @brief   PLM Get image UUID
  */
-static int iPlmGetUid(uint32_t* uuid)
+int iPlmGetUid(uint32_t* uuid)
 {
     int iStatus = XST_SUCCESS;
     XMailbox MailboxInstance;
@@ -1104,18 +1105,21 @@ static void vConfigurePartitionTable( void )
         0
     };
     uint8_t *pucDestAdd = NULL;
+    uint32_t uuid = 0;
 
     xPartTable.ulMagicNum                  = HAL_PARTITION_TABLE_MAGIC_NO;
     xPartTable.xRingBuffer.ulRingBufferOff = HAL_PARTITION_TABLE_SIZE;
     xPartTable.xRingBuffer.ulRingBufferLen = HAL_RPU_RING_BUFFER_LEN;
     xPartTable.xStatus.ulStatusOff         = HAL_PARTITION_TABLE_SIZE + HAL_RPU_RING_BUFFER_LEN;
     xPartTable.xStatus.ulStatusLen         = sizeof( uint32_t );
+    xPartTable.xUuid.ulUuidOff             = xPartTable.xStatus.ulStatusOff + xPartTable.xStatus.ulStatusLen;
+    xPartTable.xUuid.ulUuidLen             = HAL_UUID_SIZE;
     xPartTable.xLogMsg.ulLogMsgIndex       = 0;
-    xPartTable.xLogMsg.ulLogMsgBufferOff   = xPartTable.xStatus.ulStatusOff + xPartTable.xStatus.ulStatusLen;
+    xPartTable.xLogMsg.ulLogMsgBufferOff   = xPartTable.xUuid.ulUuidOff + xPartTable.xUuid.ulUuidLen;
     xPartTable.xLogMsg.ulLogMsgBufferLen   = PLL_LOG_BUF_LEN;
     xPartTable.xData.ulDataStart           = xPartTable.xLogMsg.ulLogMsgBufferOff +
                                              xPartTable.xLogMsg.ulLogMsgBufferLen;
-    xPartTable.xData.ulDataEnd = HAL_RPU_SHARED_MEMORY_SIZE;
+    xPartTable.xData.ulDataEnd             = HAL_RPU_SHARED_MEMORY_SIZE;
 
     /* Copy the populated table into the start of shared memory */
     pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR );
@@ -1140,4 +1144,16 @@ static void vConfigurePartitionTable( void )
     pvOSAL_MemSet( pucDestAdd, HAL_ENABLE_AMI_COMMS, xPartTable.xStatus.ulStatusLen );
     HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xStatus.ulStatusOff ),
                           xPartTable.xStatus.ulStatusLen );
+
+    /*
+     * UUID
+     */
+    iPlmGetUid(&uuid);
+    PLL_INF( AMC_NAME, "UUID = 0x%08x\r\n", uuid );
+
+    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xUuid.ulUuidOff );
+    pvOSAL_MemSet( pucDestAdd, 0, xPartTable.xUuid.ulUuidLen );
+    pvOSAL_MemCpy( pucDestAdd, &uuid, sizeof(uuid) );
+    HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xUuid.ulUuidOff ),
+                          xPartTable.xUuid.ulUuidLen );
 }

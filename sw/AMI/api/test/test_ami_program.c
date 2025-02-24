@@ -2,7 +2,7 @@
 /*
  * test_ami_program.c - Unit test file for ami_program.c
  * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/

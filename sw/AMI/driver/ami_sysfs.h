@@ -2,7 +2,7 @@
 /*
  * ami_sysfs.h - This file contains sysfs-related functions.
  * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_SYSFS_H

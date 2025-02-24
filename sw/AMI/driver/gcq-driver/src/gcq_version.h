@@ -1,6 +1,12 @@
-
-// SPDX-License-Identifier: MIT
-// Copyright (C) 2023, Advanced Micro Devices, Inc. All rights reserved.
+/**
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * This header file contains definitions for the internal ring buffer implementation.
+ *
+ * @file gcq_version.h
+ *
+ */
 
 #ifndef _GCQ_VERSION_H_
 #define _GCQ_VERSION_H_

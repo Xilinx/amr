@@ -2,7 +2,7 @@
 /*
  * ami_top.c - This file contains the main entry point for the AMI driver.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/module.h>
@@ -237,16 +237,11 @@ static int create_pf_dev_data(struct pci_dev *dev)
 		goto delete_data;
 
 	/* Read vendor specific information */
-	if (pf_dev->pcie_config->ext_cap->vsec_base_addr_found) {
-		ret = read_vsec(dev,
-				pf_dev->pcie_config->ext_cap->vsec_base_addr,
-				&pf_dev->endpoints);
-		if (ret)
-			goto delete_data;
-	} else {
-		ret = -EINVAL;
+	ret = read_vsec(dev,
+			pf_dev->pcie_config->ext_cap->vsec_base_addr,
+			&pf_dev->endpoints);
+	if (ret)
 		goto delete_data;
-	}
 
 	/* AMC Setup */
 	/*
@@ -847,7 +842,7 @@ static DRIVER_ATTR_RO(version);
  */
 static ssize_t ami_debug_enabled_store(struct device_driver *drv, const char *buf, size_t count)
 {
-	int set_output_status = 0;
+	uint8_t set_output_status = 0;
 
 	if (!drv || !buf)
 		return 0;

@@ -2,7 +2,7 @@
 /*
  * ami_pcie.c - This file contains PCI reading/writing logic.
  *
- * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/device.h>

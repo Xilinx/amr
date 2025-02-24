@@ -2,7 +2,7 @@
 /*
  * ami_amc_control.c - This file contains AMC control implementation.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/kthread.h>
@@ -217,7 +217,7 @@ bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 			      sizeof(amc_ctrl_ctxt->amc_shared_mem));
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "************ AMC Shared Memory ***************, virt_addr : %p",
+			 "**** AMC Shared Memory virt_addr ****: %p",
 			 amc_ctrl_ctxt->gcq_payload_base_virt_addr);
 
 		AMI_VDBG(amc_ctrl_ctxt,
@@ -225,39 +225,47 @@ bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 			 amc_ctrl_ctxt->amc_shared_mem.amc_magic_no);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of gcq ring buffer inited by gcq server : 0x%x",
+			 "GCQ server initiated gcq ring buffer offset    : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Length of gcq ring buffer inited by gcq server : 0x%x",
+			 "GCQ server initiated gcq ring buffer length    : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_len);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of amc device status                    : 0x%x",
+			 "AMC device status offset                       : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.status.amc_status_off);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Length of amc device status                    : 0x%x",
+			 "AMC device status length                       : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.status.amc_status_len);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Current index of ring buffer log               : 0x%x",
+			 "AMC device uuid offset                         : 0x%x",
+			 amc_ctrl_ctxt->amc_shared_mem.uuid.amc_uuid_off);
+
+		AMI_VDBG(amc_ctrl_ctxt,
+			 "AMC device uuid length                         : 0x%x",
+			 amc_ctrl_ctxt->amc_shared_mem.uuid.amc_uuid_len);
+
+		AMI_VDBG(amc_ctrl_ctxt,
+			 "Ring buffer log current index                  : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_index);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of dbg log                              : 0x%x",
+			 "Debug log offset                               : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_buf_off);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Length of dbg log                              : 0x%x",
+			 "Debug log length                               : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_buf_len);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of data buffer started                  : 0x%x",
+			 "Data buffer start offset                       : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.data.amc_data_start);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of data buffer ended                    : 0x%x",
+			 "Data buffer end offset                         : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.data.amc_data_end);
 
 		if (amc_ctrl_ctxt->amc_shared_mem.amc_magic_no == AMC_GCQ_MAGIC_NO) {
@@ -832,24 +840,24 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 		goto fail;
 	}
 
-	if (pf_dev->pcie_config->header->bar[PCIE_BAR0].requested) {
+	if (pf_dev->pcie_config->header->bar[ep_gcq.bar_num].requested) {
 		ret = -EINVAL;
 		goto fail;
 	}
 
 	/* TODO: do not hardcode which BAR is requested */
 	ret = pci_request_region(amc_ctrl_ctxt->pcie_dev,
-				 PCIE_BAR0,
-				 PCIE_BAR_NAME[PCIE_BAR0]);
+				 ep_gcq.bar_num,
+				 PCIE_BAR_NAME[ep_gcq.bar_num]);
 	if (ret) {
 		AMI_ERR(amc_ctrl_ctxt,
 			"Could not request %s region (SQ_BASE)",
-			PCIE_BAR_NAME[PCIE_BAR0]);
+			PCIE_BAR_NAME[ep_gcq.bar_num]);
 		ret = -EIO;
 		goto fail;
 	}
 
-	pf_dev->pcie_config->header->bar[PCIE_BAR0].requested = true;
+	pf_dev->pcie_config->header->bar[ep_gcq.bar_num].requested = true;
 
 	/* Map the GCQ IP Region */
 	amc_ctrl_ctxt->gcq_base_virt_addr = pci_iomap_range(amc_ctrl_ctxt->pcie_dev,
@@ -1872,8 +1880,6 @@ int setup_amc(struct pci_dev		*dev,
 		}
 	}
 
-	vfree(version_buf);
-
 	/*
 	 * COMPAT MODE: heartbeat disabled, logging disabled.
 	 * When the AMC version does not match the current AMI version, we run
@@ -1904,6 +1910,7 @@ int setup_amc(struct pci_dev		*dev,
 	if (ret)
 		goto fail;
 
+	vfree(version_buf);
 	return SUCCESS;
 
 fail:

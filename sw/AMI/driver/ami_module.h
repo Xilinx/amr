@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_module.h - This file contains functions to read/write QSFP modules
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
  
 #ifndef AMI_MODULE_H
@@ -21,14 +21,15 @@
  *   0xCC is the page number
  *   0xDD is the offset
  */
-#define MK_MODULE_RW_FLAGS(req, dev, page, off)	(((uint8_t)req << 24)         | \
-							((uint8_t)dev << 16)  | \
-							((uint8_t)page << 8)  | \
-							((uint8_t)off))
-#define MODULE_RW_TYPE(flags)			((uint8_t)(flags >> 24))
-#define MODULE_RW_DEVICE(flags)			((uint8_t)((flags & 0x00ff0000) >> 16))
-#define MODULE_RW_PAGE(flags)			((uint8_t)((flags & 0x0000ff00) >> 8))
-#define MODULE_RW_OFFSET(flags)			((uint8_t)(flags & 0x000000ff))
+#define MK_MODULE_RW_FLAGS(req, dev, page, off) \
+					(((uint8_t)req << 24) | \
+					((uint8_t)dev << 16)  | \
+					((uint8_t)page << 8)  | \
+					((uint8_t)off))
+#define MODULE_RW_TYPE(flags)		((uint8_t)(flags >> 24))
+#define MODULE_RW_DEVICE(flags)		((uint8_t)((flags & 0x00ff0000) >> 16))
+#define MODULE_RW_PAGE(flags)		((uint8_t)((flags & 0x0000ff00) >> 8))
+#define MODULE_RW_OFFSET(flags)		((uint8_t)(flags & 0x000000ff))
 
 
 /**

@@ -2,7 +2,7 @@
 /*
  * ami_device_internal.h - This file contains the private interface for device related logic
  * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_DEVICE_INTERNAL_H

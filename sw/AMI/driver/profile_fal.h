@@ -2,11 +2,11 @@
 /*
  * profile_fal.h - This file contains the fal profile for the Linux platform
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-#ifndef AMI_PROFILE_FAL
-#define AMI_PROFILE_FAL
+#ifndef AMI_PROFILE_FAL_H
+#define AMI_PROFILE_FAL_H
 
 #define PLL_INF( t, m, ... ) printk( "[" t "] " m, ##__VA_ARGS__ )
 #define PLL_ERR( t, m, ... ) printk( "[" t "] " m, ##__VA_ARGS__ )
@@ -19,4 +19,4 @@
 #define PLL_DBG( t, m, ... ) ( ( void )( 0 ) )
 #endif
 
-#endif
+#endif /* AMI_PROFILE_FAL_H */

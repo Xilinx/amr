@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the hal profile for the Rave
@@ -57,7 +57,7 @@
 #define HAL_RPU_SHARED_MEMORY_END_ADDR          ( 0x3FFFF000 )
 #define HAL_RPU_SHARED_MEMORY_SIZE              ( HAL_RPU_SHARED_MEMORY_END_ADDR - HAL_RPU_SHARED_MEMORY_BASE_ADDR )
 #define HAL_RPU_RING_BUFFER_BASE                ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + HAL_PARTITION_TABLE_SIZE )
-#define HAL_BASE_LOGIC_GCQ_M2R_S01_AXI_BASEADDR ( XPAR_BLP_BLP_LOGIC_GCQ_M2R_S01_AXI_BASEADDR )
+#define HAL_BASE_LOGIC_GCQ_M2R_S01_AXI_BASEADDR ( 0x40000000 )
 
 #define HAL_FLUSH_CACHE_DATA( addr, size ) Xil_DCacheFlushRange( addr, size )
 
@@ -149,6 +149,18 @@ typedef struct HAL_PARTITION_TABLE_STATUS
 } HAL_PARTITION_TABLE_STATUS;
 
 /**
+ * @struct  HAL_PARTITION_TABLE_UUID
+ *
+ * @brief   Stores the AMC UUID info - part of the partition table.
+ */
+typedef struct HAL_PARTITION_TABLE_UUID
+{
+    uint32_t ulUuidOff;
+    uint32_t ulUuidLen;
+
+} HAL_PARTITION_TABLE_UUID;
+
+/**
  * @struct  HAL_PARTITION_TABLE_LOG_MSG
  *
  * @brief   Stores the AMC logs and info - part of the partition table.
@@ -184,6 +196,7 @@ typedef struct HAL_PARTITION_TABLE
     uint32_t                        ulMagicNum;
     HAL_PARTITION_TABLE_RING_BUFFER xRingBuffer;
     HAL_PARTITION_TABLE_STATUS      xStatus;
+    HAL_PARTITION_TABLE_UUID        xUuid;
     HAL_PARTITION_TABLE_LOG_MSG     xLogMsg;
     HAL_PARTITION_TABLE_DATA        xData;
 

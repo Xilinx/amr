@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains definitions for the internal ring buffer implementation.
@@ -112,7 +112,7 @@ static inline void prvvGCQInitRing( const struct GCQ_INSTANCE_TYPE *pxGCQInstanc
     pxRing->ulRingProduced = pxRing->ulRingConsumed = 0;
 
     GCQ_DEBUG( "Produced Tail:0x%llx\r\n", ullProducedAddr );
-    GCQ_DEBUG( "Consumed Tail:0x%llx\r\n", ullConsumedAddr );
+    GCQ_DEBUG( "Hdr Consumed Tail:0x%llx\r\n", ullConsumedAddr );
     GCQ_DEBUG( "Slot Addr:0x%llx\r\n", ullSlotAddr );
     GCQ_DEBUG( "Slot Size:%ld\r\n", ulSlotSize );
     GCQ_DEBUG( "Slot Num:%ld\r\n", ulSlotNum );

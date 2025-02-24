@@ -2,7 +2,7 @@
 /*
  * ami_internal.h - This file contains generic private API definitions
  * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_INTERNAL_H

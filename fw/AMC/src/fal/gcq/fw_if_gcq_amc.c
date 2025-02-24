@@ -191,7 +191,7 @@ static FW_IF_GCQ_PRIVATE_DATA *pxThis = &xLocalData;
  */
 static inline void prvvWriteMemReg32( uint64_t ullDestAddr, uint32_t ulValue )
 {
-    /* PLL_DBG( FW_IF_GCQ_NAME, "W [0x%llx: 0x%lx]\r\n", ullDestAddr, ulValue ); */
+    PLL_DBG( FW_IF_GCQ_NAME, "W [0x%llx: 0x%lx]\r\n", ullDestAddr, ulValue );
     HAL_IO_WRITE32( ulValue, ullDestAddr );
 }
 
@@ -208,7 +208,7 @@ static inline void prvvWriteMemReg32( uint64_t ullDestAddr, uint32_t ulValue )
 static inline uint32_t prvulReadMemReg32( uint64_t ullSrcAddr )
 {
     uint32_t ulValue = HAL_IO_READ32( ullSrcAddr );
-    /* PLL_DBG( FW_IF_GCQ_NAME, "R [0x%llx: 0x%lx]\r\n", ullSrcAddr, ulValue ); */
+    PLL_DBG( FW_IF_GCQ_NAME, "R [0x%llx: 0x%lx]\r\n", ullSrcAddr, ulValue );
     return ( ulValue );
 }
 
@@ -219,7 +219,6 @@ static inline uint32_t prvulReadMemReg32( uint64_t ullSrcAddr )
  * @param   error is the return code returned by the gcq driver
  *
  * @return  the mapped interface return code
- * 
  *
  */
 static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
@@ -256,7 +255,6 @@ static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
  * @param   xInterruptMode is the interface interrupt mode
  *
  * @return  the mapped gcq driver interrupt mode
- * 
  *
  */
 static GCQ_INTERRUPT_MODE_TYPE prvxMapInterruptMode( FW_IF_GCQ_INTERRUPT_MODE_TYPE xInterruptMode )

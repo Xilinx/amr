@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_program.h - This file contains functions to program (flash) devices.
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
  
 #ifndef AMI_PROGRAM_H
@@ -14,8 +14,8 @@
 #include "ami_top.h"
 #include "ami_amc_control.h"
 
-#define MAX_PARTITION			(15)
-#define MAX_DEVICE			(1)
+#define MAX_PARTITION		(15)
+#define MAX_DEVICE		(1)
 
 /*
  * Format of flags:
@@ -25,34 +25,36 @@
  *   0xCC is the destination device (8 bits)
  *   0xDD is the destination partition (8 bits)
  */
-#define MK_PARTITION_FLAGS(src_device, src_part, dest_device, dest_part)	(((uint8_t)src_device << 24) | \
-										 ((uint8_t)src_part   << 16) | \
-										 ((uint8_t)dest_device << 8) | \
-										 ((uint8_t)dest_part))
+#define MK_PARTITION_FLAGS(src_device, src_part, dest_device, dest_part) \
+				(((uint8_t)src_device << 24) | \
+				((uint8_t)src_part   << 16) | \
+				((uint8_t)dest_device << 8) | \
+				((uint8_t)dest_part))
 
 
-#define DEVICE_SRC(flags)		((uint8_t)(flags >> 24))
-#define PARTITION_SRC(flags)		((uint8_t)(flags >> 16))
-#define DEVICE_DEST(flags)		((uint8_t)(flags >> 8))
-#define PARTITION_DEST(flags)		((uint8_t)(flags))
+#define DEVICE_SRC(flags)	((uint8_t)(flags >> 24))
+#define PARTITION_SRC(flags)	((uint8_t)(flags >> 16))
+#define DEVICE_DEST(flags)	((uint8_t)(flags >> 8))
+#define PARTITION_DEST(flags)	((uint8_t)(flags))
 
-#define FPT_UPDATE_FLAG			(0xAA)  /* uint8 - the other bytes are the boot device, and chunk num */
-#define FPT_UPDATE_MAGIC		(0xAAAAAAAA)
-#define PDI_CHUNK_MULTIPLIER		(1024)
-#define PDI_CHUNK_SIZE			(32)  /* Multiple of 1024 */
+#define FPT_UPDATE_FLAG		(0xAA)  /* uint8 - the other bytes are the boot device, and chunk num */
+#define FPT_UPDATE_MAGIC	(0xAAAAAAAA)
+#define PDI_CHUNK_MULTIPLIER	(1024)
+#define PDI_CHUNK_SIZE		(32)  /* Multiple of 1024 */
 
 /*
  * Format of flags:
  * 0xAABBCCCC where:
  *   0xAA is the boot device flag (8 bits)
- * 	 0xBB is the partition number (8 bits) - this is 0xAA when updating the FPT
+ *   0xBB is the partition number (8 bits) - this is 0xAA when updating the FPT
  *   0xCCCC is the current chunk number (15 bits) with the MSB set to 1 if this is the last chunk (1 bit)
  *
  * `last` in this macro should be a bool.
  */
-#define MK_PDI_FLAGS(boot, part, chunk, last)	(((uint8_t)boot << 24) | ((uint8_t)part << 16 ) | ((last) ? \
-							((uint16_t)chunk | ((uint16_t)1 << 15)) : \
-							((uint16_t)chunk & ~((uint16_t)1 << 15))))
+#define MK_PDI_FLAGS(boot, part, chunk, last) \
+					(((uint8_t)boot << 24) | ((uint8_t)part << 16 ) | ((last) ? \
+					((uint16_t)chunk | ((uint16_t)1 << 15)) : \
+					((uint16_t)chunk & ~((uint16_t)1 << 15))))
 #define PDI_BOOT_DEVICE(flags)		((uint8_t)(flags >> 24))
 #define PDI_PARTITION(flags)		((uint8_t)(flags >> 16))
 #define PDI_CHUNK(flags)		(((uint16_t)(flags & 0x0000ffff)) & ~((uint16_t)1 << 15))

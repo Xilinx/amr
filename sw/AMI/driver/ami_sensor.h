@@ -2,7 +2,7 @@
 /*
  * ami_sensor.h - This file contains sensor-related definitions.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_SENSOR_H
@@ -26,8 +26,8 @@
  * @name: Human readable string for this status
  */
 struct sensor_status_name_map_t{
-	int     status;
-	char    *name;
+	int  status;
+	char *name;
 };
 
 /* Forward declaration of pf_dev_struct */
@@ -74,9 +74,9 @@ int read_power_sensors(struct pf_dev_struct *pf_dev, bool *fresh);
 
 int read_fpt_hdr(struct pf_dev_struct *pf_dev, uint8_t boot_device, struct fpt_header *hdr);
 int read_fpt_partition(struct pf_dev_struct *pf_dev,
-		       		   uint8_t boot_device,
-		       		   uint32_t partition_id,
-		       		   struct fpt_partition *partition);
+			uint8_t boot_device,
+			uint32_t partition_id,
+			struct fpt_partition *partition);
 int read_board_info(struct pf_dev_struct *pf_dev, struct bd_info_record *bd_info);
 
 #endif /* AMI_SENSOR_H */

@@ -2,7 +2,7 @@
 /*
  * ami_amc_control.h - This file contains AMC control defintions.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_AMC_CONTROL_H
@@ -80,7 +80,7 @@
 /******************************************************************************************/
 
 /**
- * enum gcq_submit_cmd_flags - QCQ command-specific flags.
+ * enum gcq_submit_cmd_flags - GCQ command-specific flags.
  * @GCQ_CMD_FLAG_NONE: No flags.
  * @GCQ_CMD_FLAG_REPO_TYPE_BD_INFO: Command relates to the board info SDR.
  * @GCQ_CMD_FLAG_REPO_TYPE_TEMP: Command relates to the temperature SDR.
@@ -429,7 +429,7 @@ struct sdr_record {
 	uint8_t unit_type;
 	uint8_t unit_len;
 	uint8_t unit[SDR_VALUE_MAX_LEN];
-	char	unit_mod;
+	char    unit_mod;
 	uint8_t threshold_support;
 	uint8_t lower_fatal_limit[SDR_THRESHOLD_MAX_LEN];
 	uint8_t lower_crit_limit[SDR_THRESHOLD_MAX_LEN];
@@ -464,9 +464,9 @@ struct fpt_header {
  * @partition_size: Partition size
  */
 struct fpt_partition {
-	uint32_t	type;
-	uint32_t	base_addr;
-	uint32_t	partition_size;
+	uint32_t type;
+	uint32_t base_addr;
+	uint32_t partition_size;
 };
 
 /**
@@ -475,10 +475,10 @@ struct fpt_partition {
  * @partition: List of partitions
  */
 struct fpt_record {
-	struct fpt_header	hdr_primary;
-	struct fpt_partition	*partition_primary;
-	struct fpt_header	hdr_secondary;
-	struct fpt_partition	*partition_secondary;
+	struct fpt_header     hdr_primary;
+	struct fpt_partition  *partition_primary;
+	struct fpt_header     hdr_secondary;
+	struct fpt_partition  *partition_secondary;
 };
 
 /**
@@ -580,6 +580,16 @@ struct amc_status {
 };
 
 /**
+ * struct amc_uuid - Stores AMC UUID information - part of the partition table.
+ * @amc_uuid_off:     the offset of amc device status
+ * @amc_uuid_len:     the length of amc device status
+ */
+struct amc_uuid {
+	uint32_t	amc_uuid_off;
+	uint32_t	amc_uuid_len;
+};
+
+/**
  * struct amc_log_msg - Stores AMC logs and information - part of the partition table.
  * @log_msg_index:      the current index of ring buffer log
  * @log_msg_buf_off:    the offset of dbg log
@@ -609,6 +619,7 @@ struct amc_data {
  * @amc_magic_no:       magic number.
  * @amc_ring_buffer:    ring buffer struct.
  * @amc_status:         amc status struct.
+ * @amc_uuid:           amc uuid struct.
  * @amc_log_msg:        amc log struct.
  * @amc_data:           amc data struct.
  */
@@ -616,6 +627,7 @@ struct amc_shared_mem {
 	uint32_t		amc_magic_no;
 	struct amc_ring_buffer	ring_buffer;
 	struct amc_status	status;
+	struct amc_uuid		uuid;
 	struct amc_log_msg	log_msg;
 	struct amc_data		data;
 };
@@ -640,7 +652,7 @@ struct amc_version {
  * struct amc_control_ctxt - context for the AMC.
  * @pcie_dev: the physical function
  * @gcq_payload_base_virt_addr: payload virtual base address
- * @gcq_base_virt_addr: the virtual base address
+ * @gcq_base_virt_addr: the virtual sq base address
  * @amc_shared_mem: the shared memory base address
  * @gcq_ring_buf_base_virt_addr: the ring buffer virtual address
  * @fw_if_cfg: fal configuration
@@ -742,8 +754,10 @@ void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt);
  *
  * Return: 0 or negative error code.
  */
-int setup_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt, endpoint_info_struct ep_gcq,
-	      endpoint_info_struct ep_gcq_payload, amc_event_callback event_cb, void *event_cb_data);
+int setup_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt, 
+			endpoint_info_struct ep_gcq,
+			endpoint_info_struct ep_gcq_payload,
+			amc_event_callback event_cb, void *event_cb_data);
 
 /**
  * unset_amc() - Stop the service, close proxy and tidy up PCI

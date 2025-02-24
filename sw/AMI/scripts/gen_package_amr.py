@@ -313,7 +313,7 @@ def main(args):
                 api_headers.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
 
         config['package']                       = {}
-        config['package']['name']               = 'amr'
+        config['package']['name']               = 'ami'
         config['package']['release']            = opt.pkg_release
         config['package']['summary']            = config['package']['name'] + ' driver package'
         config['package']['description']        = [

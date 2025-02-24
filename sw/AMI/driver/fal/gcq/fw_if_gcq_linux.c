@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF GCQ abstraction.
@@ -52,9 +52,9 @@
 
 /* TODO: Replace the OSAL #define's with an appropriate OSAL implementation */
 #ifdef __KERNEL__
-#define iOSAL_Task_SleepMs( c )              msleep( c )
+#define iOSAL_Task_SleepMs( c )         msleep( c )
 #else
-#define iOSAL_Task_SleepMs( c )              do { } while ( 0 )
+#define iOSAL_Task_SleepMs( c )         do { } while ( 0 )
 #endif
 
 

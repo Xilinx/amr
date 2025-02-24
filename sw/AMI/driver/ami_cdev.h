@@ -2,7 +2,7 @@
 /*
  * ami_cdev.h - This file contains definitions related to AMI character device files.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_CDEV_H
@@ -119,11 +119,11 @@ enum ami_ioc_sensor_type {
  * instantaneous value of a sensor.
  */
 struct ami_ioc_sensor_value {
-	long    val;
-	char    status[AMI_IOC_SENSOR_STATUS_LEN];
-	bool    fresh;
-	int     hwmon_channel;
-	int     sensor_type;
+	long val;
+	char status[AMI_IOC_SENSOR_STATUS_LEN];
+	bool fresh;
+	int  hwmon_channel;
+	int  sensor_type;
 };
 
 /**
@@ -168,7 +168,7 @@ struct ami_ioc_fpt_partition_value {
  * @offset: Offset from the EEPROM base address.
  */
 struct ami_ioc_eeprom_payload {
-        unsigned long  addr;
+	unsigned long  addr;
 	uint8_t        len;
 	uint8_t        offset;
 };
