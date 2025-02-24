@@ -58,8 +58,8 @@
 #define SYSFS_PCI_LINK_WIDTH_M		"link_width_max"
 
 /* For PCI reloading */
-#define HOT_RESET_GPIO_BAR		(0)
-#define HOT_RESET_GPIO_OFFSET		(0x1040000)
+#define HOT_RESET_GPIO_BAR		(4)
+#define HOT_RESET_GPIO_OFFSET		(0x2040000)
 #define PCI_ENABLE			(1)
 /*
  * NOTE: The following delays may need tweaking.

@@ -111,7 +111,6 @@ typedef enum AMC_TASK_PRIOS
 
 } AMC_TASK_PRIOS;
 
-extern int iPlmGetUid(uint32_t* uuid);
 
 /******************************************************************************/
 /* EVL Callback Declarations                                                  */
@@ -968,54 +967,11 @@ static int iInitProxies( void )
 }
 
 /**
- * @brief   PLM Get image UUID
- */
-int iPlmGetUid(uint32_t* uuid)
-{
-    int iStatus = XST_SUCCESS;
-    XMailbox MailboxInstance;
-    XLoader_ClientInstance LoaderClientInstance;
-    XLoader_ImageInfo ImageInfo;
-
-#ifndef SDT
-    iStatus = XMailbox_Initialize(&MailboxInstance, 0U);
-#else
-    iStatus = XMailbox_Initialize(&MailboxInstance, XPAR_XIPIPSU_0_BASEADDR);
-#endif
-	if (XST_SUCCESS == iStatus)
-    {
-        iStatus = XLoader_ClientInit(&LoaderClientInstance, &MailboxInstance);
-        if (XST_SUCCESS == iStatus)
-        {
-            iStatus = XLoader_GetImageInfo(&LoaderClientInstance, PL_NODE_ID, &ImageInfo);
-            if (XST_SUCCESS == iStatus)
-            {
-                *uuid = ImageInfo.UID;
-            }
-        }
-	}
-
-    if (XST_SUCCESS != iStatus)
-    {
-        PLL_ERR( AMC_NAME, "PLM UUID Read Failed =%d uuid=%x", iStatus, ImageInfo.UID);
-    }
-    return iStatus;
-}
-
-
-/**
  * @brief   Initialise App layer
  */
 static int iInitApp( void )
 {
     int iStatus = OK;
-    uint32_t uuid;
-
-    iPlmGetUid(&uuid);
-    PLL_ERR( AMC_NAME, "iInitApp uuid=0x%08X\r\n", uuid );
-
-    Xil_Out32(XPAR_BLP_BLP_LOGIC_UUID_REGISTER_BASEADDR, uuid);
-    Xil_DCacheFlushRange(XPAR_BLP_BLP_LOGIC_UUID_REGISTER_BASEADDR, sizeof(uint32_t));
 
     if( AMC_CFG_ASDM_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASDM_PREREQUISITES ) )
     {
@@ -1091,6 +1047,41 @@ static int iInitDebug( void )
     }
 #endif
 
+    return iStatus;
+}
+
+/**
+ * @brief   PLM Get image UUID
+ */
+static int iPlmGetUid(uint32_t* uuid)
+{
+    int iStatus = XST_SUCCESS;
+    XMailbox MailboxInstance;
+    XLoader_ClientInstance LoaderClientInstance;
+    XLoader_ImageInfo ImageInfo;
+
+#ifndef SDT
+    iStatus = XMailbox_Initialize(&MailboxInstance, 0U);
+#else
+    iStatus = XMailbox_Initialize(&MailboxInstance, XPAR_XIPIPSU_0_BASEADDR);
+#endif
+	if (XST_SUCCESS == iStatus)
+    {
+        iStatus = XLoader_ClientInit(&LoaderClientInstance, &MailboxInstance);
+        if (XST_SUCCESS == iStatus)
+        {
+            iStatus = XLoader_GetImageInfo(&LoaderClientInstance, PL_NODE_ID, &ImageInfo);
+            if (XST_SUCCESS == iStatus)
+            {
+                *uuid = ImageInfo.UID;
+            }
+        }
+	}
+
+    if (XST_SUCCESS != iStatus)
+    {
+        PLL_ERR( AMC_NAME, "PLM UUID Read Failed =%d uuid=%x", iStatus, ImageInfo.UID);
+    }
     return iStatus;
 }
 

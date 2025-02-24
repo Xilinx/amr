@@ -35,6 +35,7 @@
  * @AMI_PCIE_DEVICE_ID_VCK5000_PF0: VCK5000 PF0
  * @AMI_PCIE_DEVICE_ID_V80: V80
  * @AMI_PCIE_DEVICE_ID_V80P: V80P
+ * @AMI_PCIE_DEVICE_ID_RAVE: RAVE
  *
  * Note, if you want the driver to pick up these ID's they must be added to
  * the array at the top of `ami_pcie.c`.
@@ -59,7 +60,7 @@ enum AMI_PCIE_DEVICE_ID {
 
 #define CAP_NOT_FOUND 0
 
-#define PCI_GPIO_RESET_OFFSET               (0x1040000)
+#define PCI_GPIO_RESET_OFFSET               (0x2040000)
 #define PCI_GPIO_RESET_BAR                  (4)
 
 /* Command Register Offsets */
@@ -90,15 +91,15 @@ enum AMI_PCIE_DEVICE_ID {
 #define  PCI_STATUS_DETECTED_PARITY_OFFSET  0xF
 
 /* Class Revision Register Offsets */
-#define PCI_CLASS_REVISION_ID           0x0
-#define PCI_CLASS_REVISION_PROG_IF      0x8
-#define PCI_CLASS_REVISION_SUBCLASS     0x10
-#define PCI_CLASS_REVISION_CLASSCODE    0x18
+#define PCI_CLASS_REVISION_ID               0x0
+#define PCI_CLASS_REVISION_PROG_IF          0x8
+#define PCI_CLASS_REVISION_SUBCLASS         0x10
+#define PCI_CLASS_REVISION_CLASSCODE        0x18
 
-#define PCI_CLASS_REVISION_ID_MASK              0xFF
-#define PCI_CLASS_REVISION_PROG_IF_MASK         0xFF
-#define PCI_CLASS_REVISION_SUBCLASS_MASK        0xFF
-#define PCI_CLASS_REVISION_CLASSCODE_MASK       0xFF
+#define PCI_CLASS_REVISION_ID_MASK          0xFF
+#define PCI_CLASS_REVISION_PROG_IF_MASK     0xFF
+#define PCI_CLASS_REVISION_SUBCLASS_MASK    0xFF
+#define PCI_CLASS_REVISION_CLASSCODE_MASK   0xFF
 
 #define CLASS_CODE_PROCESSING_ACCELERATOR   0x12
 
@@ -296,17 +297,17 @@ enum AMI_PCIE_DEVICE_ID {
 #define PCIE_CAP_LINK_CAPABILITIES_ASPM_OPTIONAL_COMPLIANCE_OFFSET  0x16
 #define PCIE_CAP_LINK_CAPABILITIES_PORT_NUM_OFFSET                  0x18
 
-#define PCIE_CAP_LINK_CAPABILITIES_MAX_LINK_SPEED_MASK                     0x0F
-#define PCIE_CAP_LINK_CAPABILITIES_MAX_PCIE_CAP_LINK_WIDTH_MASK            0x3F
-#define PCIE_CAP_LINK_CAPABILITIES_PCIE_CAP_ASPM_SUPPORT_MASK              0x03
-#define PCIE_CAP_LINK_CAPABILITIES_L0_EXIT_LATENCY_MASK                    0x07
-#define PCIE_CAP_LINK_CAPABILITIES_L1_EXIT_LATENCY_MASK                    0x07
-#define PCIE_CAP_LINK_CAPABILITIES_CLK_PWR_MGMNT_MASK                      0x01
-#define PCIE_CAP_LINK_CAPABILITIES_SURP_DOWN_ERR_REPORT_CAP_MASK           0x01
-#define PCIE_CAP_LINK_CAPABILITIES_DLLL_ACTIVE_REPORT_CAP_MASK             0x01
-#define PCIE_CAP_LINK_CAPABILITIES_LINK_BW_NOT_CAP_MASK                    0x01
-#define PCIE_CAP_LINK_CAPABILITIES_ASPM_OPTIONAL_COMPLIANCE_MASK           0x01
-#define PCIE_CAP_LINK_CAPABILITIES_PORT_NUM_MASK                           0xFF
+#define PCIE_CAP_LINK_CAPABILITIES_MAX_LINK_SPEED_MASK              0x0F
+#define PCIE_CAP_LINK_CAPABILITIES_MAX_PCIE_CAP_LINK_WIDTH_MASK     0x3F
+#define PCIE_CAP_LINK_CAPABILITIES_PCIE_CAP_ASPM_SUPPORT_MASK       0x03
+#define PCIE_CAP_LINK_CAPABILITIES_L0_EXIT_LATENCY_MASK             0x07
+#define PCIE_CAP_LINK_CAPABILITIES_L1_EXIT_LATENCY_MASK             0x07
+#define PCIE_CAP_LINK_CAPABILITIES_CLK_PWR_MGMNT_MASK               0x01
+#define PCIE_CAP_LINK_CAPABILITIES_SURP_DOWN_ERR_REPORT_CAP_MASK    0x01
+#define PCIE_CAP_LINK_CAPABILITIES_DLLL_ACTIVE_REPORT_CAP_MASK      0x01
+#define PCIE_CAP_LINK_CAPABILITIES_LINK_BW_NOT_CAP_MASK             0x01
+#define PCIE_CAP_LINK_CAPABILITIES_ASPM_OPTIONAL_COMPLIANCE_MASK    0x01
+#define PCIE_CAP_LINK_CAPABILITIES_PORT_NUM_MASK                    0xFF
 
 #define PCIE_CAP_LINK_STATUS_CUR_LINK_SPEED_OFFSET              0x00
 #define PCIE_CAP_LINK_STATUS_NEG_PCIE_CAP_LINK_WIDTH_OFFSET     0x04
@@ -578,21 +579,21 @@ enum AMI_PCIE_DEVICE_ID {
 /*
  * PCI Code and ID Assignment Specification as per Rev 1.1 (Codes not included in pci_regs.h)
  */
-#define PCI_EXT_CAP_ID_LANE_MERGE_REC          0x27     /* Lane merging at receiver */
-#define PCI_EXT_CAP_ID_HIERARCHY_ID            0x28     /* Hierarchy ID */
-#define PCI_EXT_CAP_ID_NPEM                    0x29     /* Native PCIe enclosure management */
-#define PCI_EXT_CAP_ID_PHY_LAYER_32_GTS        0x2A     /* Physical Layer 32.0 GT/s */
-#define PCI_EXT_CAP_ID_ALT_PROTOCOL            0x2B     /* Alternate Protocol */
-#define PCI_EXT_CAP_SFI                        0x2C     /* System Firmware Intermediary */
+#define PCI_EXT_CAP_ID_LANE_MERGE_REC   0x27 /* Lane merging at receiver */
+#define PCI_EXT_CAP_ID_HIERARCHY_ID     0x28 /* Hierarchy ID */
+#define PCI_EXT_CAP_ID_NPEM             0x29 /* Native PCIe enclosure management */
+#define PCI_EXT_CAP_ID_PHY_LAYER_32_GTS 0x2A /* Physical Layer 32.0 GT/s */
+#define PCI_EXT_CAP_ID_ALT_PROTOCOL     0x2B /* Alternate Protocol */
+#define PCI_EXT_CAP_SFI                 0x2C /* System Firmware Intermediary */
 
 /* CG added */
 
-#define PCI_STATUS_IMM_READY    0x01                    /* Immediate Readiness */
+#define PCI_STATUS_IMM_READY    0x01         /* Immediate Readiness */
 
-#define PCI_EXT_CAP_ID_L1SS                   0x1E      /* L1 PM Substates */
-#define PCI_EXT_CAP_ID_PTM                    0x1F      /* Precision Time Measurement */
-#define PCI_EXT_CAP_ID_DLF                    0x25      /* Data Link Feature */
-#define PCI_EXT_CAP_ID_PL_16GT                0x26      /* Physical Layer 16.0 GT/s */
+#define PCI_EXT_CAP_ID_L1SS             0x1E /* L1 PM Substates */
+#define PCI_EXT_CAP_ID_PTM              0x1F /* Precision Time Measurement */
+#define PCI_EXT_CAP_ID_DLF              0x25 /* Data Link Feature */
+#define PCI_EXT_CAP_ID_PL_16GT          0x26 /* Physical Layer 16.0 GT/s */
 
 /* Config */
 
