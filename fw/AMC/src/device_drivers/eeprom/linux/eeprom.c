@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This implenents the functions for accessing the
  * manufacturing eeprom.
  *
  * @file eeprom.c
- *
  */
 
 /******************************************************************************/
@@ -1140,7 +1139,7 @@ int iEEPROM_DisplayEepromValues( void )
             PLL_INF( EEPROM_NAME, "board max power mode  : %d\n\r",
                      pxThis->pucBoardMaxPowerMode[ 0 ] );
             PLL_INF( EEPROM_NAME, "Memory Size           : %s\n\r",
-                     pxThis->pucMemorySize        );
+                     pxThis->pucMemorySize );
             PLL_INF( EEPROM_NAME, "OEM ID                : %02x%02x%02x%02x\n\r",
                      pxThis->pucOemId[ 3 ],
                      pxThis->pucOemId[ 2 ],
@@ -1328,6 +1327,6 @@ static int iEepromDumpContents( void )
         vPLL_Printf( "\r\n" );
     }
 
-    return ( iStatus );
+    return iStatus;
 }
-#endif
+#endif /* EEPROM_VERBOSE_DEBUG_ENABLE */

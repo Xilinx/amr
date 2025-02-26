@@ -5,7 +5,6 @@
  * This file contains the hal profile for the Rave
  *
  * @file profile_hal.h
- *
  */
 
 #ifndef _PROFILE_HAL_H_
@@ -19,14 +18,11 @@
 
 #define HAL_UUID_SIZE       ( 16 )
 #define HAL_EMMC_FEATURE    ( 0 )
-#define HAL_EMMC_DEVICE_ID  ( 0 ) /* XPAR_XSDPS_0_DEVICE_ID */
+#define HAL_EMMC_DEVICE_ID  ( 0 )               /* XPAR_XSDPS_0_DEVICE_ID */
 #define HAL_EMMC_BLOCK_SIZE ( 512 )
-#define HAL_EMMC_MAX_BLOCKS ( 0x7690000 )                                      /* 64 GBytes / 512 Bytes */
+#define HAL_EMMC_MAX_BLOCKS ( 0x7690000 )       /* 64 GBytes / 512 Bytes */
 
 #define HAL_SMBUS_FEATURE   ( 0 )
-//#define HAL_SMBUS_BASE_ADDR ( XPAR_SMBUS_0_BASEADDR )
-//#define HAL_SMBUS_ADDR      ( 0x18 )
-//#define HAL_SMBUS_INTERRUPT ( XPAR_FABRIC_BASE_LOGIC_AXI_SMBUS_RPU_IP2INTC_IRPT_INTR )
 
 #define HAL_EEPROM_VERSION            ( EEPROM_VERSION_1_0 )
 #define HAL_EEPROM_I2C_BUS            ( 0 )

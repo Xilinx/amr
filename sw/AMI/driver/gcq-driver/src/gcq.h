@@ -6,7 +6,6 @@
  * for the GCQ driver.
  *
  * @file gcq.h
- *
  */
 
 #ifndef _GCQ_H_
@@ -208,7 +207,6 @@ typedef enum GCQ_FLAGS_TYPE
 /******************************************************************************/
 
 /**
- *
  * @brief    Initialise the GCQ standalone driver
  *           Internally the function will:
  *           - Allocate an internal instance if any are free
@@ -230,7 +228,6 @@ typedef enum GCQ_FLAGS_TYPE
  * @param    ulCQSlotSize is the required completion queue (CQ) slot size
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           const GCQ_IO_ACCESS_TYPE *pxIOAccess,
@@ -244,18 +241,15 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           uint32_t ulCQSlotSize );
 
 /**
- *
  * @brief    De-initialise a GCQ driver instance
  *
  * @param    ppxGCQInstance is the instance to de-initialise
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
 
 /**
- *
  * @brief    Attempt to attach to the consumer, needs to be called before
  *           data can be consumed.
  *           Internally the function will:
@@ -267,12 +261,10 @@ GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
  * @param    pxGCQInstance is the instance of the GCQ
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
 
 /**
- *
  * @brief    Function to consume/read data from the GCQ
  *           Internally the function will:
  *           - Check driver has been initilaised
@@ -284,12 +276,10 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
  * @param    ulDatalLen is the length of the data received
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDatalLen );
 
 /**
- *
  * @brief    Function to produce/send data to the GCQ
  *           Internally the function will:
  *           - Check driver has been initilaised
@@ -300,17 +290,14 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
  * @param    ulDataLen the length of the data being sent
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDataLen );
 
 /**
- *
  * @brief    Gets version information from gcq_version.h
  *
  * @return   OK                  Version set successfully
  *           ERROR               Version not set successfully
- *
  */
 int iGCQGetVersion( GCQ_VERSION_TYPE *pxVersion );
 

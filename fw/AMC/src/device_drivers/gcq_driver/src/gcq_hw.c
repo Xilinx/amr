@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains API definitions for HW accesses to GCQ IP.
  *
  * @file gcq_hw.c
- *
  */
 
 #include "gcq_internal.h"
@@ -84,7 +83,7 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
             GCQ_DEBUG( "GCQ IP Block HW Init Complete: (%s) (0x%llx)\r\n", pcGCQModeStr[ xMode ], ullBaseAddr );
         }
 
-        return ( xStatus );
+        return xStatus;
     }
 }
 
@@ -166,7 +165,7 @@ GCQ_ERRORS_TYPE xGCQHWConfigureInterruptMode( GCQ_MODE_TYPE xMode,
             GCQ_DEBUG( "Interrupt Mode Type Configured: (%s)\r\n", pcGCQInterruptModeStr[ xIntMode ] );
         }
 
-        return ( xStatus );
+        return xStatus;
     }
 }
 
@@ -207,7 +206,7 @@ GCQ_ERRORS_TYPE xGCQHWTriggerInterrupt( GCQ_MODE_TYPE xMode,
             GCQ_DEBUG( "Trigger Interrupt [%s]\r\n", pcGCQModeStr[ xMode ] );
         }
 
-        return ( xStatus );
+        return xStatus;
     }
 }
 
@@ -245,6 +244,6 @@ GCQ_ERRORS_TYPE xGCQHWClearInterrupt( GCQ_MODE_TYPE xMode,
             GCQ_DEBUG( "Interrupt Cleared [%s]\r\n", pcGCQModeStr[ xMode ] );
         }
 
-        return ( xStatus );
+        return xStatus;
     }
 }

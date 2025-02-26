@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the MCTP Interpreter functionality
  *
  * @file pldm_mctp_interpreter.c
- *
  */
 
 
@@ -100,7 +99,7 @@ static int send_mctp_response( uint8_t *buffer, size_t len )
 
     retVal = iResponseDataWrite( buffer, ( uint16_t )len );
 
-    return ( retVal );
+    return retVal;
 }
 
 /**
@@ -135,7 +134,7 @@ uint16_t process_request( mctp_message *req, mctp_message *resp )
         }
     }
 
-    return ( payload_size += 1 );                                              /* account for the msg_type byte that is included in the first response packet */
+    return ( payload_size += 1 );       /* account for the msg_type byte that is included in the first response packet */
 }
 
 /**
@@ -205,7 +204,7 @@ void process_pmci_request( int i2cSlaveReadCount )
         PLL_INF( BMC_NAME, "0x%x ", print_req_pkt[ req_pkt_print_index ] );
     }
     PLL_INF( BMC_NAME, "\r\n" );
-#endif
+#endif /* SPDM_DEBUG */
 
     byte_count = req->byte_count + 2;
     if( byte_count != i2cSlaveReadCount )
@@ -374,7 +373,7 @@ void process_pmci_request( int i2cSlaveReadCount )
                 PLL_INF( BMC_NAME, "0x%x ", print_resp_pkt[ resp_pkt_print_index ] );
             }
             PLL_INF( BMC_NAME, "\r\n" );
-#endif
+#endif /* SPDM_DEBUG */
 
             /* send MCTP response */
             sent_size = send_mctp_response( RespBuffer, ret_size );
@@ -404,7 +403,7 @@ void process_pmci_request( int i2cSlaveReadCount )
             PLL_INF( BMC_NAME,
                      "\r\nTime taken to process the SPDM command : %d ms \r\n",
                      spdm_tick_stop_time - spdm_tick_start_time );
-#endif
+#endif /* SPDM_DEBUG */
         }
         else
         {

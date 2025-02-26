@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains register definitions and macros to
  * access fields.
  *
  * @file gcq_regmap.h
- *
  */
 
 #ifndef _GCQ_REGMAP_H_

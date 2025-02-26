@@ -1531,7 +1531,7 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
         PLL_INF( ASDM_NAME, "\r\n" );
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -2304,7 +2304,7 @@ static int iPopulateSdr( uint8_t ucIndex,
         }
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3190,7 +3190,7 @@ static int iPopulateAsdmGetSingleSensorResponse( ASDM_REPOSITORY_TYPE xRepo,
         }
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3340,7 +3340,7 @@ static int iGetFptData( void )
         }
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3453,7 +3453,7 @@ static int iPopulateAsdmFpt( uint16_t *pusByteCount )
         }
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3757,7 +3757,7 @@ static int iGetBoardInfoData( void )
         INC_ERROR_COUNTER( ASDM_ERRORS_ASDM_POPULATE_BDINFO_FAILED )
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3780,7 +3780,7 @@ static int iPopulateAsdmBoardInfo( uint16_t *pusByteCount )
         iStatus       = OK;
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3964,7 +3964,7 @@ static int iPopulateAsdmSdrBoardInfoResponse( ASDM_REPOSITORY_TYPE xRepo,
         }
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -4025,7 +4025,7 @@ static int iRefreshFptData( void )
         }
     }
 
-    return ( iStatus );
+    return iStatus;
 }
 
 /**

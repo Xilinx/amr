@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains functions to initialize and to add log entries to the SMBus Driver circular log
  * for the SMBus driver.
  *
  * @file smbus_circular_log.c
- *
  */
 
 #include "smbus_internal.h"
@@ -53,12 +52,12 @@ static void prvvFormatLine( SMBUS_PROFILE_TYPE* pxSMBusProfile, int entry, char*
 
 /*******************************************************************************/
 
-/******************************************************************************
+/**
 *
 * @brief    This function formats a log entry as a text string ready to be displayed
 *           The format of the string depends on the type of event that was logged
 *
-*****************************************************************************/
+*/
 static char* prvpcConvertEventTypeToText( SMBUS_LOG_EVENT_TYPE xEvent )
 {
     char* pcReturnText = "         ";   
@@ -100,15 +99,14 @@ static char* prvpcConvertEventTypeToText( SMBUS_LOG_EVENT_TYPE xEvent )
         pcReturnText = "TRYWRITE ";
     }
     
-    return (pcReturnText);
+    return pcReturnText;
 }
 
-/******************************************************************************
-*
+/**
 * @brief    This function formats a log entry as a text string ready to be displayed
 *           The format of the string depends on the type of event that was logged
 *
-*****************************************************************************/
+*/
 static void prvvFormatLine( SMBUS_PROFILE_TYPE* pxSMBusProfile, int entry, char* pcLogBuffer, 
                                 int* pslLineSize )
 {
@@ -171,11 +169,11 @@ static void prvvFormatLine( SMBUS_PROFILE_TYPE* pxSMBusProfile, int entry, char*
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Will retreive the log as a character string
 *
-*******************************************************************************/
+*/
 void vLogDisplayLog( SMBUS_PROFILE_TYPE* pxSMBusProfile, char* pcLogBuffer, uint32_t* usLogSizeBytes )
 {
     int slStart         = 0;
@@ -211,11 +209,11 @@ void vLogDisplayLog( SMBUS_PROFILE_TYPE* pxSMBusProfile, char* pcLogBuffer, uint
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Initializes the debug log. Setting its pointer to zero
 *
-*******************************************************************************/
+*/
 void vLogInitialize( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t i = 0;
@@ -235,11 +233,11 @@ void vLogInitialize( SMBUS_PROFILE_TYPE* pxSMBusProfile )
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Will add a log entry into the debug log
 *
-*******************************************************************************/
+*/
 void vLogAddEntry( SMBUS_PROFILE_TYPE* pxSMBusProfile, SMBUS_LOG_LEVEL_TYPE xLogLevel, uint32_t ulInstance,
                     SMBUS_LOG_EVENT_TYPE  Log_Event, uint32_t ulEntry1, uint32_t ulEntry2 )
 {

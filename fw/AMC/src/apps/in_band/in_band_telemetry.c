@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the amc in band telemetry implementation
@@ -139,18 +139,18 @@ typedef struct IN_BAND_PRIVATE_DATA
 
 static IN_BAND_PRIVATE_DATA xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    NULL,                                                                      /* pvOsalMutexHdl */
-    0,                                                                         /* ullSharedMemBaseAddr*/
+    UPPER_FIREWALL,             /* ulUpperFirewall */
+    NULL,                       /* pvOsalMutexHdl */
+    0,                          /* ullSharedMemBaseAddr*/
     {
         0
-    },                                                                         /* pulStatCounters */
+    },                          /* pulStatCounters */
     {
         0
-    },                                                                         /* pulErrorCounters */
-    FALSE,                                                                     /* iInitialised */
-    FALSE,                                                                     /* iInBandTestMode */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall */
+    },                          /* pulErrorCounters */
+    FALSE,                      /* iInitialised */
+    FALSE,                      /* iInBandTestMode */
+    LOWER_FIREWALL              /* ulLowerFirewall */
 
 };
 static IN_BAND_PRIVATE_DATA *pxThis = &xLocalData;
@@ -474,8 +474,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                     /* Flush shared memory so the latest data is available in cache. */
                     HAL_FLUSH_CACHE_DATA(
                         ullDestAddr,
-                        xEepromReadWriteRequest.ulLength
-                        );
+                        xEepromReadWriteRequest.ulLength );
                     break;
                 }
 
@@ -484,8 +483,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                     /* Flush shared memory so the latest data is available in cache. */
                     HAL_FLUSH_CACHE_DATA(
                         ullDestAddr,
-                        xEepromReadWriteRequest.ulLength
-                        );
+                        xEepromReadWriteRequest.ulLength );
 
                     iStatus = iEEPROM_WriteRawValue( pucDestAddr,
                                                      xEepromReadWriteRequest.ulLength,
@@ -530,8 +528,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 iStatus = iAXC_ValidateRequest(
                     xModuleReadWriteRequest.ucExDeviceId,
                     xModuleReadWriteRequest.ucPage,
-                    xModuleReadWriteRequest.ucByteOffset
-                    );
+                    xModuleReadWriteRequest.ucByteOffset );
 
                 if( OK == iStatus )
                 {
@@ -551,8 +548,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                 xModuleReadWriteRequest.ucExDeviceId,
                                 xModuleReadWriteRequest.ucPage,
                                 xModuleReadWriteRequest.ucByteOffset,
-                                pucDestAddr
-                                );
+                                pucDestAddr );
                         }
 
                         /* Flush shared memory so the latest data is available in cache. */
@@ -577,8 +573,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                 xModuleReadWriteRequest.ucExDeviceId,
                                 xModuleReadWriteRequest.ucPage,
                                 xModuleReadWriteRequest.ucByteOffset,
-                                pucDestAddr[ 0 ]
-                                );
+                                pucDestAddr[ 0 ] );
                         }
                         break;
                     }
@@ -859,5 +854,5 @@ static int iMapAmiProxyRequestRepo( AMI_PROXY_CMD_SENSOR_REPO xRepo, ASDM_REPOSI
         }
     }
 
-    return ( iStatus );
+    return iStatus;
 }

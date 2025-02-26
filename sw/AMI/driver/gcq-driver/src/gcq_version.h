@@ -5,7 +5,6 @@
  * This header file contains definitions for the internal ring buffer implementation.
  *
  * @file gcq_version.h
- *
  */
 
 #ifndef _GCQ_VERSION_H_

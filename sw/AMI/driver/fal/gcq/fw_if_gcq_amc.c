@@ -5,7 +5,6 @@
  * This file contains the FW IF GCQ abstraction for AMC.
  *
  * @file fw_if_gcq_amc.c
- *
  */
 
 /*****************************************************************************/

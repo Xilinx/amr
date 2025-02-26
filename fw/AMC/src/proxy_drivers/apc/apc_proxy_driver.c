@@ -1562,11 +1562,11 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 			uint32_t ulStartMs           = ulOSAL_GetUptimeMs();
 			uint32_t ulTotalBytesWritten = 0;
 			uint32_t ulBootTag           = 0;
-			APC_MBOX_DOWNLOAD_IMAGE xImageData          =
+			APC_MBOX_DOWNLOAD_IMAGE xImageData =
 			{
 				.xBootDevice  = xSrcBootDevice,
 				.iPartition   = iSrcPartition,
-				.ulImageSize  = ( APC_COPY_PACKET_SIZE_KB ) *( APC_BASE_PACKET_SIZE ),
+				.ulImageSize  = ( APC_COPY_PACKET_SIZE_KB ) * ( APC_BASE_PACKET_SIZE ),
 				.ulSrcAddr    = pxCopyData->ulCpyAddr,
 				.usPacketNum  = 0,
 				.usPacketSize = APC_COPY_PACKET_SIZE_KB

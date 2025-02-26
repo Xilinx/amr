@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the EEPROM debug implementation
  *
  * @file eeprom_debug.c
- *
  */
 
 #include "standard.h"
@@ -527,7 +526,7 @@ static void vGetEepromConfigMode( void )
     }
     else
     {
-        PLL_DAL( EEPROM_DBG_NAME, "Board Config Mode     : %02x\n\r",          pucField[0]   );
+        PLL_DAL( EEPROM_DBG_NAME, "Board Config Mode     : %02x\n\r", pucField[0] );
     }
 }
 
@@ -547,7 +546,7 @@ static void vGetEepromMfgDate( void )
     }
     else
     {
-        PLL_DAL( EEPROM_DBG_NAME, "Mfg Date              : %x%x%x\n\r",   pucField[0],
+        PLL_DAL( EEPROM_DBG_NAME, "Mfg Date              : %x%x%x\n\r", pucField[0],
                  pucField[1],
                  pucField[2] );
     }
@@ -569,7 +568,7 @@ static void vGetEepromPartNumber( void )
     }
     else
     {
-        PLL_DAL( EEPROM_DBG_NAME, "Board Part Num        : %s\n\r",            pucField       );
+        PLL_DAL( EEPROM_DBG_NAME, "Board Part Num        : %s\n\r", pucField );
     }
 }
 
@@ -589,7 +588,7 @@ static void vGetEepromMfgPartNumber( void )
     }
     else
     {
-        PLL_DAL( EEPROM_DBG_NAME, "Mfg Part Num        : %s\n\r",            pucField       );
+        PLL_DAL( EEPROM_DBG_NAME, "Mfg Part Num        : %s\n\r", pucField );
     }
 }
 

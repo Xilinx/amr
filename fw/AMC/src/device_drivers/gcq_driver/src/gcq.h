@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -27,22 +27,22 @@
 /******************************************************************************/
 
 #ifndef GCQ_MAX_INSTANCES
-#define GCQ_MAX_INSTANCES                       ( 4 )   /**< Default value, but can be overridden by build environmental variable  */
+#define GCQ_MAX_INSTANCES	( 4 )   /**< Default value, but can be overridden by build environmental variable  */
 #endif
 
 #ifdef __KERNEL__
-#define gcq_assert( x )                                                              \
-do {    if ( x ) break;                                                              \
-        printk(KERN_EMERG "### ASSERTION FAILED [GCQ Driver] %s: %s: %d: %s\n",      \
-               __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();               \
+#define gcq_assert( x )                                                         \
+do {    if ( x ) break;                                                         \
+        printk(KERN_EMERG "### ASSERTION FAILED [GCQ Driver] %s: %s: %d: %s\n", \
+               __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();          \
 } while ( 0 )
 
 #else
 #include <assert.h>
-#define gcq_assert( x ) assert( x )
+#define gcq_assert( x )	assert( x )
     
-#define likely( x )                             __builtin_expect( !!( x ), 1 )
-#define unlikely( x )                           __builtin_expect( !!( x ), 0 )
+#define likely( x )	__builtin_expect( !!( x ), 1 )
+#define unlikely( x )	__builtin_expect( !!( x ), 0 )
 #endif
 
 
@@ -208,7 +208,6 @@ typedef enum GCQ_FLAGS_TYPE
 /******************************************************************************/
 
 /**
- *
  * @brief    Initialise the GCQ standalone driver
  *           Internally the function will:
  *           - Allocate an internal instance if any are free
@@ -230,7 +229,6 @@ typedef enum GCQ_FLAGS_TYPE
  * @param    ulCQSlotSize is the required completion queue (CQ) slot size
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           const GCQ_IO_ACCESS_TYPE *pxIOAccess,
@@ -244,18 +242,15 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           uint32_t ulCQSlotSize );
 
 /**
- *
  * @brief    De-initialise a GCQ driver instance
  *
  * @param    ppxGCQInstance is the instance to de-initialise
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
 
 /**
- *
  * @brief    Attempt to attach to the consumer, needs to be called before
  *           data can be consumed.
  *           Internally the function will:
@@ -267,12 +262,10 @@ GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
  * @param    pxGCQInstance is the instance of the GCQ
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
 
 /**
- *
  * @brief    Function to consume/read data from the GCQ
  *           Internally the function will:
  *           - Check driver has been initilaised
@@ -284,12 +277,10 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
  * @param    ulDatalLen is the length of the data received
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDatalLen );
 
 /**
- *
  * @brief    Function to produce/send data to the GCQ
  *           Internally the function will:
  *           - Check driver has been initilaised
@@ -300,17 +291,14 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
  * @param    ulDataLen the length of the data being sent
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
- *
  */
 GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDataLen );
 
 /**
- *
  * @brief    Gets version information from gcq_version.h
  *
  * @return   OK                  Version set successfully
  *           ERROR               Version not set successfully
- *
  */
 int iGCQGetVersion( GCQ_VERSION_TYPE *pxVersion );
 

@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF GCQ abstraction for AMC.
  *
  * @file fw_if_gcq_amc.c
- *
  */
 
 /*****************************************************************************/
@@ -179,15 +178,12 @@ static FW_IF_GCQ_PRIVATE_DATA *pxThis = &xLocalData;
 /*****************************************************************************/
 
 /**
- *
  * @brief   Handle memory & register writes in AMC
  *
  * @param   ullDestAddr is the destination address
  * @param   ulValue is the 32-bit value to write
  *
  * @return  N/A
- * 
- *
  */
 static inline void prvvWriteMemReg32( uint64_t ullDestAddr, uint32_t ulValue )
 {
@@ -196,30 +192,25 @@ static inline void prvvWriteMemReg32( uint64_t ullDestAddr, uint32_t ulValue )
 }
 
 /**
- *
  * @brief   Handle memory & register reads in AMC
  *
  * @param   ullSrcAddr is the source address
  *
  * @return  the 32-bit value read
- * 
- *
  */
 static inline uint32_t prvulReadMemReg32( uint64_t ullSrcAddr )
 {
     uint32_t ulValue = HAL_IO_READ32( ullSrcAddr );
     PLL_DBG( FW_IF_GCQ_NAME, "R [0x%llx: 0x%lx]\r\n", ullSrcAddr, ulValue );
-    return ( ulValue );
+    return ulValue;
 }
 
 /**
- *
  * @brief   Map interface error return code
  *
  * @param   error is the return code returned by the gcq driver
  *
  * @return  the mapped interface return code
- *
  */
 static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
 {
@@ -245,17 +236,15 @@ static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
             break;
     }
 
-    return ( xMappedErr );
+    return xMappedErr;
 }
 
 /**
- *
  * @brief   Map interrupt mode
  *
  * @param   xInterruptMode is the interface interrupt mode
  *
  * @return  the mapped gcq driver interrupt mode
- *
  */
 static GCQ_INTERRUPT_MODE_TYPE prvxMapInterruptMode( FW_IF_GCQ_INTERRUPT_MODE_TYPE xInterruptMode )
 {
@@ -272,18 +261,15 @@ static GCQ_INTERRUPT_MODE_TYPE prvxMapInterruptMode( FW_IF_GCQ_INTERRUPT_MODE_TY
             break;
     }
 
-    return ( xMappedMode );
+    return xMappedMode;
 }
 
 /**
- *
  * @brief   Map consumer/producer mode
  *
  * @param   xMode is the interface mode (producer/consumer)
  *
  * @return  the mapped gcq driver interface mode
- * 
- *
  */
 static GCQ_MODE_TYPE prvxMapMode( FW_IF_GCQ_MODE_TYPE xMode )
 {
@@ -299,7 +285,7 @@ static GCQ_MODE_TYPE prvxMapMode( FW_IF_GCQ_MODE_TYPE xMode )
             break;
     }
 
-    return ( xMappedMode );
+    return xMappedMode;
 }
 
 /**

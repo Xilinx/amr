@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the GCQ driver.
  *
  * @file gcq_driver.c
- *
  */
 
 #ifndef __KERNEL__
@@ -82,7 +81,6 @@ static GCQ_PRIVATE_DATA *pxThis = &xLocalData;
 /*****************************************************************************/
 
 /**
- *
  * @brief   Calculate the number of slots that can be allocated based on
  *          the length of the ring and the SQ & CQ slot sizes
  *
@@ -91,7 +89,6 @@ static GCQ_PRIVATE_DATA *pxThis = &xLocalData;
  * @param   ulCQSlotSize is the CQ slot size
  *
  * @return  the number of slots that can be allocated
- *
  */
 static inline uint32_t prvulGCQAllocNumSlots( uint64_t ullRingLen,
                                               const uint32_t ulSQSlotSize,
@@ -113,14 +110,12 @@ static inline uint32_t prvulGCQAllocNumSlots( uint64_t ullRingLen,
 }
 
 /**
- *
  * @brief   Fast forward both the producer & consumer
  *
  * @param   pxGCQInstance the gcq driver instance
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  N/A
- * 
  */
 static inline void prvvGCQFastForward( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
@@ -132,14 +127,12 @@ static inline void prvvGCQFastForward( const GCQ_INSTANCE_TYPE *pxGCQInstance, s
 }
 
 /**
- *
  * @brief   Check if the producer has any more free slots
  *
  * @param   pxGCQInstance the gcq driver instance
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  returns true if can produce
- * 
  */
 static inline uint32_t prvucGCQCanProduce( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
@@ -159,18 +152,16 @@ static inline uint32_t prvucGCQCanProduce( const GCQ_INSTANCE_TYPE *pxGCQInstanc
         }
     }
 
-    return ( ulStatus );
+    return ulStatus;
 }
 
 /**
- *
  * @brief   Check if the consumer has data that can be consumed
  *
  * @param   pxGCQInstance the gcq driver instance
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  returns GCQ_TRUE if data can be consumed
- *
  */
 static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
@@ -203,11 +194,10 @@ static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstanc
         }
     }
 
-    return ( ulStatus );
+    return ulStatus;
 }
 
 /**
- *
  * @brief   Set consumed to be the same as produced to ignore any existing
  *          commands.
  *
@@ -215,7 +205,6 @@ static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstanc
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  N/A
- *
  */
 static inline void prvvGCQSoftReset( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
@@ -228,7 +217,6 @@ static inline void prvvGCQSoftReset( const GCQ_INSTANCE_TYPE *pxGCQInstance, str
 }
 
 /**
- *
  * @brief   Attempt to add data into the producer, can fail if no more
  *          free slots
  *
@@ -236,7 +224,6 @@ static inline void prvvGCQSoftReset( const GCQ_INSTANCE_TYPE *pxGCQInstance, str
  * @param   ullSlotAddr is the slot address
  *
  * @return  returns GCQ_TRUE if produced else error
- *
  */
 static inline GCQ_ERRORS_TYPE prvxGCQProduce( GCQ_INSTANCE_TYPE *pxGCQInstance, uint64_t *ullSlotAddr )
 {
@@ -272,7 +259,6 @@ static inline GCQ_ERRORS_TYPE prvxGCQProduce( GCQ_INSTANCE_TYPE *pxGCQInstance, 
 
 
 /**
- *
  * @brief   Attempt to consume data from the consumer, can fail is no data
  *          is available to read
  *
@@ -280,7 +266,6 @@ static inline GCQ_ERRORS_TYPE prvxGCQProduce( GCQ_INSTANCE_TYPE *pxGCQInstance, 
  * @param   ullSlotAddr is the slot address
  *
  * @return  returns GCQ_TRUE if consumed else error
- *
  */
 static inline GCQ_ERRORS_TYPE prvxGCQConsume( GCQ_INSTANCE_TYPE *pxGCQInstance, uint64_t *ullSlotAddr )
 {
@@ -314,13 +299,11 @@ static inline GCQ_ERRORS_TYPE prvxGCQConsume( GCQ_INSTANCE_TYPE *pxGCQInstance, 
 }
 
 /**
- *
  * @brief   Attempt to find an uninitialized GCQ instance
  *
  * @param   ppxGCQInstance variable to store the gcq driver instance
  *
  * @return  returns GCQ_ERRORS_NONE if instance found, error otherwise
- *
  */
 static inline GCQ_ERRORS_TYPE prviGCQFindNextFreeInstance( struct GCQ_INSTANCE_TYPE **ppxGCQInstance )
 {

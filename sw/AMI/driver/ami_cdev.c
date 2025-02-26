@@ -14,6 +14,7 @@
 #include <linux/types.h>
 #include <linux/hwmon.h>
 #include <linux/eventfd.h>
+#include <linux/version.h>
 
 #include "ami.h"
 #include "ami_hwmon.h"
@@ -41,7 +42,11 @@ static int dev_major = 0;  /* This will be overriden. */
  * 
  * Return: NULL.
  */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,8,0)
+static char *devnode(const struct device *dev, umode_t *mode)
+#else
 static char *devnode(struct device *dev, umode_t *mode)
+#endif
 {
 	if (mode)
 		*mode = READ_WRITE;
@@ -741,7 +746,11 @@ int create_cdev(unsigned baseminor, struct drv_cdev_struct *drv_cdev,
 
 	if(!drv_cdev->dev_class) {
 		cls_created = true;
-		drv_cdev->dev_class = class_create(THIS_MODULE, drv_cdev->drv_cls_str);
+		#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,8,0)
+			drv_cdev->dev_class = class_create(drv_cdev->drv_cls_str);
+		#else
+			drv_cdev->dev_class = class_create(THIS_MODULE, drv_cdev->drv_cls_str);
+		#endif
 		if (IS_ERR(drv_cdev->dev_class)) {
 			ret = PTR_ERR(drv_cdev->dev_class);
 			PR_ERR("Failed to create class %s. ret : %d",

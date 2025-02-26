@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions
  * for the SMBus driver.
  *
  * @file smbus_driver.c
- *
  */
 #include <string.h>
 #include "smbus.h"
@@ -64,12 +63,12 @@ static char* prvpcProtocol_UNKNOWN                                             =
 
 /* Driver Functions */
 
-/*******************************************************************************
+/**
 *
 * @brief    Does a ceiling conversion on a floating point number and returns the
 *           rounded up interger value
 *
-*******************************************************************************/
+*/
 uint32_t ulSMBusCeil( float fNum )
 {
     uint32_t ulNum = ( uint32_t )fNum;
@@ -78,14 +77,14 @@ uint32_t ulSMBusCeil( float fNum )
         ulNum++;
     }
 
-    return ( ulNum );
+    return ulNum;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Converts a protocol enum value to a text string for logging
 *
-*******************************************************************************/
+*/
 SMBus_Error_Type xSMBusFirewallCheck( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     SMBus_Error_Type    xError = SMBUS_SUCCESS;
@@ -112,13 +111,12 @@ SMBus_Error_Type xSMBusFirewallCheck( SMBUS_PROFILE_TYPE* pxSMBusProfile )
     return xError;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Will walk through all active instances, check if any events have been
 *           raised against that instance and call into the state machine for that
 *           instance with each event found
-*
-*******************************************************************************/
+*/
 void vSMBusEventQueueHandle( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint8_t ucAnyEvent;
@@ -141,11 +139,11 @@ void vSMBusEventQueueHandle( SMBUS_PROFILE_TYPE* pxSMBusProfile )
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Retrieves the SMBus driver version
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xSMBusGetVersion( struct SMBUS_PROFILE_TYPE* pxSMBusProfile, SMBUS_VERSION_TYPE* pxSMBusVersion )
 {
 #ifdef GIT_TAG
@@ -185,15 +183,15 @@ SMBus_Error_Type xSMBusGetVersion( struct SMBUS_PROFILE_TYPE* pxSMBusProfile, SM
         }
     }
 
-    return ( xError );
-#endif
+    return xError;
+#endif /* GIT_TAG */
 }
 
-/****************************************************************************
+/**
 *
 * @brief    Disables and then clears all SMBus interrupts
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xSMBusInterruptDisableAndClearInterrupts( struct SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     SMBus_Error_Type xError = SMBUS_ERROR;
@@ -220,14 +218,14 @@ SMBus_Error_Type xSMBusInterruptDisableAndClearInterrupts( struct SMBUS_PROFILE_
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    enables all necessary SMBus interrupts
 *
-*******************************************************************************/
+*/
 SMBus_Error_Type xSMBusInterruptEnableInterrupts( struct SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     SMBus_Error_Type xError = SMBUS_ERROR;
@@ -250,16 +248,16 @@ SMBus_Error_Type xSMBusInterruptEnableInterrupts( struct SMBUS_PROFILE_TYPE* pxS
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Checks hardware is present at the supplied base address
 *           Sets up hardware registers for the frequency class supplied
 *           initializes software structures, sets up log and event queues
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xInitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile, SMBus_Freq_Class_Type xFrequencyClass, void * pvBaseAddress,
                 SMBUS_LOG_LEVEL_TYPE xLogLevel, SMBUS_USER_SUPPLIED_ENVIRONMENT_READ_TICKS pFnReadTicks )
 {
@@ -511,15 +509,15 @@ SMBus_Error_Type xInitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile, SMBus_
         xError = SMBUS_ERROR;
     }
 
-    return ( xError );
+    return xError;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Checks all instances have already been removed
 *           If so sets Profile structure to default values
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xDeinitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile )
 {
     SMBus_Error_Type xError = SMBUS_SUCCESS;
@@ -560,16 +558,16 @@ SMBus_Error_Type xDeinitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile )
         xError = SMBUS_ERROR;
     }
 
-    return ( xError );
+    return xError;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Checks that a free instance slot is available and if so stores the
 *           supplied data associated with the instance and enables the hardware
 *           to send or receive SMBus messages for the supplied instance
 *
-*******************************************************************************/
+*/
 uint8_t ucCreateSMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
                                uint8_t ucSMBusAddress,
                                uint8_t ucUDID[SMBUS_UDID_LENGTH],
@@ -745,13 +743,13 @@ uint8_t ucCreateSMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
     return ucInstanceToReturn;
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Checks that the supplied instance is present and attempts to remove
 *           it. If the instance being removed is the only instance then the ARP
 *           instance is also removed
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xDestroySMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t ucSMBusInstanceID )
 {
     SMBus_Error_Type xError               = SMBUS_ERROR;
@@ -859,15 +857,15 @@ SMBus_Error_Type xDestroySMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfil
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Will initiate an SMBus message from the supplied intance as a
 *           controller
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xSMBusControllerInitiateCommand( struct SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t ucSMBusInstanceID,
                                         uint8_t ucSMBusDestinationAddress, uint8_t ucCommand,
                                         SMBus_Command_Protocol_Type xProtocol, uint16_t usDataSize, uint8_t* pucData,
@@ -952,16 +950,16 @@ SMBus_Error_Type xSMBusControllerInitiateCommand( struct SMBUS_PROFILE_TYPE* pxS
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
 
-/*******************************************************************************
+/**
 *
 * @brief    Retrieves SMBus log that is stored as a circular buffer in profile struct
 *           as ASCII char array
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xSMBusGetLog( struct SMBUS_PROFILE_TYPE* pxSMBusProfile, char* pcLogBuffer, uint32_t* pulLogSizeBytes )
 {
     SMBus_Error_Type xError = SMBUS_ERROR;
@@ -983,15 +981,15 @@ SMBus_Error_Type xSMBusGetLog( struct SMBUS_PROFILE_TYPE* pxSMBusProfile, char* 
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
 
-/*******************************************************************************
+/**
 *
 * @brief    Resets SMBus Driver Log
 *
-*****************************************************************************/
+*/
 SMBus_Error_Type xSMBusLogReset( struct SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     SMBus_Error_Type xError = SMBUS_ERROR;
@@ -1010,14 +1008,14 @@ SMBus_Error_Type xSMBusLogReset( struct SMBUS_PROFILE_TYPE* pxSMBusProfile )
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Enables logging
 *
-*******************************************************************************/
+*/
 void vSMBusLogEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     if( NULL != pxSMBusProfile )
@@ -1034,11 +1032,11 @@ void vSMBusLogEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Disables logging
 *
-*******************************************************************************/
+*/
 void vSMBusLogDisable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     if( NULL != pxSMBusProfile )
@@ -1055,11 +1053,11 @@ void vSMBusLogDisable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Resets the statistics log values for the specified instance
 *
-*******************************************************************************/
+*/
 void vSMBusResetStatsLogInstance( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t ucSMBusInstance )
 {
     int i = 0;
@@ -1086,11 +1084,11 @@ void vSMBusResetStatsLogInstance( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t uc
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Reads the statistics log values for the specified instance
 *
-*******************************************************************************/
+*/
 void vSMBusReadStatsLogInstance( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t ucSMBusInstance,
                                 SMBUS_LOG_TYPE* pxSMBusMessageLog )
 {
@@ -1118,11 +1116,11 @@ void vSMBusReadStatsLogInstance( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t ucS
     }
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Converts a protocol enum value to a text string for logging
 *
-*******************************************************************************/
+*/
 char* pcProtocolToString( uint8_t ucProtocol )
 {
     char* pcResult = prvpcProtocol_UNKNOWN;
@@ -1233,14 +1231,13 @@ char* pcProtocolToString( uint8_t ucProtocol )
     return pcResult;
 }
 
-/*******************************************************************************
+/**
 *
 * @brief    Creates an i2c device to act as both a master and a slave
 *           Checks that a free instance slot is available and if so stores the
 *           supplied data associated with the instance and enables the hardware
 *           to send or receive I2C messages for the supplied instance
-*
-*******************************************************************************/
+*/
 uint8_t ucI2CCreateDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
 							 uint8_t ucAddr,
 							 I2C_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE    pFnGetData,
@@ -1332,11 +1329,11 @@ uint8_t ucI2CCreateDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
     return ucInstanceToReturn;
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Destroys a previously created i2c device
 *
-*****************************************************************************/
+*/
 uint8_t ucI2CDestroyDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
 							  uint8_t ucDeviceId )
 {
@@ -1401,14 +1398,14 @@ uint8_t ucI2CDestroyDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
-/******************************************************************************
+/**
 *
 *	@brief	Writes data to a remote slave as a master
 *
-*******************************************************************************/
+*/
 uint8_t ucI2CWriteData( struct I2C_PROFILE_TYPE* pxI2cProfile,
 						  uint8_t  ucDeviceId,
 						  uint8_t  ucAddr,
@@ -1477,14 +1474,14 @@ uint8_t ucI2CWriteData( struct I2C_PROFILE_TYPE* pxI2cProfile,
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
-/******************************************************************************
+/**
 *
 *	@brief	Reads data from a remote slave as a master
 *
-*******************************************************************************/
+*/
 uint8_t ucI2CReadData( struct I2C_PROFILE_TYPE* pxI2cProfile,
 						 uint8_t   ucDeviceId,
 						 uint8_t   ucAddr,
@@ -1544,14 +1541,14 @@ uint8_t ucI2CReadData( struct I2C_PROFILE_TYPE* pxI2cProfile,
         }
     }
 
-    return ( xError );
+    return xError;
 }
 
-/******************************************************************************
+/**
 *
 *	@brief	Writes data to and then reads from remote slave as a master
 *
-*******************************************************************************/
+*/
 uint8_t ucI2CWriteReadData( struct I2C_PROFILE_TYPE* pxI2cProfile,
 						 uint8_t   ucDeviceId,
 						 uint8_t   ucAddr,
@@ -1619,5 +1616,5 @@ uint8_t ucI2CWriteReadData( struct I2C_PROFILE_TYPE* pxI2cProfile,
         }
     }
 
-    return ( xError );
+    return xError;
 }

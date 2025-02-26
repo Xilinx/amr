@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of ISL68221 sensor read
@@ -436,7 +436,7 @@ static int iWriteRegister( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegi
         INC_ERROR_COUNTER( ISL68221_ERRORS_VALIDATION )
     }
 
-    return( iStatus );
+    return iStatus;
 }
 
 /**
@@ -463,6 +463,6 @@ static int iReadRegister( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegis
         INC_ERROR_COUNTER( ISL68221_ERRORS_VALIDATION )
     }
 
-    return( iStatus );
+    return iStatus;
 }
 
