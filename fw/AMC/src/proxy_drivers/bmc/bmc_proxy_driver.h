@@ -5,7 +5,6 @@
  * This file contains the API for the Board Management Controller (BMC) proxy driver
  *
  * @file bmc_proxy_driver.h
- *
  */
 
 #ifndef _BMC_PROXY_DRIVER_H_
@@ -229,4 +228,4 @@ int iBMC_GetSensorIdRequest( EVL_SIGNAL *pxSignal, int16_t *pssSensorId, uint8_t
  */
 int iBMC_GetState( MODULE_STATE *pxState );
 
-#endif
+#endif /* _BMC_PROXY_DRIVER_H_ */

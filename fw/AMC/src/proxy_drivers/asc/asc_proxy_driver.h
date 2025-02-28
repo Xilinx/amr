@@ -5,7 +5,6 @@
  * This file contains the API for the Alveo Sensor Control (ASC) proxy driver
  *
  * @file asc_proxy_driver.h
- *
  */
 
 #ifndef _ASC_PROXY_DRIVER_H_
@@ -397,4 +396,4 @@ int iASC_ClearStatistics( void );
  */
 int iASC_GetState( MODULE_STATE *pxState );
 
-#endif
+#endif /* _ASC_PROXY_DRIVER_H_ */

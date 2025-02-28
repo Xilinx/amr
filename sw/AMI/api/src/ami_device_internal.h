@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_device_internal.h - This file contains the private interface for device related logic
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -45,7 +45,7 @@
  * @num_sensors: number of suported sensors (eg. vccint, 12v_pex, etc...)
  * @num_total_sensors: total number of sensors  (e.g. vccint temp, vccint power, etc...)
  * @sensors: list of supported sensors (head)
- * 
+ *
  * If `cap_override` is set to true, all IOCTL's (and any other relevant API)
  * issued using this device handle will bypass any permission checks
  * and execute code that would, normally, only be reachable with root/sudo!
@@ -86,7 +86,7 @@ int ami_close_cdev(ami_device *dev);
  * @dev: Device handle.
  * @attr: Attribute name.
  * @buf: Buffer to store attribute value. Must be at least AMI_SYSFS_STR_MAX bytes.
- * 
+ *
  * Return: AMI_STATUS_ERROR or AMI_STATUS_OK
  */
 int ami_read_sysfs(ami_device *dev, const char *attr, char *buf);

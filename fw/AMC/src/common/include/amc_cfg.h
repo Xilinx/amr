@@ -6,7 +6,6 @@
  * bitmasks for the AMC
  *
  * @file amc_cfg.h
- *
  */
 
 #ifndef _AMC_CFG_H_

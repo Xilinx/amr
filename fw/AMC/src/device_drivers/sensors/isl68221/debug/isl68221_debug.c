@@ -5,7 +5,6 @@
  * This file contains the ISL68221 debug implementation
  *
  * @file isl68221_debug.c
- *
  */
 
 #include "standard.h"

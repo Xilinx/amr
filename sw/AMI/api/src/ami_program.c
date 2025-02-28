@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_program.c - This file contains the implementation of device programming logic.
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -55,7 +55,7 @@ static int read_file(const char *fname, uint8_t **buf, uint32_t *size)
 
 	if (fp == NULL)
 		return AMI_API_ERROR(AMI_ERROR_EBADF);
-	
+
 	/* Go to end of file. */
 	if (fseek(fp, 0L, SEEK_END) != AMI_LINUX_STATUS_OK) {
 		ret = AMI_API_ERROR(AMI_ERROR_EIO);
@@ -118,17 +118,17 @@ static int do_image_download(ami_device *dev, const char *path, uint8_t boot_dev
 	uint32_t img_size = 0;
 	int ret = AMI_STATUS_ERROR;
 	struct ami_ioc_data_payload payload = { 0 };
-	
+
 	/* For progress tracking */
 	struct ami_event_data evt_data = { 0 };
 	struct ami_pdi_progress progress = { 0 };
 
 	if (!dev || !path)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR;  /* last error is set by ami_open_cdev */
-	
+
 	if (read_file(path, &img_data, &img_size) == AMI_STATUS_OK) {
 		payload.size = img_size;
 		payload.addr = (unsigned long)(&img_data[0]);
@@ -214,12 +214,12 @@ int ami_prog_device_boot(struct ami_device **dev, uint32_t partition)
 
 	if (!dev || !(*dev))
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(*dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR; /* last error is set by ami_open_cdev */
-	
+
 	payload.partition = partition;
-	
+
 	if (ioctl((*dev)->cdev, AMI_IOC_DEVICE_BOOT, &payload) == AMI_LINUX_STATUS_ERROR) {
 		ret = AMI_API_ERROR_M(
 			AMI_ERROR_EIO,
@@ -238,7 +238,7 @@ int ami_prog_device_boot(struct ami_device **dev, uint32_t partition)
 /*
  * Copy a device partition.
  */
-int ami_prog_copy_partition(ami_device *dev, uint32_t src_device, uint32_t src_part, 
+int ami_prog_copy_partition(ami_device *dev, uint32_t src_device, uint32_t src_part,
 	uint32_t dest_device, uint32_t dest_part, ami_event_handler progress_handler)
 {
 	int ret = AMI_STATUS_ERROR;
@@ -249,10 +249,10 @@ int ami_prog_copy_partition(ami_device *dev, uint32_t src_device, uint32_t src_p
 
 	if (!dev)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR; /* last error is set by ami_open_cdev */
-	
+
 	payload.src_device = src_device;
 	payload.src_part = src_part;
 	payload.dest_device = dest_device;
@@ -265,7 +265,7 @@ int ami_prog_copy_partition(ami_device *dev, uint32_t src_device, uint32_t src_p
 			progress_handler,
 			NULL
 		);
-	
+
 	if (ioctl(dev->cdev, AMI_IOC_COPY_PARTITION, &payload) == AMI_LINUX_STATUS_ERROR)
 		ret = AMI_API_ERROR_M(
 			AMI_ERROR_EIO,
@@ -292,12 +292,12 @@ int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device, struct ami_fpt
 
 	if (!dev || !header)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR; /* last error is set by ami_open_cdev */
 
 	data.boot_device = boot_device;
-	
+
 	errno = 0;
 	if (ioctl(dev->cdev, AMI_IOC_GET_FPT_HDR, &data) == AMI_LINUX_STATUS_ERROR) {
 		ret = AMI_API_ERROR_M(
@@ -327,13 +327,13 @@ int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device, uint32_t nu
 
 	if (!dev || !partition)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR; /* last error is set by ami_open_cdev */
 
 	data.boot_device = boot_device;
 	data.partition = num;
-	
+
 	errno = 0;
 	if (ioctl(dev->cdev, AMI_IOC_GET_FPT_PARTITION, &data) == AMI_LINUX_STATUS_ERROR) {
 		ret = AMI_API_ERROR_M(

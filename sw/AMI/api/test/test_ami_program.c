@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * test_ami_program.c - Unit test file for ami_program.c
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -88,11 +88,11 @@ FILE *__wrap_fopen(const char *filename, const char *mode)
 	case OK:
 		ret = &dummy;
 		break;
-	
+
 	case REAL:
 		ret = __real_fopen(filename, mode);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -111,11 +111,11 @@ int __wrap_fclose(FILE *stream)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_fclose(stream);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -136,11 +136,11 @@ void *__wrap_malloc(size_t size)
 	case REAL:
 		ret = __real_malloc(size);
 		break;
-	
+
 	default:
 		break;
 	}
-	
+
 	WRAPPER_DONE(malloc);
 	return ret;
 }
@@ -162,11 +162,11 @@ size_t __wrap_fread(void *restrict buffer, size_t size, size_t count,
 		ret = strlen(str);
 		break;
 	}
-	
+
 	case REAL:
 		ret = __real_fread(buffer, size, count, stream);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -185,11 +185,11 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_fseek(stream, offset, whence);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -208,11 +208,11 @@ long int __wrap_ftell(FILE *stream)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_ftell(stream);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -231,11 +231,11 @@ int __wrap_ferror(FILE *stream)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_ferror(stream);
 		break;
-	
+
 	default:
 		break;
 	}

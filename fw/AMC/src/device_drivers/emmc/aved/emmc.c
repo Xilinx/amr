@@ -5,7 +5,6 @@
  * This file contains the user API definitions for the EMMC driver.
  *
  * @file emmc.c
- *
  */
 
 /******************************************************************************/

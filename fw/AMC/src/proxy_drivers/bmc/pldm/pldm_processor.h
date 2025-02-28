@@ -5,7 +5,6 @@
  * This file contains PLDM enums, structures and functions
  *
  * @file pldm_processor.h
- *
  */
 
 #ifndef PLDM_PROCESSOR_H_

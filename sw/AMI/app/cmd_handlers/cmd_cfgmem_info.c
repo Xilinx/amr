@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * cmd_cfgmem_info.c - This file contains the implementation for the command "cfgmem_info"
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -34,10 +34,10 @@
  * @options:  Ordered list of options passed in at the command line
  * @num_args:  Number of non-option arguments (excluding command)
  * @args:  List of non-option arguments (excluding command)
- * 
+ *
  * `args` may be an invalid pointer. It is the function's responsibility
  * to validate the `num_args` parameter.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_cfgmem_info(struct app_option *options, int num_args, char **args);
@@ -127,7 +127,7 @@ static int do_cmd_cfgmem_info(struct app_option *options, int num_args, char **a
 		return AMI_STATUS_ERROR;
 	}
 
-	ret = print_fpt_info(dev, selected_boot_device, options); 
+	ret = print_fpt_info(dev, selected_boot_device, options);
 
 	ami_dev_delete(&dev);
 	return ret;

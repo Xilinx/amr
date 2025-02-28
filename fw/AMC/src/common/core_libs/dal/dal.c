@@ -5,7 +5,6 @@
  * This file contains the implementation of the Debug Access Library (DAL)
  *
  * @file dal.c
- *
  */
 
 /******************************************************************************/

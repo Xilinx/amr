@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * apputils.c - Utility functions for the AMI command line
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -45,7 +45,7 @@
  * parse_logic_uuid() - Utility function to parse logic UUID JSON.
  * @json: Raw JSON string.
  * @uuid: Pointer to store parsed uuid string.
- * 
+ *
  * The expected JSON format is `{"design": {"logic_uuid": "..."}}`.
  * For best results, the logic UUID should be lowercase.
  *
@@ -62,7 +62,7 @@ static int parse_logic_uuid(const char *json, char *uuid)
 
 	if (!json || !uuid)
 		return EXIT_FAILURE;
-	
+
 	parent = json_decode(json);
 
 	if (parent) {
@@ -193,7 +193,7 @@ exit:
 
 	if (buf)
 		free(buf);
-	
+
 	return ret;
 }
 
@@ -260,7 +260,7 @@ int read_file(const char *fname, uint8_t **buf, uint32_t *size)
 
 	if (fp == NULL)
 		return EXIT_FAILURE;
-	
+
 	/* Go to end of file. */
 	if (fseek(fp, 0L, SEEK_END) != AMI_LINUX_STATUS_OK)
 		goto close;
@@ -400,7 +400,7 @@ int parse_output_options(struct app_option *options, enum app_out_format *fmt,
 
 		o_given = true;
 		*stream = fopen(opt->arg, "w");
-		
+
 		/* Defaults to stdout */
 		if (!(*stream))
 			APP_WARN("could not open output file");
@@ -409,7 +409,7 @@ int parse_output_options(struct app_option *options, enum app_out_format *fmt,
 	/* The format is only for the output file. */
 	if (f_given && !o_given)
 		APP_WARN("format specified but no output given");
-	
+
 	/* Check if user requested verbose output */
 	if (verbose)
 		*verbose = (NULL != find_app_option('v', options));

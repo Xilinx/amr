@@ -6,7 +6,6 @@
  * for the I2C driver.
  *
  * @file i2c.h
- *
  */
 
 #ifndef _I2C_H_

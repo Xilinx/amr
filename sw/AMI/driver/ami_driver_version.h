@@ -19,5 +19,5 @@
 #define GIT_BRANCH                ""
 #define GIT_STATUS                (0)
 
-#endif // _AMI_DRIVER_VERSION_H_
+#endif /* _AMI_DRIVER_VERSION_H_ */
 

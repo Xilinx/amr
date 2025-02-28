@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * printer.c - This file contains utilities for printing formatted output
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -88,7 +88,7 @@ void print_hexdump(uint64_t start_addr, void *values, uint32_t num_values,
 
 	if (!values || (num_values == 0) || (num_groups == 0))
 		return;
-	
+
 	for (i = 0; i < num_values; i++) {
 		if ((i % num_groups) == 0)
 			printf(
@@ -172,7 +172,7 @@ int print_table_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
 		ret = EXIT_FAILURE;
 		goto delete_header;
 	}
-	
+
 	/* Row of pointers to each column. */
 	for (i = 0; i < n_rows; i++) {
 		rows[i] = (char**)calloc(n_fields, sizeof(char*));
@@ -240,7 +240,7 @@ delete_header:
 
 		free(header);
 	}
-	
+
 	return ret;
 }
 
@@ -342,13 +342,13 @@ char print_progress_bar(uint32_t cur, uint32_t max, uint32_t width,
 
 	if (width < progress)
 		progress = width;
-	
+
 	for (i = 0; i < progress; i++)
 		putchar(fill);
 
 	for (i = 0; i < (width - progress); i++)
 		putchar(empty);
-	
+
 	putchar(right);
 	printf(" %.0f%% ", ((double)cur / (double)max) * 100);
 
@@ -357,12 +357,12 @@ char print_progress_bar(uint32_t cur, uint32_t max, uint32_t width,
 		putchar('|');
 		new_state = '-';
 		break;
-	
+
 	case '-':
 		putchar('-');
 		new_state = '|';
 		break;
-	
+
 	default:
 		putchar('|');
 		new_state = '-';

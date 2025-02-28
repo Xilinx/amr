@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_device.c - This file contains the implementation of device related logic
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -88,7 +88,7 @@
  * @dev: Device handle.
  * @attr: Attribute name.
  * @mode: File mode (O_RDONLY, O_WRONLY, O_RDWR).
- * 
+ *
  * Return: The file descriptor (-1 on error).
  */
 static int open_sysfs(ami_device *dev, const char *attr, int mode);
@@ -158,7 +158,7 @@ static int open_sysfs(ami_device *dev, const char *attr, int mode)
 
 	if (!dev || !attr)
 		return file;
-	
+
 	snprintf(
 		path,
 		AMI_SYSFS_PATH_MAX,
@@ -228,7 +228,7 @@ static int pci_remove(uint16_t bdf)
 	} else {
 		ret = AMI_API_ERROR(AMI_ERROR_EBADF);
 	}
-	
+
 	return ret;
 }
 
@@ -263,7 +263,7 @@ static int do_app_setup(ami_device *dev, enum ami_ioc_app_setup arg)
 
 	if (!dev)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR;
 
@@ -339,7 +339,7 @@ int ami_read_sysfs(ami_device *dev, const char *attr, char *buf)
 
 	if (!dev || !attr || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	file = open_sysfs(dev, attr, O_RDONLY);
 
 	if (file != AMI_INVALID_FD) {
@@ -347,7 +347,7 @@ int ami_read_sysfs(ami_device *dev, const char *attr, char *buf)
 			ret = AMI_STATUS_OK;
 		else
 			ret = AMI_API_ERROR(AMI_ERROR_EIO);
-		
+
 		close(file);
 	} else {
 		ret = AMI_API_ERROR(AMI_ERROR_EBADF);
@@ -458,7 +458,7 @@ int ami_dev_find_next(ami_device **dev, int b, int d, int f, ami_device *prev)
 					} else {
 						ret = AMI_API_ERROR(AMI_ERROR_ENOMEM);
 					}
-					
+
 					break;
 				}
 
@@ -470,10 +470,10 @@ int ami_dev_find_next(ami_device **dev, int b, int d, int f, ami_device *prev)
 		}
 
 		fclose(file);
-		
+
 		if (line)
 			free(line);
-		
+
 		/* Check if device was found. */
 		if ((nread == AMI_LINUX_STATUS_ERROR) && !found)
 			ret = AMI_API_ERROR(AMI_ERROR_ENODEV);
@@ -493,7 +493,7 @@ int ami_dev_find(const char *bdf, ami_device **dev)
 
 	if (!dev)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	bdf_num = ami_parse_bdf(bdf);
 
 	return ami_dev_find_next(
@@ -514,7 +514,7 @@ int ami_dev_bringup(const char *bdf, ami_device **dev)
 
 	if (!bdf || !dev)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_dev_find(bdf, dev) == AMI_STATUS_OK)
 		ret = ami_sensor_discover(*dev);
 
@@ -631,7 +631,7 @@ int ami_dev_hot_reset(ami_device **dev)
 
 	if (ret)
 		return ret;
-	
+
 	snprintf(
 		config_path,
 		AMI_SYSFS_PATH_MAX,
@@ -659,7 +659,7 @@ int ami_dev_hot_reset(ami_device **dev)
 	ret = pci_remove(bdf);
 	if (ret)
 		goto close_config;
-	
+
 	/*
 	 * On some systems, the device that is being reset disappears from the host,
 	 * forcing a system reboot - adding a delay before setting the SBR seems
@@ -768,7 +768,7 @@ int ami_dev_set_amc_debug_level(ami_device *dev, enum ami_amc_debug_level level)
 
 	if (!dev)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR;
 
@@ -795,10 +795,10 @@ int ami_dev_read_uuid(ami_device *dev, char buf[AMI_LOGIC_UUID_SIZE])
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_LOGIC_UUID, raw_buf) == AMI_STATUS_OK) {
 		/*
-		 * This will also strip the new line because we're specifying 
+		 * This will also strip the new line because we're specifying
 		 * the maximum size of the logic UUID.
 		 */
 		strncpy(buf, raw_buf, AMI_LOGIC_UUID_SIZE - 1);
@@ -822,13 +822,13 @@ int ami_dev_get_num_devices(uint16_t *num)
 
 	if (!num)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	file = fopen(AMI_DEVICES_MAP, "r");
 
 	if (file) {
 		if (getline(&line, &len, file) != AMI_LINUX_STATUS_ERROR) {
 			int num_devices = 0;
-			
+
 			if (sscanf(line, "%d", &num_devices) == 1) {
 				*num = num_devices;
 				ret = AMI_STATUS_OK;
@@ -859,17 +859,17 @@ int ami_dev_get_pci_link_speed(ami_device *dev, uint8_t *current, uint8_t *max)
 
 	if (!dev || !current || !max)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_PCI_LINK_SPEED_M, raw_buf_m) == AMI_STATUS_OK) {
 		if (ami_read_sysfs(dev, SYSFS_PCI_LINK_SPEED_C, raw_buf_c) == AMI_STATUS_OK) {
 			uint8_t c = 0, m = 0;
 
 			if (sscanf(raw_buf_c, "%hhd", &c) != 1)
 				return AMI_API_ERROR(AMI_ERROR_ERET);
-			
+
 			if (sscanf(raw_buf_m, "%hhd", &m) != 1)
 				return AMI_API_ERROR(AMI_ERROR_ERET);
-			
+
 			*current = c;
 			*max = m;
 			ret = AMI_STATUS_OK;
@@ -890,14 +890,14 @@ int ami_dev_get_pci_link_width(ami_device *dev, uint8_t *current, uint8_t *max)
 
 	if (!dev || !current || !max)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_PCI_LINK_WIDTH_M, raw_buf_m) == AMI_STATUS_OK) {
 		if (ami_read_sysfs(dev, SYSFS_PCI_LINK_WIDTH_C, raw_buf_c) == AMI_STATUS_OK) {
 			uint8_t c = 0, m = 0;
 
 			if (sscanf(raw_buf_c, "%hhd", &c) != 1)
 				return AMI_API_ERROR(AMI_ERROR_ERET);
-			
+
 			if (sscanf(raw_buf_m, "%hhd", &m) != 1)
 				return AMI_API_ERROR(AMI_ERROR_ERET);
 
@@ -917,16 +917,16 @@ int ami_dev_get_pci_vendor(ami_device *dev, uint16_t *vendor)
 {
 	int ret = AMI_STATUS_ERROR;
 	char raw_buf[AMI_SYSFS_STR_MAX] = { 0 };
-	
+
 	if (!dev || !vendor)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_PCI_VENDOR, raw_buf) == AMI_STATUS_OK) {
 		uint16_t v = 0;
 
 		if (sscanf(raw_buf, "0x%hx", &v) != 1)
 			return AMI_API_ERROR(AMI_ERROR_ERET);
-		
+
 		*vendor = v;
 		ret = AMI_STATUS_OK;
 	}
@@ -941,16 +941,16 @@ int ami_dev_get_pci_device(ami_device *dev, uint16_t *device)
 {
 	int ret = AMI_STATUS_ERROR;
 	char raw_buf[AMI_SYSFS_STR_MAX] = { 0 };
-	
+
 	if (!dev || !device)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_PCI_DEVICE, raw_buf) == AMI_STATUS_OK) {
 		uint16_t d = 0;
 
 		if (sscanf(raw_buf, "0x%hx", &d) != 1)
 			return AMI_API_ERROR(AMI_ERROR_ERET);
-		
+
 		*device = d;
 		ret = AMI_STATUS_OK;
 	}
@@ -965,16 +965,16 @@ int ami_dev_get_pci_numa_node(ami_device *dev, uint8_t *node)
 {
 	int ret = AMI_STATUS_ERROR;
 	char raw_buf[AMI_SYSFS_STR_MAX] = { 0 };
-	
+
 	if (!dev || !node)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_PCI_NUMA_NODE, raw_buf) == AMI_STATUS_OK) {
 		uint8_t n = 0;
 
 		if (sscanf(raw_buf, "%hhd", &n) != 1)
 			return AMI_API_ERROR(AMI_ERROR_ERET);
-		
+
 		*node = n;
 		ret = AMI_STATUS_OK;
 	}
@@ -992,7 +992,7 @@ int ami_dev_get_pci_cpulist(ami_device *dev, char buf[AMI_PCI_CPULIST_SIZE])
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_PCI_CPULIST, raw_buf) == AMI_STATUS_OK) {
 		/* Strip newline */
 		raw_buf[strcspn(raw_buf, "\r\n")] = 0;
@@ -1014,7 +1014,7 @@ int ami_dev_get_state(ami_device *dev, char buf[AMI_DEV_STATE_SIZE])
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_DEV_STATE, raw_buf) == AMI_STATUS_OK) {
 		/* Strip newline */
 		raw_buf[strcspn(raw_buf, "\r\n")] = 0;
@@ -1036,7 +1036,7 @@ int ami_dev_get_name(ami_device *dev, char buf[AMI_DEV_NAME_SIZE])
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_DEV_NAME, raw_buf) == AMI_STATUS_OK) {
 		/* Strip newline */
 		raw_buf[strcspn(raw_buf, "\r\n")] = 0;
@@ -1058,7 +1058,7 @@ int ami_dev_get_amc_version(ami_device *dev, struct amc_version *amc_version)
 
 	if (!dev || !amc_version)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, SYSFS_AMC_VERSION, raw_buf) == AMI_STATUS_OK) {
 		int scan = sscanf(
 			raw_buf,
@@ -1090,7 +1090,7 @@ int ami_dev_get_pci_port(ami_device *dev, char buf[AMI_DEV_PCI_PORT_SIZE])
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	snprintf(
 		dev_path,
 		AMI_SYSFS_PATH_MAX,
@@ -1114,7 +1114,7 @@ int ami_dev_get_pci_port(ami_device *dev, char buf[AMI_DEV_PCI_PORT_SIZE])
 			basename(dirname(link_path)),
 			AMI_DEV_PCI_PORT_SIZE
 		);
-		
+
 		ret = AMI_STATUS_OK;
 	}
 

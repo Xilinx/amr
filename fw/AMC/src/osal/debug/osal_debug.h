@@ -5,7 +5,6 @@
  * This file contains the AVED Management Interface (AMI) debug access
  *
  * @file osal_debug.h
- *
  */
 
 #ifndef _OSAL_DEBUG_H_
@@ -23,4 +22,4 @@
  */
 void vOSAL_DebugInit( void );
 
-#endif
+#endif /* _OSAL_DEBUG_H_ */

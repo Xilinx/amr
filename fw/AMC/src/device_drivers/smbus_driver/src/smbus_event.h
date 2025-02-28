@@ -6,7 +6,6 @@
  * function declarations for the functions which generate those events
  *
  * @file smbus_event.h
- *
  */
 
 #ifndef _SMBUS_EVENT_H_
@@ -566,7 +565,7 @@ void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBUS_INSTANCE
 
 /*******************************************************************************
 *
-* @brief    Converts an event enum value to a text string for logging 
+* @brief    Converts an event enum value to a text string for logging
 *
 * @param    ucEvent is any state machine event enum value
 *

@@ -5,7 +5,6 @@
  * This file contains the fal profile for the V80
  *
  * @file profile_fal.c
- *
  */
 
 /*****************************************************************************/
@@ -53,7 +52,7 @@
 #define FAL_PROFILE_NAME      "PROFILE_FAL"
 #define OSPI_PAGE_SIZE        ( 256 )
 #define OSPI_RPU_BASE_ADDRESS ( 0x0 )
-#define OSPI_RPU_LENGTH       ( 0x10000000 )                                   /* 2Gb (256MB) */
+#define OSPI_RPU_LENGTH       ( 0x10000000 )       /* 2Gb (256MB) */
 #define EMMC_RPU_BASE_ADDRESS ( 0x0 )
 #define EMMC_RPU_LENGTH       ( ( uint64_t )HAL_EMMC_MAX_BLOCKS * ( uint64_t )HAL_EMMC_BLOCK_SIZE ) /* 64Gb */
 
@@ -721,5 +720,5 @@ void vFAL_DebugInitialise( void )
     }
 
     vFW_IF_SMBUS_DebugInit( pxFwIfTop );
-#endif
+#endif /* DEBUG_BUILD */
 }

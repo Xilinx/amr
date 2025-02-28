@@ -5,7 +5,6 @@
  * This file contains the OSAL (Operating system abstraction layer) debug implementation.
  *
  * @file osal_debug.c
- *
  */
 
 #include "standard.h"
@@ -49,12 +48,12 @@ static void vPrintStats( void );
 static void vClearStats( void );
 
 /**
- * @brief   Debug function to print user specified stats. 
+ * @brief   Debug function to print user specified stats.
  */
 static void vPrintStatsCustom( void );
 
 /**
- * @brief   Debug function of Osal Uptime function in ms. 
+ * @brief   Debug function of Osal Uptime function in ms.
  */
 static void vGetUptimeMs( void );
 /******************************************************************************/
@@ -99,13 +98,13 @@ static void vClearStats( void )
 }
 
 /**
- * @brief   Debug function to print user specified stats. 
+ * @brief   Debug function to print user specified stats.
  */
 static void vPrintStatsCustom( void )
 {
     int iStatVerbosity = 0;
     int iStatType = 0;
-    
+
     vPLL_Printf( "\r\n     0:OS \
                   \r\n     1:Task \
                   \r\n     2:Mutex \
@@ -132,12 +131,12 @@ static void vPrintStatsCustom( void )
             PLL_DAL( OSAL_DBG_NAME, "Error retrieving verbosity level\r\n" );
         }
     }
-   
+
     vOSAL_PrintAllStats( ( OSAL_STATS_VERBOSITY )iStatVerbosity, ( OSAL_STATS_TYPE )iStatType );
 }
 
 /**
- * @brief   Debug function of Osal Uptime function in ms. 
+ * @brief   Debug function of Osal Uptime function in ms.
  */
 static void vGetUptimeMs( void )
 {

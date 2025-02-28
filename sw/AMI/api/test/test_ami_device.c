@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * test_ami_device.c - Unit test file for ami_device.c
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -121,11 +121,11 @@ FILE *__wrap_fopen(const char *filename, const char *mode)
 	case OK:
 		ret = &dummy;
 		break;
-	
+
 	case REAL:
 		ret = __real_fopen(filename, mode);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -144,11 +144,11 @@ int __wrap_fclose(FILE *stream)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_fclose(stream);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -169,11 +169,11 @@ void *__wrap_calloc(size_t num, size_t size)
 	case REAL:
 		ret = __real_calloc(num, size);
 		break;
-	
+
 	default:
 		break;
 	}
-	
+
 	WRAPPER_DONE(calloc);
 	return ret;
 }
@@ -192,11 +192,11 @@ int __wrap_open(const char *pathname, int flags, int mode)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_open(pathname, flags, mode);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -219,11 +219,11 @@ int __wrap_close(int fd)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_close(fd);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -247,11 +247,11 @@ ssize_t __wrap_read(int fildes, void *buf, size_t nbyte)
 		ret = strlen(str);
 		break;
 	}
-	
+
 	case REAL:
 		ret = __real_read(fildes, buf, nbyte);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -276,11 +276,11 @@ ssize_t __wrap_write(int fildes, const void *buf, size_t nbyte)
 		ret = AMI_LINUX_STATUS_OK;
 		break;
 	}
-	
+
 	case REAL:
 		ret = __real_write(fildes, buf, nbyte);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -682,7 +682,7 @@ void test_happy_ami_dev_pci_reload(void **state)
 		ami_dev_pci_reload(NULL, "c1:00.0"),
 		AMI_STATUS_OK
 	);
-	
+
 	free(dev);
 }
 

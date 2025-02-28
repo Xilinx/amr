@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * table.c - This file contains utilities for printing tables
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -139,7 +139,7 @@ int print_table(char* header[], char** values[], int num_cols, int num_rows,
 	case TABLE_DIVIDER_GROUPS:
 		print_divider = true;
 		break;
-	
+
 	default:
 		break;
 	}
@@ -176,7 +176,7 @@ int print_table(char* header[], char** values[], int num_cols, int num_rows,
 			else
 				print_divider = true;
 			break;
-		
+
 		default:
 			print_divider = false;
 			break;

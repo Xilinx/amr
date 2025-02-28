@@ -5,7 +5,6 @@
  * This file contains the API for the Alveo Management Interface (AMI) proxy driver
  *
  * @file ami_proxy_driver.h
- *
  */
 
 #ifndef _AMI_PROXY_DRIVER_H_
@@ -150,7 +149,7 @@ typedef struct AMI_PROXY_PDI_DOWNLOAD_REQUEST
     uint64_t ullAddress;
     uint32_t ulLength;
     uint32_t ulPartitionSel;
-    uint16_t usPacketNum; 
+    uint16_t usPacketNum;
     uint16_t usPacketSize;
 
 } AMI_PROXY_PDI_DOWNLOAD_REQUEST;
@@ -219,7 +218,7 @@ typedef struct AMI_PROXY_IDENTITY_RESPONSE
     uint8_t  ucVerPatch;        /* patch number */
     uint8_t  ucLocalChanges;    /* 0 for no changes, 1 for changes */
     uint16_t usDevCommits;      /* number of commits since the version tag */
-    
+
     uint8_t  ucLinkVerMajor;    /* major version number of the comms link */
     uint8_t  ucLinkVerMinor;    /* minor version number of the comms link */
 
@@ -456,7 +455,7 @@ int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
  *
  * @return  OK          Stats retrieved from proxy driver successfully
  *          ERROR       Stats not retrieved successfully
- * 
+ *
  */
 int iAMI_PrintStatistics( void );
 
@@ -465,7 +464,7 @@ int iAMI_PrintStatistics( void );
  *
  * @return  OK          Stats cleared successfully
  *          ERROR       Stats not cleared successfully
- * 
+ *
  */
 int iAMI_ClearStatistics( void );
 
@@ -479,4 +478,4 @@ int iAMI_ClearStatistics( void );
  */
 int iAMI_GetState( MODULE_STATE *pxState );
 
-#endif
+#endif /* _AMI_PROXY_DRIVER_H_ */

@@ -5,7 +5,6 @@
  * This file contains the user API definitions for the I2C driver.
  *
  * @file i2c.c
- *
  */
 
 /******************************************************************************/

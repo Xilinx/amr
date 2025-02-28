@@ -5,7 +5,6 @@
  * This file contains the user API definitions for the OSPI device driver.
  *
  * @file ospi.c
- *
  */
 
 /******************************************************************************/

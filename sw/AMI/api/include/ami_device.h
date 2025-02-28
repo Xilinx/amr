@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_device.h - This file contains the public interface for device related functionality.
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -97,7 +97,7 @@ enum ami_amc_debug_level {
  * @d: Device must have this device number (can be AMI_ANY_DEV)
  * @f: Device must have this function number (can be AMI_ANY_DEV)
  * @prev: Previous device handle (may be NULL)
- * 
+ *
  * This function attempts to find a compatible PCIe device which is
  * attached to the AMI driver. Upon success, it populates all necessary
  * fields in the device struct that gets passed into this function. This
@@ -128,16 +128,16 @@ int ami_dev_find_next(ami_device **dev, int b, int d, int f, ami_device *prev);
  * ami_dev_find() - Wrapper around `ami_dev_find_next`.
  * @bdf: Human readable BDF of the device to search for.
  * @dev: Pointer to device handle.
- * 
+ *
  * This function is a (slight) abstraction of `ami_dev_find_next` -
  * it simply tries to find a device which matches the given BDF
  * and returns the handle if successful. No extra logic or setup is
  * performed. For a higher level function, see `ami_dev_bringup`.
- * 
+ *
  * The format of the BDF string is "bb:dd.f" where bb is the bus,
  * dd is the device, and f is the function. This is automatically
  * converted to a numeric representation internally
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_dev_find(const char *bdf, ami_device **dev);
@@ -146,7 +146,7 @@ int ami_dev_find(const char *bdf, ami_device **dev);
  * ami_dev_bringup() - Find a device and perform additional setup logic on it.
  * @bdf: Human readable BDF of the device to search for.
  * @dev: Pointer to device handle.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_dev_bringup(const char *bdf, ami_device **dev);
@@ -154,7 +154,7 @@ int ami_dev_bringup(const char *bdf, ami_device **dev);
 /**
  * ami_dev_delete() - Free the memory held by a device struct
  * @dev: Device handle.
- * 
+ *
  * Return: None
  */
 void ami_dev_delete(ami_device **dev);
@@ -221,7 +221,7 @@ int ami_dev_set_amc_debug_level(ami_device *dev, enum ami_amc_debug_level level)
  * ami_dev_read_uuid() - Read the logic uuid sysfs node.
  * @dev: Device handle.
  * @buf: Buffer to hold output string.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_dev_read_uuid(ami_device *dev, char buf[AMI_LOGIC_UUID_SIZE]);
@@ -241,7 +241,7 @@ int ami_dev_get_num_devices(uint16_t *num);
  *   current link speed.
  * @max: Variable to store the PCI generation number corresponding to the
  *   maximum link speed.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_dev_get_pci_link_speed(ami_device *dev, uint8_t *current, uint8_t *max);
@@ -251,7 +251,7 @@ int ami_dev_get_pci_link_speed(ami_device *dev, uint8_t *current, uint8_t *max);
  * @dev: Device handle.
  * @current: Variable to store current link width.
  * @max: Variable to store max link width.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_dev_get_pci_link_width(ami_device *dev, uint8_t *current, uint8_t *max);
@@ -260,7 +260,7 @@ int ami_dev_get_pci_link_width(ami_device *dev, uint8_t *current, uint8_t *max);
  * ami_dev_get_pci_vendor() - Get the PCI vendor ID.
  * @dev: Device handle.
  * @vendor: Variable to store vendor ID.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
 */
 int ami_dev_get_pci_vendor(ami_device *dev, uint16_t *vendor);
@@ -269,7 +269,7 @@ int ami_dev_get_pci_vendor(ami_device *dev, uint16_t *vendor);
  * ami_dev_get_pci_device() - Get the PCI device ID.
  * @dev: Device handle.
  * @device: Variable to store device ID.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
 */
 int ami_dev_get_pci_device(ami_device *dev, uint16_t *device);
@@ -278,7 +278,7 @@ int ami_dev_get_pci_device(ami_device *dev, uint16_t *device);
  * ami_dev_get_pci_numa_node() - Get the PCI device NUMA node.
  * @dev: Device handle.
  * @node: Variable to store node number.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
 */
 int ami_dev_get_pci_numa_node(ami_device *dev, uint8_t *node);
@@ -287,7 +287,7 @@ int ami_dev_get_pci_numa_node(ami_device *dev, uint8_t *node);
  * ami_dev_get_pci_cpulist() - Get the PCI CPU affinity.
  * @dev: Device handle.
  * @buf: Variable to store CPU affinity string.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
 */
 int ami_dev_get_pci_cpulist(ami_device *dev, char buf[AMI_PCI_CPULIST_SIZE]);
@@ -337,7 +337,7 @@ int ami_dev_get_pci_port(ami_device *dev, char buf[AMI_DEV_PCI_PORT_SIZE]);
  * ami_dev_get_pci_bdf() - Get PCI BDF for this device.
  * @dev: Device handle.
  * @bdf: Variable to store BDF.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_dev_get_pci_bdf(ami_device *dev, uint16_t *bdf);
@@ -346,7 +346,7 @@ int ami_dev_get_pci_bdf(ami_device *dev, uint16_t *bdf);
  * ami_dev_get_cdev_num() - Get the character device number for this device.
  * @dev: Device handle
  * @num: Variable to store number.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_dev_get_cdev_num(ami_device *dev, int *num);
@@ -355,7 +355,7 @@ int ami_dev_get_cdev_num(ami_device *dev, int *num);
  * ami_dev_get_hwmon_num() - Get the HWMON number for this device.
  * @dev: Device handle
  * @num: Variable to store number.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_dev_get_hwmon_num(ami_device *dev, int *num);

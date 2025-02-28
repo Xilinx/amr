@@ -5,7 +5,6 @@
  * This file contains PLDM sensor enums
  *
  * @file pldm_sensors.h
- *
  */
 
 #ifndef SRC_PLDM_SENSORS_H_

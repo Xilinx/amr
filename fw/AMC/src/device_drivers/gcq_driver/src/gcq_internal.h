@@ -5,7 +5,6 @@
  * This header file contains private definitions for the GCQ driver.
  *
  * @file gcq_internal.h
- *
  */
 
 #ifndef _GCQ_INTERNAL_H_
@@ -61,17 +60,17 @@ static const char* const pcGCQInterruptModeStr[ ]   =   {  GCQ_INTERRUPT_MODE_NA
 
 /**
  * @struct GCQ_RING_TYPE
- * 
+ *
  * @brief  Forward declaration of GCQ_RING_TYPE, used to model the ring buffer.
- * 
+ *
  */
 struct GCQ_RING_TYPE;
 
 /**
  * @struct  GCQ_TYPE
- * 
+ *
  * @brief   Instance of an GCQ_TYPE, used to model the GCQ IP Block.
- * 
+ *
  */
 typedef struct GCQ_INSTANCE_TYPE
 {

@@ -5,7 +5,6 @@
  * This file contains the API for the Alveo Management Interface (BMC) proxy driver
  *
  * @file mctp_parser.c
- *
  */
 
 #include <unistd.h>

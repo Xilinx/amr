@@ -5,7 +5,6 @@
  * This file contains the Event Library (EVL) debug access
  *
  * @file evl_debug.h
- *
  */
 
 #ifndef _EVL_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the EVL debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vEVL_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _EVL_DEBUG_H_ */
 

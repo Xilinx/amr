@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * cmd_debug_verbosity.c - This file contains the implementation for the command "debug_verbosity"
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -33,10 +33,10 @@
  * @options:  Ordered list of options passed in at the command line
  * @num_args:  Number of non-option arguments (excluding command)
  * @args:  List of non-option arguments (excluding command)
- * 
+ *
  * `args` may be an invalid pointer. It is the function's responsibility
  * to validate the `num_args` parameter.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_debug_verbosity(struct app_option *options, int num_args, char **args);
@@ -158,9 +158,9 @@ static int do_cmd_debug_verbosity(struct app_option *options, int num_args, char
 		APP_API_ERROR("could not find the requested device");
 		return EXIT_FAILURE;
 	}
-	
+
 	printf("Setting AMC debug level to '%s'.\r\n", level->arg);
-	
+
 	if (ami_dev_set_amc_debug_level(dev, debug_level) == AMI_STATUS_OK) {
 		printf("OK. debug level updated!\r\n");
 		ret = EXIT_SUCCESS;

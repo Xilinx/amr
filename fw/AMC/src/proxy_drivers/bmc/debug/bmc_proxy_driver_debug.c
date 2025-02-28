@@ -5,7 +5,6 @@
  * This file contains the Board Management Controller (BMC) proxy debug implementation
  *
  * @file bmc_proxy_driver_debug.c
- *
  */
 
 #include "standard.h"

@@ -21,5 +21,5 @@
 #define GIT_BRANCH                ""
 #define GIT_STATUS                (0)
 
-#endif // _GCQ_VERSION_H_
+#endif /* _GCQ_VERSION_H_ */
 

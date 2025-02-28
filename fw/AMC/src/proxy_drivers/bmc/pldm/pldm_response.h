@@ -5,7 +5,6 @@
  * This file contains PLDM response codes
  *
  * @file pldm_response.h
- *
  */
 
 #ifndef PLDM_RESPONSE_H_

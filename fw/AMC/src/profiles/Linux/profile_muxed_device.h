@@ -5,7 +5,6 @@
  * This file contains the muxed device profile for the Linux platform
  *
  * @file profile_muxed_device.h
- *
  */
 
 #ifndef _PROFILE_MUXED_DEVICE_H_
@@ -32,4 +31,4 @@
 #define QSFP_I2C_ADDR                      ( 0x50 )
 #define DIMM_I2C_ADDR                      ( 0x18 )
 
-#endif
+#endif /* _PROFILE_MUXED_DEVICE_H_ */

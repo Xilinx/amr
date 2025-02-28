@@ -5,7 +5,6 @@
  * This file contains PLDM command enums, structures and functions
  *
  * @file pldm_commands.c
- *
  */
 
 

@@ -5,7 +5,6 @@
  * This file contains the API for the AVED EXternal Device Control (AXC) proxy driver
  *
  * @file axc_proxy_driver.h
- *
  */
 
 #ifndef _AXC_PROXY_DRIVER_H_
@@ -277,4 +276,4 @@ int iAXC_ClearStatistics( void );
  */
 int iAXC_ValidateRequest( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset );
 
-#endif
+#endif /* _AXC_PROXY_DRIVER_H_ */

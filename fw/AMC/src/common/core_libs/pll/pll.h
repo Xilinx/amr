@@ -5,8 +5,7 @@
  * This file contains the public API of the Printing and Logging Library (PLL)
  *
  * @file pll.h
- *
- */
+  */
 #ifndef _PLL_H_
 #define _PLL_H_
 
@@ -66,7 +65,7 @@ typedef struct PLL_LOG_MSG
 
 /**
  * @enum    PLL_OUTPUT_LEVEL
- * @brief   Output verbosity levels for the PLL   
+ * @brief   Output verbosity levels for the PLL
  */
 typedef enum PLL_OUTPUT_LEVEL
 {
@@ -93,7 +92,7 @@ typedef enum PLL_OUTPUT_LEVEL
  *
  * @return  OK     if PLL is initialised and running successfully
  *          ERROR  if the PLL is not initialised
- */ 
+ */
 int iPLL_Initialise( PLL_OUTPUT_LEVEL xOutputLevel, PLL_OUTPUT_LEVEL xLoggingLevel );
 
 /**
@@ -110,7 +109,7 @@ int iPLL_SetOutputLevel( PLL_OUTPUT_LEVEL xOutputLevel );
  * @brief   Gets current PLL output verbosity level
  *
  * @param   pxOutputLevel   Pointer to output level
- * 
+ *
  * @return  OK     if level retrieved successful
  *          ERROR  if level not retrieved successful
  */
@@ -130,7 +129,7 @@ int iPLL_SetLoggingLevel( PLL_OUTPUT_LEVEL xLoggingLevel );
  * @brief   Gets current PLL logging verbosity level
  *
  * @param   pxLoggingLevel  Pointer to logging level
- * 
+ *
  * @return  OK     if level retrieved successful
  *          ERROR  if level not retrieved successful
  */
@@ -140,7 +139,7 @@ int iPLL_GetLoggingLevel( PLL_OUTPUT_LEVEL *pxLoggingLevel );
  * @brief   Function for task/thread safe prints.
  *
  * @param   xOutputLevel  Verbosity level of the message.
- * 
+ *
  * @param   pcFormat      C string that contains the text to be written.
  */
 void vPLL_Output( PLL_OUTPUT_LEVEL xOutputLevel, const char *pcFormat, ... );
@@ -149,7 +148,7 @@ void vPLL_Output( PLL_OUTPUT_LEVEL xOutputLevel, const char *pcFormat, ... );
  * @brief   Function for task/thread safe prints.
  *
  * @param   pcFormat  C string that contains the text to be written.
- * 
+ *
  * @note    Print function that overwrites the set PLL_OUTPUT_LEVEL, used ...
  *          for the likes of the DAL.
  */
@@ -157,33 +156,33 @@ void vPLL_Printf( const char *pcFormat, ... );
 
 /**
  * @brief    Dumps logs from shared memory.
- * 
+ *
  * @return   OK if successful
- *           ERROR if not successful. 
+ *           ERROR if not successful.
  */
 int iPLL_DumpLog( void );
 
 /**
  * @brief    Clears shared memory log buffer.
- * 
+ *
  * @return   OK if successful
- *           ERROR if not successful. 
+ *           ERROR if not successful.
  */
 int iPLL_ClearLog( void );
 
 /**
  * @brief    Reads and dumps the FSBL (First-Stage Bootloader) log
- * 
+ *
  * @return   OK if successful
- *           ERROR if not successful. 
+ *           ERROR if not successful.
  */
 int iPLL_DumpFsblLog( void );
 
 /**
  * @brief    Sends collected AMC boot records to the log once communciation is available
- * 
+ *
  * @return   OK if successful
- *           ERROR if not successful. 
+ *           ERROR if not successful.
  */
 int iPLL_SendBootRecords( void );
 
@@ -205,4 +204,4 @@ int iPLL_PrintStatistics( void );
  */
 int iPLL_ClearStatistics( void );
 
-#endif
+#endif /* _PLL_H_ */

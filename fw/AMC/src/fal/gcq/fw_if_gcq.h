@@ -5,7 +5,6 @@
  * This header file containing the FW IF GCQ abstraction definitions.
  *
  * @file fw_if_gcq.h
- *
  */
 
 #ifndef _FW_IF_GCQ_H_
@@ -45,7 +44,7 @@ typedef enum _FW_IF_GCQ_MODE_TYPE
 
 /**
  * @enum FW_IF_GCQ_INTERRUPT_MODE_TYPE
- * @brief Enumeration of the mechanisum used to trigger interrupt 
+ * @brief Enumeration of the mechanisum used to trigger interrupt
  */
 typedef enum _FW_IF_GCQ_INTERRUPT_MODE_TYPE
 {
@@ -146,45 +145,39 @@ typedef struct _FW_IF_GCQ_CFG
 /* Public Functions                                                          */
 /*****************************************************************************/
 
-/*******************************************************************************************
+/**
  * @brief   initialisation function for GCQ interfaces (generic across all GCQ interfaces)
  *
  * @param   xInitCfg    pointer to the config to initialise the driver with
  *
  * @return  See FW_IF_ERRORS
- ******************************************************************************************/
+ */
 extern uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxInitCfg );
 
-/*******************************************************************************************
+/**
  * @brief   creates an instance of the GCQ interface
  *
  * @param   xFWIf       fw_if handle to the interface instance
  * @param   xGCQCfg     unique data of this instance
  *
  * @return  See FW_IF_ERRORS
- ******************************************************************************************/
+ */
 extern uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *pxFwIf, FW_IF_GCQ_CFG *pxGCQCfg );
 
 /**
- *
  * @brief    Print all the stats gathered by the interface
  *
  * @return   OK                  Stats retrieved from gcq successfully
  *           ERROR               Stats not retrieved successfully
- * 
- *
  */
 int iFW_IF_GCQ_PrintStatistics( void );
 
 /**
- *
  * @brief    Clears all the stats gathered by the interface
  *
  * @return   OK                  Stats cleared successfully
  *           ERROR               Stats not cleared successfully
- * 
- *
  */
 int iFW_IF_GCQ_ClearStatistics( void );
 
-#endif
+#endif /* _FW_IF_GCQ_H_ */

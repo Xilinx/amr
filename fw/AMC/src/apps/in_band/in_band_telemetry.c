@@ -5,7 +5,6 @@
  * This file contains the amc in band telemetry implementation
  *
  * @file in_band_telemetry.c
- *
  */
 
 /******************************************************************************/

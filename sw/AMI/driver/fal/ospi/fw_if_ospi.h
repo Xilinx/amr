@@ -5,7 +5,6 @@
  * This header file containing the FW IF OSPI abstraction definitions.
  *
  * @file fw_if_ospi.h
- *
  */
 
 #ifndef _FW_IF_OSPI_H_

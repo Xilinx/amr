@@ -5,7 +5,6 @@
  * This file contains the AVED Management Interface (AMI) debug access
  *
  * @file ami_proxy_driver_debug.h
- *
  */
 
 #ifndef _AMI_PROXY_DRIVER_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the AMI debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vAMI_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _AMI_PROXY_DRIVER_DEBUG_H_ */
 

@@ -5,7 +5,6 @@
  * This file contains the AVED Sensor Control (ASC) debug implementation
  *
  * @file asc_proxy_driver_debug.c
- *
  */
 
 #include "standard.h"
@@ -299,7 +298,7 @@ static void vGetAllSensors( void )
     else
     {
         PLL_DAL( ASC_DBG_NAME, "Allocating memory for %d sensors\r\n", iMaxSensors );
-        ASC_PROXY_DRIVER_SENSOR_DATA *pxSensors = pvOSAL_MemAlloc( iMaxSensors * 
+        ASC_PROXY_DRIVER_SENSOR_DATA *pxSensors = pvOSAL_MemAlloc( iMaxSensors *
                                                                   sizeof( ASC_PROXY_DRIVER_SENSOR_DATA ) );
 
         if( NULL == pxSensors )
@@ -344,7 +343,7 @@ static void vGetSingleSensorById( void )
     else
     {
         ASC_PROXY_DRIVER_SENSOR_DATA xSensor = { { 0 } };
-        
+
         if( OK != iASC_GetSingleSensorDataById( ( uint8_t )iId, &xSensor ) )
         {
             PLL_DAL( ASC_DBG_NAME, "Error retrieving sensor %d data\r\n", iId );
@@ -370,7 +369,7 @@ static void vGetSingleSensorByName( void )
     else
     {
         ASC_PROXY_DRIVER_SENSOR_DATA xSensor = { { 0 } };
-        
+
         if( OK != iASC_GetSingleSensorDataByName( pcName, &xSensor ) )
         {
             PLL_DAL( ASC_DBG_NAME, "Error retrieving sensor %s data\r\n", pcName );
@@ -409,7 +408,7 @@ static void vPrintSensorData( ASC_PROXY_DRIVER_SENSOR_DATA *pxSensor )
     if( NULL != pxSensor )
     {
         int i = 0;
-            
+
         PLL_DAL( ASC_DBG_NAME, "====================================================\r\n" );
         PLL_DAL( ASC_DBG_NAME, "Sensor . . . . . . . . . . . . . . %s\r\n", pxSensor->pcSensorName );
         PLL_DAL( ASC_DBG_NAME, "- ID . . . . . . . . . . . . . . . %d\r\n", pxSensor->ucSensorId );

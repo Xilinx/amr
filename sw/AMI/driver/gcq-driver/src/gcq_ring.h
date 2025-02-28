@@ -17,11 +17,11 @@
 
 /**
  * @struct  GCQ_HEADER_TYPE
- * 
+ *
  * @brief   The internal header format which is sent by the producer first
  *          to allow syncing with the consumer. Note the format is kept the
  *          same as original implementation to allow backwards compatability.
- * 
+ *
  */
 struct GCQ_HEADER_TYPE
 {
@@ -54,9 +54,9 @@ struct GCQ_HEADER_TYPE
 
 /**
  * @struct  GCQ_RING_TYPE
- * 
+ *
  * @brief   Instance of an GCQ_RING_TYPE, used to model the ring buffer
- * 
+ *
  */
 struct GCQ_RING_TYPE
 {
@@ -89,7 +89,7 @@ struct GCQ_RING_TYPE
  * @param    ulSlotSize is the slot size
  *
  * @return   N/A
- * 
+ *
  */
 static inline void prvvGCQInitRing( const struct GCQ_INSTANCE_TYPE *pxGCQInstance,
                                     struct GCQ_RING_TYPE *pxRing,

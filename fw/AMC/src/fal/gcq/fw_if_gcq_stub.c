@@ -5,7 +5,6 @@
  * This file contains the FW IF GCQ Stub abstraction.
  *
  * @file fw_if_gcq_stub.c
- *
  */
 
 /*****************************************************************************/

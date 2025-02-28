@@ -5,7 +5,6 @@
  * This file contains MCTP enums and structs
  *
  * @file mctp.h
- *
  */
 
 #ifndef INC_MCTP_H_

@@ -5,7 +5,6 @@
  * This file contains the in band telemetry defintions
  *
  * @file out_of_band_telemetry.h
- *
  */
 
 #ifndef _OUT_OF_BAND_TELEMETRY_DEBUG_H_

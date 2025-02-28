@@ -5,7 +5,6 @@
  * This file contains the implementation for the Board Management Controller (BMC) proxy driver
  *
  * @file bmc_proxy_driver.c
- *
  */
 
 /******************************************************************************/

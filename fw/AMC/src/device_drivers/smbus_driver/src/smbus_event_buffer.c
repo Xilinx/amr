@@ -50,7 +50,7 @@ void vEventBufferInitialize( SMBUS_EVENT_BUFFER_TYPE* pxContext, SMBUS_EVENT_BUF
             pxContext->pxEventBuffer[i].ucIsOccupied = SMBUS_FALSE;
             pxContext->pxEventBuffer[i].ucOctet = 0x00;
         }
-        
+
         pxContext->ulWrite = 0;
         pxContext->ulRead = 0;
     }
@@ -89,7 +89,7 @@ uint8_t ucEventBufferTryWrite( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint8_t ucAny
 {
     uint8_t ucResult = SMBUS_EVENT_BUFFER_FAIL;
 
-    if( ( NULL != pxContext ) &&  
+    if( ( NULL != pxContext ) &&
         ( NULL != pulWrite_Position ) )
     {
         if( SMBUS_FALSE == pxContext->pxEventBuffer[pxContext->ulWrite].ucIsOccupied )
@@ -119,7 +119,7 @@ uint8_t ucEventBufferTryRead( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint8_t* pucAn
         ( NULL != pulRead_Position ) )
     {
         *pucAnyCharacter = 0xCC;
-        
+
         if( SMBUS_TRUE == pxContext->pxEventBuffer[pxContext->ulRead].ucIsOccupied )
         {
             *pulRead_Position = pxContext->ulRead;
@@ -129,6 +129,6 @@ uint8_t ucEventBufferTryRead( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint8_t* pucAn
             ucResult = SMBUS_TRUE;
         }
     }
-    
+
     return ucResult;
 }

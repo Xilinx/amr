@@ -4,8 +4,7 @@
  *
  * This file contains the profile debug menu for the V80
  *
- * @file profile_debug_menu.h
- *
+ * @file profile_debug_menu.c
  */
 
 /*****************************************************************************/
@@ -49,7 +48,7 @@
 /**
  * @brief   Initialise Debug Menu
  */
-void vDebugMenu_Initialise( )
+void vDebugMenu_Initialise()
 {
     /* top level directories */
     static DAL_HDL pxDeviceDrivers   = NULL;

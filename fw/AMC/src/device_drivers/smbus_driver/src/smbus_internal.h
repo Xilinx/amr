@@ -5,7 +5,6 @@
  * This header file contains private definitions for the SMBus driver.
  *
  * @file smbus_internal.h
- *
  */
 
 #ifndef _SMBUS_INTERNAL_H_
@@ -259,7 +258,7 @@ typedef struct SMBUS_PROFILE_TYPE
 
 /*******************************************************************************
 *
-* @brief    Does a ceiling conversion on a floating point number and returns the 
+* @brief    Does a ceiling conversion on a floating point number and returns the
 *           rounded up interger value
 *
 * @param    fNum is a floating point number
@@ -272,7 +271,7 @@ uint32_t ulSMBusCeil( float fNum );
 
 /*******************************************************************************
 *
-* @brief    Converts a protocol enum value to a text string for logging 
+* @brief    Converts a protocol enum value to a text string for logging
 *
 * @param    ucProtocol is any protocol enum value
 * @return   A character string of the protocol
@@ -303,7 +302,7 @@ void vLogAddEntry( SMBUS_PROFILE_TYPE* pxSMBusProfile, SMBUS_LOG_LEVEL_TYPE xLog
 
 /*******************************************************************************
 *
-* @brief    Converts a protocol enum value to a text string for logging 
+* @brief    Converts a protocol enum value to a text string for logging
 *
 * @param    ucProtocol is any protocol enum value
 * @return   A character string of the protocol
@@ -409,7 +408,7 @@ void vSMBusResetStatsLogInstance( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t uc
 * @note     None.
 *
 *******************************************************************************/
-void vSMBusReadStatsLogInstance( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t ucSMBusInstance, 
+void vSMBusReadStatsLogInstance( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t ucSMBusInstance,
                                 SMBUS_LOG_TYPE* pSMBusMessageLog );
 
 #ifdef __cplusplus

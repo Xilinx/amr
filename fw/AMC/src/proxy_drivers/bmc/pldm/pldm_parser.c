@@ -5,7 +5,6 @@
  * This file contains the PLDM parser structs and functions
  *
  * @file pldm_parser.c
- *
  */
 
 

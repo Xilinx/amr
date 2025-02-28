@@ -223,7 +223,7 @@ void vEeprom_DebugInit( DAL_HDL pxParentHandle )
             pxDAL_NewDebugFunction( "clear_stats",                      pxEepromTop, vClearStats );
             pxSetDir = pxDAL_NewSubDirectory( "sets", pxEepromTop );
             pxGetDir = pxDAL_NewSubDirectory( "gets", pxEepromTop );
-            
+
             if( NULL != pxSetDir )
             {
                 pxDAL_NewDebugFunction( "write_eeprom_data",                pxSetDir, vWriteEepromData );
@@ -306,7 +306,7 @@ static void vWriteEepromData( void )
                 PLL_DAL( EEPROM_DBG_NAME, "Error retrieving data[%d]\r\n", i );
             }
         }
-        
+
         if( OK != iEEPROM_WriteRawValue( pucData, ( uint8_t )iSize, ( uint8_t )ulAddr ) )
         {
             PLL_DAL( EEPROM_DBG_NAME, "Error writing data to 0x%02X\r\n", ulAddr );
@@ -371,7 +371,7 @@ static void vGetEepromVersion( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetEepromVersion( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -391,7 +391,7 @@ static void vGetEepromProductName( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetProductName( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -411,7 +411,7 @@ static void vGetEepromProductRevision( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetProductRevision( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -431,7 +431,7 @@ static void vGetEepromSerialNumber( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetSerialNumber( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -451,7 +451,7 @@ static void vGetEepromMacAddressCount( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetMacAddressCount( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -471,7 +471,7 @@ static void vGetEepromFirstMacAddress( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetFirstMacAddress( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -497,7 +497,7 @@ static void vGetEepromActiveState( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetActiveState( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -518,7 +518,7 @@ static void vGetEepromConfigMode( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetConfigMode( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -538,7 +538,7 @@ static void vGetEepromMfgDate( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetManufacturingDate( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -560,7 +560,7 @@ static void vGetEepromPartNumber( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetPartNumber( pucField, &ucSizeBytes);
     if( ERROR == iStatus )
     {
@@ -600,7 +600,7 @@ static void vGetEepromUuid( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetUuid( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -608,7 +608,7 @@ static void vGetEepromUuid( void )
     }
     else
     {
-        PLL_DAL( EEPROM_DBG_NAME, "UUID                  : %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\n\r", 
+        PLL_DAL( EEPROM_DBG_NAME, "UUID                  : %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\n\r",
                  pucField[0],
                  pucField[1],
                  pucField[2],
@@ -636,7 +636,7 @@ static void vGetEepromPcieId( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetPcieId( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -664,7 +664,7 @@ static void vGetEepromBoardMaxPowerMode( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetMaxPowerMode( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -684,7 +684,7 @@ static void vGetEepromMemorySize( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetMemorySize( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -704,7 +704,7 @@ static void vGetEepromOemId( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetOemId( pucField, &ucSizeBytes );
     if( ERROR == iStatus )
     {
@@ -712,7 +712,7 @@ static void vGetEepromOemId( void )
     }
     else
     {
-        PLL_DAL( EEPROM_DBG_NAME, "OEM ID                : %02x%02x%02x%02x\n\r",  
+        PLL_DAL( EEPROM_DBG_NAME, "OEM ID                : %02x%02x%02x%02x\n\r",
                  pucField[3],
                  pucField[2],
                  pucField[1],
@@ -728,7 +728,7 @@ static void vGetEepromCapability( void )
     uint8_t pucField[ EEPROM_DBG_MAX_FIELD_SIZE ] = { 0 };
     uint8_t ucSizeBytes = 0;
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_GetCapability( pucField, &ucSizeBytes);
     if( ERROR == iStatus )
     {
@@ -736,7 +736,7 @@ static void vGetEepromCapability( void )
     }
     else
     {
-        PLL_DAL( EEPROM_DBG_NAME, "Capability            : %02x%02x\n\r",          
+        PLL_DAL( EEPROM_DBG_NAME, "Capability            : %02x%02x\n\r",
                  pucField[1],
                  pucField[0] );
     }
@@ -748,7 +748,7 @@ static void vGetEepromCapability( void )
 static void vGetAllEepromValues( void )
 {
     int iStatus = ERROR;
-                                                                     
+
     iStatus = iEEPROM_DisplayEepromValues( );
     if( ERROR == iStatus )
     {

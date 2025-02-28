@@ -438,63 +438,63 @@ static uint8_t prvucSMBusGenericDescriptorIDLookup( SMBus_HW_Descriptor_Type xDe
     case DESC_CONTROLLER_WRITE_START:
         ucDescriptorID = 0x0;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_QUICK:
         ucDescriptorID = 0x1;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_BYTE:
         ucDescriptorID = 0x2;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_STOP:
         ucDescriptorID = 0x3;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_PEC:
         ucDescriptorID = 0x4;
         break;
-    
+
     case DESC_CONTROLLER_READ_START:
         ucDescriptorID = 0x8;
         break;
-    
+
     case DESC_CONTROLLER_READ_QUICK:
         ucDescriptorID = 0x9;
         break;
-    
+
     case DESC_CONTROLLER_READ_BYTE:
         ucDescriptorID = 0xA;
         break;
-    
+
     case DESC_CONTROLLER_READ_STOP:
         ucDescriptorID = 0xB;
         break;
-    
+
     case DESC_CONTROLLER_READ_PEC:
         ucDescriptorID = 0xC;
-        break;    
-    
+        break;
+
     case DESC_TARGET_WRITE_ACK:
         ucDescriptorID = 0x0;
         break;
-    
+
     case DESC_TARGET_WRITE_NACK:
         ucDescriptorID = 0x1;
         break;
-    
+
     case DESC_TARGET_WRITE_PEC:
         ucDescriptorID = 0x2;
         break;
-    
+
     case DESC_TARGET_READ:
         ucDescriptorID = 0x8;
         break;
-    
+
     case DESC_TARGET_READ_PEC:
         ucDescriptorID = 0x9;
         break;
-    
+
     default:
         break;
     }
@@ -852,63 +852,63 @@ char* pcDescriptorToString( SMBus_HW_Descriptor_Type xDescriptor )
     case DESC_TARGET_READ:
         pResult = pDescriptorTargetRead;
         break;
-    
+
     case DESC_TARGET_READ_PEC:
         pResult = pDescriptorTargetPEC;
         break;
-    
+
     case DESC_TARGET_WRITE_ACK:
         pResult = pDescriptorTargetWriteACK;
         break;
-    
+
     case DESC_TARGET_WRITE_NACK:
         pResult = pDescriptorTargetWriteNACK;
         break;
-    
+
     case DESC_TARGET_WRITE_PEC:
         pResult = pDescriptorTargetWritePEC;
         break;
-    
+
     case DESC_CONTROLLER_READ_START:
         pResult = pDescriptorControllerReadStart;
         break;
-    
+
     case DESC_CONTROLLER_READ_QUICK:
         pResult = pDescriptorControllerReadQuick;
         break;
-    
+
     case DESC_CONTROLLER_READ_BYTE:
         pResult = pDescriptorControllerReadByte;
         break;
-    
+
     case DESC_CONTROLLER_READ_STOP:
         pResult = pDescriptorControllerReadStop;
         break;
-    
+
     case DESC_CONTROLLER_READ_PEC:
         pResult = pDescriptorControllerReadPEC;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_START:
         pResult = pDescriptorControllerWriteStart;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_QUICK:
         pResult = pDescriptorControllerWriteQuick;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_BYTE:
         pResult = pDescriptorControllerWriteByte;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_STOP:
         pResult = pDescriptorControllerWriteStop;
         break;
-    
+
     case DESC_CONTROLLER_WRITE_PEC:
         pResult = pDescriptorControllerWritePEC;
         break;
-    
+
     default:
         pResult = pDescriptorUnknown;
         break;
@@ -926,16 +926,16 @@ static uint32_t prvulSMBusHardwareRead( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint
 {
     uint32_t           ulReadValue = 0;
     volatile uintptr_t xAddress    = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         xAddress = ( uintptr_t )( ( ( SMBUS_BASE_ADDRESS_TYPE )pxSMBusProfile->pvBaseAddress ) + ulRegisterOffset / 4 );
         ulReadValue = prvulSMBusIn32( ( void* )xAddress );
-        
-        vLogAddEntry( pxSMBusProfile, SMBUS_LOG_LEVEL_DEBUG, 
+
+        vLogAddEntry( pxSMBusProfile, SMBUS_LOG_LEVEL_DEBUG,
                         SMBUS_INSTANCE_UNDETERMINED, SMBUS_LOG_EVENT_HW_READ, ( uint32_t )ulRegisterOffset, ( uint32_t )ulReadValue );
     }
- 
+
     return ulReadValue;
 }
 
@@ -947,11 +947,11 @@ static uint32_t prvulSMBusHardwareRead( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint
 static void prvvSMBusHardwareWrite( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulRegisterOffset, uint32_t ulValue )
 {
     volatile uintptr_t xAddress = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         xAddress = ( uintptr_t )( ( ( SMBUS_BASE_ADDRESS_TYPE )pxSMBusProfile->pvBaseAddress ) + ulRegisterOffset / 4 );
-        
+
         vLogAddEntry( pxSMBusProfile, SMBUS_LOG_LEVEL_DEBUG,
                         SMBUS_INSTANCE_UNDETERMINED, SMBUS_LOG_EVENT_HW_WRITE, ( uint32_t )ulRegisterOffset, ( uint32_t )ulValue );
         prvvSMBusOut32( ( void* )xAddress, ulValue );
@@ -966,10 +966,10 @@ static void prvvSMBusHardwareWrite( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t
 static void prvvSMBusHardwareWriteWithMask( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulRegisterOffset,
                                     uint32_t ulMask, uint32_t ulValue )
 {
-    
+
     uint32_t ulRegisterulValue = 0;
     uint32_t ulMaskedulValue   = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulRegisterulValue = prvulSMBusHardwareRead( pxSMBusProfile, ulRegisterOffset );
@@ -991,12 +991,12 @@ static void prvvSMBusHardwareWriteWithMask( SMBUS_PROFILE_TYPE* pxSMBusProfile, 
 uint32_t ulSMBusHWReadIPVersion( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue = ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IP_VERSION ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1009,12 +1009,12 @@ uint32_t ulSMBusHWReadIPVersion( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadIPRevision( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IP_REVISION ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1027,12 +1027,12 @@ uint32_t ulSMBusHWReadIPRevision( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadIPMagicNum( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IP_MAGIC_NUM ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1045,12 +1045,12 @@ uint32_t ulSMBusHWReadIPMagicNum( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadBuildConfig0( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IP_BUILD_CONFIG_0 ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1063,12 +1063,12 @@ uint32_t ulSMBusHWReadBuildConfig0( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadBuildConfig1( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IP_BUILD_CONFIG_1 ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1081,12 +1081,12 @@ uint32_t ulSMBusHWReadBuildConfig1( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadIRQGIEEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IRQ_GIE ) & SMBUS_IRQ_GIE_ENABLE_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1099,12 +1099,12 @@ uint32_t ulSMBusHWReadIRQGIEEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadIRQIER( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IRQ_IER ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1117,12 +1117,12 @@ uint32_t ulSMBusHWReadIRQIER( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadIRQISR( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_IRQ_ISR ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1135,12 +1135,12 @@ uint32_t ulSMBusHWReadIRQISR( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadErrIRQIER( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_ERR_IRQ_IER ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1153,12 +1153,12 @@ uint32_t ulSMBusHWReadErrIRQIER( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadErrIRQISR( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_ERR_IRQ_ISR ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1174,12 +1174,12 @@ uint32_t ulSMBusHWReadErrIRQISR( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYStatus( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_STATUS ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1192,13 +1192,13 @@ uint32_t ulSMBusHWReadPHYStatus( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYStatusSMBDATLowTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_STATUS )
             & SMBUS_PHY_STATUS_SMBDAT_LOW_TIMEOUT_MASK ) >> SMBUS_PHY_STATUS_SMBDAT_LOW_TIMEOUT_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1211,13 +1211,13 @@ uint32_t ulSMBusHWReadPHYStatusSMBDATLowTimeout( SMBUS_PROFILE_TYPE* pxSMBusProf
 uint32_t ulSMBusHWReadPHYStatusSMBClkLowTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_STATUS )
             & SMBUS_PHY_STATUS_SMBCLK_LOW_TIMEOUT_MASK ) >> SMBUS_PHY_STATUS_SMBCLK_LOW_TIMEOUT_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1230,12 +1230,12 @@ uint32_t ulSMBusHWReadPHYStatusSMBClkLowTimeout( SMBUS_PROFILE_TYPE* pxSMBusProf
 uint32_t ulSMBusHWReadPHYStatusBusIdle( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_STATUS ) & SMBUS_PHY_STATUS_BUS_IDLE_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1251,12 +1251,12 @@ uint32_t ulSMBusHWReadPHYStatusBusIdle( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYFilterControl( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_FILTER_CONTROL ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1269,13 +1269,13 @@ uint32_t ulSMBusHWReadPHYFilterControl( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYFilterControlEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_FILTER_CONTROL ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_FILTER_CONTROL )
             & SMBUS_PHY_FILTER_CONTROL_ENABLE_MASK ) >> SMBUS_PHY_FILTER_CONTROL_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1288,13 +1288,13 @@ uint32_t ulSMBusHWReadPHYFilterControlEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile
 uint32_t ulSMBusHWReadPHYFilterControlDuration( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_FILTER_CONTROL ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_FILTER_CONTROL )
             & SMBUS_PHY_FILTER_CONTROL_DURATION_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1309,12 +1309,12 @@ uint32_t ulSMBusHWReadPHYFilterControlDuration( SMBUS_PROFILE_TYPE* pxSMBusProfi
 uint32_t ulSMBusHWReadPHYBusFreetime( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_BUS_FREE_TIME ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1330,13 +1330,13 @@ uint32_t ulSMBusHWReadPHYBusFreetime( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYIdleThresholdIdleThreshold( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_IDLE_THRESHOLD ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_IDLE_THRESHOLD )
             & SMBUS_PHY_IDLE_THRESHOLD_IDLE_THRESHOLD_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1351,12 +1351,12 @@ uint32_t ulSMBusHWReadPHYIdleThresholdIdleThreshold( SMBUS_PROFILE_TYPE* pxSMBus
 uint32_t ulSMBusHWReadPHYTimeoutPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TIMEOUT_PRESCALER ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1372,12 +1372,12 @@ uint32_t ulSMBusHWReadPHYTimeoutPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYTimeoutMin( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TIMEOUT_MIN ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1390,13 +1390,13 @@ uint32_t ulSMBusHWReadPHYTimeoutMin( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TIMEOUT_MIN ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TIMEOUT_MIN )
             & SMBUS_PHY_TIMEOUT_MIN_TIMEOUT_ENABLE_MASK ) >> SMBUS_PHY_TIMEOUT_MIN_TIMEOUT_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1409,13 +1409,13 @@ uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutEnable( SMBUS_PROFILE_TYPE* pxSMBusPro
 uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutMin( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TIMEOUT_MIN ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TIMEOUT_MIN )
             & SMBUS_PHY_TIMEOUT_MIN_TIMEOUT_MIN_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1430,12 +1430,12 @@ uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutMin( SMBUS_PROFILE_TYPE* pxSMBusProfil
 uint32_t ulSMBusHWReadPHYTimeoutMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TIMEOUT_MAX ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1451,13 +1451,13 @@ uint32_t ulSMBusHWReadPHYTimeoutMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYResetControlSMBClkForce( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_RESET_CONTROL ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_RESET_CONTROL )
             & SMBUS_PHY_RESET_CONTROL_SMBCLK_FORCE_LOW_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1473,13 +1473,13 @@ uint32_t ulSMBusHWReadPHYResetControlSMBClkForce( SMBUS_PROFILE_TYPE* pxSMBusPro
 uint32_t ulSMBusHWReadPHYTgtDataSetupTgtDataSetup( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_DATA_SETUP ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_DATA_SETUP )
             & SMBUS_PHY_TGT_DATA_SETUP_TGT_DATA_SETUP_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1495,13 +1495,13 @@ uint32_t ulSMBusHWReadPHYTgtDataSetupTgtDataSetup( SMBUS_PROFILE_TYPE* pxSMBusPr
 uint32_t ulSMBusHWReadPHYTgtTextPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_TEXT_PRESCALER ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_TEXT_PRESCALER )
             & SMBUS_PHY_TGT_TEXT_PRESCALER_TGT_TEXT_PRESCALER_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1517,13 +1517,13 @@ uint32_t ulSMBusHWReadPHYTgtTextPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYTgtTextTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_TEXT_TIMEOUT ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_TEXT_TIMEOUT )
             & SMBUS_PHY_TGT_TEXT_TIMEOUT_TGT_TEXT_TIMEOUT_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1539,13 +1539,13 @@ uint32_t ulSMBusHWReadPHYTgtTextTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYTgtTextMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_TEXT_MAX ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_TEXT_MAX )
             & SMBUS_PHY_TGT_TEXT_MAX_TGT_TEXT_MAX_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1561,13 +1561,13 @@ uint32_t ulSMBusHWReadPHYTgtTextMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYTgtDbgState( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_DBG_STATE ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_DBG_STATE )
             & SMBUS_PHY_TGT_DBG_STATE_DBG_STATE_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1583,13 +1583,13 @@ uint32_t ulSMBusHWReadPHYTgtDbgState( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYTgtDataHold( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_DATA_HOLD ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_TGT_DATA_HOLD )
             & SMBUS_PHY_TGT_DATA_HOLD_DATA_HOLD_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1604,12 +1604,12 @@ uint32_t ulSMBusHWReadPHYTgtDataHold( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtStatus( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
         ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_STATUS ) );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1622,13 +1622,13 @@ uint32_t ulSMBusHWReadTgtStatus( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtStatusActive( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_STATUS )
             & SMBUS_TGT_STATUS_ACTIVE_MASK ) >> SMBUS_TGT_STATUS_ACTIVE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1641,13 +1641,13 @@ uint32_t ulSMBusHWReadTgtStatusActive( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtStatusAddress( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_STATUS )
             & SMBUS_TGT_STATUS_ADDRESS_MASK ) >> SMBUS_TGT_STATUS_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1660,13 +1660,13 @@ uint32_t ulSMBusHWReadTgtStatusAddress( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtStatusRW( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_STATUS ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_STATUS )
             & SMBUS_TGT_STATUS_RW_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1682,13 +1682,13 @@ uint32_t ulSMBusHWReadTgtStatusRW( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtDescStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS )
             & SMBUS_TGT_DESC_STATUS_FILL_LEVEL_MASK ) >> SMBUS_TGT_DESC_STATUS_FILL_LEVEL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1701,10 +1701,10 @@ uint32_t ulSMBusHWReadTgtDescStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProfile
 uint32_t ulSMBusHWReadTgtDescStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS )
             & SMBUS_TGT_DESC_STATUS_FULL_MASK ) >> SMBUS_TGT_DESC_STATUS_FULL_FIELD_POSITION );
     }
     return( ulReadValue );
@@ -1719,13 +1719,13 @@ uint32_t ulSMBusHWReadTgtDescStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtDescStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS )
             & SMBUS_TGT_DESC_STATUS_ALMOST_FULL_MASK ) >> SMBUS_TGT_DESC_STATUS_ALMOST_FULL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1738,13 +1738,13 @@ uint32_t ulSMBusHWReadTgtDescStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusProfil
 uint32_t ulSMBusHWReadTgtDescStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS )
             & SMBUS_TGT_DESC_STATUS_ALMOST_EMPTY_MASK ) >> SMBUS_TGT_DESC_STATUS_ALMOST_EMPTY_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1757,13 +1757,13 @@ uint32_t ulSMBusHWReadTgtDescStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfi
 uint32_t ulSMBusHWReadTgtDescStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DESC_STATUS )
             & SMBUS_TGT_DESC_STATUS_EMPTY_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1778,13 +1778,13 @@ uint32_t ulSMBusHWReadTgtDescStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtRxFifoPayload( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO )
             & SMBUS_TGT_RX_FIFO_PAYLOAD_MASK ) >> SMBUS_TGT_RX_FIFO_PAYLOAD_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1799,13 +1799,13 @@ uint32_t ulSMBusHWReadTgtRxFifoPayload( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtRxFifoStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS )
             & SMBUS_TGT_RX_FIFO_STATUS_FILL_LEVEL_MASK ) >> SMBUS_TGT_RX_FIFO_STATUS_FILL_LEVEL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1817,13 +1817,13 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProfi
 uint32_t ulSMBusHWReadTgtRxFifoStatusResetBusY( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS )
             & SMBUS_TGT_RX_FIFO_STATUS_RESET_BUSY_MASK ) >> SMBUS_TGT_RX_FIFO_STATUS_RESET_BUSY_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1835,13 +1835,13 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusResetBusY( SMBUS_PROFILE_TYPE* pxSMBusProfi
 uint32_t ulSMBusHWReadTgtRxFifoStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS )
             & SMBUS_TGT_RX_FIFO_STATUS_FULL_MASK ) >> SMBUS_TGT_RX_FIFO_STATUS_FULL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1853,13 +1853,13 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS )
             & SMBUS_TGT_RX_FIFO_STATUS_ALMOST_FULL_MASK ) >> SMBUS_TGT_RX_FIFO_STATUS_ALMOST_FULL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1871,13 +1871,13 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusProf
 uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS )
             & SMBUS_TGT_RX_FIFO_STATUS_ALMOST_EMPTY_MASK ) >> SMBUS_TGT_RX_FIFO_STATUS_ALMOST_EMPTY_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1889,13 +1889,13 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusPro
 uint32_t ulSMBusHWReadTgtRxFifoStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_STATUS )
             & SMBUS_TGT_RX_FIFO_STATUS_EMPTY_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1911,13 +1911,13 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtRxFifoFillThresholdFillThresh( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_FILL_THRESHOLD ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_FILL_THRESHOLD )
             & SMBUS_TGT_RX_FIFO_FILL_THRESHOLD_FILL_THRESHOLD_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1932,13 +1932,13 @@ uint32_t ulSMBusHWReadTgtRxFifoFillThresholdFillThresh( SMBUS_PROFILE_TYPE* pxSM
 uint32_t ulSMBusHWReadTgtDbg( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DBG ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_DBG )
             & SMBUS_TGT_DBG_DBG_STATE_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1953,13 +1953,13 @@ uint32_t ulSMBusHWReadTgtDbg( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl0Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_0 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_0 )
             & SMBUS_TGT_CONTROL_0_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_0_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1971,13 +1971,13 @@ uint32_t ulSMBusHWReadTgtControl0Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl0Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_0 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_0 )
             & SMBUS_TGT_CONTROL_0_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_0_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -1990,13 +1990,13 @@ uint32_t ulSMBusHWReadTgtControl0Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl1Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_1 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_1 )
             & SMBUS_TGT_CONTROL_1_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_1_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2008,13 +2008,13 @@ uint32_t ulSMBusHWReadTgtControl1Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl1Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_1 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_1 )
             & SMBUS_TGT_CONTROL_1_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_1_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2027,13 +2027,13 @@ uint32_t ulSMBusHWReadTgtControl1Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl2Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_2 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_2 )
             & SMBUS_TGT_CONTROL_2_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_2_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2045,13 +2045,13 @@ uint32_t ulSMBusHWReadTgtControl2Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl2Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_2 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_2 )
             & SMBUS_TGT_CONTROL_2_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_2_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2064,13 +2064,13 @@ uint32_t ulSMBusHWReadTgtControl2Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl3Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_3 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_3 )
             & SMBUS_TGT_CONTROL_3_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_3_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2082,13 +2082,13 @@ uint32_t ulSMBusHWReadTgtControl3Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl3Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_3 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_3 )
             & SMBUS_TGT_CONTROL_3_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_3_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2101,13 +2101,13 @@ uint32_t ulSMBusHWReadTgtControl3Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl4Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_4 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_4 )
             & SMBUS_TGT_CONTROL_4_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_4_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2119,13 +2119,13 @@ uint32_t ulSMBusHWReadTgtControl4Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl4Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_4 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_4 )
             & SMBUS_TGT_CONTROL_4_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_4_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2138,13 +2138,13 @@ uint32_t ulSMBusHWReadTgtControl4Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl5Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_5 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_5 )
             & SMBUS_TGT_CONTROL_5_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_5_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2156,13 +2156,13 @@ uint32_t ulSMBusHWReadTgtControl5Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl5Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_5 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_5 )
             & SMBUS_TGT_CONTROL_5_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_5_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2175,13 +2175,13 @@ uint32_t ulSMBusHWReadTgtControl5Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl6Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_6 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_6 )
             & SMBUS_TGT_CONTROL_6_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_6_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2193,13 +2193,13 @@ uint32_t ulSMBusHWReadTgtControl6Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl6Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_6 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_6 )
             & SMBUS_TGT_CONTROL_6_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_6_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2212,13 +2212,13 @@ uint32_t ulSMBusHWReadTgtControl6Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl7Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_7 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_7 )
             & SMBUS_TGT_CONTROL_7_ENABLE_MASK ) >> SMBUS_TGT_CONTROL_7_ENABLE_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2230,13 +2230,13 @@ uint32_t ulSMBusHWReadTgtControl7Enable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadTgtControl7Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_7 ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_TGT_CONTROL_7 )
             & SMBUS_TGT_CONTROL_7_ADDRESS_MASK ) >> SMBUS_TGT_CONTROL_7_ADDRESS_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2252,13 +2252,13 @@ uint32_t ulSMBusHWReadTgtControl7Address( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlDataHold( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_DATA_HOLD ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_DATA_HOLD )
             & SMBUS_PHY_CTLR_DATA_HOLD_CTLR_DATA_HOLD_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2274,13 +2274,13 @@ uint32_t ulSMBusHWReadPHYCtrlDataHold( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlStartHold( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_START_HOLD ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_START_HOLD )
             & SMBUS_PHY_CTLR_START_HOLD_CTLR_START_HOLD_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2296,13 +2296,13 @@ uint32_t ulSMBusHWReadPHYCtrlStartHold( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlStartSetup( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_START_SETUP ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_START_SETUP )
             & SMBUS_PHY_CTLR_START_SETUP_CTLR_START_SETUP_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2318,13 +2318,13 @@ uint32_t ulSMBusHWReadPHYCtrlStartSetup( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlStopSetup( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_STOP_SETUP ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_STOP_SETUP )
             & SMBUS_PHY_CTLR_STOP_SETUP_CTLR_STOP_SETUP_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2340,13 +2340,13 @@ uint32_t ulSMBusHWReadPHYCtrlStopSetup( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlClkTLow( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CLK_TLOW ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CLK_TLOW )
             & SMBUS_PHY_CTLR_CLK_TLOW_CTLR_CLK_TLOW_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2362,13 +2362,13 @@ uint32_t ulSMBusHWReadPHYCtrlClkTLow( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlClkTHigh( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CLK_THIGH ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CLK_THIGH )
             & SMBUS_PHY_CTLR_CLK_THIGH_CTLR_CLK_THIGH_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2384,13 +2384,13 @@ uint32_t ulSMBusHWReadPHYCtrlClkTHigh( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlTextPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_TEXT_PRESCALER ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_TEXT_PRESCALER )
             & SMBUS_PHY_CTLR_TEXT_PRESCALER_CTLR_TEXT_PRESCALER_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2406,13 +2406,13 @@ uint32_t ulSMBusHWReadPHYCtrlTextPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlTextTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_TEXT_TIMEOUT ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_TEXT_TIMEOUT )
             & SMBUS_PHY_CTLR_TEXT_TIMEOUT_CTLR_TEXT_TIMEOUT_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2428,13 +2428,13 @@ uint32_t ulSMBusHWReadPHYCtrlTextTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlTextMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_TEXT_MAX ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_TEXT_MAX )
             & SMBUS_PHY_CTLR_TEXT_MAX_CTLR_TEXT_MAX_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2450,13 +2450,13 @@ uint32_t ulSMBusHWReadPHYCtrlTextMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlCextPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CEXT_PRESCALER ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CEXT_PRESCALER )
             & SMBUS_PHY_CTLR_CEXT_PRESCALER_CTLR_CEXT_PRESCALER_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2472,13 +2472,13 @@ uint32_t ulSMBusHWReadPHYCtrlCextPrescaler( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlCextTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CEXT_TIMEOUT ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CEXT_TIMEOUT )
             & SMBUS_PHY_CTLR_CEXT_TIMEOUT_CTLR_CEXT_TIMEOUT_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2494,13 +2494,13 @@ uint32_t ulSMBusHWReadPHYCtrlCextTimeout( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlCextMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CEXT_MAX ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_CEXT_MAX )
             & SMBUS_PHY_CTLR_CEXT_MAX_CTLR_CEXT_MAX_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2516,13 +2516,13 @@ uint32_t ulSMBusHWReadPHYCtrlCextMax( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadPHYCtrlDbgState( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_DBG_STATE ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_PHY_CTLR_DBG_STATE )
             & SMBUS_PHY_CTLR_DBG_STATE_DBG_STATE_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2537,13 +2537,13 @@ uint32_t ulSMBusHWReadPHYCtrlDbgState( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadCtrlStatusEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_STATUS ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_STATUS )
             & SMBUS_CTLR_STATUS_ENABLE_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2559,13 +2559,13 @@ uint32_t ulSMBusHWReadCtrlStatusEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadCtrlDescStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS )
             & SMBUS_CTLR_DESC_STATUS_FILL_LEVEL_MASK ) >> SMBUS_CTLR_DESC_STATUS_FILL_LEVEL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2578,13 +2578,13 @@ uint32_t ulSMBusHWReadCtrlDescStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProfil
 uint32_t ulSMBusHWReadCtrlDescStatusResetBusy( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS )
             & SMBUS_CTLR_DESC_STATUS_RESET_BUSY_MASK ) >> SMBUS_CTLR_DESC_STATUS_RESET_BUSY_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2597,13 +2597,13 @@ uint32_t ulSMBusHWReadCtrlDescStatusResetBusy( SMBUS_PROFILE_TYPE* pxSMBusProfil
 uint32_t ulSMBusHWReadCtrlDescStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS )
             & SMBUS_CTLR_DESC_STATUS_FULL_MASK ) >> SMBUS_CTLR_DESC_STATUS_FULL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2616,13 +2616,13 @@ uint32_t ulSMBusHWReadCtrlDescStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadCtrlDescStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS )
             & SMBUS_CTLR_DESC_STATUS_ALMOST_FULL_MASK ) >> SMBUS_CTLR_DESC_STATUS_ALMOST_FULL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2635,13 +2635,13 @@ uint32_t ulSMBusHWReadCtrlDescStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusProfi
 uint32_t ulSMBusHWReadCtrlDescStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS )
             & SMBUS_CTLR_DESC_STATUS_ALMOST_EMPTY_MASK ) >> SMBUS_CTLR_DESC_STATUS_ALMOST_EMPTY_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2654,13 +2654,13 @@ uint32_t ulSMBusHWReadCtrlDescStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusProf
 uint32_t ulSMBusHWReadCtrlDescStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DESC_STATUS )
             & SMBUS_CTLR_DESC_STATUS_EMPTY_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2676,13 +2676,13 @@ uint32_t ulSMBusHWReadCtrlDescStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadCtrlRxFifoPayload( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO )
             & SMBUS_CTLR_RX_FIFO_PAYLOAD_MASK ) >> SMBUS_CTLR_RX_FIFO_PAYLOAD_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2698,13 +2698,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoPayload( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadCtrlRxFifoStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS )
             & SMBUS_CTLR_RX_FIFO_STATUS_FILL_LEVEL_MASK ) >> SMBUS_CTLR_RX_FIFO_STATUS_FILL_LEVEL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2717,13 +2717,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusFillLevel( SMBUS_PROFILE_TYPE* pxSMBusProf
 uint32_t ulSMBusHWReadCtrlRxFifoStatusResetBusy( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS )
             & SMBUS_CTLR_RX_FIFO_STATUS_RESET_BUSY_MASK ) >> SMBUS_CTLR_RX_FIFO_STATUS_RESET_BUSY_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2735,13 +2735,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusResetBusy( SMBUS_PROFILE_TYPE* pxSMBusProf
 uint32_t ulSMBusHWReadCtrlRxFifoStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS )
             & SMBUS_CTLR_RX_FIFO_STATUS_FULL_MASK ) >> SMBUS_CTLR_RX_FIFO_STATUS_FULL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2754,13 +2754,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS )
             & SMBUS_CTLR_RX_FIFO_STATUS_ALMOST_FULL_MASK ) >> SMBUS_CTLR_RX_FIFO_STATUS_ALMOST_FULL_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2773,13 +2773,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostFull( SMBUS_PROFILE_TYPE* pxSMBusPro
 uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS ) 
+        ulReadValue =( ( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS )
             & SMBUS_CTLR_RX_FIFO_STATUS_ALMOST_EMPTY_MASK ) >> SMBUS_CTLR_RX_FIFO_STATUS_ALMOST_EMPTY_FIELD_POSITION );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2792,13 +2792,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostEmpty( SMBUS_PROFILE_TYPE* pxSMBusPr
 uint32_t ulSMBusHWReadCtrlRxFifoStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_STATUS )
             & SMBUS_CTLR_RX_FIFO_STATUS_EMPTY_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2814,13 +2814,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusEmpty( SMBUS_PROFILE_TYPE* pxSMBusProfile 
 uint32_t ulSMBusHWReadCtrlRxFifoFillThresholdFillThresh( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_FILL_THRESHOLD ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_FILL_THRESHOLD )
             & SMBUS_CTLR_RX_FIFO_FILL_THRESHOLD_FILL_THRESHOLD_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2836,13 +2836,13 @@ uint32_t ulSMBusHWReadCtrlRxFifoFillThresholdFillThresh( SMBUS_PROFILE_TYPE* pxS
 uint32_t ulSMBusHWReadCtrlDbgState( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
-    
+
     if( NULL != pxSMBusProfile )
     {
-        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DBG ) 
+        ulReadValue =( prvulSMBusHardwareRead( pxSMBusProfile, SMBUS_REG_CTLR_DBG )
             & SMBUS_CTLR_DBG_DBG_STATE_MASK );
     }
-    
+
     return( ulReadValue );
 }
 
@@ -2876,7 +2876,7 @@ void vSMBusHWWriteIRQGIEEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulV
 void vSMBusHWWriteIRQIER( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulValue )
 {
     if( NULL != pxSMBusProfile )
-    {   
+    {
         prvvSMBusHardwareWrite( pxSMBusProfile, SMBUS_REG_IRQ_IER, ulValue );
     }
 }
@@ -2956,7 +2956,7 @@ void vSMBusHWWritePHYFilterControlEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile, ui
 void vSMBusHWWritePHYFilterControlDuration( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulValue )
 {
     if( NULL != pxSMBusProfile )
-    {   
+    {
         prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_FILTER_CONTROL, SMBUS_PHY_FILTER_CONTROL_DURATION_MASK, ulValue );
     }
 }
@@ -2972,7 +2972,7 @@ void vSMBusHWWritePHYFilterControlDuration( SMBUS_PROFILE_TYPE* pxSMBusProfile, 
 void vSMBusHWWritePHYBusFreetime( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulValue )
 {
     if( NULL != pxSMBusProfile )
-    {   
+    {
         prvvSMBusHardwareWrite( pxSMBusProfile, SMBUS_REG_PHY_BUS_FREE_TIME, ulValue );
     }
 }
@@ -2989,8 +2989,8 @@ void vSMBusHWWritePHYBusFreetime( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t u
 void vSMBusHWWritePHYIdleThresholdIdleThreshold( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulValue )
 {
     if( NULL != pxSMBusProfile )
-    {   
-        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_IDLE_THRESHOLD, 
+    {
+        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_IDLE_THRESHOLD,
                             SMBUS_PHY_IDLE_THRESHOLD_IDLE_THRESHOLD_MASK, ulValue );
     }
 }
@@ -3086,7 +3086,7 @@ void vSMBusHWWritePHYResetControlSMBClkForceTimeout( SMBUS_PROFILE_TYPE* pxSMBus
     if( NULL != pxSMBusProfile )
     {
         ulValue = ulValue << SMBUS_PHY_RESET_CONTROL_SMBCLK_FORCE_TIMEOUT_FIELD_POSITION;
-        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_RESET_CONTROL, 
+        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_RESET_CONTROL,
                                 SMBUS_PHY_RESET_CONTROL_SMBCLK_FORCE_TIMEOUT_MASK, ulValue );
     }
 }
@@ -3101,7 +3101,7 @@ void vSMBusHWWritePHYResetControlSMBClkForceLow( SMBUS_PROFILE_TYPE* pxSMBusProf
 {
     if( NULL != pxSMBusProfile )
     {
-        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_RESET_CONTROL, 
+        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_RESET_CONTROL,
                                 SMBUS_PHY_RESET_CONTROL_SMBCLK_FORCE_LOW_MASK, ulValue );
     }
 }
@@ -3119,7 +3119,7 @@ void vSMBusHWWritePHYTgtDataSetupTgtDataSetup( SMBUS_PROFILE_TYPE* pxSMBusProfil
 {
     if( NULL != pxSMBusProfile )
     {
-        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_TGT_DATA_SETUP, 
+        prvvSMBusHardwareWriteWithMask( pxSMBusProfile, SMBUS_REG_PHY_TGT_DATA_SETUP,
                                 SMBUS_PHY_TGT_DATA_SETUP_TGT_DATA_SETUP_MASK, ulValue );
     }
 }
@@ -3264,7 +3264,7 @@ void vSMBusHWWriteRxFifoFillThresholdFillThresh( SMBUS_PROFILE_TYPE* pxSMBusProf
 {
     if( NULL != pxSMBusProfile )
     {
-        prvvSMBusHardwareWrite( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_FILL_THRESHOLD, 
+        prvvSMBusHardwareWrite( pxSMBusProfile, SMBUS_REG_TGT_RX_FIFO_FILL_THRESHOLD,
                         ( SMBUS_TGT_RX_FIFO_FILL_THRESHOLD_FILL_THRESHOLD_MASK & ulValue ) );
     }
 }
@@ -3534,35 +3534,35 @@ void vSMBusHWWriteTgtControlAddress( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t
         case 0:
             prvvSMBusHWWriteTgtControl0Address( pxSMBusProfile, ulValue );
             break;
-        
+
         case 1:
             prvvSMBusHWWriteTgtControl1Address( pxSMBusProfile, ulValue );
             break;
-        
+
         case 2:
             prvvSMBusHWWriteTgtControl2Address( pxSMBusProfile, ulValue );
             break;
-        
+
         case 3:
             prvvSMBusHWWriteTgtControl3Address( pxSMBusProfile, ulValue );
             break;
-        
+
         case 4:
             prvvSMBusHWWriteTgtControl4Address( pxSMBusProfile, ulValue );
             break;
-        
+
         case 5:
             prvvSMBusHWWriteTgtControl5Address( pxSMBusProfile, ulValue );
             break;
-        
+
         case 6:
             prvvSMBusHWWriteTgtControl6Address( pxSMBusProfile, ulValue );
             break;
-        
+
         case 7:
             prvvSMBusHWWriteTgtControl7Address( pxSMBusProfile, ulValue );
             break;
-        
+
         default:
             break;
         }
@@ -3584,35 +3584,35 @@ void vSMBusHWWriteTgtControlEnable( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint8_t 
         case 0:
             prvvSMBusHWWriteTgtControl0Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         case 1:
             prvvSMBusHWWriteTgtControl1Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         case 2:
             prvvSMBusHWWriteTgtControl2Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         case 3:
             prvvSMBusHWWriteTgtControl3Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         case 4:
             prvvSMBusHWWriteTgtControl4Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         case 5:
             prvvSMBusHWWriteTgtControl5Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         case 6:
             prvvSMBusHWWriteTgtControl6Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         case 7:
             prvvSMBusHWWriteTgtControl7Enable( pxSMBusProfile, ulValue );
             break;
-        
+
         default:
             break;
         }
@@ -3887,7 +3887,7 @@ void vSMBusHWWriteCtrlRxFifoFillThreshold( SMBUS_PROFILE_TYPE* pxSMBusProfile, u
 {
     if( NULL != pxSMBusProfile )
     {
-        prvvSMBusHardwareWrite( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_FILL_THRESHOLD, 
+        prvvSMBusHardwareWrite( pxSMBusProfile, SMBUS_REG_CTLR_RX_FIFO_FILL_THRESHOLD,
                         ( SMBUS_CTLR_RX_FIFO_FILL_THRESHOLD_FILL_THRESHOLD_MASK & ulValue ) );
     }
 }

@@ -5,7 +5,6 @@
 * This file contains the FW IF SMBus Block IO interface implementation.
 *
 * @file fw_if_smbus_block_io.c
-*
 */
 
 

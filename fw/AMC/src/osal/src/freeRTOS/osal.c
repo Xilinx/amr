@@ -5,7 +5,6 @@
  * This file contains the (OSAL) API implementation for FreeRTOS.
  *
  * @file osal_FreeRTOS.c
- *
  */
 
 /*****************************************************************************/
@@ -64,8 +63,8 @@
 
 /**
  * @struct OSAL_TASK_MEMORY
- * 
- * @brief Struct to store task's stack, TCB (Task control block) and handle. 
+ *
+ * @brief Struct to store task's stack, TCB (Task control block) and handle.
  *        Used for static task allocation.
  */
 typedef struct OSAL_TASK_MEMORY
@@ -186,7 +185,7 @@ typedef struct OSAL_OS_STATS
 
 } OSAL_OS_STATS;
 
-static OSAL_OS_STATS xOsStatsHandle = 
+static OSAL_OS_STATS xOsStatsHandle =
 {
     NULL,   /* pxTaskHead */
     NULL,   /* pxSemHead */
@@ -433,7 +432,7 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
         ( NULL == pvGetCharMutexHandle ) &&
         ( NULL == pvMemSetSemHandle    ) &&
         ( NULL == pvMemCpySemHandle    ) &&
-        ( NULL == pvStrNCpySemHandle   ) && 
+        ( NULL == pvStrNCpySemHandle   ) &&
         ( NULL == pvMemCmpSemHandle    ) &&
         ( NULL == pvMemMoveSemHandle   ) )
     {
@@ -2214,8 +2213,8 @@ char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize
 {
     char *pcSetString = NULL;
 
-    if( ( NULL != pcDestination ) && 
-        ( NULL != pcSource ) && 
+    if( ( NULL != pcDestination ) &&
+        ( NULL != pcSource ) &&
         ( 0 < usSize ) )
     {
         if( TRUE == iOsStarted )
@@ -2249,7 +2248,7 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usS
 {
     int iStatus = ERROR;
 
-    if( ( NULL != pvMemoryOne ) && 
+    if( ( NULL != pvMemoryOne ) &&
         ( NULL != pvMemoryTwo ) &&
         ( 0 < usSize ) )
     {
@@ -2296,11 +2295,11 @@ static OSAL_TASK_MEMORY* pxAllocateTaskMemory( void )
         {
             xTaskMemoryUsed[ i ] = MEM_USED;
             pxMemory = &xTaskMemoryPool[ i ];
-            break; 
+            break;
         }
     }
 
-    return pxMemory; 
+    return pxMemory;
 }
 
 /**
@@ -2413,7 +2412,7 @@ void vOSAL_ClearAllStats( void )
             free( pxTemp->pcStatus );
             vOSAL_MemFree( ( void** )&pxTemp );
         }
-        
+
         pxOsStatsHandle->pxSemHead = NULL;
 
         OSAL_MUTEX_STATS_LINKED_LIST* pxCurrentMutex = pxOsStatsHandle->pxMutexHead;

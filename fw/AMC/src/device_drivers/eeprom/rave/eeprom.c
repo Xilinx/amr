@@ -596,7 +596,7 @@ int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROM_CFG *pxEepromCfg )
 							uint32_t fru_ts = (uint32_t)(pxThis->pucBoardMfgDate[2] << 16) |  /* MSB */
 											    		(pxThis->pucBoardMfgDate[1] <<  8) |
 														(pxThis->pucBoardMfgDate[0]      ); /* LSB */
-							
+
 
 							/*if (FRU_BOARD_DATE_UNSPEC == fru_ts) {
 								ts = IPMI_TIME_UNSPECIFIED;
@@ -1374,7 +1374,7 @@ static int ucEepromWriteByte( uint8_t ucAddressOffset, uint8_t ucRegisterValue )
 				pxThis->xEepromCfg.ucEepromAddressSize,
 				ucAddressOffset,
 				ucRegisterValue);
-			
+
 			pucBuffer[ EEPROM_ADDRESS_BYTE_ONE ]     = ucAddressOffset;
 			pucBuffer[ EEPROM_ADDRESS_BYTE_ONE + 1 ] = ucRegisterValue;
 		}

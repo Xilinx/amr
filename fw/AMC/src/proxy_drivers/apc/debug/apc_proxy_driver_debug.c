@@ -5,7 +5,6 @@
  * This file contains the AVED Programming Control (APC) debug implementation
  *
  * @file apc_proxy_driver_debug.c
- *
  */
 
 #include "standard.h"
@@ -211,9 +210,9 @@ static void vSetDownloadImage( void )
     int iPartition     = 0;
     int iImageSize     = 0;
     uint32_t ulSrcAddr = 0;
-    int iPacketNum     = 0; 
+    int iPacketNum     = 0;
     int iPacketSize    = 0;
-    
+
     if( OK != iDAL_GetIntInRange( "Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
     {
         PLL_DAL( APC_DBG_NAME, "Error retrieving instance\r\n" );
@@ -248,7 +247,7 @@ static void vSetDownloadImage( void )
         EVL_SIGNAL xSignal = { 0 };
         xSignal.ucInstance = iInstance;
 
-        if( OK != iAPC_DownloadImage( &xSignal, ( APC_BOOT_DEVICES )xBootDevice, iPartition, ulSrcAddr, ( uint32_t )iImageSize, 
+        if( OK != iAPC_DownloadImage( &xSignal, ( APC_BOOT_DEVICES )xBootDevice, iPartition, ulSrcAddr, ( uint32_t )iImageSize,
                                       ( uint16_t )iPacketNum, ( uint16_t )iPacketSize ) )
         {
             PLL_DAL( APC_DBG_NAME, "Error writing %d bytes to partition %d\r\n", iImageSize, iPartition );
@@ -264,7 +263,7 @@ static void vSetDownloadImage( void )
 /**
  * @brief   Debug function to download an image to flash
  */
-static void vSetCopyImage( void )   
+static void vSetCopyImage( void )
 {
     int iInstance       = 0;
     int xSrcBootDevice  = 0;
@@ -325,7 +324,7 @@ static void vSetNextPartition( void )
 {
     int iInstance  = 0;
     int iPartition = 0;
-    
+
     if( OK != iDAL_GetIntInRange( "Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
     {
         PLL_DAL( APC_DBG_NAME, "Error retrieving instance\r\n" );
@@ -338,7 +337,7 @@ static void vSetNextPartition( void )
     {
         EVL_SIGNAL xSignal = { 0 };
         xSignal.ucInstance = iInstance;
-        
+
         if( OK != iAPC_SetNextPartition( &xSignal, iPartition ) )
         {
             PLL_DAL( APC_DBG_NAME, "Error selecting partition %d\r\n", iPartition );
@@ -356,7 +355,7 @@ static void vSetNextPartition( void )
 static void vSetEnableHotReset( void )
 {
     int iInstance = 0;
-    
+
     if( OK != iDAL_GetIntInRange( "Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
     {
         PLL_DAL( APC_DBG_NAME, "Error retrieving instance\r\n" );
@@ -365,7 +364,7 @@ static void vSetEnableHotReset( void )
     {
         EVL_SIGNAL xSignal = { 0 };
         xSignal.ucInstance = iInstance;
-        
+
         if( OK != iAPC_EnableHotReset( &xSignal ) )
         {
             PLL_DAL( APC_DBG_NAME, "Error enabling hot reset\r\n" );
@@ -405,7 +404,7 @@ static void vGetFptHeader( void )
             PLL_DAL( APC_DBG_NAME, "\tFPT header size. . . . : 0x%02X\r\n", xFptHeader.ucFptHeaderSize );
             PLL_DAL( APC_DBG_NAME, "\tEntry size . . . . . . : 0x%02X\r\n", xFptHeader.ucEntrySize );
             PLL_DAL( APC_DBG_NAME, "\tNum entries. . . . . . : 0x%02X\r\n", xFptHeader.ucNumEntries );
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );    
+            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
         }
     }
 }
@@ -441,7 +440,7 @@ static void vGetFptPartition( void )
             PLL_DAL( APC_DBG_NAME, "\tPartition type . . . . : 0x%08X\r\n", xFptPartition.ulPartitionType );
             PLL_DAL( APC_DBG_NAME, "\tPartition base address : 0x%08X\r\n", xFptPartition.ulPartitionBaseAddr );
             PLL_DAL( APC_DBG_NAME, "\tPartition size . . . . : 0x%08X\r\n", xFptPartition.ulPartitionSize );
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );    
+            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
         }
     }
 }

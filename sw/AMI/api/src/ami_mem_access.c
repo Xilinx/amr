@@ -36,7 +36,7 @@
  * @num: Number of BAR registers to read/write.
  * @val: Buffer to write to the BAR or to store values read from the BAR.
  * @request: IOCTL request code (AMI_IOC_READ_BAR or AMI_IOC_WRITE_BAR).
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 static int do_bar_transaction(ami_device *dev, uint8_t idx, uint64_t offset,
@@ -57,7 +57,7 @@ static int do_bar_transaction(ami_device *dev, uint8_t idx, uint64_t offset,
 
 	if (!dev || !val || (num == 0))
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if ((request != AMI_IOC_READ_BAR) && (request != AMI_IOC_WRITE_BAR))
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
 

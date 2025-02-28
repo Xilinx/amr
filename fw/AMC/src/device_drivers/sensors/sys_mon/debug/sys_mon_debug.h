@@ -5,7 +5,6 @@
  * This file contains the System Monitoring (SYS_MON) debug access
  *
  * @file sys_mon_debug.h
- *
  */
 
 #ifndef _SYS_MON_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the SYS_MON debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vSYS_MON_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _SYS_MON_DEBUG_H_ */
 

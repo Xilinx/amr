@@ -5,7 +5,6 @@
  * This file contains the AVED Management Interface (AMI) debug implementation
  *
  * @file ami_proxy_driver_debug.c
- *
  */
 
 #include "standard.h"
@@ -158,7 +157,7 @@ static int iTestCallback( EVL_SIGNAL *pxSignal );
 
 const char *pcSensorReqString[ MAX_AMI_PROXY_CMD_SENSOR_REQUEST ] =
 {
-    "Get size", "Get SDR", "Get single SDR", "Get all SDRs" 
+    "Get size", "Get SDR", "Get single SDR", "Get all SDRs"
 };
 
 const char *pcSensorRepoString[ MAX_AMI_PROXY_CMD_SENSOR_REPO ] =
@@ -514,7 +513,7 @@ static void vSetIdentityResponse( void )
                 xId.usDevCommits   = ( uint16_t )iCommits;
                 xId.ucLinkVerMajor = ( uint8_t )iLinkMaj;
                 xId.ucLinkVerMinor = ( uint8_t )iLinkMin;
-        
+
                 if( OK != iAMI_SetIdentityResponse( &xEv, xRes, &xId ) )
                 {
                     PLL_DAL( AMI_DBG_NAME, "Error setting result %s to instance %d\r\n",
@@ -589,7 +588,7 @@ static void vGetPdiDownloadRequest( void )
     {
         EVL_SIGNAL                     xEv  = { 0 };
         AMI_PROXY_PDI_DOWNLOAD_REQUEST xReq = { 0 };
-        
+
         xEv.ucInstance = ( uint8_t )iInstance;
 
         if( OK != iAMI_GetPdiDownloadRequest( &xEv, &xReq ) )
@@ -620,7 +619,7 @@ static void vGetPdiCopyRequest( void )
     {
         EVL_SIGNAL                 xEv  = { 0 };
         AMI_PROXY_PDI_COPY_REQUEST xReq = { 0 };
-        
+
         xEv.ucInstance = ( uint8_t )iInstance;
 
         if( OK != iAMI_GetPdiCopyRequest( &xEv, &xReq ) )
@@ -652,7 +651,7 @@ static void vGetSensorRequest( void )
         AMI_PROXY_SENSOR_REQUEST xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
-        
+
         if( OK != iAMI_GetSensorRequest( &xEv, &xReq ) )
         {
             PLL_DAL( AMI_DBG_NAME, "Error getting sensor request\r\n" );
@@ -683,7 +682,7 @@ static void vGetBootSelectRequest( void )
     {
         EVL_SIGNAL                    xEv  = { 0 };
         AMI_PROXY_BOOT_SELECT_REQUEST xReq = { 0 };
-        
+
         xEv.ucInstance = ( uint8_t )iInstance;
 
         if( OK != iAMI_GetBootSelectRequest( &xEv, &xReq ) )

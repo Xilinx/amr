@@ -5,7 +5,6 @@
  * This file contains the Board Management Controller (BMC) proxy debug access
  *
  * @file bmc_proxy_driver_debug.h
- *
  */
 
 #ifndef _BMC_PROXY_DRIVER_DEBUG_H_
@@ -27,4 +26,4 @@
  */
 void vBMC_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _BMC_PROXY_DRIVER_DEBUG_H_ */

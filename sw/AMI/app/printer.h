@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * printer.h - This file contains utilities for printing formatted output
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -61,10 +61,10 @@ enum app_out_format {
  * @n_fields: Pointer to number of elements in each row.
  * @fmt: Output format/format of data structure.
  * @data: Implementation specific data.
- * 
+ *
  * Fuctions of this type should be passed to the functions `print_json`
  * and `print_table` to print arbitrary data in a specific format.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 typedef int (*app_value_builder)(ami_device *dev, void *values,
@@ -76,9 +76,9 @@ typedef int (*app_value_builder)(ami_device *dev, void *values,
  * @header: Pointer to pre-allocated header.
  * @n_fields: Number of columns in the table/header.
  * @data: Implementation specific data.
- * 
+ *
  * Note that functions of this type are applicable only to printing tables.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 typedef int (*app_header_builder)(ami_device *dev, char **header,
@@ -96,7 +96,7 @@ typedef int (*app_header_builder)(ami_device *dev, char **header,
  *
  * Useful for commands that need to print to the screen and potentially
  * also write to a specified output file.
- * 
+ *
  * Return: None.
  */
 void my_fprintf(FILE *stream, const char *format, ...);
@@ -109,7 +109,7 @@ void my_fprintf(FILE *stream, const char *format, ...);
  *
  * Useful for commands that need to print to the screen and potentially
  * also write to a specified output file.
- * 
+ *
  * Return: None.
  */
 void my_putc(const char c, FILE *stream);
@@ -119,7 +119,7 @@ void my_putc(const char c, FILE *stream);
  * @c: Character to use.
  * @len: Length of divider.
  * @stream: Output stream (if NULL, print only to stdout)
- * 
+ *
  * Return: None.
  */
 void print_divider(const char c, uint8_t len, FILE *stream);
@@ -144,7 +144,7 @@ void print_hexdump(uint64_t start_addr, void *values, uint32_t num_values,
  * @populate_values: Implementation specific function to populate JSON values.
  * @data: Implementation specific data (optional).
  * @out: Argument to store the generated JSON object.
- * 
+ *
  * This function allocates the memory for a top level JSON parent,
  * populates it with children objects, and returns the resulting object via
  * the `out` parameter. If you only want to print the resulting JSON, see the
@@ -172,7 +172,7 @@ int print_json_obj(JsonNode *obj, FILE *stream);
  * @stream: Output stream.
  * @populate_values: Implementation specific function to populate JSON values.
  * @data: Implementation specific data (optional).
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int print_json_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
@@ -189,12 +189,12 @@ int print_json_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
  * @populate_header: Implementation specific function to populate table header.
  * @data: Implementation specific data.
  * @col_align: Optional column alignment values.
- * 
+ *
  * This function allocates the memory for a table, populates the table values
- * and finally prints the table to the indicated output stream. The number of 
- * fields (columns) and number of rows might differ in the printed table, as 
+ * and finally prints the table to the indicated output stream. The number of
+ * fields (columns) and number of rows might differ in the printed table, as
  * these variables may be modified by the populate_values callback.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int print_table_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
@@ -211,7 +211,7 @@ int print_table_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
  * @fill: Progress fill character.
  * @empty: Remaining fill character.
  * @state: Last progress bar state; this is either '|' or '-'
- * 
+ *
  * The progress bar state is used simply to determine which character
  * gets printed after the progress bar (either '|' or '-'). This is useful
  * as it lets the user know that nothing is hanging if progress
@@ -223,4 +223,4 @@ int print_table_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
 char print_progress_bar(uint32_t cur, uint32_t max, uint32_t width,
 	char left, char right, char fill, char empty, char state);
 
-#endif
+#endif /* AMI_APP_PRINTER_H */

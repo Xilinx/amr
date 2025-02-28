@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * cmd_eeprom_wr.c - This file contains the implementation for the command "eeprom_wr"
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -32,7 +32,7 @@
 
 /**
  * do_cmd_eeprom_wr() - "eeprom_wr" command callback.
- * 
+ *
  * For parameters and return value see the definition for `app_command`.
  */
 static int do_cmd_eeprom_wr(struct app_option *options, int num_args, char **args);
@@ -47,7 +47,7 @@ static int do_cmd_eeprom_wr(struct app_option *options, int num_args, char **arg
  * a: Offset
  * i: Input value
  * I: Input file
- * 
+ *
  * i and I are mutually exclusive.
  */
 static const char short_options[] = "hd:a:i:I:";
@@ -177,7 +177,7 @@ static int do_cmd_eeprom_wr(struct app_option *options, int num_args, char **arg
 done:
 	if (buf)
 		free(buf);
-	
+
 	ami_dev_delete(&dev);
 	return ret;
 }

@@ -5,7 +5,6 @@
  * This file contains the public API of the Built in Monitoring (BIM) Application.
  *
  * @file bim.h
- *
  */
 #ifndef _BIM_H_
 #define _BIM_H_
@@ -123,4 +122,4 @@ int iBIM_PrintStatistics( void );
  */
 int iBIM_ClearStatistics( void );
 
-#endif
+#endif /* _BIM_H_ */

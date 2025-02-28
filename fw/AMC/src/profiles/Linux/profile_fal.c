@@ -5,7 +5,6 @@
  * This file contains the fal profile for the Linux platform
  *
  * @file profile_fal.c
- *
  */
 
 /*****************************************************************************/
@@ -46,7 +45,7 @@
 #define FAL_PROFILE_NAME           "PROFILE_FAL"
 #define OSPI_PAGE_SIZE             ( 256 )
 #define OSPI_RPU_BASE_ADDRESS      ( 0x0 )
-#define OSPI_RPU_LENGTH            ( 0x10000000 )                              /* 2Gb (256MB) */
+#define OSPI_RPU_LENGTH            ( 0x10000000 )       /* 2Gb (256MB) */
 #define OSPI_TEST_CONFIG_NAME      "OSPI TEST"
 #define OSPI_TEST_CONFIG_NAME_SIZE ( 10 )
 #define OSPI_TEST_CONFIG_ID        ( 0 )
@@ -483,5 +482,5 @@ void vFAL_DebugInitialise( void )
     }
 
     vFW_IF_SMBUS_DebugInit( pxFwIfTop );
-#endif
+#endif /* DEBUG_BUILD */
 }

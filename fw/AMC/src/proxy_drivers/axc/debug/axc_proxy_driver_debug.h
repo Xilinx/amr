@@ -5,7 +5,6 @@
  * This file contains the AVED External Device (AXC) debug access
  *
  * @file axc_proxy_driver_debug.h
- *
  */
 
 #ifndef _AXC_PROXY_DRIVER_DEBUG_H_
@@ -27,5 +26,5 @@
  */
 void vAXC_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _AXC_PROXY_DRIVER_DEBUG_H_ */
 

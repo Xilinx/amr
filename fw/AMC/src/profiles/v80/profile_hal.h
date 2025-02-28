@@ -5,7 +5,6 @@
  * This file contains the hal profile for the V80
  *
  * @file profile_hal.h
- *
  */
 
 #ifndef _PROFILE_HAL_H_
@@ -188,4 +187,4 @@ typedef struct HAL_PARTITION_TABLE
 
 } HAL_PARTITION_TABLE;
 
-#endif
+#endif /* _PROFILE_HAL_H_ */

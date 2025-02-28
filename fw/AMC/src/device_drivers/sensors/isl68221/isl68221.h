@@ -6,7 +6,6 @@
  * sensor.
  *
  * @file isl68221.h
- *
  */
 
 #ifndef _ISL68221_H_
@@ -52,7 +51,7 @@ typedef enum ISL68821_SENSOR_PAGE_ENUM
  *
  * @return  OK             Voltage read successfully
  *          ERROR          Voltage not read successfully
- * 
+ *
  */
 int iISL68221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPageNum, float *pfVoltageInMV );
 
@@ -66,7 +65,7 @@ int iISL68221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPage
  *
  * @return  OK            Current read successfully
  *          ERROR         Current not read successfully
- * 
+ *
  */
 int iISL68221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPageNum, float *pfCurrentInA );
 
@@ -80,7 +79,7 @@ int iISL68221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPage
  *
  * @return  OK             Temperature read successfully
  *          ERROR          Temperature not read successfully
- * 
+ *
  */
 int iISL68221_ReadTemperature( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPageNum, float *pfTemperature );
 
@@ -89,7 +88,7 @@ int iISL68221_ReadTemperature( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t uc
  *
  * @return  OK     Stats retrieved from driver successfully
  *          ERROR  Stats not retrieved successfully
- * 
+ *
  */
 int iISL68221_PrintStatistics( void );
 
@@ -98,8 +97,8 @@ int iISL68221_PrintStatistics( void );
  *
  * @return  OK     Stats cleared successfully
  *          ERROR  Stats not cleared successfully
- * 
+ *
  */
 int iISL68221_ClearStatistics( void );
 
-#endif
+#endif /* _ISL68221_H_ */

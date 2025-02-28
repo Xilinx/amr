@@ -6,7 +6,6 @@
  * sensor.
  *
  * @file cat34ts02.h
- *
  */
 
 #ifndef _CAT34TS02_H_
@@ -55,4 +54,4 @@ int iCAT34TS02_PrintStatistics( void );
  */
 int iCAT34TS02_ClearStatistics( void );
 
-#endif
+#endif /* _CAT34TS02_H_ */

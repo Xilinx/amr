@@ -5,7 +5,6 @@
  * This file contains the PLDM PDR profile for the Rave
  *
  * @file profile_pdr.h
- *
  */
 
 #ifndef _PROFILE_PDR_H_
@@ -1682,4 +1681,4 @@ PLDM_NUMERIC_SENSOR_NAME_PDR pxPdrSensorNames[ TOTAL_PDR_NUMERIC_ASCI_SENSORS ] 
     }
 };
 
-#endif
+#endif /* _PROFILE_PDR_H_ */

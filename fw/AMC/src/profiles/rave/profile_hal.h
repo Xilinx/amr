@@ -14,7 +14,6 @@
 #include "xparameters.h"
 #include "xil_io.h"
 #include "xil_cache.h"
-//#include "xsdps.h"
 
 #define HAL_UUID_SIZE       ( 16 )
 #define HAL_EMMC_FEATURE    ( 0 )
@@ -198,4 +197,4 @@ typedef struct HAL_PARTITION_TABLE
 
 } HAL_PARTITION_TABLE;
 
-#endif
+#endif /* _PROFILE_HAL_H_ */

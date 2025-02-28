@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * meta.c - This file contains utilities for printing AMI info/metadata
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -136,7 +136,7 @@ static char* fpt_partition_type_to_str(enum ami_fpt_type type)
 	switch (type) {
 	case AMI_FPT_TYPE_FPT:
 		return "FPT";
-	
+
 	case AMI_FPT_TYPE_RECOVERY_FPT:
 		return "RECOVERY_FPT";
 
@@ -180,7 +180,7 @@ static char* fpt_partition_type_to_str(enum ami_fpt_type type)
  * @header: Pointer to pre-allocated table header.
  * @num_fields: Number of elements in table header.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_fpt_header(ami_device *dev, char **header,
@@ -188,12 +188,12 @@ static int populate_fpt_header(ami_device *dev, char **header,
 {
 	int i = 0;
 	int ret = EXIT_SUCCESS;
-	
+
 	if (!header)
 		return EXIT_FAILURE;
-	
+
 	/* dev and data may be NULL */
-	
+
 	for (i = 0; (i < num_fields) && (i < NUM_FPT_HEADER_COLS); i++) {
 		if (!header[i]) {
 			ret = EXIT_FAILURE;
@@ -222,7 +222,7 @@ static int populate_fpt_header(ami_device *dev, char **header,
  * @n_fields: Pointer to number of elements in each row.
  * @fmt: Format of data structure. Used to determine type of `values`.
  * @data: Pointer to fpt header struct.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_fpt_values(ami_device *dev, void *values,
@@ -233,9 +233,9 @@ static int populate_fpt_values(ami_device *dev, void *values,
 
 	if (!dev || !values || !n_rows || !n_fields || !data)
 		return EXIT_FAILURE;
-	
+
 	hdr = (struct ami_fpt_header*)data;
-	
+
 	for (i = 0; i < NUM_FPT_HEADER_ROWS; i++) {
 		int col = 0;
 
@@ -247,7 +247,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Version");
 				sprintf(((char***)values)[i][col++], "%d", hdr->version);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 				json_append_member(
 					(JsonNode*)values,
@@ -255,7 +255,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 					json_mknumber(hdr->version)
 				);
 				break;
-			
+
 			default:
 				break;
 			}
@@ -270,7 +270,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Header Size");
 				sprintf(((char***)values)[i][col++], "%d", hdr->hdr_size);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 				json_append_member(
 					(JsonNode*)values,
@@ -278,7 +278,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 					json_mknumber(hdr->hdr_size)
 				);
 				break;
-			
+
 			default:
 				break;
 			}
@@ -293,7 +293,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Entry Size");
 				sprintf(((char***)values)[i][col++], "%d", hdr->entry_size);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 				json_append_member(
 					(JsonNode*)values,
@@ -301,7 +301,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 					json_mknumber(hdr->entry_size)
 				);
 				break;
-			
+
 			default:
 				break;
 			}
@@ -316,7 +316,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Entries");
 				sprintf(((char***)values)[i][col++], "%d", hdr->num_entries);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 				json_append_member(
 					(JsonNode*)values,
@@ -324,7 +324,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
 					json_mknumber(hdr->num_entries)
 				);
 				break;
-			
+
 			default:
 				break;
 			}
@@ -346,7 +346,7 @@ static int populate_fpt_values(ami_device *dev, void *values,
  * @header: Pointer to pre-allocated header.
  * @num_fields: Number of elements in header.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_version_header(ami_device *dev, char **header,
@@ -354,12 +354,12 @@ static int populate_version_header(ami_device *dev, char **header,
 {
 	int i = 0;
 	int ret = EXIT_SUCCESS;
-	
+
 	if (!header)
 		return EXIT_FAILURE;
-	
+
 	/* dev and data may be NULL */
-	
+
 	for (i = 0; i < num_fields; i++) {
 		if (!header[i]) {
 			ret = EXIT_FAILURE;
@@ -370,7 +370,7 @@ static int populate_version_header(ami_device *dev, char **header,
 		case VERSION_HEADER_AMI:
 			sprintf(header[i], "%s", "AMI");
 			break;
-		
+
 		default:
 			break;
 		}
@@ -388,7 +388,7 @@ static int populate_version_header(ami_device *dev, char **header,
  * @n_fields:  Pointer to number of elements in each row.
  * @fmt: Format of data structure. Used to determine type of `values`.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_version_values(ami_device *dev, void *values,
@@ -398,7 +398,7 @@ static int populate_version_values(ami_device *dev, void *values,
 
 	if (!values || !n_rows || !n_fields)
 		return EXIT_FAILURE;
-	
+
 	/* dev and data may be NULL */
 
 	/* Get the driver version. */
@@ -427,22 +427,22 @@ static int populate_version_values(ami_device *dev, void *values,
 					GIT_TAG_VER_DEV_COMMITS
 				);
 				break;
-			
+
 			case VERSION_ROW_BRANCH:
 				sprintf(rows[i][col++], "%s", "Branch");
 				sprintf(rows[i][col++], "%s", GIT_BRANCH);
 				break;
-			
+
 			case VERSION_ROW_HASH:
 				sprintf(rows[i][col++], "%s", "Hash");
 				sprintf(rows[i][col++], "%s", GIT_HASH);
 				break;
-			
+
 			case VERSION_ROW_DATE:
 				sprintf(rows[i][col++], "%s", "Hash Date");
 				sprintf(rows[i][col++], "%s", GIT_DATE);
 				break;
-			
+
 			case VERSION_ROW_DRV:
 				sprintf(rows[i][col++], "%s", "Driver Version");
 				sprintf(
@@ -485,7 +485,7 @@ static int populate_version_values(ami_device *dev, void *values,
 		json_append_member(drv_ver, "patch", json_mknumber(driver_ver.patch));
 		json_append_member(drv_ver, "commits", json_mknumber(driver_ver.dev_commits));
 		json_append_member(drv_ver, "status", json_mknumber(driver_ver.status));
-		
+
 		/* Add to parent */
 		json_append_member(parent, "api", api_ver);
 		json_append_member(parent, "driver", drv_ver);
@@ -506,7 +506,7 @@ static int populate_version_values(ami_device *dev, void *values,
  * @header: Pointer to pre-allocated table header.
  * @num_fields: Number of elements in table header.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_partition_header(ami_device *dev, char **header,
@@ -518,7 +518,7 @@ static int populate_partition_header(ami_device *dev, char **header,
 	/* data is unused */
 	if (!header)
 		return EXIT_FAILURE;
-	
+
 	/* dev and data may be NULL */
 
 	for (i = 0; (i < num_fields) && (i < NUM_PARTITION_COLS); i++) {
@@ -543,7 +543,7 @@ static int populate_partition_header(ami_device *dev, char **header,
 		case PARTITION_COL_SIZE:
 			sprintf(header[i], "%s", "Size");
 			break;
-		
+
 		default:
 			break;
 		}
@@ -553,13 +553,13 @@ static int populate_partition_header(ami_device *dev, char **header,
 }
 
 /**
- * construct_partition_row() - Construct a single table row with FPT partition 
+ * construct_partition_row() - Construct a single table row with FPT partition
  *    information.
  * @part: Partition data.
  * @part_num: Current row number (partition ID).
  * @row: Row to fill in.
  * @n_fields: Number of expected elements in the row.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int construct_partition_row(struct ami_fpt_partition *part, int part_num,
@@ -569,21 +569,21 @@ static int construct_partition_row(struct ami_fpt_partition *part, int part_num,
 
 	if (!part || !row)
 		return EXIT_FAILURE;
-	
+
 	for (col = 0; (col < n_fields) && (col < NUM_PARTITION_COLS); col++) {
 		switch (col) {
 		case PARTITION_COL_ID:
 			sprintf(row[col], "%d", part_num);
 			break;
-		
+
 		case PARTITION_COL_TYPE:
 			sprintf(row[col], "%s", fpt_partition_type_to_str(part->type));
 			break;
-		
+
 		case PARTITION_COL_ADDR:
 			sprintf(row[col], "0x%08x", part->base_addr);
 			break;
-		
+
 		case PARTITION_COL_SIZE:
 			sprintf(row[col], "0x%08x", part->size);
 			break;
@@ -614,7 +614,7 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 
 	if (!part || !parent)
 		return EXIT_FAILURE;
-	
+
 	row = json_mkobject();
 
 	for (col = 0; (col < n_fields) && (col < NUM_PARTITION_COLS); col++) {
@@ -626,7 +626,7 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 				json_mkstring(fpt_partition_type_to_str(part->type))
 			);
 			break;
-		
+
 		case PARTITION_COL_ADDR:
 			json_append_member(
 				row,
@@ -634,7 +634,7 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 				json_mknumber(part->base_addr)
 			);
 			break;
-		
+
 		case PARTITION_COL_SIZE:
 			json_append_member(
 				row,
@@ -662,7 +662,7 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
  * @n_fields: Pointer to number of elements in each row.
  * @fmt: Format of data structure. Used to determine type of `values`.
  * @data: Pointer to fpt header struct.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_partition_values(ami_device *dev, void *values,
@@ -718,7 +718,7 @@ static int populate_partition_values(ami_device *dev, void *values,
  * @header: Pointer to pre-allocated header.
  * @num_fields: Number of elements in header.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_overview_header(ami_device *dev, char **header,
@@ -729,7 +729,7 @@ static int populate_overview_header(ami_device *dev, char **header,
 
 	if (!header)
 		return EXIT_FAILURE;
-	
+
 	/* dev and data may be NULL */
 
 	for (i = 0; (i < num_fields) && (i < NUM_OVERVIEW_COLS_V); i++) {
@@ -754,19 +754,19 @@ static int populate_overview_header(ami_device *dev, char **header,
 		case OVERVIEW_COL_CDEV:
 			sprintf(header[i], "%s", "CDEV");
 			break;
-		
+
 		case OVERVIEW_COL_STATE:
 			sprintf(header[i], "%s", "State");
 			break;
-		
+
 		case OVERVIEW_COL_NAME:
 			sprintf(header[i], "%s", "Device");
 			break;
-		
+
 		case OVERVIEW_COL_AMC:
 			sprintf(header[i], "%s", "AMC");
 			break;
-		
+
 		default:
 			break;
 		}
@@ -780,7 +780,7 @@ static int populate_overview_header(ami_device *dev, char **header,
  * @dev: Device handle.
  * @parent: Parent JSON object.
  * @n_fields: Number of expected elements in the JSON node.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fields)
@@ -798,7 +798,7 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 
 	if (!dev || !parent)
 		return EXIT_FAILURE;
-	
+
 	row = json_mkobject();
 
 	for (col = 0; (col < n_fields) && (col < NUM_OVERVIEW_COLS_V); col++) {
@@ -811,7 +811,7 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 				uuid_node = json_mkstring(uuid);
 			else
 				uuid_node = json_mknull();
-			
+
 			json_append_member(row, "uuid", uuid_node);
 			break;
 		}
@@ -824,7 +824,7 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 				hwmon_node = json_mknumber(hwmon);
 			else
 				hwmon_node = json_mknull();
-			
+
 			json_append_member(row, "hwmon", hwmon_node);
 			break;
 		}
@@ -837,7 +837,7 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 				cdev_node = json_mknumber(cdev);
 			else
 				cdev_node = json_mknull();
-			
+
 			json_append_member(row, "cdev", cdev_node);
 			break;
 		}
@@ -850,7 +850,7 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 				state_node = json_mkstring(state);
 			else
 				state_node = json_mknull();
-			
+
 			json_append_member(row, "state", state_node);
 			break;
 		}
@@ -863,11 +863,11 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 				name_node = json_mkstring(name);
 			else
 				name_node = json_mknull();
-			
+
 			json_append_member(row, "name", name_node);
 			break;
 		}
-	
+
 		case OVERVIEW_COL_AMC:
 		{
 			struct amc_version ver = { 0 };
@@ -882,7 +882,7 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 			} else {
 				amc_node = json_mknull();
 			}
-			
+
 			json_append_member(row, "amc", amc_node);
 			break;
 		}
@@ -908,7 +908,7 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
  * @dev: Device handle.
  * @row: Row to fill in.
  * @n_fields: Number of expected elements in the row.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int construct_overview_row(ami_device *dev, char **row, int n_fields)
@@ -917,7 +917,7 @@ static int construct_overview_row(ami_device *dev, char **row, int n_fields)
 
 	if (!dev || !row)
 		return EXIT_FAILURE;
-	
+
 	for (col = 0; (col < n_fields) && (col < NUM_OVERVIEW_COLS_V); col++) {
 		switch (col) {
 		case OVERVIEW_COL_BDF:
@@ -1039,7 +1039,7 @@ static int construct_overview_row(ami_device *dev, char **row, int n_fields)
  * @n_fields:  Pointer to number of elements in each row.
  * @fmt: Format of data structure. Used to determine type of `values`.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_overview_values(ami_device *dev, void *values,
@@ -1051,12 +1051,12 @@ static int populate_overview_values(ami_device *dev, void *values,
 
 	if (!values || !n_rows || !n_fields)
 		return EXIT_FAILURE;
-	
+
 	/* dev and data may be NULL */
 
 	while ((i < *n_rows) &&
 		(ami_dev_find_next(&device, AMI_ANY_DEV, AMI_ANY_DEV, AMI_ANY_DEV, prev) == AMI_STATUS_OK)) {
-		
+
 		switch (fmt) {
 		case APP_OUT_FORMAT_TABLE:
 			construct_overview_row(
@@ -1065,7 +1065,7 @@ static int populate_overview_values(ami_device *dev, void *values,
 				*n_fields
 			);
 			break;
-		
+
 		case APP_OUT_FORMAT_JSON:
 			construct_overview_node(
 				device,
@@ -1099,7 +1099,7 @@ static int populate_overview_values(ami_device *dev, void *values,
  * @header: Pointer to pre-allocated header.
  * @num_fields: Number of elements in header.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_pcieinfo_header(ami_device *dev, char **header,
@@ -1123,7 +1123,7 @@ static int populate_pcieinfo_header(ami_device *dev, char **header,
 		case PCIEINFO_HEADER_INFO:
 			sprintf(header[i], "%s", "PCIe Info");
 			break;
-		
+
 		default:
 			break;
 		}
@@ -1141,7 +1141,7 @@ static int populate_pcieinfo_header(ami_device *dev, char **header,
  * @n_fields: Pointer to number of elements in each row.
  * @fmt: Format of data structure. Used to determine type of `values`.
  * @data: Implementation data. Not used.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_pcieinfo_values(ami_device *dev, void *values,
@@ -1168,7 +1168,7 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Vendor");
 				sprintf(((char***)values)[i][col++], "0x%04x", vendor);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 			{
 				JsonNode *vendor_node = NULL;
@@ -1185,7 +1185,7 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 			default:
 				break;
 			}
-			
+
 			break;
 		}
 
@@ -1199,7 +1199,7 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Device");
 				sprintf(((char***)values)[i][col++], "0x%04x", device);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 			{
 				JsonNode *device_node = NULL;
@@ -1212,14 +1212,14 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				json_append_member((JsonNode*)values, "device", device_node);
 				break;
 			}
-			
+
 			default:
 				break;
 			}
-			
+
 			break;
 		}
-		
+
 		case PCIEINFO_ROW_LINK_SPEED:
 		{
 			uint8_t current = 0, max = 0;
@@ -1230,7 +1230,7 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Link Speed");
 				sprintf(((char***)values)[i][col++], "Gen%d (max Gen%d)", current, max);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 			{
 				JsonNode *link_node = NULL;
@@ -1249,15 +1249,15 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				json_append_member((JsonNode*)values, "link_speed", link_node);
 				break;
 			}
-			
+
 			default:
 				break;
 			}
-			
-			
+
+
 			break;
 		}
-		
+
 		case PCIEINFO_ROW_LINK_WIDTH:
 		{
 			uint8_t current = 0, max = 0;
@@ -1268,7 +1268,7 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "Link Width");
 				sprintf(((char***)values)[i][col++], "x%d (max x%d)", current, max);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 			{
 				JsonNode *width_node = NULL;
@@ -1287,12 +1287,12 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				json_append_member((JsonNode*)values, "link_width", width_node);
 				break;
 			}
-			
+
 			default:
 				break;
 			}
-			
-			
+
+
 			break;
 		}
 
@@ -1306,7 +1306,7 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				sprintf(((char***)values)[i][col++], "%s", "NUMA Node");
 				sprintf(((char***)values)[i][col++], "%d", numa);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 			{
 				JsonNode *numa_node = NULL;
@@ -1319,11 +1319,11 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				json_append_member((JsonNode*)values, "numa_node", numa_node);
 				break;
 			}
-			
+
 			default:
 				break;
 			}
-			
+
 			break;
 		}
 
@@ -1341,7 +1341,7 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 					(buf[0] == '\0') ? ("N/A") : (buf)
 				);
 				break;
-			
+
 			case APP_OUT_FORMAT_JSON:
 			{
 				JsonNode *cpu_node = NULL;
@@ -1354,14 +1354,14 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 				json_append_member((JsonNode*)values, "cpu_affinity", cpu_node);
 				break;
 			}
-			
+
 			default:
 				break;
 			}
-			
+
 			break;
 		}
-		
+
 		default:
 			break;
 		}
@@ -1595,7 +1595,7 @@ static int populate_mfg_info_values(ami_device *dev, void *values,
 
 			/* convert to long from hex */
 			manufacturing_date_mins = strtol(eeprom_buf, NULL, MFG_TIMESTAMP_BASE);
-			
+
 			if (manufacturing_date_mins) {
 				info.tm_year = MFG_DATE_TM_YEAR;
 				info.tm_mon = 1;
@@ -1701,11 +1701,11 @@ int print_overview(struct app_option *options)
 	FILE *stream = NULL;
 	uint16_t num_devices = 0;
 	bool verbose = false;
-	
+
 	if (parse_output_options(options, &format, &verbose, &stream,
 			NULL, NULL) == EXIT_FAILURE)
 		return EXIT_FAILURE;
-	
+
 	/* Print version information. */
 	ret = print_table_data(
 		NULL,
@@ -1753,7 +1753,7 @@ int print_overview(struct app_option *options)
 		case APP_OUT_FORMAT_JSON:
 		{
 			JsonNode *v = NULL;
-			JsonNode *o = NULL;	
+			JsonNode *o = NULL;
 
 			ret = gen_json_data(
 				NULL,
@@ -1773,7 +1773,7 @@ int print_overview(struct app_option *options)
 					NULL,
 					&o
 				);
-			
+
 				if (ret == EXIT_SUCCESS) {
 					JsonNode *parent = NULL;
 
@@ -1883,8 +1883,8 @@ int print_fpt_info(ami_device *dev, uint8_t boot_device, struct app_option *opti
 	if (parse_output_options(options, &format, NULL, &stream,
 			NULL, NULL) == EXIT_FAILURE)
 		return EXIT_FAILURE;
-		
-	
+
+
 	/* Must fetch FPT header */
 	if (ami_prog_get_fpt_header(dev, boot_device, &hdr) != EXIT_SUCCESS) {
 		APP_API_ERROR("could not fetch FPT header");

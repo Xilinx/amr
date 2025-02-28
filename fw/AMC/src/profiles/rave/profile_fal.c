@@ -5,7 +5,6 @@
  * This file contains the fal profile for the Rave
  *
  * @file profile_fal.c
- *
  */
 
 /*****************************************************************************/

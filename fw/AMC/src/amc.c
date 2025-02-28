@@ -5,7 +5,6 @@
  * This file contains the main entry point for the Alveo Managment Controller
  *
  * @file amc.c
- *
  */
 
 /******************************************************************************/

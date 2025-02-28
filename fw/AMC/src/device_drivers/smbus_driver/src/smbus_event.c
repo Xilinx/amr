@@ -6,7 +6,6 @@
  * for the SMBus driver.
  *
  * @file smbus_event.c
- *
  */
 
 #include "smbus.h"
@@ -83,12 +82,12 @@ char* pEvent_UNKNOWN                        = "UNKNOWN";
 void vSMBusCreateEvent( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     uint32_t ulWrite_Position = 0;
-    
+
     if( NULL != pxSMBusInstance )
     {
         if( SMBUS_EVENT_BUFFER_FAIL == ucEventBufferTryWrite( &( pxSMBusInstance->xEventSourceCircularBuffer ), ucAnyEvent, &ulWrite_Position ) )
         {
-            vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_ERROR, 
+            vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_ERROR,
                             pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_ERROR, ucAnyEvent, __LINE__ );
         }
     }
@@ -101,7 +100,7 @@ void vSMBusCreateEvent( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent
 *
 *******************************************************************************/
 void vSMBusGenerateEvent_E_IS_PEC_REQUIRED( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
-{   
+{
     if( NULL != pxSMBusInstance )
     {
         vSMBusCreateEvent( pxSMBusInstance, E_IS_PEC_REQUIRED );
@@ -117,7 +116,7 @@ void vSMBusGenerateEvent_E_IS_PEC_REQUIRED( SMBUS_INSTANCE_TYPE* pxSMBusInstance
 *
 *******************************************************************************/
 void vSMBusGenerateEvent_E_SEND_NEXT_BYTE( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
-{       
+{
     if( NULL != pxSMBusInstance )
     {
         vSMBusCreateEvent( pxSMBusInstance, E_SEND_NEXT_BYTE );
@@ -133,7 +132,7 @@ void vSMBusGenerateEvent_E_SEND_NEXT_BYTE( SMBUS_INSTANCE_TYPE* pxSMBusInstance 
 *
 *******************************************************************************/
 void vSMBusGenerateEvent_E_TARGET_WRITE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
-{   
+{
     if( NULL != pxSMBusInstance )
     {
         vSMBusCreateEvent( pxSMBusInstance, E_TARGET_WRITE_IRQ );
@@ -147,7 +146,7 @@ void vSMBusGenerateEvent_E_TARGET_WRITE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstanc
 *
 *******************************************************************************/
 void vSMBusGenerateEvent_E_TARGET_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
-{   
+{
     if( NULL != pxSMBusInstance )
     {
         vSMBusCreateEvent( pxSMBusInstance, E_TARGET_DATA_IRQ );
@@ -161,7 +160,7 @@ void vSMBusGenerateEvent_E_TARGET_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance
 *
 *******************************************************************************/
 void vSMBusGenerateEvent_E_CONTROLLER_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
-{   
+{
     if( NULL != pxSMBusInstance )
     {
         vSMBusCreateEvent( pxSMBusInstance, E_CONTROLLER_DATA_IRQ );
@@ -219,7 +218,7 @@ void vSMBusGenerateEvent_E_CONTROLLER_DONE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInst
 void vSMBusGenerateEvent_E_TARGET_LOA_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
-    {   
+    {
         vSMBusCreateEvent( pxSMBusInstance, E_TARGET_LOA_ERROR_IRQ );
     }
 }

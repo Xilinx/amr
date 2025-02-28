@@ -5,7 +5,6 @@
  * This file contains the standard definitions for the AMC
  *
  * @file standard.h
- *
  */
 
 #ifndef _STANDARD_H_
@@ -64,4 +63,4 @@ typedef enum MODULE_STATE
 
 } MODULE_STATE;
 
-#endif
+#endif /* _STANDARD_H_ */

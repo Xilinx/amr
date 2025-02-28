@@ -5,7 +5,6 @@
  * This file contains the FW IF QSFP abstraction for AMC.
  *
  * @file fw_if_qsfp_amc.c
- *
  */
 
 /*****************************************************************************/

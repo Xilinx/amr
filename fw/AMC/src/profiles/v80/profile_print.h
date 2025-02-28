@@ -5,7 +5,6 @@
  * This file contains the printing profile for the AVED v80 platform
  *
  * @file profile_print.h
- *
  */
 
 #ifndef _PROFILE_PRINT_H_
@@ -17,4 +16,4 @@
 #define PRINT( ... ) ( xil_printf( __VA_ARGS__ ) )
 #endif
 
-#endif
+#endif /* _PROFILE_PRINT_H_ */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_sensor.h- This file contains the public interface for sensor logic
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -85,11 +85,11 @@ enum ami_sensor_status {
  * @AMI_SENSOR_UNIT_MOD_NONE: 10^0 modifier (none)
  * @AMI_SENSOR_UNIT_MOD_MILLI: 10^-3 modifier
  * @AMI_SENSOR_UNIT_MOD_MICRO: 10^-6 modifier
- * 
+ *
  * Note that no enum is defined for the type of unit used as this can be
  * inferred from the getter function being called. For reference, the units used
  * are as follows:
- * 
+ *
  * Temp - Degrees Celsius
  * Power - Watts
  * Voltage - Volts
@@ -141,11 +141,11 @@ struct ami_sensor {
 /**
  * ami_sensor_discover() - Find all sensors supported by a specific device.
  * @dev: Device handle
- * 
+ *
  * This function updates the sensor related attributes of
  * the given device handle. This should generally be called only once
  * in the lifetime of a particular device.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_sensor_discover(ami_device *dev);
@@ -154,7 +154,7 @@ int ami_sensor_discover(ami_device *dev);
  * ami_sensor_set_refresh() - Set the sensor update interval.
  * @dev: Device handle.
  * @val: New update interval (ms).
- * 
+ *
  * Note that nothing needs to be done by the user to enforce the refresh
  * interval. The set/get functions are simply for updating the interval
  * or fetching it. The refresh will always be in effect under the hood
@@ -184,9 +184,9 @@ int ami_sensor_get_refresh(ami_device *dev, uint16_t *val);
  * @dev: Device handle.
  * @sensor_name: Name of sensor.
  * @type: Output variable to store sensor type.
- * 
+ *
  * See `enum AMI_SENSOR_TYPE` for possible values.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_sensor_get_type(ami_device *dev, const char *sensor_name, uint32_t *type);
@@ -196,11 +196,11 @@ int ami_sensor_get_type(ami_device *dev, const char *sensor_name, uint32_t *type
  * @dev: Device handle.
  * @sensors: Output variable to hold list of sensors.
  * @num: Output variable to hold number of sensors.
- * 
+ *
  * Note that sensors are grouped by name. For example, a sensor called
  * 'vccint' which is composed of a temperature, current, and voltage sensor
  * is counted as a single sensor.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_sensor_get_sensors(ami_device *dev, struct ami_sensor **sensors, int *num);
@@ -209,10 +209,10 @@ int ami_sensor_get_sensors(ami_device *dev, struct ami_sensor **sensors, int *nu
  * ami_sensor_get_num_total() - Get the total number of sensors for a device.
  * @dev: Device handle.
  * @num: Output variable to hold number of sensors.
- * 
+ *
  * For this function, each sensor type is treated as an individual sensor.
  * For example, 'vccint temp', 'vccint power', '12v_pex temp', etc...
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_sensor_get_num_total(ami_device *dev, int *num);
@@ -235,7 +235,7 @@ int ami_sensor_get_temp_status(ami_device *dev, const char *sensor_name,
  * @val: Variable to hold status code.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
- */	
+ */
 int ami_sensor_get_voltage_status(ami_device *dev, const char *sensor_name,
 	enum ami_sensor_status *val);
 
@@ -257,7 +257,7 @@ int ami_sensor_get_current_status(ami_device *dev, const char *sensor_name,
  * @val: Variable to hold status code.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
- */	
+ */
 int ami_sensor_get_power_status(ami_device *dev, const char *sensor_name,
 	enum ami_sensor_status *val);
 
@@ -267,15 +267,15 @@ int ami_sensor_get_power_status(ami_device *dev, const char *sensor_name,
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
  * @sensor_status: Optional variable to hold the status of the sensor
- * 
+ *
  * Note that this function returns the instantaneous sensor value at time of
  * the last sensor refresh.
- * 
+ *
  * To check if the value returned is valid, you must check the return code
  * of the function AND the sensor status. The sensor status refers to the
  * status of the sensor as a whole, so it is possible for the function
  * to fail but the status to be OK. Note that the `sensor_status` argument is
- * optional - if not NULL, the function will call the 
+ * optional - if not NULL, the function will call the
  * `get_temp_status` function in addition to reading the sensor value;
  * otherwise, only the sensor value is read.
  *
@@ -290,15 +290,15 @@ int ami_sensor_get_temp_value(ami_device *dev, const char *sensor_name,
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
  * @sensor_status: Optional variable to hold the status of the sensor
- * 
+ *
  * Note that this function returns the instantaneous sensor value at time of
  * the last sensor refresh.
- * 
+ *
  * To check if the value returned is valid, you must check the return code
  * of the function AND the sensor status. The sensor status refers to the
  * status of the sensor as a whole, so it is possible for the function
  * to fail but the status to be OK. Note that the `sensor_status` argument is
- * optional - if not NULL, the function will call the 
+ * optional - if not NULL, the function will call the
  * `get_voltage_status` function in addition to reading the sensor value;
  * otherwise, only the sensor value is read.
  *
@@ -313,15 +313,15 @@ int ami_sensor_get_voltage_value(ami_device *dev, const char *sensor_name,
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
  * @sensor_status: Optional variable to hold the status of the sensor
- * 
+ *
  * Note that this function returns the instantaneous sensor value at time of
  * the last sensor refresh.
- * 
+ *
  * To check if the value returned is valid, you must check the return code
  * of the function AND the sensor status. The sensor status refers to the
  * status of the sensor as a whole, so it is possible for the function
  * to fail but the status to be OK. Note that the `sensor_status` argument is
- * optional - if not NULL, the function will call the 
+ * optional - if not NULL, the function will call the
  * `get_current_status` function in addition to reading the sensor value;
  * otherwise, only the sensor value is read.
  *
@@ -336,10 +336,10 @@ int ami_sensor_get_current_value(ami_device *dev, const char *sensor_name,
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
  * @sensor_status: Optional variable to hold the status of the sensor
- * 
+ *
  * Note that this function returns the instantaneous sensor value at time of
  * the last sensor refresh.
- * 
+ *
  * To check if the value returned is valid, you must check the return code
  * of the function AND the sensor status. The sensor status refers to the
  * status of the sensor as a whole, so it is possible for the function
@@ -349,7 +349,7 @@ int ami_sensor_get_current_value(ami_device *dev, const char *sensor_name,
  * otherwise, only the sensor value is read.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
- */	
+ */
 int ami_sensor_get_power_value(ami_device *dev, const char *sensor_name,
 	long *val, enum ami_sensor_status *sensor_status);
 
@@ -358,7 +358,7 @@ int ami_sensor_get_power_value(ami_device *dev, const char *sensor_name,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -371,7 +371,7 @@ int ami_sensor_get_temp_uptime_max(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -384,7 +384,7 @@ int ami_sensor_get_voltage_uptime_max(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -397,7 +397,7 @@ int ami_sensor_get_current_uptime_max(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -410,7 +410,7 @@ int ami_sensor_get_power_uptime_max(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -423,7 +423,7 @@ int ami_sensor_get_temp_uptime_average(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -436,7 +436,7 @@ int ami_sensor_get_voltage_uptime_average(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -449,7 +449,7 @@ int ami_sensor_get_current_uptime_average(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @val: Variable to hold output value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -462,7 +462,7 @@ int ami_sensor_get_power_uptime_average(ami_device *dev,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @mod: Variable to hold modifier value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -475,7 +475,7 @@ int ami_sensor_get_temp_unit_mod(ami_device *dev, const char *sensor_name,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @mod: Variable to hold modifier value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -488,7 +488,7 @@ int ami_sensor_get_voltage_unit_mod(ami_device *dev, const char *sensor_name,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @mod: Variable to hold modifier value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
@@ -501,7 +501,7 @@ int ami_sensor_get_current_unit_mod(ami_device *dev, const char *sensor_name,
  * @dev: Device handle.
  * @sensor_name: Sensor name.
  * @mod: Variable to hold modifier value.
- * 
+ *
  * These values are NOT calculated by AMI.
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.

@@ -1,6 +1,11 @@
-
-// SPDX-License-Identifier: MIT
-// Copyright (C) 2023, Advanced Micro Devices, Inc. All rights reserved.
+/**
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * This file contains the AMc version
+ *
+ * @file amc_version.h
+ */
 
 #ifndef _AMC_VERSION_H_
 #define _AMC_VERSION_H_
@@ -16,5 +21,5 @@
 #define GIT_BRANCH                ""
 #define GIT_STATUS                (0)
 
-#endif // _AMC_VERSION_H_
+#endif /* _AMC_VERSION_H_ */
 

@@ -5,7 +5,6 @@
  * This file contains PLDM PDR enums, structures and functions
  *
  * @file pldm_pdr.h
- *
  */
 
 #ifndef PLDM_PDR_H_

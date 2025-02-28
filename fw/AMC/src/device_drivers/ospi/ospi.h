@@ -6,7 +6,6 @@
  * for the OSPI driver.
  *
  * @file ospi.h
- *
  */
 
 #ifndef _OSPI_H_

@@ -5,7 +5,6 @@
  * This file contains the FW IF Muxed Device debug implementation.
  *
  * @file fw_if_muxed_device_debug.c
- *
  */
 
 #include "standard.h"

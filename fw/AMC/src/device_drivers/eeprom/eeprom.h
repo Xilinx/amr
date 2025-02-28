@@ -6,7 +6,6 @@
  * manufacturing eeprom.
  *
  * @file eeprom.h
- *
  */
 
 #ifndef _EEPROM_H_
@@ -91,10 +90,10 @@ int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROM_CFG *pxEepromCfg )
  *
  * @param   pucField       Pointer to store the EEPROM Version in
  * @param   pucSizeBytes   The number of bytes used to store the returned value
- * 
+ *
  * @return  OK             EEPROM Version read successfully
  *          ERROR          EEPROM Version not read successfully
- * 
+ *
  */
 int iEEPROM_GetEepromVersion( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -103,10 +102,10 @@ int iEEPROM_GetEepromVersion( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @param   pucField       Pointer to store the Product Name in
  * @param   pucSizeBytes   The number of bytes used to store the returned value
- * 
+ *
  * @return  OK             Product Name read successfully
  *          ERROR          Product Name not read successfully
- * 
+ *
  */
 int iEEPROM_GetProductName( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -115,10 +114,10 @@ int iEEPROM_GetProductName( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @param   pucField       Pointer to store the Product Revision in
  * @param   pucSizeBytes   The number of bytes used to store the returned value
- * 
+ *
  * @return  OK             Product Revision read successfully
  *          ERROR          Product Revision not read successfully
- * 
+ *
  */
 int iEEPROM_GetProductRevision( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -130,7 +129,7 @@ int iEEPROM_GetProductRevision( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             Serial number read successfully
  *          ERROR          Serial number not read successfully
- * 
+ *
  */
 int iEEPROM_GetSerialNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -142,7 +141,7 @@ int iEEPROM_GetSerialNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             MAC address count read successfully
  *          ERROR          MAC address count not read successfully
- * 
+ *
  */
 int iEEPROM_GetMacAddressCount( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -154,19 +153,19 @@ int iEEPROM_GetMacAddressCount( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             First MAC Address read successfully
  *          ERROR          First MAC Address not read successfully
- * 
+ *
  */
 int iEEPROM_GetFirstMacAddress( uint8_t *pucField, uint8_t *pucSizeBytes );
 
 /**
- * @brief   Read the Active/Passive state 
+ * @brief   Read the Active/Passive state
  *
  * @param   pucField       Pointer to store the Active/Passive State in
  * @param   pucSizeBytes   The number of bytes used to store the returned value
  *
  * @return  OK             Active/Passive State read successfully
  *          ERROR          Active/Passive State not read successfully
- * 
+ *
  */
 int iEEPROM_GetActiveState( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -178,7 +177,7 @@ int iEEPROM_GetActiveState( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             Config Mode read successfully
  *          ERROR          Config Mode not read successfully
- * 
+ *
  */
 int iEEPROM_GetConfigMode( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -190,7 +189,7 @@ int iEEPROM_GetConfigMode( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             Manufacturing Date read successfully
  *          ERROR          Manufacturing Date not read successfully
- * 
+ *
  */
 int iEEPROM_GetManufacturingDate( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -202,7 +201,7 @@ int iEEPROM_GetManufacturingDate( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             Part Number read successfully
  *          ERROR          Part Number not read successfully
- * 
+ *
  */
 int iEEPROM_GetPartNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -226,7 +225,7 @@ int iEEPROM_GetMfgPartNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             UUID read successfully
  *          ERROR          UUID not read successfully
- * 
+ *
  */
 int iEEPROM_GetUuid( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -238,7 +237,7 @@ int iEEPROM_GetUuid( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             PCIe ID read successfully
  *          ERROR          PCIe ID not read successfully
- * 
+ *
  */
 int iEEPROM_GetPcieId( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -250,7 +249,7 @@ int iEEPROM_GetPcieId( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             Max Power Mode read successfully
  *          ERROR          Max Power Mode not read successfully
- * 
+ *
  */
 int iEEPROM_GetMaxPowerMode( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -262,7 +261,7 @@ int iEEPROM_GetMaxPowerMode( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             Memory Size read successfully
  *          ERROR          Memory Size not read successfully
- * 
+ *
  */
 int iEEPROM_GetMemorySize( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -274,7 +273,7 @@ int iEEPROM_GetMemorySize( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             OEM ID read successfully
  *          ERROR          OEM ID not read successfully
- * 
+ *
  */
 int iEEPROM_GetOemId( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -283,10 +282,10 @@ int iEEPROM_GetOemId( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @param   pucField       Pointer to store the Capability in
  * @param   pucSizeBytes   The number of bytes used to store the returned value
- * 
+ *
  * @return  OK             Capability read successfully
  *          ERROR          Capability not read successfully
- * 
+ *
  */
 int iEEPROM_GetCapability( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -298,7 +297,7 @@ int iEEPROM_GetCapability( uint8_t *pucField, uint8_t *pucSizeBytes );
  *
  * @return  OK             Config Mode read successfully
  *          ERROR          Config Mode not read successfully
- * 
+ *
  */
 int iEEPROM_GetConfigMode( uint8_t *pucField, uint8_t *pucSizeBytes );
 
@@ -333,7 +332,7 @@ int iEEPROM_WriteRawValue( uint8_t *pucData, uint8_t ucSizeBytes, uint8_t ucEepr
  *
  * @return  OK                  Stats retrieved from driver successfully
  *          ERROR               Stats not retrieved successfully
- * 
+ *
  */
 int iEEPROM_PrintStatistics( void );
 
@@ -342,7 +341,7 @@ int iEEPROM_PrintStatistics( void );
  *
  * @return  OK                  Stats cleared successfully
  *          ERROR               Stats not cleared successfully
- * 
+ *
  */
 int iEEPROM_ClearStatistics( void );
 
@@ -351,8 +350,8 @@ int iEEPROM_ClearStatistics( void );
  *
  * @return  OK                  Stats cleared successfully
  *          ERROR               Stats not cleared successfully
- * 
+ *
  */
 int iEEPROM_DisplayEepromValues( void );
 
-#endif
+#endif /* _EEPROM_H_ */

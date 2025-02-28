@@ -5,7 +5,6 @@
 * This header file containing the FW IF SMBus abstraction definitions.
 *
 * @file fw_if_smbus.h
-*
 */
 
 #ifndef _FW_IF_SMBUS_H_
@@ -60,7 +59,7 @@ typedef enum FW_IF_SMBUS_COMMAND_PROTOCOLS
     FW_IF_SMBUS_COMMAND_PROTOCOL_ASSIGN_ADDRESS,
     FW_IF_SMBUS_COMMAND_PROTOCOL_GET_UDID_DIRECTED,
     FW_IF_SMBUS_COMMAND_PROTOCOL_RESET_DEVICE_DIRECTED,
-    FW_IF_SMBUS_COMMAND_PROTOCOL_NONE, 
+    FW_IF_SMBUS_COMMAND_PROTOCOL_NONE,
 
     MAX_FW_IF_SMBUS_COMMAND_PROTOCOL
 
@@ -104,9 +103,9 @@ typedef enum _FW_IF_SMBUS_IOCTRL_OPTIONS
     FW_IF_SMBUS_IOCTRL_SET_CONTROLLER = MAX_FW_IF_COMMON_IOCTRL_OPTION,
     FW_IF_SMBUS_IOCTRL_SET_TARGET,
     FW_IF_SMBUS_IOCTRL_ENABLE_PEC,
-                            
+
     MAX_FW_IF_SMBUS_IOCTRL_OPTION
-                                    
+
 } FW_IF_SMBUS_IOCTRL_OPTIONS;
 
 
@@ -119,7 +118,7 @@ typedef enum _FW_IF_SMBUS_EVENTS
     FW_IF_SMBUS_EVENT_ADDRESS_CHANGE = MAX_FW_IF_COMMON_EVENT,
 
     MAX_FW_IF_SMBUS_EVENT
-                            
+
 } FW_IF_SMBUS_EVENTS;
 
 /**
@@ -251,4 +250,4 @@ extern int iFW_IF_SMBUS_PrintStatistics( void );
  */
 extern int iFW_IF_SMBUS_ClearStatistics( void );
 
-#endif
+#endif /* _FW_IF_SMBUS_H_ */

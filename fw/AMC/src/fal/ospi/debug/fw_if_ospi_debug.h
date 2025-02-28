@@ -5,7 +5,6 @@
  * This file contains the FW IF OSPI debug access
  *
  * @file fw_if_ospi_debug.h
- *
  */
 
 #ifndef _FW_IF_OSPI_DEBUG_H_
@@ -20,11 +19,11 @@
 
 /**
  * @brief   Initialise the FW IF OSPI debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vFW_IF_OSPI_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _FW_IF_OSPI_DEBUG_H_ */

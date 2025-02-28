@@ -5,7 +5,6 @@
  * This file contains the PLDM support functions
  *
  * @file pldm_commands_internal.h
- *
  */
 
 #ifndef PLDM_COMMANDS_INTERNAL_H_

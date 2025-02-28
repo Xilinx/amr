@@ -5,7 +5,6 @@
  * This file contains the i2c driver debug implementation
  *
  * @file i2c_debug.c
- *
  */
 
 #include "standard.h"

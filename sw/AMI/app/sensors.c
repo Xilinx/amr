@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * sensors.c - This file contains sensor utilities for the AMI CLI
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -86,7 +86,7 @@ struct sensor_values {
  * parse_extra() - Parse the -x | --extra command line argument.
  * @options: List of command line options given by the user.
  * @extra: Pointer to bitflag which will be updated.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int parse_extra(struct app_option *options, int *extra)
@@ -97,7 +97,7 @@ static int parse_extra(struct app_option *options, int *extra)
 
 	if (!options || !extra)
 		return EXIT_FAILURE;
-	
+
 	while (opt) {
 		if (opt->val == 'x') {
 			str = (char*)malloc(strlen(opt->arg));
@@ -118,7 +118,7 @@ static int parse_extra(struct app_option *options, int *extra)
 					*extra |= EXTRA_FIELDS_AVG;
 				else if (strcmp(tok, "limits") == 0)
 					*extra |= EXTRA_FIELDS_LIMITS;
-				
+
 				tok = strtok(NULL, ",");
 			}
 
@@ -136,7 +136,7 @@ static int parse_extra(struct app_option *options, int *extra)
  * @mod: Unit modifier.
  * @type: Sensor type (relevant bits must be extracted).
  * @unit: Variable to hold output string.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int make_unit_string(enum ami_sensor_unit_mod mod, int type, char *unit)
@@ -146,27 +146,27 @@ static int make_unit_string(enum ami_sensor_unit_mod mod, int type, char *unit)
 
 	if (!unit)
 		return EXIT_FAILURE;
-	
+
 	switch (mod) {
 	case AMI_SENSOR_UNIT_MOD_MEGA:
 		unit[col++] = 'M';
 		break;
-	
+
 	case AMI_SENSOR_UNIT_MOD_KILO:
 		unit[col++] = 'k';
 		break;
-	
+
 	case AMI_SENSOR_UNIT_MOD_MILLI:
 		unit[col++] = 'm';
 		break;
-	
+
 	case AMI_SENSOR_UNIT_MOD_MICRO:
 		unit[col++] = 'u';
 		break;
 
 	case AMI_SENSOR_UNIT_MOD_NONE:
 		break;
-	
+
 	default:
 		ret = EXIT_FAILURE;
 		break;
@@ -179,19 +179,19 @@ static int make_unit_string(enum ami_sensor_unit_mod mod, int type, char *unit)
 	case AMI_SENSOR_TYPE_TEMP:
 		unit[col++] = 'C';
 		break;
-	
+
 	case AMI_SENSOR_TYPE_CURRENT:
 		unit[col++] = 'A';
 		break;
-	
+
 	case AMI_SENSOR_TYPE_VOLTAGE:
 		unit[col++] = 'V';
 		break;
-	
+
 	case AMI_SENSOR_TYPE_POWER:
 		unit[col++] = 'W';
 		break;
-	
+
 	default:
 		ret = EXIT_FAILURE;
 		break;
@@ -206,11 +206,11 @@ static int make_unit_string(enum ami_sensor_unit_mod mod, int type, char *unit)
  * @header: Pointer to pre-allocated header.
  * @num_fields: Number of elements in header.
  * @data: Pointer to `struct app_sensor_data`.
- * 
+ *
  * Note that name, value and status are always filled in. This function
  * is only used for table formatting. JSON formatting uses different logic
  * and has no concept of a header.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_sensor_header(ami_device *dev, char **header,
@@ -223,7 +223,7 @@ static int populate_sensor_header(ami_device *dev, char **header,
 
 	if (!header || !data || !dev)
 		return EXIT_FAILURE;
-	
+
 	sensor_data = (struct app_sensor_data*)data;
 	extra = sensor_data->extra_fields;
 
@@ -237,15 +237,15 @@ static int populate_sensor_header(ami_device *dev, char **header,
 		case TABLE_NAME:
 			sprintf(header[i], "%s", "Name");
 			break;
-		
+
 		case TABLE_VALUE:
 			sprintf(header[i], "%s", "Value");
 			break;
-		
+
 		case TABLE_STATUS:
 			sprintf(header[i], "%s", "Status");
 			break;
-		
+
 		default:
 		{
 			if (extra & EXTRA_FIELDS_MAX) {
@@ -276,10 +276,10 @@ static int populate_sensor_header(ami_device *dev, char **header,
  * @values: Struct to hold all relevant sensor data.
  * @convert_units: Boolean indicating whether sensor values should be converted
  *   based on the sensor unit modifier.
- * 
+ *
  * Note, if `convert_units` is NULL, all values will be converted to their
  * non-modified version (as if the mod was AMI_SENSOR_UNIT_MOD_NONE).
- * 
+ *
  * Return: None.
  */
 static void get_all_sensor_values(ami_device *dev, const char *sensor,
@@ -301,7 +301,7 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
 
 		if (extra_fields & EXTRA_FIELDS_MAX)
 			values->max_r = ami_sensor_get_temp_uptime_max(dev, sensor, &m);
-		
+
 		if (extra_fields & EXTRA_FIELDS_AVG)
 			values->avg_r = ami_sensor_get_temp_uptime_average(dev, sensor, &a);
 
@@ -319,7 +319,7 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
 
 		if (extra_fields & EXTRA_FIELDS_MAX)
 			values->max_r = ami_sensor_get_power_uptime_max(dev, sensor, &m);
-		
+
 		if (extra_fields & EXTRA_FIELDS_AVG)
 			values->avg_r = ami_sensor_get_power_uptime_average(dev, sensor, &a);
 
@@ -337,10 +337,10 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
 
 		if (extra_fields & EXTRA_FIELDS_MAX)
 			values->max_r = ami_sensor_get_current_uptime_max(dev, sensor, &m);
-		
+
 		if (extra_fields & EXTRA_FIELDS_AVG)
 			values->avg_r = ami_sensor_get_current_uptime_average(dev, sensor, &a);
-			
+
 		if (extra_fields & EXTRA_FIELDS_LIMITS) {
 			values->limit_w_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
 			values->limit_c_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
@@ -355,10 +355,10 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
 
 		if (extra_fields & EXTRA_FIELDS_MAX)
 			values->max_r = ami_sensor_get_voltage_uptime_max(dev, sensor, &m);
-		
+
 		if (extra_fields & EXTRA_FIELDS_AVG)
 			values->avg_r = ami_sensor_get_voltage_uptime_average(dev, sensor, &a);
-		
+
 		if (extra_fields & EXTRA_FIELDS_LIMITS) {
 			values->limit_w_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
 			values->limit_c_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
@@ -366,7 +366,7 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
 		}
 
 		break;
-	
+
 	default:
 		break;
 	}
@@ -374,10 +374,10 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
 	if (convert_units) {
 		/* Convert units */
 		values->value = (double)v * pow(UNIT_MOD_BASE, (double)modifier);
-		
-		if ((extra_fields & EXTRA_FIELDS_MAX) && ((values->max_r) == AMI_STATUS_OK)) 
+
+		if ((extra_fields & EXTRA_FIELDS_MAX) && ((values->max_r) == AMI_STATUS_OK))
 			values->max = (double)m * pow(UNIT_MOD_BASE, (double)modifier);
-		
+
 		if ((extra_fields & EXTRA_FIELDS_AVG) && ((values->max_r) == AMI_STATUS_OK))
 			values->avg = (double)a * pow(UNIT_MOD_BASE, (double)modifier);
 
@@ -413,7 +413,7 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
  * @n_row: Current row number (for this sensor only).
  * @extra_fields: Extra fields bitflag.
  * @row: Parent row.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int mk_sensor_row(ami_device *dev, const char *sensor,
@@ -427,14 +427,14 @@ static int mk_sensor_row(ami_device *dev, const char *sensor,
 
 	if (!dev || !sensor || !row)
 		return EXIT_FAILURE;
-	
+
 	get_all_sensor_values(
 		dev, sensor, sensor_type, extra_fields, &values, true
 	);
 
 	if (make_unit_string(AMI_SENSOR_UNIT_MOD_NONE, sensor_type, unit) == EXIT_FAILURE)
 		memset(unit, 0x00, UNIT_STR_SIZE);
-	
+
 	/* Print name - always valid. */
 	if (n_row == 0)
 		sprintf(
@@ -522,7 +522,7 @@ static int mk_sensor_row(ami_device *dev, const char *sensor,
 					"%s",
 					"N/A"
 				);
-			
+
 			/* Critical limit */
 			if (values.limit_c_r == AMI_STATUS_OK)
 				sprintf(
@@ -550,7 +550,7 @@ static int mk_sensor_row(ami_device *dev, const char *sensor,
 					"%s",
 					"N/A"
 				);
-			
+
 			sprintf(
 				row[col++],
 				"%*s, %*s, %*s",
@@ -578,7 +578,7 @@ static int mk_sensor_row(ami_device *dev, const char *sensor,
  * This function populates a variable number of rows in a table according
  * to a predefined format (it must be in the same order as the header),
  * and for each row filled in, it increments `j`.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int construct_sensor_table(ami_device *dev, char ***rows,
@@ -594,7 +594,7 @@ static int construct_sensor_table(ami_device *dev, char ***rows,
 
 	if (ami_sensor_get_type(dev, sensor, &sensor_type) != AMI_STATUS_OK)
 		return EXIT_FAILURE;
-	
+
 	for (i = 0; i < AMI_SENSOR_TYPE_MAX; i++) {
 		if ((1U << i) & sensor_type) {
 			if (mk_sensor_row(dev, sensor, (1U << i), group_row,
@@ -618,7 +618,7 @@ static int construct_sensor_table(ami_device *dev, char ***rows,
  * @sensor_type: Sensor type (relevant bits MUST be extracted).
  * @extra_fields: Extra fields bitflag.
  * @parent: Parent node.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int mk_sensor_node(ami_device *dev, const char *sensor,
@@ -626,7 +626,7 @@ static int mk_sensor_node(ami_device *dev, const char *sensor,
 {
 	int ret = EXIT_SUCCESS;
 	struct sensor_values values = { 0 };
-	
+
 	JsonNode *row = NULL;  /* sensor object belonging to the group */
 	/* Object attributes */
 	JsonNode *unit_node = NULL;
@@ -638,11 +638,11 @@ static int mk_sensor_node(ami_device *dev, const char *sensor,
 
 	if (!dev || !sensor || !parent)
 		return EXIT_FAILURE;
-	
+
 	get_all_sensor_values(
 		dev, sensor, sensor_type, extra_fields, &values, false
 	);
-	
+
 	row = json_mkobject();
 
 	/* All objects have value, status, and unit. */
@@ -653,23 +653,23 @@ static int mk_sensor_node(ami_device *dev, const char *sensor,
 	json_append_member(row, "unit_mod", unit_node);
 	json_append_member(row, "value", value_node);
 	json_append_member(row, "status", status_node);
-	
+
 	/* Extra attributes. */
 	if (extra_fields & EXTRA_FIELDS_MAX) {
 		if (values.max_r == AMI_STATUS_OK)
 			max_node = json_mknumber(values.max);
 		else
 			max_node = json_mknull();
-		
+
 		json_append_member(row, "max", max_node);
 	}
-	
+
 	if (extra_fields & EXTRA_FIELDS_AVG) {
 		if (values.avg_r == AMI_STATUS_OK)
 			avg_node = json_mknumber(values.avg);
 		else
 			avg_node = json_mknull();
-		
+
 		json_append_member(row, "average", avg_node);
 	}
 
@@ -707,19 +707,19 @@ static int mk_sensor_node(ami_device *dev, const char *sensor,
 	case AMI_SENSOR_TYPE_TEMP:
 		json_append_member(parent, "temp", row);
 		break;
-	
+
 	case AMI_SENSOR_TYPE_CURRENT:
 		json_append_member(parent, "current", row);
 		break;
-	
+
 	case AMI_SENSOR_TYPE_VOLTAGE:
 		json_append_member(parent, "voltage", row);
 		break;
-	
+
 	case AMI_SENSOR_TYPE_POWER:
 		json_append_member(parent, "power", row);
 		break;
-	
+
 	default:
 		ret = EXIT_FAILURE;
 		break;
@@ -738,7 +738,7 @@ static int mk_sensor_node(ami_device *dev, const char *sensor,
  *
  * This function creates a variable number of JSON nodes and appends them to
  * the parent in a predefined format, and for each object, it increments `j`.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int construct_sensor_json(ami_device *dev, JsonNode *parent,
@@ -751,10 +751,10 @@ static int construct_sensor_json(ami_device *dev, JsonNode *parent,
 
 	if (!j || !parent || !dev || !sensor)
 		return EXIT_FAILURE;
-	
+
 	if (ami_sensor_get_type(dev, sensor, &sensor_type) != AMI_STATUS_OK)
 		return EXIT_FAILURE;
-	
+
 	current_group = json_mkobject();
 
 	for (i = 0; i < AMI_SENSOR_TYPE_MAX; i++) {
@@ -764,7 +764,7 @@ static int construct_sensor_json(ami_device *dev, JsonNode *parent,
 				ret = EXIT_FAILURE;
 				break;
 			}
-			
+
 			(*j)++;
 		}
 	}
@@ -782,10 +782,10 @@ static int construct_sensor_json(ami_device *dev, JsonNode *parent,
  * @n_fields: Pointer to number of elements in each row.
  * @fmt: Format of data structure. Used to determine type of `values`.
  * @data: Pointer to `struct app_sensor_data`.
- * 
+ *
  * Note that this function is used for any generic data structure
  * (JSON and tables, in this case).
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int populate_sensor_values(ami_device *dev, void *values,
@@ -800,9 +800,9 @@ static int populate_sensor_values(ami_device *dev, void *values,
 
 	if (!values || !n_rows || !n_fields || !data || !dev)
 		return EXIT_FAILURE;
-	
+
 	sensor_data = (struct app_sensor_data*)data;
-	
+
 	if (sensor_data->sensor) {
 		sensors = (struct ami_sensor*)calloc(1, sizeof(struct ami_sensor));
 
@@ -867,7 +867,7 @@ static int populate_sensor_values(ami_device *dev, void *values,
  * @stream: Optional output stream (defaults to stdout).
  * @fmt: Output format.
  * @json_out: Optional variable to store generated JSON data instead of printing.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 static int print_sensor_data(ami_device *dev, int extra_fields,
@@ -883,14 +883,14 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 
 	if (!dev)
 		return EXIT_FAILURE;
-	
+
 	if (sensor) {
 		/* Figure out number of data entires for this sensor. */
 		uint32_t type = 0;
 
 		if (ami_sensor_get_type(dev, sensor, &type) != AMI_STATUS_OK)
 			return EXIT_FAILURE;
-		
+
 		for (i = 0; i < AMI_SENSOR_TYPE_MAX; i++) {
 			if ((1U << i) & type) {
 				n_rows++;
@@ -901,13 +901,13 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 
 		if (ami_sensor_get_num_total(dev, &num) != AMI_STATUS_OK)
 			return EXIT_FAILURE;
-		
+
 		n_rows = num;
 	}
 
 	if (n_rows == 0)
 		return EXIT_FAILURE;
-	
+
 	/* All values except name and status are right aligned */
 	for (i = 0; i < MAX_SENSOR_FIELDS; i++) {
 		switch (i) {
@@ -915,25 +915,25 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 		case TABLE_STATUS:
 			col_align[i] = TABLE_ALIGN_LEFT;
 			break;
-		
+
 		default:
 			col_align[i] = TABLE_ALIGN_RIGHT;
 			break;
 		}
 	}
-	
+
 	if (extra_fields & EXTRA_FIELDS_MAX)
 		n_fields++;
-	
+
 	if (extra_fields & EXTRA_FIELDS_AVG)
 		n_fields++;
 
 	if (extra_fields & EXTRA_FIELDS_LIMITS)
 		n_fields++;
-	
+
 	data.extra_fields = extra_fields;
 	data.sensor = sensor;
-	
+
 	/*
 	 * Only the table is ever printed to stdout.
 	 * The format is used only for the output file.
@@ -949,7 +949,7 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 		&data,
 		col_align
 	);
-	
+
 	/* Write to file. */
 	if (stream && (ret != EXIT_FAILURE) && (fmt != APP_OUT_FORMAT_TABLE)) {
 		switch (fmt) {
@@ -972,7 +972,7 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 					&data,
 					json_out
 				);
-			
+
 			break;
 
 		default:
@@ -1017,12 +1017,12 @@ int report_sensors(struct app_option *options)
 		/* Check if user requested extra fields. */
 		parse_extra(options, &extra_fields);
 	}
-	
+
 	/* Check if user specified a sensor. */
 	if (NULL != (opt = find_app_option('n', options))) {
 		sensor_filter = opt->arg;
 	}
-	
+
 	/* Check for -d | --device */
 	if (NULL != (opt = find_app_option('d', options))) {
 		ami_device *dev = NULL;

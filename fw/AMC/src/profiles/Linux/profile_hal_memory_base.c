@@ -2,11 +2,10 @@
  * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains definitions of memory base variables, required by 
+ * This file contains definitions of memory base variables, required by
  * the AMC Linux build
  *
  * @file profile_hal_memory_base.c
- *
  */
 
 /******************************************************************************/

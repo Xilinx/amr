@@ -6,7 +6,6 @@
  * sensor.
  *
  * @file sys_mon.h
- *
  */
 
 #ifndef _SYS_MON_H_
@@ -60,7 +59,7 @@ typedef enum SYS_MON_VOLTAGES_ENUM
  *
  * @return  OK                  SYS_MON was initialised successfully
  *          ERROR               SYS_MON was not initialised
- * 
+ *
  */
 int iSYS_MON_Initialise( void );
 
@@ -71,7 +70,7 @@ int iSYS_MON_Initialise( void );
  *
  * @return  OK                  Temperature read successfully
  *          ERROR               Temperature not read successfully
- * 
+ *
  */
 int iSYS_MON_ReadTemperature( float *pfTemperatureInC );
 
@@ -83,7 +82,7 @@ int iSYS_MON_ReadTemperature( float *pfTemperatureInC );
  *
  * @return  OK                  Voltage read successfully
  *          ERROR               Voltage not read successfully
- * 
+ *
  */
 int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageInMV );
 
@@ -92,7 +91,7 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
  *
  * @return  OK                  Stats retrieved from driver successfully
  *          ERROR               Stats not retrieved successfully
- * 
+ *
  */
 int iSYS_MON_PrintStatistics( void );
 
@@ -101,8 +100,8 @@ int iSYS_MON_PrintStatistics( void );
  *
  * @return  OK                  Stats cleared successfully
  *          ERROR               Stats not cleared successfully
- * 
+ *
  */
 int iSYS_MON_ClearStatistics( void );
 
-#endif
+#endif /* _SYS_MON_H_ */

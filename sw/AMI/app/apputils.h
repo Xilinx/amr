@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * apputils.h - Utility functions for the AMI command line
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -62,19 +62,19 @@ int read_file(const char *fname, uint8_t **buf, uint32_t *size);
  *
  * Note that the user prompt will timeout after 5 minutes if no input is
  * received - this relies on a Linux-only poll API.
- * 
+ *
  * Return: true if the user accepted, false otherwise.
  */
 bool confirm_action(const char *prompt, const char yes, int attempts);
 
 /**
- * find_logic_uuid() - Find the logic UUID of a PDI file. 
+ * find_logic_uuid() - Find the logic UUID of a PDI file.
  * @pdi: Full PDI file path.
  * @uuid: Variable to store UUID.
  *
  * This function expects a file 'version.json' to exist in the same
  * directory as the PDI image - this file must contain the logic UUID.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int find_logic_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE]);
@@ -85,11 +85,11 @@ int find_logic_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE]);
  * @values: Buffer to store values read from file.
  * @num_values: Variable to store number of values read.
  * @value_size: Size of a single value in the data buffer.
- * 
+ *
  * For this function and the `write_hex_data` functions, the file format is that
  * of a single register value per line. The size of a register depends on the
  * value of the `value_size` parameter.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int read_hex_data(const char *fname, void **values, uint32_t *num_values,
@@ -101,7 +101,7 @@ int read_hex_data(const char *fname, void **values, uint32_t *num_values,
  * @values: Buffer containing values which were read.
  * @num_values: Number of values which were read.
  * @value_size: Size of a single value in the data buffer.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int write_hex_data(const char *fname, void *values, uint32_t num_values,
@@ -133,4 +133,4 @@ int parse_output_options(struct app_option *options, enum app_out_format *fmt,
  */
 void warn_compat_mode(ami_device *dev);
 
-#endif
+#endif /* AMI_APP_UTILS_H */

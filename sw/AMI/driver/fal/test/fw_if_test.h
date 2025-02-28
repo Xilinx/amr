@@ -5,7 +5,6 @@
 * This header file contains the FW IF test interface definitions.
 *
 * @file fw_if_test.h
-*
 */
 
 #ifndef _FW_IF_TEST_H_
@@ -40,11 +39,11 @@ typedef enum _FW_IF_TEST_IOCTRL_OPTIONS
 
     FW_IF_TEST_IOCTRL_SET_NEXT_RX_DATA,
     FW_IF_TEST_IOCTRL_SET_NEXT_RX_SIZE,
-    
+
     FW_IF_TEST_IOCTRL_TRIGGER_EVENT,
-                            
+
     MAX_FW_IF_TEST_IOCTRL_OPTION
-                                    
+
 } FW_IF_TEST_IOCTRL_OPTIONS;
 
 
@@ -99,4 +98,4 @@ extern uint32_t FW_IF_test_init( FW_IF_TEST_INIT_CFG *pxCfg );
  */
 extern uint32_t FW_IF_test_create( FW_IF_CFG *pxFwIf, FW_IF_TEST_CFG *pxTestCfg );
 
-#endif
+#endif /* _FW_IF_TEST_H_ */

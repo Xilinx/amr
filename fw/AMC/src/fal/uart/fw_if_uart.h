@@ -5,7 +5,6 @@
  * This header file contains the FW IF UART abstraction definitions.
  *
  * @file fw_if_uart.h
- *
  */
 
 #ifndef _FW_IF_UART_H_
@@ -191,4 +190,4 @@ extern int iFW_IF_UART_PrintStatistics( void );
  */
 extern int iFW_IF_UART_ClearStatistics( void );
 
-#endif
+#endif /* _FW_IF_UART_H_ */

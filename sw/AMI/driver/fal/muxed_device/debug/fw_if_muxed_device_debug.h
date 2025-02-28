@@ -5,7 +5,6 @@
  * This file contains the FW IF MUXED_DEVICE debug access.
  *
  * @file fw_if_muxed_device_debug.h
- *
  */
 
 #ifndef _FW_IF_MUXED_DEVICE_DEBUG_H_
@@ -27,4 +26,4 @@
  */
 void vFW_IF_MUXED_DEVICE_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _FW_IF_MUXED_DEVICE_DEBUG_H_ */

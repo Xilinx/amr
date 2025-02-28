@@ -34,7 +34,7 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 	ret = pci_request_region(dev, (*endpoints)->gcq_payload.bar_num,
 			PCIE_BAR_NAME[(*endpoints)->gcq_payload.bar_num]);
 	if (ret) {
-		DEV_ERR(dev, "Could not request %s region (%s)", 
+		DEV_ERR(dev, "Could not request %s region (%s)",
 			PCIE_BAR_NAME[(*endpoints)->gcq_payload.bar_num],
 			(*endpoints)->gcq_payload.name);
 		ret = -EIO;
@@ -45,7 +45,7 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 			(*endpoints)->gcq_payload.start_addr,
 			(*endpoints)->gcq_payload.bar_len);
 	if (!virt_addr) {
-		DEV_ERR(dev, "Could not map %s endpoint into virtual memory at start address 0x%llx", 
+		DEV_ERR(dev, "Could not map %s endpoint into virtual memory at start address 0x%llx",
 			(*endpoints)->gcq_payload.name, (*endpoints)->gcq_payload.start_addr);
 		ret = -EIO;
 		goto release_bar;
@@ -56,7 +56,7 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 
 	if ((shared_mem.uuid.amc_uuid_off + shared_mem.uuid.amc_uuid_len)
 		> (*endpoints)->gcq_payload.bar_len) {
-		DEV_ERR(dev, "Could not map %s UUID offset 0x%08x out of range", 
+		DEV_ERR(dev, "Could not map %s UUID offset 0x%08x out of range",
 			(*endpoints)->gcq_payload.name, shared_mem.uuid.amc_uuid_off);
 		ret = -EIO;
 		goto release_bar;

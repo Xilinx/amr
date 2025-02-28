@@ -5,7 +5,6 @@
  * This file contains the AVED Programming Control (APC) debug access
  *
  * @file apc_proxy_driver_debug.h
- *
  */
 
 #ifndef _APC_PROXY_DRIVER_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the APC debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vAPC_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _APC_PROXY_DRIVER_DEBUG_H_ */
 

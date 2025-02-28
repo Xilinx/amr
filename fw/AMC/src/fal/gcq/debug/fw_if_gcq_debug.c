@@ -5,7 +5,6 @@
  * This file contains the GCQ debug implementation.
  *
  * @file fw_if_gcq_debug.c
- *
  */
 
 #include "standard.h"
@@ -58,7 +57,7 @@ static void vClearStats( void );
 void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle )
 {
     if( FALSE == iIsInitialised )
-    {   
+    {
         if( NULL == pxParentHandle )
         {
             pxFwIfGcqTop = pxDAL_NewDirectory( "fw_if_gcq" );

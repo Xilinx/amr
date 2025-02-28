@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * cmd_device_boot.c - This file contains the implementation for the command "device_boot"
- * 
+ *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -34,10 +34,10 @@
  * @options:  Ordered list of options passed in at the command line
  * @num_args:  Number of non-option arguments (excluding command)
  * @args:  List of non-option arguments (excluding command)
- * 
+ *
  * `args` may be an invalid pointer. It is the function's responsibility
  * to validate the `num_args` parameter.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_device_boot(struct app_option *options, int num_args, char **args);
@@ -124,7 +124,7 @@ static int do_cmd_device_boot(struct app_option *options, int num_args, char **a
 
 	printf("Will do a hot reset to boot into partition %d. This may take a minute...\r\n",
 		partition_number);
-	
+
 	if (ami_prog_device_boot(&dev, partition_number) == AMI_STATUS_OK) {
 		ret = EXIT_SUCCESS;
 		printf(
