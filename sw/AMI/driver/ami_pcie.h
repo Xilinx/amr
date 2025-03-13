@@ -60,8 +60,8 @@ enum AMI_PCIE_DEVICE_ID {
 
 #define CAP_NOT_FOUND 0
 
-#define PCI_GPIO_RESET_OFFSET               (0x2040000)
-#define PCI_GPIO_RESET_BAR                  (4)
+#define PCI_GPIO_RESET_OFFSET               (0x4000)
+#define PCI_GPIO_RESET_BAR                  (1)
 
 /* Command Register Offsets */
 #define  PCI_COMMAND_IO_OFFSET              0x0

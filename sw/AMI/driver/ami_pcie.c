@@ -1025,8 +1025,11 @@ static int do_bar_transaction(struct pci_dev	*dev,
 
 	bar = &(pf_dev->pcie_config->header->bar[bar_idx]);
 
-	if ((bar->len == 0) || ((offset + num) > bar->len))
+	if ((bar->len == 0) || ((offset + num) > bar->len)) {
+		DEV_VDBG(dev, "bar_idx = %d bar_len = %d offset = %d num = %d val = %d",
+			bar_idx, bar->len, offset, num, *val);
 		return -EFAULT;  /* Bad address */
+	}
 
 	/* Try to request region if it hasn't already been requested. */
 	if (!bar->requested) {

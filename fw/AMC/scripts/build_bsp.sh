@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 ################################################################################
@@ -20,7 +20,6 @@
 ###                                 Variables                                ###
 ################################################################################
 
-ARCH_DIR=archive
 ### store xsa path ###
 xsa=0
 ### store os param ###

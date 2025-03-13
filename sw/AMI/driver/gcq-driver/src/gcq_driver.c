@@ -622,9 +622,7 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
 }
 
 /**
- *
  * @brief    Function to consume data from the ring buffer
- *
  */
 GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDataLen )
 {
@@ -701,9 +699,7 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 
 
 /**
- *
  * @brief    Function to provide data and populate the ring buffer
- *
  */
 GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t * pucData, uint32_t ulDataLen )
 {
@@ -778,9 +774,7 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 }
 
 /**
- *
  * @brief    Sets this modules version information
- *
  */
 int iGCQGetVersion( GCQ_VERSION_TYPE *pxVersion )
 {

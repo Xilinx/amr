@@ -251,7 +251,6 @@ static int create_pf_dev_data(struct pci_dev *dev)
 	ret = setup_amc(dev,
 			&pf_dev->amc_ctrl_ctxt,
 			pf_dev->endpoints->gcq,
-			pf_dev->endpoints->gcq_payload,
 			amc_event_cb,
 			(void*)dev);
 	if (ret) {

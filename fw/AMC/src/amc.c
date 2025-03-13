@@ -669,7 +669,7 @@ static void vGetProjectInfo( void )
     vPLL_Printf( "#                                                             #\r\n" );
     vPLL_Printf( "#                             AMC                             #\r\n" );
     vPLL_Printf( "#                                                             #\r\n" );
-    vPLL_Printf( "# Copyright (c) 2024 Advanced Micro Devices, Inc.             #\r\n" );
+    vPLL_Printf( "# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc.      #\r\n" );
     vPLL_Printf( "# All rights reserved.                                        #\r\n" );
     vPLL_Printf( "#                                                             #\r\n" );
     vPLL_Printf( "# SPDX-License-Identifier: MIT                                #\r\n" );

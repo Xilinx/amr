@@ -70,7 +70,6 @@ struct GCQ_RING_TYPE;
  * @struct  GCQ_TYPE
  *
  * @brief   Instance of an GCQ_TYPE, used to model the GCQ IP Block.
- *
  */
 typedef struct GCQ_INSTANCE_TYPE
 {

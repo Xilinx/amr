@@ -58,9 +58,9 @@
 #define SYSFS_PCI_LINK_WIDTH_M		"link_width_max"
 
 /* For PCI reloading */
-#define HOT_RESET_GPIO_BAR		(4)
-#define HOT_RESET_GPIO_OFFSET		(0x2040000)
-#define PCI_ENABLE			(1)
+#define HOT_RESET_GPIO_BAR		(1)
+#define HOT_RESET_GPIO_OFFSET	(0x4000)
+#define PCI_ENABLE				(1)
 /*
  * NOTE: The following delays may need tweaking.
  * It is possible that a device may not show up after a rescan

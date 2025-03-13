@@ -28,7 +28,7 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define PDI_CHUNK_MULTIPLIER		(1024)
+#define PDI_CHUNK_MULTIPLIER	(1024)
 #define PDI_CHUNK_SIZE			(32)	/* Multiple of 1024 */
 #define COPY_CHUNK_DUR_MS		(70)	/* Est duration for partition chunk copy (ms) */
 #define SECOND_IN_MS			(1000)
@@ -131,7 +131,7 @@ static uint32_t calc_est_time(uint32_t part_size)
 	uint32_t est_num_chunks = 0;
 	/* calc est copy duration */
 	est_num_chunks = (part_size + ((PDI_CHUNK_SIZE * PDI_CHUNK_MULTIPLIER) - 1)) /
-		                 (PDI_CHUNK_SIZE * PDI_CHUNK_MULTIPLIER);
+						(PDI_CHUNK_SIZE * PDI_CHUNK_MULTIPLIER);
 	est_dur_seconds = ((est_num_chunks*COPY_CHUNK_DUR_MS) / SECOND_IN_MS) + 1;
 	return est_dur_seconds;
 }

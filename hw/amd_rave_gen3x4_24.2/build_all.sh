@@ -55,8 +55,8 @@ popd
 # Step PDI combine
 # Generate PDI w/ bootgen
 pushd ${HW_DIR}
-  bootgen -arch versal -image ${HW_DIR}/fpt/pdi_combine_${PRODUCT}.bif -w -o ${HW_DIR}/${DESIGN}_nofpt.pdi
+  bootgen -arch versal -image ${HW_DIR}/fpt/pdi_combine_${PRODUCT}.bif -w -o ${HW_DIR}/build/OSPI_RAVE.bin
 popd
 
 # final pdi generation
-${HW_DIR}/fpt/fpt_pdi_gen.py --fpt ${HW_DIR}/build/fpt.bin --pdi ${HW_DIR}/${DESIGN}_nofpt.pdi --output ${DESIGN}.pdi
+${HW_DIR}/fpt/fpt_pdi_gen.py --fpt ${HW_DIR}/build/fpt.bin --pdi ${HW_DIR}/${DESIGN}_nofpt.pdi --output build/OSPI_RAVE_fpt.bin

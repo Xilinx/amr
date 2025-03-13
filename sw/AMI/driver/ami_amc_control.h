@@ -651,8 +651,8 @@ struct amc_version {
 /**
  * struct amc_control_ctxt - context for the AMC.
  * @pcie_dev: the physical function
- * @gcq_payload_base_virt_addr: payload virtual base address
  * @gcq_base_virt_addr: the virtual sq base address
+ * @gcq_payload_base_virt_addr: payload virtual base address
  * @amc_shared_mem: the shared memory base address
  * @gcq_ring_buf_base_virt_addr: the ring buffer virtual address
  * @fw_if_cfg: fal configuration
@@ -676,8 +676,8 @@ struct amc_version {
  */
 struct amc_control_ctxt {
 	struct pci_dev		*pcie_dev;
-	void __iomem		*gcq_payload_base_virt_addr;
 	void __iomem		*gcq_base_virt_addr;
+	void __iomem		*gcq_payload_base_virt_addr;
 	struct amc_shared_mem	amc_shared_mem;
 	void __iomem		*gcq_ring_buf_base_virt_addr;
 	FW_IF_CFG		fw_if_cfg;
@@ -747,8 +747,7 @@ void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt);
  * setup_amc() - Init setup & configuration for the AMC.
  * @dev: the pci device.
  * @amc_ctrl_ctxt: Pointer to top level AMC data struct.
- * @ep_gcq: The rpu endpoint info.
- * @ep_gcq_payload: The mgmt endpoint info.
+ * @ep_gcq: The mgmt endpoint info.
  * @event_cb: Callback to be invoked when event occurs.
  * @event_cb_data: Private data to be passed into the event callback.
  *
@@ -756,7 +755,6 @@ void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt);
  */
 int setup_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt,
 			endpoint_info_struct ep_gcq,
-			endpoint_info_struct ep_gcq_payload,
 			amc_event_callback event_cb, void *event_cb_data);
 
 /**

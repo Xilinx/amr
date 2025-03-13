@@ -24,40 +24,40 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 	if (!dev || !endpoints)
 		return -EINVAL;
 
-	if (!(*endpoints)->gcq_payload.found) {
+	if (!(*endpoints)->gcq.found) {
 		DEV_ERR(dev, "Endpoint %s not found!!",
-			XILINX_ENDPOINT_NAME_GCQ_PAYLOAD);
+			XILINX_ENDPOINT_NAME_SGCQ);
 		ret = -ENODEV;
 		goto fail;
 	}
 
-	ret = pci_request_region(dev, (*endpoints)->gcq_payload.bar_num,
-			PCIE_BAR_NAME[(*endpoints)->gcq_payload.bar_num]);
+	ret = pci_request_region(dev, (*endpoints)->gcq.bar_num,
+			PCIE_BAR_NAME[(*endpoints)->gcq.bar_num]);
 	if (ret) {
 		DEV_ERR(dev, "Could not request %s region (%s)",
-			PCIE_BAR_NAME[(*endpoints)->gcq_payload.bar_num],
-			(*endpoints)->gcq_payload.name);
+			PCIE_BAR_NAME[(*endpoints)->gcq.bar_num],
+			(*endpoints)->gcq.name);
 		ret = -EIO;
 		goto fail;
 	}
 
-	virt_addr = pci_iomap_range(dev, (*endpoints)->gcq_payload.bar_num,
-			(*endpoints)->gcq_payload.start_addr,
-			(*endpoints)->gcq_payload.bar_len);
+	virt_addr = pci_iomap_range(dev, (*endpoints)->gcq.bar_num,
+			(*endpoints)->gcq.start_addr,
+			(*endpoints)->gcq.bar_len);
 	if (!virt_addr) {
 		DEV_ERR(dev, "Could not map %s endpoint into virtual memory at start address 0x%llx",
-			(*endpoints)->gcq_payload.name, (*endpoints)->gcq_payload.start_addr);
+			(*endpoints)->gcq.name, (*endpoints)->gcq.start_addr);
 		ret = -EIO;
 		goto release_bar;
 	}
 	memcpy_fromio(&shared_mem,
-			virt_addr,
+			virt_addr + XILINX_SGCQ_SIZE_BYTES,
 			sizeof(struct amc_shared_mem));
 
 	if ((shared_mem.uuid.amc_uuid_off + shared_mem.uuid.amc_uuid_len)
-		> (*endpoints)->gcq_payload.bar_len) {
+		> (*endpoints)->gcq.bar_len) {
 		DEV_ERR(dev, "Could not map %s UUID offset 0x%08x out of range",
-			(*endpoints)->gcq_payload.name, shared_mem.uuid.amc_uuid_off);
+			(*endpoints)->gcq.name, shared_mem.uuid.amc_uuid_off);
 		ret = -EIO;
 		goto release_bar;
 	}
@@ -75,12 +75,12 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 
 	DEV_INFO(dev, "Logic uuid = %s", (*endpoints)->logic_uuid_str);
 	pci_iounmap(dev, virt_addr);
-	pci_release_region(dev, (*endpoints)->gcq_payload.bar_num);
+	pci_release_region(dev, (*endpoints)->gcq.bar_num);
 
 	return SUCCESS;
 
 release_bar:
-	pci_release_region(dev, (*endpoints)->gcq_payload.bar_num);
+	pci_release_region(dev, (*endpoints)->gcq.bar_num);
 
 fail:
 	DEV_ERR(dev, "Failed to read logic UUID");
@@ -108,31 +108,20 @@ int read_vsec(struct pci_dev *dev, uint32_t vsec_base_addr,
 		goto fail;
 	}
 
-	/* sGCQ BAR 0: offset 0 */
+	/* sGCQ payload BAR 0: Offset 0 */
 	(*endpoints)->gcq.found = true;
 	(*endpoints)->gcq.bar_num = PCIE_BAR0;
 	(*endpoints)->gcq.start_addr = 0;
-	(*endpoints)->gcq.bar_len = XILINX_ENDPOINT_BAR_LEN_GCQ;
+	(*endpoints)->gcq.bar_len = XILINX_ENDPOINT_BAR_LEN_SGCQ;
 	(*endpoints)->gcq.end_addr = (*endpoints)->gcq.start_addr +
-					(*endpoints)->gcq.bar_len - 1;
+						(*endpoints)->gcq.bar_len - 1;
 
-	strcpy((*endpoints)->gcq.name, XILINX_ENDPOINT_NAME_GCQ);
+	strcpy((*endpoints)->gcq.name, XILINX_ENDPOINT_NAME_SGCQ);
 	print_endpoint_info(dev, (*endpoints)->gcq);
 
-	/* GCQ payload BAR 2: Offset 0 */
-	(*endpoints)->gcq_payload.found = true;
-	(*endpoints)->gcq_payload.bar_num = PCIE_BAR2;
-	(*endpoints)->gcq_payload.start_addr = 0;
-	(*endpoints)->gcq_payload.bar_len = XILINX_ENDPOINT_BAR_LEN_GCQ_PAYLOAD;
-	(*endpoints)->gcq_payload.end_addr = (*endpoints)->gcq_payload.start_addr +
-						(*endpoints)->gcq_payload.bar_len - 1;
-
-	strcpy((*endpoints)->gcq_payload.name, XILINX_ENDPOINT_NAME_GCQ_PAYLOAD);
-	print_endpoint_info(dev, (*endpoints)->gcq_payload);
-
-	/* PL BAR 4: offset 0 */
+	/* PL BAR 1: offset 0 */
 	(*endpoints)->pl.found = true;
-	(*endpoints)->pl.bar_num = PCIE_BAR4;
+	(*endpoints)->pl.bar_num = PCIE_BAR1;
 	(*endpoints)->pl.start_addr = 0;
 	(*endpoints)->pl.bar_len = XILINX_ENDPOINT_BAR_LEN_PL;
 	(*endpoints)->pl.end_addr = (*endpoints)->pl.start_addr +

@@ -320,8 +320,9 @@ static int start_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt)
 		goto fail;
 	}
 
-	amc_ctrl_ctxt->gcq_ring_buf_base_virt_addr = amc_ctrl_ctxt->gcq_payload_base_virt_addr +
-						     amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off;
+	amc_ctrl_ctxt->gcq_ring_buf_base_virt_addr =
+		amc_ctrl_ctxt->gcq_payload_base_virt_addr +
+		amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off;
 
 	AMI_VDBG(amc_ctrl_ctxt,
 		 "\t- GCQ ring buffer virtual addr   : 0x%p",
@@ -815,15 +816,13 @@ static enum amc_cmd_id get_cmd_command_id(enum gcq_submit_cmd_req cmd_req)
  * map_amc_endpoints() - map the IP based on the endpoint.
  * @dev: the device.
  * @amc_ctrl_ctxt: AMC data struct instance.
- * @ep_gcq: The rpu endpoint info.
- * @ep_gcq_payload: The mgmt endpoint info.
+ * @ep_gcq: The mgmt endpoint info.
  *
  * Return: the errno.
  */
 static int map_amc_endpoints(struct pci_dev		*dev,
-			     struct amc_control_ctxt	*amc_ctrl_ctxt,
-			     endpoint_info_struct	ep_gcq,
-			     endpoint_info_struct	ep_gcq_payload)
+				struct amc_control_ctxt	*amc_ctrl_ctxt,
+				endpoint_info_struct	ep_gcq)
 {
 	int ret = 0;
 	struct pf_dev_struct *pf_dev = NULL;
@@ -831,7 +830,7 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 	if (!amc_ctrl_ctxt || !dev)
 		return -EINVAL;
 
-	AMI_VDBG(amc_ctrl_ctxt, "Mapping GCQ endpoints");
+	AMI_VDBG(amc_ctrl_ctxt, "Mapping sGCQ endpoints");
 
 	pf_dev = dev_get_drvdata(&dev->dev);
 
@@ -845,13 +844,13 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 		goto fail;
 	}
 
-	/* TODO: do not hardcode which BAR is requested */
+	/* Request region */
 	ret = pci_request_region(amc_ctrl_ctxt->pcie_dev,
 				 ep_gcq.bar_num,
 				 PCIE_BAR_NAME[ep_gcq.bar_num]);
 	if (ret) {
 		AMI_ERR(amc_ctrl_ctxt,
-			"Could not request %s region (SQ_BASE)",
+			"Could not request %s region (BASE)",
 			PCIE_BAR_NAME[ep_gcq.bar_num]);
 		ret = -EIO;
 		goto fail;
@@ -859,18 +858,19 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 
 	pf_dev->pcie_config->header->bar[ep_gcq.bar_num].requested = true;
 
-	/* Map the GCQ IP Region */
+	/* Map the sGCQ Region */
 	amc_ctrl_ctxt->gcq_base_virt_addr = pci_iomap_range(amc_ctrl_ctxt->pcie_dev,
-							    ep_gcq.bar_num,
-							    ep_gcq.start_addr,
-							    ep_gcq.bar_len);
+									ep_gcq.bar_num,
+									ep_gcq.start_addr,
+									ep_gcq.bar_len);
 
 	if (!(amc_ctrl_ctxt->gcq_base_virt_addr)) {
-		AMI_ERR(amc_ctrl_ctxt, "Could not map GCQ IP into virtual memory");
+		AMI_ERR(amc_ctrl_ctxt, "Could not map sGCQ into virtual memory");
 		ret = -EIO;
 		goto fail;
 	}
 
+	AMI_VDBG(amc_ctrl_ctxt, "Successfully mapped GCQ payload");
 	AMI_VDBG(amc_ctrl_ctxt,
 		 "\t- gcq_start_phy          : 0x%llx",
 		 ep_gcq.start_addr);
@@ -880,33 +880,13 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 	AMI_VDBG(amc_ctrl_ctxt,
 		 "\t- gcq_bar_num            : 0x%x",
 		 ep_gcq.bar_num);
-
-	/* Map the GCQ Payload Region */
-	amc_ctrl_ctxt->gcq_payload_base_virt_addr = pci_iomap_range(amc_ctrl_ctxt->pcie_dev,
-								    ep_gcq_payload.bar_num,
-								    ep_gcq_payload.start_addr,
-								    ep_gcq_payload.bar_len);
-
-	if (!(amc_ctrl_ctxt->gcq_payload_base_virt_addr)) {
-		AMI_ERR(amc_ctrl_ctxt, "Could not map GCQ payload into virtual memory");
-		ret = -EIO;
-		goto fail;
-	}
+	AMI_VDBG(amc_ctrl_ctxt,
+		 "\t- GCQ virtual addr       : 0x%p",
+		 amc_ctrl_ctxt->gcq_base_virt_addr);
 
 	/* Map the Ring Buffer base address */
-	AMI_VDBG(amc_ctrl_ctxt, "Successfully mapped GCQ payload");
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- gcq_payload_start_phy          : 0x%llx",
-		 ep_gcq_payload.start_addr);
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- gcq_payload_len                : 0x%llx",
-		 ep_gcq_payload.bar_len);
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- gcq_payload_bar_num            : 0x%x",
-		 ep_gcq_payload.bar_num);
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- GCQ payload virtual addr       : 0x%p",
-		 amc_ctrl_ctxt->gcq_payload_base_virt_addr);
+	amc_ctrl_ctxt->gcq_payload_base_virt_addr =
+		amc_ctrl_ctxt->gcq_base_virt_addr + XILINX_SGCQ_SIZE_BYTES;
 
 	AMI_VDBG(amc_ctrl_ctxt, "Successfully mapped GCQ endpoints");
 	return SUCCESS;
@@ -1732,7 +1712,6 @@ void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt)
 int setup_amc(struct pci_dev		*dev,
 	      struct amc_control_ctxt	**amc_ctrl_ctxt,
 	      endpoint_info_struct	ep_gcq,
-	      endpoint_info_struct	ep_gcq_payload,
 	      amc_event_callback	event_cb,
 	      void			*event_cb_data)
 {
@@ -1766,7 +1745,7 @@ int setup_amc(struct pci_dev		*dev,
 	sema_init(&((*amc_ctrl_ctxt)->gcq_data_sema), 1);
 
 	/* Map Endpoints */
-	ret = map_amc_endpoints(dev, *amc_ctrl_ctxt, ep_gcq, ep_gcq_payload);
+	ret = map_amc_endpoints(dev, *amc_ctrl_ctxt, ep_gcq);
 	if (ret)
 		goto fail;
 
@@ -1963,7 +1942,6 @@ int unset_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt)
 		if (ret)
 			DEV_ERR(dev, "Failed to close the amc proxy %d", ret);
 
-		unmap_pci_io(dev, &((*amc_ctrl_ctxt)->gcq_payload_base_virt_addr));
 		unmap_pci_io(dev, &((*amc_ctrl_ctxt)->gcq_base_virt_addr));
 	}
 
