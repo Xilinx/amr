@@ -50,8 +50,9 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 		ret = -EIO;
 		goto release_bar;
 	}
+	virt_addr += XILINX_SGCQ_SIZE_BYTES;
 	memcpy_fromio(&shared_mem,
-			virt_addr + XILINX_SGCQ_SIZE_BYTES,
+			virt_addr,
 			sizeof(struct amc_shared_mem));
 
 	if ((shared_mem.uuid.amc_uuid_off + shared_mem.uuid.amc_uuid_len)

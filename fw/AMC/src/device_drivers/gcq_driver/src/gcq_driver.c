@@ -172,12 +172,10 @@ static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstanc
     {
         /* Check for errors */
         uint32_t ulSqTailPointer = pxGCQInstance->pxGCQIOAccess->xGCQReadReg32(
-            pxGCQInstance->ullBaseAddr + GCQ_PRODUCER_SQ_TAIL_POINTER
-        );
+            pxGCQInstance->ullBaseAddr + GCQ_PRODUCER_SQ_TAIL_POINTER );
 
         uint32_t ulCqTailPointer = pxGCQInstance->pxGCQIOAccess->xGCQReadReg32(
-            pxGCQInstance->ullBaseAddr + GCQ_PRODUCER_CQ_TAIL_POINTER
-        );
+            pxGCQInstance->ullBaseAddr + GCQ_PRODUCER_CQ_TAIL_POINTER );
 
         if ( unlikely( ( ( uint32_t )-1 == ulSqTailPointer ) && ( ( uint32_t )-1 == ulCqTailPointer ) ) )
         {

@@ -119,8 +119,8 @@
 
 /* Core libs */
 /* PLL */
-#define HAL_FSBL_LOG_ADDRESS ( 0xF2019000 )
-#define HAL_FSBL_LOG_SIZE    ( 0x4000 )
+#define HAL_PLM_LOG_ADDRESS ( 0xF2019000 )
+#define HAL_PLM_LOG_SIZE    ( 0x4000 )
 
 /**
  * @struct  HAL_PARTITION_TABLE_RING_BUFFER

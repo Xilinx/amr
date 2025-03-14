@@ -187,7 +187,7 @@ static FW_IF_GCQ_PRIVATE_DATA *pxThis = &xLocalData;
  */
 static inline void prvvWriteMemReg32( uint64_t ullDestAddr, uint32_t ulValue )
 {
-    PLL_DBG( FW_IF_GCQ_NAME, "W [0x%llx: 0x%lx]\r\n", ullDestAddr, ulValue );
+//    PLL_DBG( FW_IF_GCQ_NAME, "W [0x%llx: 0x%lx]\r\n", ullDestAddr, ulValue );
     HAL_IO_WRITE32( ulValue, ullDestAddr );
 }
 
@@ -201,7 +201,7 @@ static inline void prvvWriteMemReg32( uint64_t ullDestAddr, uint32_t ulValue )
 static inline uint32_t prvulReadMemReg32( uint64_t ullSrcAddr )
 {
     uint32_t ulValue = HAL_IO_READ32( ullSrcAddr );
-    PLL_DBG( FW_IF_GCQ_NAME, "R [0x%llx: 0x%lx]\r\n", ullSrcAddr, ulValue );
+//    PLL_DBG( FW_IF_GCQ_NAME, "R [0x%llx: 0x%lx]\r\n", ullSrcAddr, ulValue );
     return ulValue;
 }
 

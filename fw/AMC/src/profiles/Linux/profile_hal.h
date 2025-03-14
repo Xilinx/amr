@@ -113,8 +113,8 @@ extern const uint64_t HAL_RPU_SHARED_MEMORY_BASE_ADDR;
 
 /* Core libs */
 /* PLL */
-const uint64_t HAL_FSBL_LOG_ADDRESS;
-#define HAL_FSBL_LOG_SIZE ( 0x4000 )
+const uint64_t HAL_PLM_LOG_ADDRESS;
+#define HAL_PLM_LOG_SIZE ( 0x4000 )
 
 /**
  * @struct  HAL_PARTITION_TABLE_RING_BUFFER

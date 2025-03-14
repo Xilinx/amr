@@ -246,6 +246,44 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
             switch( xVoltageType )
             {
 #ifdef PROFILE_RAVE
+    #ifdef SDT
+            case SYS_MON_VOLTAGES_VCCAUX:
+                iMappedVType = XPAR_SYSMON0_10_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCSOC:
+                iMappedVType = XPAR_SYSMON0_0_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCO302:
+                iMappedVType = XPAR_SYSMON0_5_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCAUXPMC:
+                iMappedVType = XPAR_SYSMON0_6_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCO500:
+                iMappedVType = XPAR_SYSMON0_7_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCPMC:
+                iMappedVType = XPAR_SYSMON0_1_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCPSFP:
+                iMappedVType = XPAR_SYSMON0_8_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCPSLP:
+                iMappedVType = XPAR_SYSMON0_4_REG;
+                break;
+            case SYS_MON_VOLTAGES_VPVN:
+                iMappedVType = XPAR_SYSMON0_2_REG;
+                break;
+            case SYS_MON_VOLTAGES_VCCO703:
+                iMappedVType = XPAR_SYSMON0_9_REG;
+                break;
+            case SYS_MON_VOLTAGES_VAUXCH0:
+                iMappedVType = XPAR_SYSMON0_3_REG;
+                break;
+            //case SYS_MON_VOLTAGES_VCCAUXSMON:
+            //    iMappedVType = VCCAUXPMC;
+            //    break;
+    #else
             case SYS_MON_VOLTAGES_VCCAUX:
                 iMappedVType = VCCAUX;
                 break;
@@ -282,6 +320,7 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
             case SYS_MON_VOLTAGES_VCCAUXSMON:
                 iMappedVType = VCCAUXPMC;
                 break;
+    #endif
 #else
             case SYS_MON_VOLTAGES_VCCAUX:
                 iMappedVType = VCCAUX;
