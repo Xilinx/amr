@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the FW IF GCQ debug access
+ * This file contains the FW IF sGCQ debug access
  *
  * @file fw_if_gcq_debug.h
  */
@@ -18,7 +18,7 @@
 /******************************************************************************/
 
 /**
- * @brief   Initialise the FW IF GCQ debug access
+ * @brief   Initialise the FW IF sGCQ debug access
  *
  * @param   pxParentHandle optional handle to the parent directory
  *

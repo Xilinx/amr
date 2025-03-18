@@ -74,7 +74,7 @@ const char *sdr_repo_type_to_str(enum gcq_sdr_repo_type sdr)
  * get_flags_for_repo() - Get the appropriate command flags for a repo type.
  * @repo_type: The repo type (SID).
  *
- * This function is to be used when a GCQ/AMC command can take various
+ * This function is to be used when a sGCQ/AMC command can take various
  * forms depending on the repo type. This means we can have a single
  * command (e.g. GET_SDR) and set the appropriate flag for the repo type,
  * rather than having many commands (GET_SDR_TEMP, GET_SDR_POWER, etc.).
@@ -1043,7 +1043,7 @@ done:
  *                   added option of not reading sensors unless they are "stale".
  * @pf_dev: Pointer to top level PCI data struct.
  * @gcq_cmd: The CMD code to submit; used to populate payload fields.
- * @fresh: boolean indicating if the value came from the cache or over GCQ
+ * @fresh: boolean indicating if the value came from the cache or over sGCQ
  *
  * Return: 0 or negative error code.
  */
@@ -1117,7 +1117,7 @@ static int read_sensors(struct pf_dev_struct	*pf_dev,
 /**
  * read_thermal_sensors() - Retrieve all temperature sensor readings.
  * @pf_dev: Pointer to top level PCI data struct.
- * @fresh: boolean indicating if the value came from the cache or over GCQ
+ * @fresh: boolean indicating if the value came from the cache or over sGCQ
  *
  * Like the `get_all_sensors` function, this simply populates data for
  * previously discovered sensor repos. It does not fetch any new sensors.
@@ -1136,7 +1136,7 @@ int read_thermal_sensors(struct pf_dev_struct *pf_dev, bool *fresh)
 /**
  * read_voltage_sensors() - Retrieve all voltage sensor readings.
  * @pf_dev: Pointer to top level PCI data struct.
- * @fresh: boolean indicating if the value came from the cache or over GCQ
+ * @fresh: boolean indicating if the value came from the cache or over sGCQ
  *
  * Like the `get_all_sensors` function, this simply populates data for
  * previously discovered sensor repos. It does not fetch any new sensors.
@@ -1155,7 +1155,7 @@ int read_voltage_sensors(struct pf_dev_struct *pf_dev, bool *fresh)
 /**
  * read_current_sensors() - Retrieve all current sensor readings.
  * @pf_dev: Pointer to top level PCI data struct.
- * @fresh: boolean indicating if the value came from the cache or over GCQ
+ * @fresh: boolean indicating if the value came from the cache or over sGCQ
  *
  * Like the `get_all_sensors` function, this simply populates data for
  * previously discovered sensor repos. It does not fetch any new sensors.
@@ -1174,7 +1174,7 @@ int read_current_sensors(struct pf_dev_struct *pf_dev, bool *fresh)
 /**
  * read_power_sensors() - Retrieve all power sensor readings.
  * @pf_dev: Pointer to top level PCI data struct.
- * @fresh: boolean indicating if the value came from the cache or over GCQ
+ * @fresh: boolean indicating if the value came from the cache or over sGCQ
  *
  * Like the `get_all_sensors` function, this simply populates data for
  * previously discovered sensor repos. It does not fetch any new sensors.

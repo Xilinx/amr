@@ -103,7 +103,8 @@ static uint32_t testClose( void *pvFwIf )
 static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
-    int i = 0;
+    uint32_t i = 0;
+    (void)ulTimeoutMs;
 
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
     CHECK_HDL( pxThisIf );
@@ -127,7 +128,6 @@ static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, 
             {
                 TEST_PRINT( "\r\n[%02x] ", i );
             }
-
             TEST_PRINT( "%02x ", pucData[ i ] );
         }
         TEST_PRINT( "\r\n" );
@@ -136,7 +136,6 @@ static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, 
     {
         ulStatus = FW_IF_ERRORS_PARAMS;
     }
-
     return ulStatus;
 }
 
@@ -146,7 +145,8 @@ static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, 
 static uint32_t testRead( void *pvFwIf, uint64_t ullOffset, uint8_t *pucData, uint32_t *pulSize, uint32_t ulTimeoutMs )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
-    int i = 0;
+    uint32_t i = 0;
+    (void)ulTimeoutMs;
 
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
     CHECK_HDL( pxThisIf );
@@ -172,7 +172,6 @@ static uint32_t testRead( void *pvFwIf, uint64_t ullOffset, uint8_t *pucData, ui
             {
                 TEST_PRINT( "\r\n[%02x] ", i );
             }
-
             TEST_PRINT( "%02x ", pucData[ i ] );
         }
         TEST_PRINT( "\r\n" );
@@ -181,7 +180,6 @@ static uint32_t testRead( void *pvFwIf, uint64_t ullOffset, uint8_t *pucData, ui
     {
         ulStatus = FW_IF_ERRORS_PARAMS;
     }
-
     return ulStatus;
 }
 
@@ -301,8 +299,6 @@ static uint32_t testBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
     {
         ulStatus = FW_IF_ERRORS_PARAMS;
     }
-
-
     return ulStatus;
 }
 
@@ -335,7 +331,6 @@ uint32_t FW_IF_test_init( FW_IF_TEST_INIT_CFG *pxCfg )
                 ( unsigned int )xMyLocalCfg.driverId,
                 xMyLocalCfg.driverName );
     }
-
     return ulStatus;
 }
 
@@ -371,6 +366,5 @@ uint32_t FW_IF_test_create( FW_IF_CFG *pxFwIf, FW_IF_TEST_CFG *pxTestCfg )
                 ( unsigned int )pxThisTestCfg->ifId,
                 pxThisTestCfg->ifName );
     }
-
     return ulStatus;
 }

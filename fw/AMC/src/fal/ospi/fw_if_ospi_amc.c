@@ -267,10 +267,10 @@ uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *xInitCfg )
              * Initialise the driver based on the device id supplied in the xparameters.h
              * and the page size.
              */
-            PLL_DBG( FW_IF_OSPI_NAME, "Device Id:%d\r\n", pxThis->xLocalCfg.ucOspiDeviceId );
+            PLL_DBG( FW_IF_OSPI_NAME, "Device Addr:%d\r\n", pxThis->xLocalCfg.ulOspiBaseAddress );
             PLL_DBG( FW_IF_OSPI_NAME, "Page Size:%d\r\n", pxThis->xLocalCfg.usPageSize );
 
-            pxOspiCfg.ucDeviceId = pxThis->xLocalCfg.ucOspiDeviceId;
+            pxOspiCfg.ulBaseAddress = pxThis->xLocalCfg.ulOspiBaseAddress;
             pxOspiCfg.usPageSize = pxThis->xLocalCfg.usPageSize;
             iStatus = iOSPI_FlashInit( &pxOspiCfg );
             if( OK != iStatus )
@@ -290,7 +290,6 @@ uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *xInitCfg )
             INC_ERROR_COUNTER( FW_IF_ERRORS_PARAMS_COUNT );
         }
     }
-
     return xRet;
 }
 
@@ -348,7 +347,6 @@ uint32_t ulFW_IF_OSPI_Create( FW_IF_CFG *pxFwIf, FW_IF_OSPI_CFG *pxOspiCfg )
             INC_ERROR_COUNTER( FW_IF_ERRORS_PARAMS_COUNT );
         }
     }
-
     return xRet;
 }
 
@@ -402,7 +400,6 @@ static uint32_t ulOspiOpen( void *pvFwIf )
                  pcOspiStateModeStr[ pxCfg->xState ] );
         INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_INVALID_STATE_COUNT );
     }
-
     return xRet;
 }
 
@@ -451,7 +448,6 @@ static uint32_t ulOspiClose( void *pvFwIf )
                  pcOspiStateModeStr[ pxCfg->xState ] );
         INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_INVALID_STATE_COUNT );
     }
-
     return xRet;
 }
 
@@ -466,6 +462,7 @@ static uint32_t ulOspiWrite( void *pvFwIf,
 {
     FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
     uint32_t ulAddrOffset = ( uint32_t )ullAddrOffset;
+    (void)ulTimeoutMs;
 
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
     if( CHECK_HDL( pxThisIf ) )
@@ -546,7 +543,6 @@ static uint32_t ulOspiWrite( void *pvFwIf,
             xRet = FW_IF_ERRORS_PARAMS;
         }
     }
-
     return xRet;
 }
 
@@ -561,8 +557,9 @@ static uint32_t ulOspiRead( void *pvFwIf,
 {
     FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
     uint32_t ulAddrOffset = ( uint32_t )ullAddrOffset;
-
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    (void)ulTimeoutMs;
+
     if( CHECK_HDL( pxThisIf ) )
     {
         xRet = FW_IF_ERRORS_INVALID_HANDLE;
@@ -627,7 +624,6 @@ static uint32_t ulOspiRead( void *pvFwIf,
             xRet = FW_IF_ERRORS_PARAMS;
         }
     }
-
     return xRet;
 }
 
@@ -637,8 +633,8 @@ static uint32_t ulOspiRead( void *pvFwIf,
 static uint32_t ulOspiIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
 {
     FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
-
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+
     if( CHECK_HDL( pxThisIf ) )
     {
         xRet = FW_IF_ERRORS_INVALID_HANDLE;
@@ -706,7 +702,6 @@ static uint32_t ulOspiIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
         PLL_ERR( FW_IF_OSPI_NAME, "OSPI FW_IF_ioctl\r\n" );
         INC_STAT_COUNTER( FW_IF_OSPI_IO_CTRL_COUNT );
     }
-
     return xRet;
 }
 
@@ -757,7 +752,6 @@ static uint32_t ulOspiBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
         xRet = FW_IF_ERRORS_PARAMS;
         INC_ERROR_COUNTER( FW_IF_ERRORS_PARAMS_COUNT );
     }
-
     return xRet;
 }
 
@@ -778,7 +772,6 @@ static uint32_t ulValidateAddressRange( FW_IF_OSPI_CFG *pxCfg, uint32_t ulAddrOf
             xRet = FW_IF_ERRORS_NONE;
         }
     }
-
     return xRet;
 }
 
@@ -812,7 +805,6 @@ int iFW_IF_OSPI_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_VALIDATION_FAILED_COUNT )
     }
-
     return iStatus;
 }
 
@@ -835,6 +827,5 @@ int iFW_IF_OSPI_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_VALIDATION_FAILED_COUNT )
     }
-
     return iStatus;
 }

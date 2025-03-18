@@ -2,7 +2,7 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This header file contains private definitions for the GCQ driver.
+ * This header file contains private definitions for the sGCQ driver.
  *
  * @file gcq_internal.h
  */
@@ -69,7 +69,7 @@ struct GCQ_RING_TYPE;
 /**
  * @struct  GCQ_TYPE
  *
- * @brief   Instance of an GCQ_TYPE, used to model the GCQ IP Block.
+ * @brief   Instance of an GCQ_TYPE, used to model the sGCQ.
  */
 typedef struct GCQ_INSTANCE_TYPE
 {

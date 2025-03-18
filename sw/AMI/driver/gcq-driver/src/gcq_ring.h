@@ -28,11 +28,11 @@ struct GCQ_HEADER_TYPE
     uint32_t ulHdrVersion;
 
     /* SQ and CQ share the same num of slots. */
-    uint32_t ulHdrSlotNum;
+    uint32_t ulHdrNumSlots;
     uint32_t ulHdrSQOffset;
     uint32_t ulHdrSQSlotSize;
     uint32_t ulHdrCQOffset;
-    /* CQ slot size and format is tied to GCQ version. */
+    /* CQ slot size and format is tied to sGCQ version. */
 
     /*
      * Consumed pointer for both SQ and CQ are here since they don't generate interrupt,
@@ -48,7 +48,6 @@ struct GCQ_HEADER_TYPE
      */
     uint32_t ulHdrSQProduced;
     uint32_t ulHdrCQProduced;
-
 };
 
 /**
@@ -59,14 +58,13 @@ struct GCQ_HEADER_TYPE
 struct GCQ_RING_TYPE
 {
     struct GCQ_INSTANCE_TYPE *pxGCQInstance; /* pointing back to parent q */
-    uint32_t ulRingSlotNum;
+    uint32_t ulRingNumSlots;
     uint32_t ulRingSlotSize;
     uint32_t ulRingProduced;
     uint32_t ulRingConsumed;
     uint64_t ullRingProducedAddr;
     uint64_t ullRingConsumedAddr;
     uint64_t ullRingSlotAddr;
-
 };
 
 
@@ -77,12 +75,12 @@ struct GCQ_RING_TYPE
 /**
  * @brief    Initialise an instance of the ring buffer
  *
- * @param    pxGCQInstance is the pointer to the parent GCQ instance
+ * @param    pxGCQInstance is the pointer to the parent sGCQ instance
  * @param    pxRing is the ring buffer instance to be populated
  * @param    ullProducedAddr is the producer address
  * @param    ullConsumedAddr is the consumer address
  * @param    ullSlotAddr is the slot address
- * @param    ulSlotNum is the number of slots
+ * @param    ulNumSlots is the number of slots
  * @param    ulSlotSize is the slot size
  *
  * @return   N/A
@@ -92,7 +90,7 @@ static inline void prvvGCQInitRing( const struct GCQ_INSTANCE_TYPE *pxGCQInstanc
                                     uint64_t ullProducedAddr,
                                     uint64_t ullConsumedAddr,
                                     uint64_t ullSlotAddr,
-                                    uint32_t ulSlotNum,
+                                    uint32_t ulNumSlots,
                                     uint32_t ulSlotSize )
 {
     gcq_assert( pxGCQInstance );
@@ -103,14 +101,14 @@ static inline void prvvGCQInitRing( const struct GCQ_INSTANCE_TYPE *pxGCQInstanc
     pxRing->ullRingConsumedAddr = ullConsumedAddr;
     pxRing->ullRingSlotAddr = ullSlotAddr;
     pxRing->ulRingSlotSize = ulSlotSize;
-    pxRing->ulRingSlotNum = ulSlotNum;
+    pxRing->ulRingNumSlots = ulNumSlots;
     pxRing->ulRingProduced = pxRing->ulRingConsumed = 0;
 
     GCQ_DEBUG( "Produced Tail:0x%llx\r\n", ullProducedAddr );
     GCQ_DEBUG( "Hdr Consumed Tail:0x%llx\r\n", ullConsumedAddr );
     GCQ_DEBUG( "Slot Addr:0x%llx\r\n", ullSlotAddr );
     GCQ_DEBUG( "Slot Size:%ld\r\n", ulSlotSize );
-    GCQ_DEBUG( "Slot Num:%ld\r\n", ulSlotNum );
+    GCQ_DEBUG( "Num Slots:%ld\r\n", ulNumSlots );
 }
 
 /**
@@ -172,7 +170,7 @@ static inline void prvvGCQCopyFromRing( const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess,
     gcq_assert( pucBuffer );
 
     {
-        int i = 0;
+        uint32_t i = 0;
         uint32_t *ullDestAddr = ( uint32_t * )pucBuffer;
         for( i = 0; i < ( ulLen / 4 ); i++, ullSrcAddr += 4 )
         {
@@ -285,7 +283,7 @@ static inline void prvvGCQRingWriteConsumed( const GCQ_IO_ACCESS_TYPE *pxGCQIOAc
 static inline uint32_t prvucGCQRingIsFull( const struct GCQ_RING_TYPE *pxRing )
 {
     gcq_assert( pxRing );
-    return ( ( pxRing->ulRingProduced - pxRing->ulRingConsumed ) >= pxRing->ulRingSlotNum );
+    return ( ( pxRing->ulRingProduced - pxRing->ulRingConsumed ) >= pxRing->ulRingNumSlots );
 }
 
 /**
@@ -312,7 +310,7 @@ static inline uint64_t prvullGCQRingGetSlotPtrProduced(const struct GCQ_RING_TYP
 {
     gcq_assert( pxRing );
     return ( pxRing->ullRingSlotAddr +
-            ( uint64_t )pxRing->ulRingSlotSize * ( pxRing->ulRingProduced & ( pxRing->ulRingSlotNum - 1 ) ) );
+            ( uint64_t )pxRing->ulRingSlotSize * ( pxRing->ulRingProduced & ( pxRing->ulRingNumSlots - 1 ) ) );
 }
 
 /**
@@ -326,7 +324,7 @@ static inline uint64_t prvullGCQRingGetSlotPtrConsumed(const struct GCQ_RING_TYP
 {
     gcq_assert( pxRing );
     return ( pxRing->ullRingSlotAddr +
-           ( uint64_t )pxRing->ulRingSlotSize * ( pxRing->ulRingConsumed & ( pxRing->ulRingSlotNum - 1 ) ) );
+           ( uint64_t )pxRing->ulRingSlotSize * ( pxRing->ulRingConsumed & ( pxRing->ulRingNumSlots - 1 ) ) );
 }
 
 #endif /* _GCQ_RING_H_ */

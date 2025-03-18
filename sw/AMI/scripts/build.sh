@@ -113,12 +113,12 @@ function fetch_ami_version() {
 }
 
 function fetch_gcq_version() {
-    echo "=== Fetching GCQ version ==="
+    echo "=== Fetching sGCQ version ==="
     SECTION_START=$SECONDS
     cd $DRIVER_DIR/gcq-driver
     ./getVersion.sh gcq
     cd $ROOT_DIR
-    echo "*** GCQ version update took $((SECONDS - $SECTION_START)) S ***"
+    echo "*** sGCQ version update took $((SECONDS - $SECTION_START)) S ***"
 }
 
 ################################################################################

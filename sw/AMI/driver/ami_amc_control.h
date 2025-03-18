@@ -80,7 +80,7 @@
 /******************************************************************************************/
 
 /**
- * enum gcq_submit_cmd_flags - GCQ command-specific flags.
+ * enum gcq_submit_cmd_flags - sGCQ command-specific flags.
  * @GCQ_CMD_FLAG_NONE: No flags.
  * @GCQ_CMD_FLAG_REPO_TYPE_BD_INFO: Command relates to the board info SDR.
  * @GCQ_CMD_FLAG_REPO_TYPE_TEMP: Command relates to the temperature SDR.
@@ -103,9 +103,9 @@ enum gcq_submit_cmd_flags {
 };
 
 /**
- * enum gcq_submit_cmd_req - Type of GCQ command to submit
+ * enum gcq_submit_cmd_req - Type of sGCQ command to submit
  * @GCQ_SUBMIT_CMD_RSVD: Reserved
- * @CQ_SUBMIT_CMD_GET_GCQ_VERSION: Get GCQ vesion
+ * @CQ_SUBMIT_CMD_GET_GCQ_VERSION: Get sGCQ vesion
  * @GCQ_SUBMIT_CMD_GET_SDR_SIZE: Get SDR size
  * @GCQ_SUBMIT_CMD_GET_SDR: Get SDR
  * @GCQ_SUBMIT_CMD_DOWNLOAD_PDI: Download PDI
@@ -612,7 +612,7 @@ struct amc_data {
 };
 
 /**
- * struct amc_shared_mem - GCQ memory partition table, should be positioned at shared memory offset 0,
+ * struct amc_shared_mem - sGCQ memory partition table, should be positioned at shared memory offset 0,
  *     and initialized by AMC software on RPU device.
  * We use the memory partition table for sharing info between host and RPU.
  * Including:
@@ -653,10 +653,10 @@ struct amc_version {
  * @pcie_dev: the physical function
  * @gcq_base_virt_addr: the virtual sq base address
  * @gcq_payload_base_virt_addr: payload virtual base address
- * @amc_shared_mem: the shared memory base address
  * @gcq_ring_buf_base_virt_addr: the ring buffer virtual address
+ * @amc_shared_mem: the shared memory base address
  * @fw_if_cfg: fal configuration
- * @fw_if_gcq_consumer: handle to the GCQ consumer
+ * @fw_if_gcq_consumer: handle to the sGCQ consumer
  * @lock: lock to protect cid creation
  * @gcq_cmd_lock: protect concurrent gcq commands
  * @gcq_halted: block/allow request messages
@@ -678,24 +678,24 @@ struct amc_control_ctxt {
 	struct pci_dev		*pcie_dev;
 	void __iomem		*gcq_base_virt_addr;
 	void __iomem		*gcq_payload_base_virt_addr;
-	struct amc_shared_mem	amc_shared_mem;
 	void __iomem		*gcq_ring_buf_base_virt_addr;
-	FW_IF_CFG		fw_if_cfg;
+	struct amc_shared_mem	amc_shared_mem;
+	FW_IF_CFG			fw_if_cfg;
 	FW_IF_GCQ_CFG		fw_if_gcq_consumer;
 	struct mutex		lock;
 	struct mutex		gcq_cmd_lock;
-	bool			gcq_halted;
+	bool				gcq_halted;
 	struct semaphore	gcq_log_page_sema;
 	struct semaphore	gcq_data_sema;
 	struct amc_version	version;
 	struct task_struct	*heartbeat_thread;
-	bool			heartbeat_thread_created;
+	bool				heartbeat_thread_created;
 	amc_event_callback	event_cb;
-	void			*event_cb_data;
+	void				*event_cb_data;
 	struct task_struct	*logging_thread;
-	bool			logging_thread_created;
-	int			last_printed_msg_index;
-	bool			compat_mode;
+	bool				logging_thread_created;
+	int					last_printed_msg_index;
+	bool				compat_mode;
 };
 
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
- * for the GCQ driver.
+ * for the sGCQ driver.
  *
  * @file gcq.h
  */
@@ -32,7 +32,7 @@
 #ifdef __KERNEL__
 #define gcq_assert( x )                                                         \
 do {    if ( x ) break;                                                         \
-        printk(KERN_EMERG "### ASSERTION FAILED [GCQ Driver] %s: %s: %d: %s\n", \
+        printk(KERN_EMERG "### ASSERTION FAILED [sGCQ Driver] %s: %s: %d: %s\n",\
                __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();          \
 } while ( 0 )
 
@@ -102,7 +102,7 @@ typedef void ( *GCQ_WRITE_MEM_32 )( uint64_t ullMemAddr, uint32_t ulValue );
 
 /*
  * @struct GCQ_INSTANCE_TYPE
- * @brief  Forward declaration of structure to hold a GCQ instance
+ * @brief  Forward declaration of structure to hold a sGCQ instance
  */
 struct GCQ_INSTANCE_TYPE;
 
@@ -135,7 +135,7 @@ typedef struct GCQ_VERSION_TYPE
 
 /*
  * @enum GCQ_ERRORS_TYPE
- * @brief Enumeration of GCQ driver return values
+ * @brief Enumeration of sGCQ driver return values
  */
 typedef enum GCQ_ERRORS_TYPE
 {
@@ -158,7 +158,7 @@ typedef enum GCQ_ERRORS_TYPE
 
 /*
  * @enum GCQ_MODE_TYPE
- * @brief Enumeration of GCQ supported modes
+ * @brief Enumeration of sGCQ supported modes
  */
 typedef enum GCQ_MODE_TYPE
 {
@@ -171,7 +171,7 @@ typedef enum GCQ_MODE_TYPE
 
 /*
  * @enum GCQ_INTERRUPT_MODE_TYPE
- * @brief Enumeration of GCQ supported interrupt modes
+ * @brief Enumeration of sGCQ supported interrupt modes
  */
 typedef enum GCQ_INTERRUPT_MODE_TYPE
 {
@@ -185,7 +185,7 @@ typedef enum GCQ_INTERRUPT_MODE_TYPE
 
 /*
  * @enum GCQ_FLAGS_TYPE
- * @brief Enumeration of GCQ supported driver flags to enable
+ * @brief Enumeration of sGCQ supported driver flags to enable
  *        relevant functionality
  */
 typedef enum GCQ_FLAGS_TYPE
@@ -207,7 +207,7 @@ typedef enum GCQ_FLAGS_TYPE
 /******************************************************************************/
 
 /**
- * @brief    Initialise the GCQ standalone driver
+ * @brief    Initialise the sGCQ standalone driver
  *           Internally the function will:
  *           - Allocate an internal instance if any are free
  *           - Calculate the number of slots required
@@ -216,12 +216,12 @@ typedef enum GCQ_FLAGS_TYPE
  *           - Write the magic metadata to the producer
  *           - Handle the extended driver functionality flags
  *
- * @param    ppxGCQInstance is the instance of the of the GCQ returned by driver
+ * @param    ppxGCQInstance is the instance of the of the sGCQ returned by driver
  * @param    pxIOAccess is the bound in function pointers for memory & register access
  * @param    xMode is the supported mode, consumer or producer
  * @param    xIntMode is the supported interrupt mode
  * @param    xFlags is the extended driver functionality
- * @param    ullBaseAddr is the base address of the GCQ IP block
+ * @param    ullBaseAddr is the base address of the sGCQ
  * @param    ullRingAddr is the base address of the shared memory for allocating slots
  * @param    ullRingLen is the length of the shared memory provided
  * @param    ulSQSlotSize is the required submission queue (SQ) slot size
@@ -241,7 +241,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           uint32_t ulCQSlotSize );
 
 /**
- * @brief    De-initialise a GCQ driver instance
+ * @brief    De-initialise a sGCQ driver instance
  *
  * @param    ppxGCQInstance is the instance to de-initialise
  *
@@ -258,20 +258,20 @@ GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
  *           - Check the internal version matches
  *           - Prepare the ring buffer to receive data
  *
- * @param    pxGCQInstance is the instance of the GCQ
+ * @param    pxGCQInstance is the instance of the sGCQ
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
  */
 GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
 
 /**
- * @brief    Function to consume/read data from the GCQ
+ * @brief    Function to consume/read data from the sGCQ
  *           Internally the function will:
  *           - Check driver has been initilaised
  *           - Check driver has attached to the consumer
  *           - Attempt to read data if any is available
  *
- * @param    pxGCQInstance is the instance of the GCQ
+ * @param    pxGCQInstance is the instance of the sGCQ
  * @param    pucData is the pointer to the data to be populated on receive
  * @param    ulDatalLen is the length of the data received
  *
@@ -280,12 +280,12 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
 GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDatalLen );
 
 /**
- * @brief    Function to produce/send data to the GCQ
+ * @brief    Function to produce/send data to the sGCQ
  *           Internally the function will:
  *           - Check driver has been initilaised
  *           - Attempt to send data
  *
- * @param    pxGCQInstance is the instance of the GCQ
+ * @param    pxGCQInstance is the instance of the sGCQ
  * @param    pucData is the pointer to be data to be sent
  * @param    ulDataLen the length of the data being sent
  *

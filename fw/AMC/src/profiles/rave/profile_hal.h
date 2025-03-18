@@ -57,11 +57,7 @@
 #define HAL_FLUSH_CACHE_DATA( addr, size ) Xil_DCacheFlushRange( addr, size )
 
 /* Definitions for peripheral CIPS_PSPMC_0_PSV_I2C_0 */
-#ifdef SDT
 #define HAL_I2C_BUS_0_DEVICE_ID         ( 0 )
-#else
-#define HAL_I2C_BUS_0_DEVICE_ID         ( XPAR_XIICPS_0_DEVICE_ID )
-#endif
 #define HAL_I2C_BUS_0_BASEADDR          ( XPAR_XIICPS_0_BASEADDR )
 #define HAL_I2C_BUS_0_HIGHADDR          ( XPAR_XIICPS_0_HIGHADDR )
 #define HAL_I2C_BUS_0_I2C_CLK_FREQ_HZ   ( UTIL_100KHZ )
@@ -69,22 +65,14 @@
 #define HAL_I2C_BUS_0_HW_DEVICE_RESET   ( FALSE )
 
 /* Definitions for peripheral CIPS_PSPMC_0_PSV_I2C_1 */
-#ifdef SDT
 #define HAL_I2C_BUS_1_DEVICE_ID         ( 0 )
-#else
-#define HAL_I2C_BUS_1_DEVICE_ID         ( XPAR_XIICPS_0_DEVICE_ID )
-#endif
 #define HAL_I2C_BUS_1_BASEADDR          ( XPAR_XIICPS_0_BASEADDR )
 #define HAL_I2C_BUS_1_HIGHADDR          ( XPAR_XIICPS_0_HIGHADDR )
 #define HAL_I2C_BUS_1_I2C_CLK_FREQ_HZ   ( UTIL_100KHZ )
 #define HAL_I2C_BUS_1_RESET_ON_INIT     ( FALSE )
 #define HAL_I2C_BUS_1_HW_DEVICE_RESET   ( TRUE )
 
-#ifdef SDT
 #define HAL_I2C_SW_RESET_BASEADDR       ( XPAR_BLP_CIPS_PSPMC_0_PSV_CRL_0_BASEADDR )
-#else
-#define HAL_I2C_SW_RESET_BASEADDR       ( XPAR_BLP_CIPS_PSPMC_0_PSV_CRL_0_S_AXI_BASEADDR )
-#endif
 #define HAL_I2C_BUS_0_SW_RESET_OFFSET   ( 0x330 )
 #define HAL_I2C_BUS_1_SW_RESET_OFFSET   ( 0x330 )
 #define HAL_I2C_BUS_0_HW_RESET_ADDR     ( 0 )
@@ -97,14 +85,10 @@
 #define HAL_I2C_RETRY_COUNT             ( 5 )
 
 /* Definitions OSPI */
-#ifdef SDT
 #define HAL_OSPI_0_DEVICE_ID            ( XPAR_OSPI_BASEADDR )
-#else
-#define HAL_OSPI_0_DEVICE_ID            ( XPAR_XOSPIPSV_0_DEVICE_ID )
-#endif
 
 /* FAL */
-/* GCQ */
+/* sGCQ */
 #ifndef HAL_IO_WRITE32
 #define HAL_IO_WRITE32( val, addr ) ( { Xil_Out32( addr, val ); \
                                         Xil_DCacheFlushRange( addr, sizeof( uint32_t ) ); } )
@@ -125,13 +109,8 @@
 
 /* Proxies */
 /* APC */
-#ifdef SDT
 #define HAL_APC_PMC_BOOT_REG ( XPAR_BLP_CIPS_PSPMC_0_PSV_PMC_GLOBAL_0_BASEADDR + 0x00004 )
 #define HAL_APC_PMC_SRST_REG ( XPAR_BLP_CIPS_PSPMC_0_PSV_PMC_GLOBAL_0_BASEADDR + 0x20084 )
-#else
-#define HAL_APC_PMC_BOOT_REG ( XPAR_PSV_PMC_GLOBAL_0_S_AXI_BASEADDR + 0x00004 )
-#define HAL_APC_PMC_SRST_REG ( XPAR_PSV_PMC_GLOBAL_0_S_AXI_BASEADDR + 0x20084 )
-#endif
 #define HAL_APC_PDI_BIT_MASK ( 0x14 )
 
 /* Core libs */

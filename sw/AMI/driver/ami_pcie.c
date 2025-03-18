@@ -961,7 +961,7 @@ int write_pcie_configuration(struct pci_dev *dev)
 	}
 
 	/*
-	 * Identity event over GCQ will enable the hot reload so we must make
+	 * Identity event over sGCQ will enable the hot reload so we must make
 	 * sure the PMC GPIO is cleared to prevent a reboot.
 	 */
 	if (PCI_FUNC(dev->devfn) == 0) {

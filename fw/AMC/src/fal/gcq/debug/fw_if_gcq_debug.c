@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the GCQ debug implementation.
+ * This file contains the sGCQ debug implementation.
  *
  * @file fw_if_gcq_debug.c
  */
@@ -52,7 +52,7 @@ static void vClearStats( void );
 /******************************************************************************/
 
 /**
- * @brief   Initialise the GCQ debug access.
+ * @brief   Initialise the sGCQ debug access.
  */
 void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle )
 {

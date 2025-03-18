@@ -89,7 +89,7 @@ enum pf_dev_cache_type {
  * @state: Current device state.
  * @pci: PCI device struct.
  * @pcie_config: PCI specific data
- * @endpoints: PCI endpoints (UUID, GCQ, etc...)
+ * @endpoints: PCI endpoints (UUID, sGCQ, etc...)
  * @amc_ctrl_ctxt: AMC data struct.
  * @ioctl_sema: Semaphore used by the IOCTL handler.
  * @sensor_refresh: Sensor update interval in milliseconds.

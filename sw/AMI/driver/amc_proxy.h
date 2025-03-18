@@ -225,15 +225,15 @@ struct amc_proxy_module_rw_request {
 };
 
 /**
- * struct amc_proxy_identify_response: AMC/GCQ version data
+ * struct amc_proxy_identify_response: AMC/sGCQ version data
  *
  * @ver_major: AMC major version number
  * @ver_minor: AMC minor version number
  * @ver_patch: AMC patch version number
  * @local_changes: 0 for no change, 1 for changes
  * @dev_commits: AMC number of dev commits
- * @link_ver_major: GCQ major version number
- * @link_ver_minor: GCQ minor version number
+ * @link_ver_major: sGCQ major version number
+ * @link_ver_minor: sGCQ minor version number
  */
 struct amc_proxy_identify_response {
 	uint8_t ver_major;

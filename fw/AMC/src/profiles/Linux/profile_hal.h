@@ -88,7 +88,7 @@ extern const uint64_t HAL_RPU_SHARED_MEMORY_BASE_ADDR;
 #define HAL_FLUSH_CACHE_DATA( addr, size ) ( ( void ) ( 0 ) )
 
 /* FAL */
-/* GCQ */
+/* sGCQ */
 #ifndef HAL_IO_WRITE32
 #define HAL_IO_WRITE32( val, addr ) ( ( void ) ( val ), ( void ) ( addr ) )
 #endif

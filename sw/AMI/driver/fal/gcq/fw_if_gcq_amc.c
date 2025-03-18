@@ -2,7 +2,7 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the FW IF GCQ abstraction for AMC.
+ * This file contains the FW IF sGCQ abstraction for AMC.
  *
  * @file fw_if_gcq_amc.c
  */
@@ -86,7 +86,7 @@
 /**
  * @struct  FW_IF_GCQ_STATE
  *
- * @brief   The internal GCQ IF state
+ * @brief   The internal sGCQ IF state
  */
 typedef enum FW_IF_GCQ_STATE
 {
@@ -648,18 +648,18 @@ static uint32_t prvGCQIOCtrl( void *pvFWIf, uint32_t ulOption, void *pvValue )
             case FW_IF_GCQ_IOCTRL_SET_OPAQUE_HANDLE:
                 /* Set the opaque handle used by calling API to store a reference. */
                 pxProfile->ulIOHandle = *( uint32_t* )pvValue;
-                PLL_DBG( FW_IF_GCQ_NAME, "GCQ IOCTL - set opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
+                PLL_DBG( FW_IF_GCQ_NAME, "sGCQ IOCTL - set opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
                 break;
 
             case FW_IF_GCQ_IOCTRL_GET_OPAQUE_HANDLE:
                 /* Get the opaque handle used by calling API to retreive a reference. */
-                PLL_DBG( FW_IF_GCQ_NAME, "GCQ IOCTL - get opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
+                PLL_DBG( FW_IF_GCQ_NAME, "sGCQ IOCTL - get opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
                 *( uint32_t* )pvValue = pxProfile->ulIOHandle;
                 break;
 
             default:
                 xRet = FW_IF_ERRORS_UNRECOGNISED_OPTION;
-                PLL_ERR( FW_IF_GCQ_NAME, "Error:  GCQ IOCTL unrecognised option\r\n" );
+                PLL_ERR( FW_IF_GCQ_NAME, "Error:  sGCQ IOCTL unrecognised option\r\n" );
                 break;
         }
     }
@@ -726,7 +726,7 @@ static uint32_t prvGCQBindCallback( void *pvFWIf, FW_IF_callback *pxNewFunc )
 /*****************************************************************************/
 
 /**
- * @brief   initialisation function for GCQ interfaces (generic across all GCQ interfaces)
+ * @brief   initialisation function for sGCQ interfaces (generic across all sGCQ interfaces)
  */
 uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
 {
@@ -761,7 +761,7 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
             /*
             * Bind in register and memory R/W function pointers
             * and assign to the local profile to be used by all
-            * GCQ instances
+            * sGCQ instances
             */
             pxThis->xGcqIoAccess.xGCQReadMem32 = prvulReadMemReg32;
             pxThis->xGcqIoAccess.xGCQWriteMem32 = prvvWriteMemReg32;
@@ -779,7 +779,7 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
 }
 
 /**
- * @brief   opens an instance of the GCQ interface
+ * @brief   opens an instance of the sGCQ interface
  */
 uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *pxFWIf, FW_IF_GCQ_CFG *pxGCQCfg )
 {
@@ -866,13 +866,13 @@ int iFW_IF_GCQ_PrintStatistics( void )
     {
         int i = 0;
         PLL_INF( FW_IF_GCQ_NAME, "============================================================\r\n" );
-        PLL_INF( FW_IF_GCQ_NAME, "FW IF GCQ Statistics:\n\r" );
+        PLL_INF( FW_IF_GCQ_NAME, "FW IF sGCQ Statistics:\n\r" );
         for( i = 0; i < FW_IF_GCQ_STATS_MAX; i++ )
         {
             PRINT_STAT_COUNTER( i );
         }
         PLL_INF( FW_IF_GCQ_NAME, "------------------------------------------------------------\r\n" );
-        PLL_INF( FW_IF_GCQ_NAME, "FW IF GCQ Errors:\n\r" );
+        PLL_INF( FW_IF_GCQ_NAME, "FW IF sGCQ Errors:\n\r" );
         for( i = 0; i < FW_IF_GCQ_ERRORS_MAX; i++ )
         {
             PRINT_ERROR_COUNTER( i );

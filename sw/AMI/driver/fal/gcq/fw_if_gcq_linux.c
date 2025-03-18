@@ -2,7 +2,7 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the FW IF GCQ abstraction.
+ * This file contains the FW IF sGCQ abstraction.
  *
  * @file fw_if_gcq_linux.c
  */
@@ -29,25 +29,25 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define FW_IF_GCQ_NAME                  "FW_IF_GCQ"
+#define FW_IF_GCQ_NAME              "FW_IF_GCQ"
 
-#define GCQ_UPPER_FIREWALL              ( 0xBEEFCAFE )
-#define GCQ_LOWER_FIREWALL              ( 0xDEADFACE )
+#define GCQ_UPPER_FIREWALL          ( 0xBEEFCAFE )
+#define GCQ_LOWER_FIREWALL          ( 0xDEADFACE )
 
-#define CHECK_DRIVER                    ( FW_IF_FALSE == iInitialised )
-#define CHECK_FIREWALLS( f )            ( ( f->upperFirewall != GCQ_UPPER_FIREWALL ) &&\
-                                          ( f->lowerFirewall != GCQ_LOWER_FIREWALL ) )
-#define CHECK_NULL( f )                 ( NULL == f )
-#define CHECK_NOT_NULL( f )             ( NULL != f )
-#define CHECK_CFG( f )                  ( NULL == ( f )->cfg )
+#define CHECK_DRIVER                ( FW_IF_FALSE == iInitialised )
+#define CHECK_FIREWALLS( f )        ( ( f->upperFirewall != GCQ_UPPER_FIREWALL ) &&\
+                                      ( f->lowerFirewall != GCQ_LOWER_FIREWALL ) )
+#define CHECK_NULL( f )             ( NULL == f )
+#define CHECK_NOT_NULL( f )         ( NULL != f )
+#define CHECK_CFG( f )              ( NULL == ( f )->cfg )
 
-#define CHECK_PROFILE( f )              ( NULL == ( f )->pvProfile )
+#define CHECK_PROFILE( f )          ( NULL == ( f )->pvProfile )
 
-#define CHECK_INVALID_STATE( f )        ( ( FW_IF_GCQ_STATE_OPENED != ( f )->xState ) &&\
-                                          ( FW_IF_GCQ_STATE_ATTACHED != ( f )->xState ) )
+#define CHECK_INVALID_STATE( f )    ( ( FW_IF_GCQ_STATE_OPENED != ( f )->xState ) &&\
+                                      ( FW_IF_GCQ_STATE_ATTACHED != ( f )->xState ) )
 
-#define GCQ_ATTACH_MAX_ATTEMPTS         ( 30 )  /* Roughly 30 seconds */
-#define GCQ_ATTACH_RETRY_TIMEOUT_MS     ( 1000 )
+#define GCQ_ATTACH_MAX_ATTEMPTS     ( 30 )  /* Roughly 30 seconds */
+#define GCQ_ATTACH_RETRY_TIMEOUT_MS ( 1000 )
 
 /* TODO: Replace the OSAL #define's with an appropriate OSAL implementation */
 #ifdef __KERNEL__
@@ -63,7 +63,7 @@
 
 /**
  * @struct  FW_IF_GCQ_STATE
- * @brief   The internal GCQ IF state
+ * @brief   The internal sGCQ IF state
  */
 typedef enum FW_IF_GCQ_STATE
 {
@@ -105,7 +105,8 @@ static GCQ_IO_ACCESS_TYPE xGCQIOAccess = { 0 };
 
 static int iInitialised = FW_IF_FALSE;
 
-static FW_IF_GCQ_PROFILE_TYPE xGCQProfile[ GCQ_MAX_INSTANCES ] = { { 0 } };     /**< Uses the same compile time value as the GCQ driver  */
+/**< Uses the same compile time value as the sGCQ driver  */
+static FW_IF_GCQ_PROFILE_TYPE xGCQProfile[ GCQ_MAX_INSTANCES ] = { { 0 } };
 
 static uint32_t ulProfilesAllocated = 0;
 
@@ -178,7 +179,6 @@ static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
             gcq_assert( 0 );
             break;
     }
-
     return xMappedErr;
 }
 
@@ -203,7 +203,6 @@ static GCQ_INTERRUPT_MODE_TYPE prvxMapInterruptMode( FW_IF_GCQ_INTERRUPT_MODE_TY
             gcq_assert( 0 );
             break;
     }
-
     return xMappedMode;
 }
 
@@ -227,14 +226,13 @@ static GCQ_MODE_TYPE prvxMapMode( FW_IF_GCQ_MODE_TYPE xMode )
             gcq_assert( 0 );
             break;
     }
-
     return xMappedMode;
 }
 
 /**
- * @brief   Attempt to find an unused GCQ profile
+ * @brief   Attempt to find an unused sGCQ profile
  *
- * @param   ppxGCQProfile is a variable to store the free GCQ profile
+ * @param   ppxGCQProfile is a variable to store the free sGCQ profile
  *
  * @return  FW_IF_ERRORS_NONE if profile found, error otherwise
  */
@@ -242,8 +240,8 @@ static uint32_t prvFindNextFreeProfile( FW_IF_GCQ_PROFILE_TYPE **ppxGCQProfile )
 {
     FW_IF_GCQ_ERRORS_TYPE xRet = FW_IF_GCQ_ERRORS_NO_FREE_PROFILES;
 
-    if( CHECK_NULL( ppxGCQProfile ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_NOT_NULL( *ppxGCQProfile ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
+    if( CHECK_NULL( ppxGCQProfile ) )                     { return FW_IF_ERRORS_INVALID_HANDLE; }
+    if( CHECK_NOT_NULL( *ppxGCQProfile ) )                { return FW_IF_ERRORS_INVALID_HANDLE; }
     if( ulProfilesAllocated > ( GCQ_MAX_INSTANCES - 1 ) ) { return FW_IF_GCQ_ERRORS_NO_FREE_PROFILES; }
 
     {
@@ -258,7 +256,6 @@ static uint32_t prvFindNextFreeProfile( FW_IF_GCQ_PROFILE_TYPE **ppxGCQProfile )
             }
         }
     }
-
     return xRet;
 }
 
@@ -327,7 +324,7 @@ static uint32_t prvGCQOpen( void *pvFWIf )
                     /*
                      * Sometimes (very rarely) the consumer is not yet ready when we reach this point.
                      * This can happen if a hot reset was performed and not enough time was given
-                     * on the host before attempting to perform GCQ setup. To mitigate this
+                     * on the host before attempting to perform sGCQ setup. To mitigate this
                      * we need a retry mechanism here.
                      */
                     int iAttempts = 0;
@@ -341,7 +338,6 @@ static uint32_t prvGCQOpen( void *pvFWIf )
                         {
                             break;
                         }
-
                         iOSAL_Task_SleepMs( GCQ_ATTACH_RETRY_TIMEOUT_MS );
                     }
 
@@ -360,7 +356,6 @@ static uint32_t prvGCQOpen( void *pvFWIf )
         {
             xRet = FW_IF_GCQ_ERRORS_NOT_SUPPORTED;
         }
-
         return xRet;
     }
 }
@@ -398,7 +393,6 @@ static uint32_t prvGCQClose( void *pvFWIf )
         {
             xRet = prvxMapIFDriverReturnCode( xStatus );
         }
-
         return xRet;
     }
 }
@@ -408,7 +402,6 @@ static uint32_t prvGCQClose( void *pvFWIf )
  */
 static uint32_t prvGCQWrite( void *pvFWIf, uint64_t ullDstPort, uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs )
 {
-
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFWIf;
     if( CHECK_NULL( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
     if( CHECK_CFG( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
@@ -432,7 +425,6 @@ static uint32_t prvGCQWrite( void *pvFWIf, uint64_t ullDstPort, uint8_t *pucData
 
         /* Map error return code */
         xRet = prvxMapIFDriverReturnCode( xStatus );
-
         return xRet;
     }
 }
@@ -465,7 +457,6 @@ static uint32_t prvGCQRead( void *pvFWIf, uint64_t ullSrcPort, uint8_t *pucData,
         xStatus = xGCQConsumeData( pxProfile->pxGCQInstance, pucData, *pulSize );
 
         xRet = prvxMapIFDriverReturnCode( xStatus );
-
         return xRet;
     }
 }
@@ -519,27 +510,25 @@ static uint32_t prvGCQIOCtrl( void *pvFWIf, uint32_t ulOption, void *pvValue )
                 * Set the opaque handle used by calling API to store a reference.
                 */
                 pxProfile->ulIOHandle = *( uint32_t* )pvValue;
-                PLL_DBG( FW_IF_GCQ_NAME, "GCQ IOCTL - set opaque handle 0x%x\r\n", pxProfile->ulIOHandle );
+                PLL_DBG( FW_IF_GCQ_NAME, "sGCQ IOCTL - set opaque handle 0x%x\r\n", pxProfile->ulIOHandle );
                 break;
 
             case FW_IF_GCQ_IOCTRL_GET_OPAQUE_HANDLE:
                 /*
                 *Get the opaque handle used by calling API to retreive a reference.
                 */
-                PLL_DBG( FW_IF_GCQ_NAME, "GCQ IOCTL - get opaque handle 0x%x\r\n", pxProfile->ulIOHandle );
+                PLL_DBG( FW_IF_GCQ_NAME, "sGCQ IOCTL - get opaque handle 0x%x\r\n", pxProfile->ulIOHandle );
                 *( uint32_t* )pvValue = pxProfile->ulIOHandle;
                 break;
 
             default:
                 xRet = FW_IF_ERRORS_UNRECOGNISED_OPTION;
-                PLL_DBG( FW_IF_GCQ_NAME, "Error:  GCQ IOCTL unrecognised option\r\n" );
+                PLL_DBG( FW_IF_GCQ_NAME, "Error:  sGCQ IOCTL unrecognised option\r\n" );
                 break;
         }
-
         return xRet;
     }
 }
-
 
 /**
  * @brief   Local implementation of FW_IF_bindCallback
@@ -560,7 +549,6 @@ static uint32_t prvGCQBindCallback( void *pvFWIf, FW_IF_callback *pxNewFunc )
      */
     pxThisIf->raiseEvent = pxNewFunc;
     PLL_DBG( FW_IF_GCQ_NAME, "FW_IF_bindCallback called\r\n" );
-
     return xRet;
 }
 
@@ -569,7 +557,7 @@ static uint32_t prvGCQBindCallback( void *pvFWIf, FW_IF_callback *pxNewFunc )
 /*****************************************************************************/
 
 /**
- * @brief   initialisation function for GCQ interfaces (generic across all GCQ interfaces)
+ * @brief   initialisation function for sGCQ interfaces (generic across all sGCQ interfaces)
  */
 uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
 {
@@ -586,7 +574,7 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
         /*
          * Bind in register and memory R/W function pointers
          * and assign to the local profile to be used by all
-         * GCQ instances
+         * sGCQ instances
          */
         xGCQIOAccess.xGCQReadMem32 = prvulReadMemReg32;
         xGCQIOAccess.xGCQWriteMem32 = prvvWriteMemReg32;
@@ -597,18 +585,17 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
 
         PLL_DBG( FW_IF_GCQ_NAME, "FW_IF_GCQ_init\r\n" );
     }
-
     return xRet;
 }
 
 /**
- * @brief   opens an instance of the GCQ interface
+ * @brief   opens an instance of the sGCQ interface
  */
 uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *xFWIf, FW_IF_GCQ_CFG *xGCQCfg )
 {
     FW_IF_GCQ_ERRORS_TYPE xRet = FW_IF_ERRORS_NONE;
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
-    if( CHECK_NULL( xFWIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
+    if( CHECK_DRIVER )          { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+    if( CHECK_NULL( xFWIf ) )   { return FW_IF_ERRORS_INVALID_CFG; }
     if( CHECK_NULL( xGCQCfg ) ) { return FW_IF_ERRORS_INVALID_CFG; }
 
     /* Validate the configuration provided */
@@ -635,7 +622,6 @@ uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *xFWIf, FW_IF_GCQ_CFG *xGCQCfg )
     {
         xRet = FW_IF_ERRORS_INVALID_CFG;
     }
-
     return xRet;
 }
 
@@ -647,7 +633,6 @@ int iFW_IF_GCQ_PrintStatistics( void )
     FW_IF_GCQ_ERRORS_TYPE xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
 
     /* TODO implement print stats */
-
     return xRet;
 }
 
@@ -659,6 +644,5 @@ int iFW_IF_GCQ_ClearStatistics( void )
     FW_IF_GCQ_ERRORS_TYPE xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
 
     /* TODO implement clear stats */
-
     return xRet;
 }

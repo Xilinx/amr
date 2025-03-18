@@ -145,22 +145,22 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
 
     if( NULL != pullAmcInitStatus )
     {
-        /* Init the GCQ FAL */
-        PLL_LOG( FAL_PROFILE_NAME, "GCQ service: starting\r\n" );
+        /* Init the sGCQ FAL */
+        PLL_LOG( FAL_PROFILE_NAME, "sGCQ service: starting\r\n" );
         if( FW_IF_ERRORS_NONE == ulFW_IF_GCQ_Init( &myGcqIf ) )
         {
-            PLL_DBG( FAL_PROFILE_NAME, "GCQ FAL initialised OK\r\n" );
-            PLL_LOG( FAL_PROFILE_NAME, "GCQ service: ready\r\n" );
+            PLL_DBG( FAL_PROFILE_NAME, "sGCQ FAL initialised OK\r\n" );
+            PLL_LOG( FAL_PROFILE_NAME, "sGCQ service: ready\r\n" );
             *pullAmcInitStatus |= AMC_CFG_GCQ_FAL_INITIALISED;
         }
         else
         {
-            PLL_ERR( FAL_PROFILE_NAME, "Error initialising GCQ FAL\r\n" );
-            PLL_LOG( FAL_PROFILE_NAME, "GCQ service: error initialising\r\n" );
+            PLL_ERR( FAL_PROFILE_NAME, "Error initialising sGCQ FAL\r\n" );
+            PLL_LOG( FAL_PROFILE_NAME, "sGCQ service: error initialising\r\n" );
             iStatus = ERROR;
         }
 
-        /* Init the OPSI FAL */
+        /* Init the OSPI FAL */
         PLL_LOG( FAL_PROFILE_NAME, "OSPI driver: starting\r\n" );
         if( FW_IF_ERRORS_NONE == ulFW_IF_OSPI_Init( &myOspiIf ) )
         {
@@ -175,17 +175,17 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
             iStatus = ERROR;
         }
 
-        /* Create instance of the GCQ based on the global configuration */
+        /* Create instance of the sGCQ based on the global configuration */
         if( AMC_CFG_GCQ_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED ) )
         {
             if( FW_IF_ERRORS_NONE == ulFW_IF_GCQ_Create( &xGcqIf, &xGcqCfg ) )
             {
-                PLL_DBG( FAL_PROFILE_NAME, "GCQ created OK\r\n" );
+                PLL_DBG( FAL_PROFILE_NAME, "sGCQ created OK\r\n" );
                 *pullAmcInitStatus |= AMC_CFG_GCQ_FAL_CREATED;
             }
             else
             {
-                PLL_ERR( FAL_PROFILE_NAME, "Error creating GCQ\r\n" );
+                PLL_ERR( FAL_PROFILE_NAME, "Error creating sGCQ\r\n" );
                 iStatus = ERROR;
             }
         }

@@ -46,6 +46,9 @@
  */
 static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1, uint8_t unused2, uint8_t unused3, float *pfValue )
 {
+    (void)unused1;
+    (void)unused2;
+    (void)unused3;
     return iSYS_MON_ReadTemperature( pfValue );
 }
 
@@ -65,6 +68,10 @@ static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1, uint8_t unus
 static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2, uint8_t ucChannelNum, float *pfValue )
 {
     int iStatus = ERROR;
+    (void)unused1;
+    (void)unused2;
+    (void)ucChannelNum;
+    (void)pfValue;
 
     return iStatus;
 }
@@ -83,6 +90,8 @@ static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2, 
  */
 static inline int iSYS_MON_WrappedReadVoltage( uint8_t unused1, uint8_t unused2, uint8_t ucVType, float *pfValue )
 {
+    (void)unused1;
+    (void)unused2;
     return iSYS_MON_ReadVoltage( ucVType, pfValue );
 }
 

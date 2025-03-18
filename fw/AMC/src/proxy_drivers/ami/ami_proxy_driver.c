@@ -624,7 +624,6 @@ int iAMI_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxFwIf, uint32_t ulFwIfPort,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -651,7 +650,6 @@ int iAMI_BindCallback( EVL_CALLBACK *pxCallback )
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -690,7 +688,6 @@ int iAMI_SetPdiDownloadCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT 
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -726,7 +723,6 @@ int iAMI_SetPdiCopyCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xRes
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -762,7 +758,6 @@ int iAMI_SetSensorCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResu
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -802,7 +797,6 @@ int iAMI_SetIdentityResponse( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -838,7 +832,6 @@ int iAMI_SetBootSelectCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT x
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -874,7 +867,6 @@ int iAMI_SetEepromReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RES
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -910,7 +902,6 @@ int iAMI_SetModuleReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RES
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -946,7 +937,6 @@ int iAMI_SetDebugVerbosityResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResu
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1022,7 +1012,6 @@ int iAMI_GetPdiDownloadRequest( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1092,7 +1081,6 @@ int iAMI_GetPdiCopyRequest( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1160,7 +1148,6 @@ int iAMI_GetSensorRequest( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1220,7 +1207,6 @@ int iAMI_GetBootSelectRequest( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1287,7 +1273,6 @@ int iAMI_GetEepromReadWriteRequest( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1358,7 +1343,6 @@ int iAMI_GetModuleReadWriteRequest( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1417,7 +1401,6 @@ int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1451,7 +1434,6 @@ int iAMI_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1474,7 +1456,6 @@ int iAMI_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1516,7 +1497,6 @@ int iAMI_GetState( MODULE_STATE *pxState )
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1535,7 +1515,7 @@ static void vProxyDriverTask( void *pvArgs )
     AMI_CMD_REQUEST xCmdRequest = { { { { 0 } } } };
     uint32_t ulStartMs = 0;
 
-    FOREVER
+    for( ;; )
     {
         ulStartMs = ulOSAL_GetUptimeMs();
         uint32_t ulCmdRequestSize = sizeof(AMI_CMD_REQUEST);
@@ -1552,7 +1532,6 @@ static void vProxyDriverTask( void *pvArgs )
             switch( xCmdRequest.xHdr.ulOpCode )
             {
                 case AMI_CMD_OPCODE_PDI_DOWNLOAD_REQ:
-                {
                     if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
                                                               OSAL_TIMEOUT_WAIT_FOREVER ) )
                     {
@@ -1614,9 +1593,8 @@ static void vProxyDriverTask( void *pvArgs )
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_PDI_COPY_REQ:
-                {
                     if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
                                                               OSAL_TIMEOUT_WAIT_FOREVER ) )
                     {
@@ -1674,9 +1652,8 @@ static void vProxyDriverTask( void *pvArgs )
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_SENSOR_REQ:
-                {
                     if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
                                                               OSAL_TIMEOUT_WAIT_FOREVER ) )
                     {
@@ -1730,9 +1707,8 @@ static void vProxyDriverTask( void *pvArgs )
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_IDENTIFY_REQ:
-                {
                     if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
                                                               OSAL_TIMEOUT_WAIT_FOREVER ) )
                     {
@@ -1778,9 +1754,8 @@ static void vProxyDriverTask( void *pvArgs )
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_BOOT_SEL_REQ:
-                {
                     if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
                                                               OSAL_TIMEOUT_WAIT_FOREVER ) )
                     {
@@ -1828,43 +1803,39 @@ static void vProxyDriverTask( void *pvArgs )
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_HEARTBEAT_REQ:
-                {
                     iStatus = iHandleHeartbeatRequest( &xCmdRequest );
                     if( ERROR == iStatus )
                     {
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_GET_HEARTBEAT_REQUEST )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_EEPROM_RW_REQ:
-                {
                     iStatus = iHandleEepromRequest( &xCmdRequest );
                     if( ERROR == iStatus )
                     {
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_GET_EEPROM_RW_REQUEST )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_MODULE_RW_REQ:
-                {
                     iStatus = iHandleModuleRequest( &xCmdRequest );
                     if( ERROR == iStatus )
                     {
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_GET_MODULE_RW_REQUEST )
                     }
                     break;
-                }
+
                 case AMI_CMD_OPCODE_DEBUG_VERBOSITY_REQ:
-                {
                     iStatus = iHandleDebugVerbosityRequest( &xCmdRequest );
                     if( ERROR == iStatus )
                     {
                         INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_GET_DEBUG_VERBOSITY_REQUEST )
                     }
                     break;
-                }
+
                 default:
                     PLL_ERR( AMI_NAME, "Error unsupported opcode received 0x%x\r\n", xCmdRequest.xHdr.ulOpCode );
                     INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_UNSUPPORTED_OPCODE_RX )
@@ -1885,7 +1856,6 @@ static void vProxyDriverTask( void *pvArgs )
             switch( xMBoxData.eMsgType )
             {
                 case AMI_MSG_TYPE_IDENTITY_COMPLETE:
-                {
                     INC_STAT_COUNTER( AMI_PROXY_STATS_IDENTITY_MBOX_PEND )
                     xCmdResponse.ulPayload[ 0 ]  = APC_LOAD_VER_MAJOR( xMBoxData.xIdentity.ucVerMajor );
                     xCmdResponse.ulPayload[ 0 ] |= APC_LOAD_VER_MINOR( xMBoxData.xIdentity.ucVerMinor );
@@ -1895,33 +1865,40 @@ static void vProxyDriverTask( void *pvArgs )
                     xCmdResponse.ulPayload[ 1 ] |= APC_LOAD_LINK_VER_MAJOR( xMBoxData.xIdentity.ucLinkVerMajor );
                     xCmdResponse.ulPayload[ 1 ] |= APC_LOAD_LINK_VER_MINOR( xMBoxData.xIdentity.ucLinkVerMinor );
                     break;
-                }
+
                 case AMI_MSG_TYPE_SENSOR_COMPLETE:
                     /* No payload associated with response */
                     INC_STAT_COUNTER( AMI_PROXY_STATS_SENSOR_MBOX_PEND )
                     break;
+
                 case AMI_MSG_TYPE_PDI_DOWNLOAD_COMPLETE:
                     /* No payload associated with response */
                     INC_STAT_COUNTER( AMI_PROXY_STATS_PDI_DOWNLOAD_MBOX_PEND )
                     break;
+
                 case AMI_MSG_TYPE_PDI_COPY_COMPLETE:
                     /* No payload associated with response */
                     INC_STAT_COUNTER( AMI_PROXY_STATS_PDI_COPY_MBOX_PEND )
                     break;
+
                 case AMI_MSG_TYPE_BOOT_SELECT_COMPLETE:
                     /* No payload associated with response */
                     INC_STAT_COUNTER( AMI_PROXY_STATS_BOOT_SELECT_MBOX_PEND )
                     break;
+
                 case AMI_MSG_TYPE_HEARTBEAT_COMPLETE:
                     INC_STAT_COUNTER( AMI_PROXY_STATS_HEARTBEAT_MBOX_PEND )
                     xCmdResponse.ulPayload[ 0 ] = xMBoxData.xHeartbeat.ucHeartbeatCount;
                     break;
+
                 case AMI_MSG_TYPE_EEPROM_RW_COMPLETE:
                     INC_STAT_COUNTER( AMI_PROXY_STATS_EEPROM_RW_MBOX_PEND )
                     break;
+
                 case AMI_MSG_TYPE_MODULE_RW_COMPLETE:
                     INC_STAT_COUNTER( AMI_PROXY_STATS_MODULE_RW_MBOX_PEND )
                     break;
+
                 case AMI_MSG_TYPE_DEBUG_VERBOSITY_COMPLETE:
                     INC_STAT_COUNTER( AMI_PROXY_STATS_DEBUG_VERBOSITY_MBOX_PEND )
                     break;
@@ -2002,7 +1979,6 @@ static int iFindNextFreeRxDataIndex( uint8_t *pucIndex )
     {
         INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -2088,7 +2064,6 @@ static int iHandleHeartbeatRequest( AMI_CMD_REQUEST *pxCmdRequest )
             }
         }
     }
-
     return iStatus;
 }
 
@@ -2158,7 +2133,6 @@ static int iHandleEepromRequest( AMI_CMD_REQUEST *pxCmdRequest )
             INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
         }
     }
-
     return iStatus;
 }
 
@@ -2232,7 +2206,6 @@ static int iHandleModuleRequest( AMI_CMD_REQUEST *pxCmdRequest )
             INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
         }
     }
-
     return iStatus;
 }
 
@@ -2294,6 +2267,5 @@ static int iHandleDebugVerbosityRequest( AMI_CMD_REQUEST *pxCmdRequest )
             INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
         }
     }
-
     return iStatus;
 }

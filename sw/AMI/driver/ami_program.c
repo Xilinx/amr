@@ -81,7 +81,7 @@ static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *bu
 			((num_chunks > 1) && (chunk != BOOT_TAG_CHUNK))) {
 			/*
 			* This will copy the bitstream buffer into shared memory and submit
-			* the GCQ command. Using `flags` to pass in partition and chunk numbers.
+			* the sGCQ command. Using `flags` to pass in partition and chunk numbers.
 			*/
 			ret = submit_gcq_command(amc_ctrl_ctxt, GCQ_SUBMIT_CMD_DOWNLOAD_PDI,
 				MK_PDI_FLAGS(boot_device, part, chunk, (!rewrite_boot_tag && (chunk == (num_chunks - 1)))),

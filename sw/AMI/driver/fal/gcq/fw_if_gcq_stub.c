@@ -2,7 +2,7 @@
  * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the FW IF GCQ Stub abstraction.
+ * This file contains the FW IF sGCQ Stub abstraction.
  *
  * @file fw_if_gcq_stub.c
  */
@@ -21,7 +21,7 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define FW_IF_GCQ_NAME                  "FW IF GCQ Stub"
+#define FW_IF_GCQ_NAME                  "FW IF sGCQ Stub"
 
 #define GCQ_UPPER_FIREWALL              ( 0xBEEFCAFE )
 #define GCQ_LOWER_FIREWALL              ( 0xDEADFACE )
@@ -85,11 +85,11 @@ static uint32_t prvGCQOpen( void *pvFWIf )
     if( CHECK_PROFILE( pxCfg ) ) { return FW_IF_GCQ_ERRORS_INVALID_PROFILE; }
 
     /*
-     * This is where the instance of the GCQ device would be opened based on
+     * This is where the instance of the sGCQ device would be opened based on
      * IP HW base address provided. Interanlly the driver will set up the ring
      * buffers based on shared memory address and slot sizes.
      */
-    PLL_DBG( FW_IF_GCQ_NAME, "GCQ FW_IF_open\r\n" );
+    PLL_DBG( FW_IF_GCQ_NAME, "sGCQ FW_IF_open\r\n" );
 
     return xRet;
 
@@ -114,7 +114,7 @@ static uint32_t prvGCQClose( void *pvFWIf )
     /*
      * Free up any allocated resources.
      */
-    PLL_DBG( FW_IF_GCQ_NAME, "GCQ FW_IF_close\r\n" );
+    PLL_DBG( FW_IF_GCQ_NAME, "sGCQ FW_IF_close\r\n" );
 
     return xRet;
 }
@@ -139,9 +139,9 @@ static uint32_t prvGCQWrite( void *pvFWIf, uint64_t ullDstPort, uint8_t *pucData
     {
         /*
          * This is where data will be written to the relevant queue
-         * depending on mode set when opening GCQ instance.
+         * depending on mode set when opening sGCQ instance.
          */
-        PLL_DBG( FW_IF_GCQ_NAME, "GCQ FW_IF_write\r\n" );
+        PLL_DBG( FW_IF_GCQ_NAME, "sGCQ FW_IF_write\r\n" );
     }
     else
     {
@@ -171,9 +171,9 @@ static uint32_t prvGCQRead( void *pvFWIf, uint64_t ullSrcPort, uint8_t *pucData,
     {
         /*
          * This is where data will be read back from the relevant queue
-         * depending on mode set when opening GCQ instance.
+         * depending on mode set when opening sGCQ instance.
          */
-        PLL_DBG( FW_IF_GCQ_NAME, "GCQ FW_IF_read\r\n" );
+        PLL_DBG( FW_IF_GCQ_NAME, "sGCQ FW_IF_read\r\n" );
     }
     else
     {
@@ -226,13 +226,13 @@ static uint32_t prvGCQIOCtrl( void *pvFWIf, uint32_t ulOption, void *pvValue )
 
         default:
             xRet = FW_IF_ERRORS_UNRECOGNISED_OPTION;
-            PLL_DBG( FW_IF_GCQ_NAME, "GCQ IOCTL - Unrecognised option\r\n" );
+            PLL_DBG( FW_IF_GCQ_NAME, "sGCQ IOCTL - Unrecognised option\r\n" );
             break;
     }
 
     if( FW_IF_ERRORS_NONE == xRet )
     {
-        PLL_DBG( FW_IF_GCQ_NAME, "GCQ FW_IF_ioctl\r\n" );
+        PLL_DBG( FW_IF_GCQ_NAME, "sGCQ FW_IF_ioctl\r\n" );
     }
 
     return xRet;
@@ -261,7 +261,7 @@ static uint32_t prvGCQBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
          * Callback will be invoked when by the driver when event occurs.
          */
         pxThisIf->raiseEvent = pxNewFunc;
-        PLL_DBG( FW_IF_GCQ_NAME, "GCQ FW_IF_bindCallback called\r\n" );
+        PLL_DBG( FW_IF_GCQ_NAME, "sGCQ FW_IF_bindCallback called\r\n" );
     }
     else
     {
@@ -277,7 +277,7 @@ static uint32_t prvGCQBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 /*****************************************************************************/
 
 /**
- * @brief   initialisation function for GCQ interfaces (generic across all GCQ interfaces)
+ * @brief   initialisation function for sGCQ interfaces (generic across all sGCQ interfaces)
  */
 uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxInitCfg )
 {
@@ -290,7 +290,7 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxInitCfg )
     else if ( NULL != pxInitCfg )
     {
         /*
-         * Initilise config data shared between all instances of GCQ.
+         * Initilise config data shared between all instances of sGCQ.
          */
         pvOSAL_MemCpy( &xLocalCfg, pxInitCfg, sizeof( FW_IF_GCQ_INIT_CFG ) );
         iInitialised = FW_IF_TRUE;
@@ -304,7 +304,7 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxInitCfg )
 }
 
 /**
- * @brief   opens an instance of the GCQ interface
+ * @brief   opens an instance of the sGCQ interface
  */
 uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *pxFwIf, FW_IF_GCQ_CFG *pxGCQCfg )
 {

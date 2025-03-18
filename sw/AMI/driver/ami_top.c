@@ -124,7 +124,7 @@ static void amc_event_cb(enum amc_event_id id, void *data)
 		struct pci_dev *dev = NULL;
 		struct pf_dev_struct *pf_dev = NULL;
 
-		PR_ERR("AMC Heartbeat fatal event received, stopping GCQ...");
+		PR_ERR("AMC Heartbeat fatal event received, stopping sGCQ...");
 
 		if (!data) {
 			PR_ERR("AMC Heartbeat callback received invalid data!");
@@ -874,7 +874,7 @@ int __init vmc_entry(void)
 {
 	int ret = 0;
 
-	/* Init FAL for GCQ */
+	/* Init FAL for sGCQ */
 	ret = ulFW_IF_GCQ_Init(&fw_if_gcq_init_cfg);
 	if (ret != FW_IF_ERRORS_NONE)
 		goto fail;

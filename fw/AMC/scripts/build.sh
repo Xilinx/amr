@@ -274,7 +274,7 @@ echo "*** CMake took $((SECONDS - $SECTION_START)) S ***" |& tee -a $BUILD_LOG
 #Running Make
 echo "=== Compiling $OUTPUT_BIN ===" |& tee -a $BUILD_LOG
 SECTION_START=$SECONDS
-make |& tee -a $BUILD_LOG
+make -j8 |& tee -a $BUILD_LOG
 echo "*** Compiling took $((SECONDS - $SECTION_START)) S ***" |& tee -a $BUILD_LOG
 
 if  [ "$STATIC_ANALYSIS_DEBUG" == 1 ]; then

@@ -16,9 +16,7 @@
 #include "util.h"
 #include "amc_cfg.h"
 #include "amc_version.h"
-#ifdef SDT
 #include "xloader_bsp_config.h"
-#endif
 #include "xil_util.h"
 #include "xil_cache.h"
 #include "xloader_defs.h"
@@ -417,7 +415,7 @@ static void vTaskFuncMain( void )
              "ucOutOfBandInitialised          %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OUT_OF_BAND_INITIALISED      ? "TRUE" : "FALSE" ) );
 
-    FOREVER
+    for( ;; )
     {
         iOSAL_Task_SleepMs( AMC_TASK_SLEEP_MS );
     }
@@ -584,7 +582,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             };
             if( OK != iGCQGetVersion( &xGcqVersion ) )
             {
-                PLL_DBG( AMC_NAME, "Error getting GCQ version\r\n" );
+                PLL_DBG( AMC_NAME, "Error getting sGCQ version\r\n" );
                 xResult = AMI_PROXY_RESULT_FAILURE;
             }
 
@@ -1059,11 +1057,7 @@ static int iPlmGetUid(uint32_t* uuid)
     XLoader_ClientInstance LoaderClientInstance;
     XLoader_ImageInfo ImageInfo;
 
-#ifndef SDT
-    iStatus = XMailbox_Initialize(&MailboxInstance, 0U);
-#else
     iStatus = XMailbox_Initialize(&MailboxInstance, XPAR_XIPIPSU_0_BASEADDR);
-#endif
 	if (XST_SUCCESS == iStatus)
     {
         iStatus = XLoader_ClientInit(&LoaderClientInstance, &MailboxInstance);
@@ -1117,14 +1111,11 @@ static void vConfigurePartitionTable( void )
     HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR, sizeof( xPartTable ) );
 
     /* Flush stale logs */
-    if( PLL_LOG_BUF_LEN >= xPartTable.xLogMsg.ulLogMsgBufferLen )
-    {
-        pvOSAL_MemSet( ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff ),
-                       0,
-                       xPartTable.xLogMsg.ulLogMsgBufferLen );
-        HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff,
-                              xPartTable.xLogMsg.ulLogMsgBufferLen );
-    }
+    pvOSAL_MemSet( ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff ),
+                    0,
+                    xPartTable.xLogMsg.ulLogMsgBufferLen );
+    HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff,
+                            xPartTable.xLogMsg.ulLogMsgBufferLen );
 
     /*
      * AMI is waiting for the status to be set to a value of 0x1, currently we have no

@@ -26,10 +26,10 @@
 #define OSAL_TRUE                  ( 1 )
 #define OSAL_FALSE                 ( 0 )
 
-#define OSAL_TIMEOUT_NO_WAIT       ( 0  )
-#define OSAL_TIMEOUT_WAIT_FOREVER  ( -1 )
-#define OSAL_TIMEOUT_TASK_WAIT_MS  ( 5  )
-#define OSAL_OS_NAME_LEN           ( 15 )
+#define OSAL_TIMEOUT_NO_WAIT       ( 0U  )
+#define OSAL_TIMEOUT_WAIT_FOREVER  ( -1U )
+#define OSAL_TIMEOUT_TASK_WAIT_MS  ( 5U  )
+#define OSAL_OS_NAME_LEN           ( 15U )
 
 /*****************************************************************************/
 /* Enums                                                                     */

@@ -2,7 +2,7 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the user API definitions for the GCQ driver.
+ * This file contains the user API definitions for the sGCQ driver.
  *
  * @file gcq_driver.c
  */
@@ -105,7 +105,6 @@ static inline uint32_t prvulGCQAllocNumSlots( uint64_t ullRingLen,
         /* The ring length is based on the ring header plus a number of SQ/CQ slots */
         ulTotalLen = prvulGCQRingLen( ulNumSlots, ulSQSlotSize, ulCQSlotSize );
     }
-
     return ( ulNumSlots >> 1 );
 }
 
@@ -151,7 +150,6 @@ static inline uint32_t prvucGCQCanProduce( const GCQ_INSTANCE_TYPE *pxGCQInstanc
             ulStatus = ( GCQ_FALSE == prvucGCQRingIsFull( pxRing ) );
         }
     }
-
     return ulStatus;
 }
 
@@ -191,7 +189,6 @@ static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstanc
             ulStatus = ( GCQ_FALSE == prvucGCQRingIsEmpty( pxRing ) );
         }
     }
-
     return ulStatus;
 }
 
@@ -251,7 +248,6 @@ static inline GCQ_ERRORS_TYPE prvxGCQProduce( GCQ_INSTANCE_TYPE *pxGCQInstance, 
             xStatus = GCQ_ERRORS_PRODUCER_NO_FREE_SLOTS;
         }
     }
-
     return xStatus;
 }
 
@@ -292,12 +288,11 @@ static inline GCQ_ERRORS_TYPE prvxGCQConsume( GCQ_INSTANCE_TYPE *pxGCQInstance, 
             xStatus = GCQ_ERRORS_CONSUMER_NO_DATA_RECEIVED;
         }
     }
-
     return xStatus;
 }
 
 /**
- * @brief   Attempt to find an uninitialized GCQ instance
+ * @brief   Attempt to find an uninitialized sGCQ instance
  *
  * @param   ppxGCQInstance variable to store the gcq driver instance
  *
@@ -324,7 +319,6 @@ static inline GCQ_ERRORS_TYPE prviGCQFindNextFreeInstance( struct GCQ_INSTANCE_T
             }
         }
     }
-
     return xStatus;
 }
 
@@ -333,9 +327,7 @@ static inline GCQ_ERRORS_TYPE prviGCQFindNextFreeInstance( struct GCQ_INSTANCE_T
 /*****************************************************************************/
 
 /**
- *
- * @brief    Initialise the GCQ standalone driver
- *
+ * @brief    Initialise the sGCQ standalone driver
  */
 GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess,
@@ -444,7 +436,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             }
 
             /* Init SQ & CQ rings */
-            GCQ_DEBUG( "GCQ Init Ring SQ\r\n" );
+            GCQ_DEBUG( "sGCQ Init Ring SQ\r\n" );
             prvvGCQInitRing( *ppxGCQInstance,
                                 &( *ppxGCQInstance )->xGCQSq,
                                 ullSQProduced,
@@ -452,7 +444,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                                 ullRingAddr + sizeof( struct GCQ_HEADER_TYPE ),
                                 ullNumSlots,
                                 ulSQSlotSize);
-            GCQ_DEBUG( "GCQ Init Ring CQ\r\n" );
+            GCQ_DEBUG( "sGCQ Init Ring CQ\r\n" );
             prvvGCQInitRing( *ppxGCQInstance,
                                 &( *ppxGCQInstance )->xGCQCq,
                                 ullCQProduced,
@@ -477,7 +469,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             {
                 xGCQHeader.ulHdrMagic = 0;
                 xGCQHeader.ulHdrVersion = GCQ_VERSION;
-                xGCQHeader.ulHdrSlotNum = ullNumSlots;
+                xGCQHeader.ulHdrNumSlots = ullNumSlots;
                 xGCQHeader.ulHdrSQOffset = ( ( *ppxGCQInstance )->xGCQSq.ullRingSlotAddr - ullRingAddr );
                 xGCQHeader.ulHdrSQSlotSize = ulSQSlotSize;
                 xGCQHeader.ulHdrCQOffset = ( ( *ppxGCQInstance )->xGCQCq.ullRingSlotAddr - ullRingAddr );
@@ -499,14 +491,11 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             pxThis->ucInstancesAllocated++;
         }
     }
-
     return xStatus;
 }
 
 /**
- *
- * @brief    De-initialise a GCQ driver instance
- *
+ * @brief    De-initialise a sGCQ driver instance
  */
 GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
 {
@@ -527,15 +516,12 @@ GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
             pxThis->ucInstancesAllocated--;
         }
     }
-
     return xStatus;
 }
 
 /**
- *
  * @brief    Attempt to attach to the consumer, needs to be called before
  *           data can be consumed.
- *
  */
 GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
 {
@@ -584,8 +570,8 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
         /* Validate the number of slots matches */
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            uint32_t ullHdrNumSlots = xGCQHeader.ulHdrSlotNum;
-            uint32_t ullNumSlots = pxGCQInstance->xGCQSq.ulRingSlotNum;
+            uint32_t ullHdrNumSlots = xGCQHeader.ulHdrNumSlots;
+            uint32_t ullNumSlots    = pxGCQInstance->xGCQSq.ulRingNumSlots;
 
             if( ullNumSlots != ullHdrNumSlots )
             {
@@ -597,7 +583,7 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
         /* Validate the slot size matches */
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            uint32_t ulHdrSlotSize = xGCQHeader.ulHdrSQSlotSize;
+            uint32_t ulHdrSlotSize  = xGCQHeader.ulHdrSQSlotSize;
             uint32_t ulRingSlotSize = pxGCQInstance->xGCQSq.ulRingSlotSize;
             if( ulRingSlotSize != ulHdrSlotSize )
             {
@@ -615,14 +601,11 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
             pxThis->ucConsumerAttached = GCQ_TRUE;
         }
     }
-
     return xStatus;
 }
 
 /**
- *
  * @brief    Function to consume data from the ring buffer
- *
  */
 GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDataLen )
 {
@@ -693,15 +676,11 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
             }
         }
     }
-
     return xStatus;
 }
 
-
 /**
- *
  * @brief    Function to provide data and populate the ring buffer
- *
  */
 GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t * pucData, uint32_t ulDataLen )
 {
@@ -771,14 +750,11 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
             GCQ_DEBUG( "Error: Failed to add data into slot: %d\r\n", xStatus );
         }
     }
-
     return xStatus;
 }
 
 /**
- *
  * @brief    Sets this modules version information
- *
  */
 int iGCQGetVersion( GCQ_VERSION_TYPE *pxVersion )
 {
@@ -796,6 +772,5 @@ int iGCQGetVersion( GCQ_VERSION_TYPE *pxVersion )
 
         iStatus = GCQ_ERRORS_NONE;
     }
-
     return iStatus;
 }

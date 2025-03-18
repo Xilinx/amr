@@ -2,7 +2,7 @@
 /*
  * amc_proxy.c - This file contains AMC proxy layer implementation.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/
@@ -82,8 +82,8 @@ enum amc_proxy_cmd_flash {
  * @AMC_PROXY_RESULT_SUCCESS: no errors
  * @AMC_PROXY_RESULT_FAILURE: generic failure
  * @AMC_PROXY_RESULT_INVALID_VALUE: invalid value provided
- * @AMC_PROXY_RESULT_GET_REQUEST_FAILED: AMC failed to properly fetch the GCQ request
- * @AMC_PROXY_RESULT_PROCESS_REQUEST_FAILED: AMC failed to process the GCQ request
+ * @AMC_PROXY_RESULT_GET_REQUEST_FAILED: AMC failed to properly fetch the sGCQ request
+ * @AMC_PROXY_RESULT_PROCESS_REQUEST_FAILED: AMC failed to process the sGCQ request
  * @AMC_PROXY_RESULT_ALREADY_IN_PROGRESS: command already in progress
  * @AMC_PROXY_RESULT_INVALID_CONFIGURATION: generic error for invalid config (e.g., no device)
  */
@@ -122,22 +122,22 @@ enum amc_proxy_result {
  * queue entry.
  */
 struct amc_proxy_cmd_request_hdr {
-        union {
+    union {
+        struct {
+            uint32_t opcode:16; /* [15-0]   */
+            uint32_t count:15;  /* [30-16] */
+            uint32_t state:1;   /* [31] */
+            uint16_t cid;
+            union {
+                uint16_t rsvd;
                 struct {
-                        uint32_t opcode:16; /* [15-0]   */
-                        uint32_t count:15;  /* [30-16] */
-                        uint32_t state:1;   /* [31] */
-                        uint16_t cid;
-                        union {
-                                uint16_t rsvd;
-                                struct {
-                                        uint16_t cu_idx:12;
-                                        uint16_t cu_domain:4;
-                                        };
-                                };
-                        };
-                        uint32_t header[2];
+                        uint16_t cu_idx:12;
+                        uint16_t cu_domain:4;
+                    };
                 };
+            };
+            uint32_t header[2];
+    };
 };
 AP_STATIC_ASSERT(sizeof(struct amc_proxy_cmd_request_hdr) == 8,\
                 "cmd_request_hdr structure no longer is 8 bytes in size");
@@ -156,15 +156,15 @@ AP_STATIC_ASSERT(sizeof(struct amc_proxy_cmd_request_hdr) == 8,\
  * matches the cid in submission queue.
  */
 struct amc_proxy_cmd_response_hdr {
-        union {
-                struct {
-                        uint16_t cid;
-                        uint16_t cstate:14;
-                        uint16_t specific:1;
-                        uint16_t state:1;
-                };
-                uint32_t header[1];
+    union {
+        struct {
+            uint16_t cid;
+            uint16_t cstate:14;
+            uint16_t specific:1;
+            uint16_t state:1;
         };
+        uint32_t header[1];
+    };
 };
 AP_STATIC_ASSERT(sizeof(struct amc_proxy_cmd_response_hdr) == 4,\
                 "cmd_response_hdr structure no longer is 4 bytes in size");
@@ -216,15 +216,15 @@ AP_STATIC_ASSERT(sizeof(struct com_queue_entry) == AMC_PROXY_RESPONSE_SIZE,\
  * This payload is used for sensor data report.
  */
 struct amc_proxy_cmd_req_sensor_payload {
-        uint64_t address;
-        uint32_t size;
-        uint32_t offset;
-        uint32_t aid:8;
-        uint32_t sid:8;
-        uint32_t addr_type:3;
-        uint32_t sensor_id:8;
-        uint32_t resvd:5;
-        uint32_t pad;
+    uint64_t address;
+    uint32_t size;
+    uint32_t offset;
+    uint32_t aid:8;
+    uint32_t sid:8;
+    uint32_t addr_type:3;
+    uint32_t sensor_id:8;
+    uint32_t resvd:5;
+    uint32_t pad;
 };
 
 /**
@@ -253,9 +253,9 @@ struct amc_proxy_cmd_data_payload {
 	uint32_t dest_partition:4;
 	uint32_t partition_sel:4;
 	uint32_t update_fpt:1;
-        uint32_t boot_device:1;
-        uint32_t src_device:1;
-        uint32_t dest_device:1;
+    uint32_t boot_device:1;
+    uint32_t src_device:1;
+    uint32_t dest_device:1;
 	uint32_t partition_resvd:16;
 	uint16_t last_chunk:1;
 	uint16_t chunk:15;
@@ -272,11 +272,11 @@ struct amc_proxy_cmd_data_payload {
  * @resvd: reserved for future use
  */
 struct amc_proxy_cmd_eeprom_payload {
-        uint64_t address;
-        uint32_t req_type:1;
-        uint32_t len:8;
-        uint32_t offset:8;
-        uint32_t resvd:15;
+    uint64_t address;
+    uint32_t req_type:1;
+    uint32_t len:8;
+    uint32_t offset:8;
+    uint32_t resvd:15;
 };
 
 /**
@@ -291,13 +291,13 @@ struct amc_proxy_cmd_eeprom_payload {
  * @resvd: reserved for future use
  */
 struct amc_proxy_cmd_module_payload {
-        uint64_t address;
-        uint8_t  device_id;
-        uint8_t  page;
-        uint8_t  offset;
-        uint8_t  len;
-        uint32_t req_type:1;
-        uint32_t resvd:31;
+    uint64_t address;
+    uint8_t  device_id;
+    uint8_t  page;
+    uint8_t  offset;
+    uint8_t  len;
+    uint32_t req_type:1;
+    uint32_t resvd:31;
 };
 
 /**
@@ -323,12 +323,12 @@ struct amc_proxy_cmd_heartbeat_payload {
 struct amc_proxy_cmd_request {
 	struct amc_proxy_cmd_request_hdr hdr;
 	union {
-	        struct amc_proxy_cmd_req_sensor_payload sensor_payload;
-                struct amc_proxy_cmd_data_payload pdi_payload;
-                struct amc_proxy_cmd_heartbeat_payload heartbeat_payload;
-                struct amc_proxy_cmd_eeprom_payload eeprom_payload;
-                struct amc_proxy_cmd_module_payload module_payload;
-                uint8_t debug_verbosity_payload;
+        struct amc_proxy_cmd_req_sensor_payload sensor_payload;
+        struct amc_proxy_cmd_data_payload pdi_payload;
+        struct amc_proxy_cmd_heartbeat_payload heartbeat_payload;
+        struct amc_proxy_cmd_eeprom_payload eeprom_payload;
+        struct amc_proxy_cmd_module_payload module_payload;
+        uint8_t debug_verbosity_payload;
 	};
 };
 
@@ -339,8 +339,8 @@ struct amc_proxy_cmd_request {
  * @resvd1: reserved
  */
 struct amc_proxy_cmd_resp_default_payload {
-        uint32_t resvd0;
-        uint32_t resvd1;
+    uint32_t resvd0;
+    uint32_t resvd1;
 };
 
 /**
@@ -352,17 +352,17 @@ struct amc_proxy_cmd_resp_default_payload {
  * @ver_patch: AMC patch version number
  * @local_changes: 0 for no change, 1 for changes
  * @dev_commits: AMC number of dev commits
- * @link_ver_major: GCQ major version number
- * @link_ver_minor: GCQ minor version number
+ * @link_ver_major: sGCQ major version number
+ * @link_ver_minor: sGCQ minor version number
  */
 struct amc_proxy_cmd_resp_identify_payload {
-        uint8_t ver_major;
-        uint8_t ver_minor;
-        uint8_t ver_patch;
-        uint8_t local_changes;
-        uint16_t dev_commits;
-        uint8_t link_ver_major;
-        uint8_t link_ver_minor;
+    uint8_t ver_major;
+    uint8_t ver_minor;
+    uint8_t ver_patch;
+    uint8_t local_changes;
+    uint16_t dev_commits;
+    uint8_t link_ver_major;
+    uint8_t link_ver_minor;
 };
 
 /**
@@ -372,8 +372,8 @@ struct amc_proxy_cmd_resp_identify_payload {
  * @resvd: reserved
  */
 struct amc_proxy_cmd_resp_sensor_payload {
-        uint32_t result;
-        uint32_t resvd;
+    uint32_t result;
+    uint32_t resvd;
 };
 
 /**
@@ -395,7 +395,7 @@ struct amc_proxy_cmd_resp_data_payload {
  */
 struct amc_proxy_cmd_resp_heartbeat_payload {
 	uint32_t request_id;
-        uint32_t resvd;
+    uint32_t resvd;
 };
 
 /**
@@ -405,8 +405,8 @@ struct amc_proxy_cmd_resp_heartbeat_payload {
  * @resvd: reserved
  */
 struct amc_proxy_cmd_resp_eeprom_read_write_payload {
-        uint32_t result;
-        uint32_t resvd;
+    uint32_t result;
+    uint32_t resvd;
 };
 
 /**
@@ -416,8 +416,8 @@ struct amc_proxy_cmd_resp_eeprom_read_write_payload {
  * @resvd: reserved
  */
 struct amc_proxy_cmd_resp_module_read_write_payload {
-        uint32_t result;
-        uint32_t resvd;
+    uint32_t result;
+    uint32_t resvd;
 };
 
 /**
@@ -456,14 +456,14 @@ struct amc_proxy_cmd_response {
  * @initialised: flag to indicate layer has been init
  */
 struct amc_proxy_instance {
-        FW_IF_CFG                       *fw_if_handle;
-        uint8_t                         proxy_id;
-        amc_proxy_event_callback        *event_cb;
-        struct mutex                    lock;
-        struct task_struct              *response_thread;
-        bool                            response_thread_created;
-        struct list_head                submitted_cmds;
-        bool                            initialised;
+    FW_IF_CFG                   *fw_if_handle;
+    uint8_t                     proxy_id;
+    amc_proxy_event_callback    *event_cb;
+    struct mutex                lock;
+    struct task_struct          *response_thread;
+    bool                        response_thread_created;
+    struct list_head            submitted_cmds;
+    bool                        initialised;
 };
 
 /**
@@ -473,8 +473,8 @@ struct amc_proxy_instance {
  * @inst: the proxy instance
  */
 struct amc_proxy_list_entry {
-        struct list_head                list;
-        struct amc_proxy_instance       inst;
+    struct list_head            list;
+    struct amc_proxy_instance   inst;
 };
 
 
@@ -492,38 +492,37 @@ LIST_HEAD(amc_proxy_list_head);
 
 /**
  * amc_result_to_linux_errno() - map an AMC return code to a Linux errno
- * @res: Return code received from AMC over GCQ.
+ * @res: Return code received from AMC over sGCQ.
  *
  * Return: The corresponding errno or -EINVAL if not recognised.
  */
 static int amc_result_to_linux_errno(enum amc_proxy_result res)
 {
 	switch (res) {
-	case AMC_PROXY_RESULT_SUCCESS:
-		return 0;
+        case AMC_PROXY_RESULT_SUCCESS:
+            return 0;
 
-	case AMC_PROXY_RESULT_FAILURE:
-		return -EIO;  /* generic I/O error */
+        case AMC_PROXY_RESULT_FAILURE:
+            return -EIO;  /* generic I/O error */
 
-	case AMC_PROXY_RESULT_INVALID_VALUE:
-		return -EINVAL;  /* invalid value */
+        case AMC_PROXY_RESULT_INVALID_VALUE:
+            return -EINVAL;  /* invalid value */
 
-	case AMC_PROXY_RESULT_GET_REQUEST_FAILED:
-		return -EPROTO;  /* protocol error */
+        case AMC_PROXY_RESULT_GET_REQUEST_FAILED:
+            return -EPROTO;  /* protocol error */
 
-	case AMC_PROXY_RESULT_PROCESS_REQUEST_FAILED:
-		return -EPROTO;  /* protocol error */
+        case AMC_PROXY_RESULT_PROCESS_REQUEST_FAILED:
+            return -EPROTO;  /* protocol error */
 
-	case AMC_PROXY_RESULT_ALREADY_IN_PROGRESS:
-		return -EALREADY;  /* operation already in progress */
+        case AMC_PROXY_RESULT_ALREADY_IN_PROGRESS:
+            return -EALREADY;  /* operation already in progress */
 
-	case AMC_PROXY_RESULT_INVALID_CONFIGURATION:
-		return -ENODATA;  /* generic no data error */
+        case AMC_PROXY_RESULT_INVALID_CONFIGURATION:
+            return -ENODATA;  /* generic no data error */
 
-	default:
-		break;
+        default:
+            break;
 	}
-
 	return -EINVAL;
 }
 
@@ -543,50 +542,49 @@ static void amc_proxy_cmd_complete(struct amc_proxy_instance *inst, struct com_q
 
 	if (!inst || !ccmd) {
 		return;
-        }
+    }
 
-        mutex_lock(&(inst->lock));
+    mutex_lock(&(inst->lock));
 	list_for_each_safe(pos, next, &(inst->submitted_cmds)) {
 
 		cmd = list_entry(pos, struct amc_proxy_cmd_struct, cmd_list);
 		if (cmd->cmd_cid == ccmd->hdr.cid) {
 
-                        struct amc_proxy_cmd_response *cmd_resp =
-                                (struct amc_proxy_cmd_response*)ccmd;
+	        struct amc_proxy_cmd_response *cmd_resp =
+	            (struct amc_proxy_cmd_response*)ccmd;
 
-                        /* Make a copy of the response before removing from the list */
-                        memcpy(&cmd->cmd_response, &cmd_resp->default_payload,
-		                sizeof(cmd_resp->default_payload));
+	        /* Make a copy of the response before removing from the list */
+	        memcpy(&cmd->cmd_response, &cmd_resp->default_payload,
+		         sizeof(cmd_resp->default_payload));
 
-                        cmd->cmd_response_code = cmd_resp->ret;
+	        cmd->cmd_response_code = cmd_resp->ret;
 
-                        /* Suppress hearbeat message so as not to flood dmesg */
-                        if (cmd->cmd_suppress_dbg == false) {
-                                PR_DBG(
-                                        "cmd=%d cid=0x%X cstate=0x%X specific=0x%X state=0x%X res=0x%X ret=0x%X",
-                                        cmd->cmd_cid,
-                                        ccmd->hdr.cid,
-                                        ccmd->hdr.cstate,
-                                        ccmd->hdr.specific,
-                                        ccmd->hdr.state,
-                                        ccmd->result,
-                                        ccmd->rcode
-                                );
-                        }
+	        /* Suppress hearbeat message so as not to flood dmesg */
+	        if (cmd->cmd_suppress_dbg == false) {
+	                PR_DBG(
+	                        "cmd=%d cid=0x%X cstate=0x%X specific=0x%X state=0x%X res=0x%X ret=0x%X",
+	                        cmd->cmd_cid,
+	                        ccmd->hdr.cid,
+	                        ccmd->hdr.cstate,
+	                        ccmd->hdr.specific,
+	                        ccmd->hdr.state,
+	                        ccmd->result,
+	                        ccmd->rcode);
+	        }
 
 			list_del(pos);
 
-                        if (inst->event_cb) {
-                                inst->event_cb(inst->proxy_id,
-                                               AMC_PROXY_EVENT_RESPONSE_COMPLETE,
-                                               cmd);
-                        }
-                        mutex_unlock(&(inst->lock));
+            if (inst->event_cb) {
+                inst->event_cb(inst->proxy_id,
+                            AMC_PROXY_EVENT_RESPONSE_COMPLETE,
+                            cmd);
+            }
+            mutex_unlock(&(inst->lock));
 			return;
 		}
 	}
         PR_ERR("No matching cid %d found, unexpected response", ccmd->hdr.cid);
-        mutex_unlock(&(inst->lock));
+    mutex_unlock(&(inst->lock));
 }
 
 /**
@@ -599,8 +597,8 @@ static void amc_proxy_cmd_complete(struct amc_proxy_instance *inst, struct com_q
 static bool amc_proxy_submitted_cmds_empty(struct amc_proxy_instance *inst)
 {
         if (!inst) {
-                /* returning true to not block */
-                return true;
+            /* returning true to not block */
+            return true;
         }
 
 	mutex_lock(&(inst->lock));
@@ -616,16 +614,15 @@ static bool amc_proxy_submitted_cmds_empty(struct amc_proxy_instance *inst)
  * amc_proxy_submitted_cmds_drain() - drain the submitted queue list checking for timeouts
  *
  * @inst: the proxy instance
- *
  */
 static void amc_proxy_submitted_cmds_drain(struct amc_proxy_instance *inst)
 {
 	struct amc_proxy_cmd_struct *cmd = NULL;
 	struct list_head *pos = NULL, *next = NULL;
 
-        if (!inst) {
-                return;
-        }
+    if (!inst) {
+        return;
+    }
 
 	mutex_lock(&(inst->lock));
 	list_for_each_safe(pos, next, &(inst->submitted_cmds)) {
@@ -635,17 +632,16 @@ static void amc_proxy_submitted_cmds_drain(struct amc_proxy_instance *inst)
 		/* Find any timed out commands */
 		if (time_before(cmd->cmd_timeout_jiffies, jiffies)) {
 
-                        /* Remove from list and invoke callback */
+            /* Remove from list and invoke callback */
 			list_del(pos);
+            cmd->cmd_rcode = -ETIME;
+            PR_CRIT_WARN("cmd id: %d timed out(drain), hot reset is required", cmd->cmd_cid);
 
-                        cmd->cmd_rcode = -ETIME;
-                        PR_CRIT_WARN("cmd id: %d timed out(drain), hot reset is required", cmd->cmd_cid);
-
-                        if (inst->event_cb) {
-                                inst->event_cb(inst->proxy_id,
-                                               AMC_PROXY_EVENT_RESPONSE_TIMEOUT,
-                                               cmd);
-                        }
+            if (inst->event_cb) {
+                inst->event_cb(inst->proxy_id,
+                                AMC_PROXY_EVENT_RESPONSE_TIMEOUT,
+                                cmd);
+            }
 		}
 	}
 	mutex_unlock(&(inst->lock));
@@ -694,24 +690,24 @@ static void amc_proxy_submitted_cmd_check_timeout(struct amc_proxy_instance *ins
 	struct amc_proxy_cmd_struct *cmd = NULL;
 	struct list_head *pos = NULL, *next = NULL;
 
-        if (!inst) {
+    if (!inst) {
 		return;
-        }
+    }
 
 	mutex_lock(&(inst->lock));
 	list_for_each_safe(pos, next, &(inst->submitted_cmds)) {
 		cmd = list_entry(pos, struct amc_proxy_cmd_struct, cmd_list);
 
 		/* Finding timed out cmds */
-                if (time_before(cmd->cmd_timeout_jiffies, jiffies)) {
+        if (time_before(cmd->cmd_timeout_jiffies, jiffies)) {
 
-                        PR_CRIT_WARN("cmd id: %d timed out(timeout), hot reset is required", cmd->cmd_cid);
+            PR_CRIT_WARN("cmd id: %d timed out(timeout), hot reset is required", cmd->cmd_cid);
                         cmd->cmd_rcode = -ETIME;
-                        if (inst->event_cb) {
-                                inst->event_cb(inst->proxy_id,
-                                               AMC_PROXY_EVENT_RESPONSE_TIMEOUT,
-                                               cmd);
-                        }
+            if (inst->event_cb) {
+                inst->event_cb(inst->proxy_id,
+                                AMC_PROXY_EVENT_RESPONSE_TIMEOUT,
+                                cmd);
+            }
 		}
 	}
 	mutex_unlock(&(inst->lock));
@@ -730,53 +726,51 @@ static void amc_proxy_submitted_cmd_check_timeout(struct amc_proxy_instance *ins
  */
 static int complete_response_thread(void *data)
 {
-        struct com_queue_entry ccmd;
-        uint32_t ccmd_size = sizeof(struct com_queue_entry);
-        struct amc_proxy_instance *amc_proxy_inst = NULL;
-        bool response_failed = false;
+    struct com_queue_entry ccmd;
+    uint32_t ccmd_size = sizeof(struct com_queue_entry);
+    struct amc_proxy_instance *amc_proxy_inst = NULL;
+    bool response_failed = false;
 
-        if (!data) {
-                PR_ERR("Response thread null data arg");
-		response_failed = true;
-        } else {
-                amc_proxy_inst = (struct amc_proxy_instance *)data;
+    if (!data) {
+        PR_ERR("Response thread null data arg");
+        response_failed = true;
+    } else {
+        amc_proxy_inst = (struct amc_proxy_instance *)data;
+    }
+
+    while(1) {
+        if (response_failed == false) {
+
+            /* Perform the read from the FW_IF */
+            if (amc_proxy_inst->fw_if_handle->read(amc_proxy_inst->fw_if_handle, 0,
+                                            (uint8_t*)&ccmd,
+                                            &ccmd_size, 0) == FW_IF_ERRORS_NONE) {
+                /*
+                * Get the entry from submitted_cmds list,
+                * remove and invoke callback
+                */
+                amc_proxy_cmd_complete(amc_proxy_inst, &ccmd);
+            }
+
+            /* Check for any commands that might have timed out & notify via callback */
+            amc_proxy_submitted_cmd_check_timeout(amc_proxy_inst);
         }
 
-        while(1) {
-
-                if (response_failed == false) {
-
-                        /* Perform the read from the FW_IF */
-                        if (amc_proxy_inst->fw_if_handle->read(amc_proxy_inst->fw_if_handle, 0,
-                                                        (uint8_t*)&ccmd,
-                                                        &ccmd_size, 0) == FW_IF_ERRORS_NONE) {
-                                /*
-                                * Get the entry from submitted_cmds list,
-                                * remove and invoke callback
-                                */
-                                amc_proxy_cmd_complete(amc_proxy_inst, &ccmd);
-                        }
-
-                        /* Check for any commands that might have timed out & notify via callback */
-                        amc_proxy_submitted_cmd_check_timeout(amc_proxy_inst);
-                }
-
-                /* Check if a stop has been requested */
-                if (kthread_should_stop()) {
-			break;
-                }
-
-                usleep_range(1000, 2000);
+        /* Check if a stop has been requested */
+        if (kthread_should_stop()) {
+            break;
         }
+        usleep_range(1000, 2000);
+    }
 
-        /* Return will be passed to kthread_stop() */
-        return 0;
+    /* Return will be passed to kthread_stop() */
+    return 0;
 }
 
 /**
  * amc_proxy_find_matching_proxy_instance() - Find matching proxy list entry
  *
- * @fw_if_gcq: GCQ consumer configuration
+ * @fw_if_gcq: sGCQ consumer configuration
  *
  * Loop around the global proxy instance list looking for a matching entry
  * based of the FW_IF instance.
@@ -785,23 +779,22 @@ static int complete_response_thread(void *data)
  */
 static struct amc_proxy_list_entry * amc_proxy_find_matching_proxy_instance(const FW_IF_CFG *fw_if_gcq)
 {
-       struct amc_proxy_list_entry *amc_proxy = NULL;
-       struct list_head *pos = NULL, *next = NULL;
+    struct amc_proxy_list_entry *amc_proxy = NULL;
+    struct list_head *pos = NULL, *next = NULL;
 
-        if (!fw_if_gcq) {
-                return(NULL);
+    if (!fw_if_gcq) {
+            return(NULL);
+    }
+
+    list_for_each_safe(pos, next, &amc_proxy_list_head) {
+
+        amc_proxy = list_entry(pos, struct amc_proxy_list_entry, list);
+        /* Find the matching list based on handle */
+        if (amc_proxy->inst.fw_if_handle == fw_if_gcq) {
+            return (amc_proxy);
         }
-
-        list_for_each_safe(pos, next, &amc_proxy_list_head) {
-
-               amc_proxy = list_entry(pos, struct amc_proxy_list_entry, list);
-                /* Find the matching list based on handle */
-                if (amc_proxy->inst.fw_if_handle == fw_if_gcq) {
-                        return (amc_proxy);
-                }
-        }
-
-        return (NULL);
+    }
+    return (NULL);
 }
 
 
@@ -815,61 +808,59 @@ static struct amc_proxy_list_entry * amc_proxy_find_matching_proxy_instance(cons
  */
 int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
 {
-        int ret = 0;
+    int ret = 0;
 
-        if (!fw_if_handle) {
-               return(-EINVAL);
+    if (!fw_if_handle) {
+        return(-EINVAL);
+    }
+
+    ret = fw_if_handle->open(fw_if_handle);
+    if (ret == FW_IF_ERRORS_NONE) {
+
+        const char *ap_thread_name = "amc proxy";
+        struct amc_proxy_list_entry *amc_proxy_entry = NULL;
+        amc_proxy_entry = kzalloc(sizeof(struct amc_proxy_list_entry), GFP_KERNEL);
+
+        if (!amc_proxy_entry) {
+            PR_ERR("Unable to allocate memory for amc context");
+            return(-EINVAL);
         }
+        amc_proxy_entry->inst.fw_if_handle = fw_if_handle;
+        amc_proxy_entry->inst.proxy_id = proxy_id;
+        amc_proxy_entry->inst.response_thread_created = false;
 
-        ret = fw_if_handle->open(fw_if_handle);
-        if (ret == FW_IF_ERRORS_NONE) {
+        mutex_init(&(amc_proxy_entry->inst.lock));
+        INIT_LIST_HEAD(&(amc_proxy_entry->list));
+        INIT_LIST_HEAD(&(amc_proxy_entry->inst.submitted_cmds));
 
-                const char *ap_thread_name = "amc proxy";
-                struct amc_proxy_list_entry *amc_proxy_entry = NULL;
-                amc_proxy_entry = kzalloc(sizeof(struct amc_proxy_list_entry), GFP_KERNEL);
-
-                if (!amc_proxy_entry) {
-                        PR_ERR("Unable to allocate memory for amc context");
-                        return(-EINVAL);
-                }
-                amc_proxy_entry->inst.fw_if_handle = fw_if_handle;
-                amc_proxy_entry->inst.proxy_id = proxy_id;
-                amc_proxy_entry->inst.response_thread_created = false;
-
-                mutex_init(&(amc_proxy_entry->inst.lock));
-                INIT_LIST_HEAD(&(amc_proxy_entry->list));
-                INIT_LIST_HEAD(&(amc_proxy_entry->inst.submitted_cmds));
-
-                /* Create thread to handle command responses */
-                amc_proxy_entry->inst.response_thread = kthread_create(complete_response_thread,
-                                                                       &amc_proxy_entry->inst,
-                                                                       ap_thread_name);
-	        if (IS_ERR(amc_proxy_entry->inst.response_thread)) {
-		        PR_ERR("Unable to create the %s thread", ap_thread_name);
-		        ret = PTR_ERR(amc_proxy_entry->inst.response_thread);
-	        } else {
-	                PR_INFO("Successfully created %s kernel thread", ap_thread_name);
-                        amc_proxy_entry->inst.response_thread_created = true;
-                }
-
-                if (!ret) {
-
-                        /* Add entry onto the global instance list */
-                        list_add_tail(&amc_proxy_entry->list, &(amc_proxy_list_head));
-
-                        /* Start response & heartbeat threads */
-                        wake_up_process(amc_proxy_entry->inst.response_thread);
-
-                        /* Set flag to indicate all initialisation has completed */
-                        amc_proxy_entry->inst.initialised = true;
-                }
-
+        /* Create thread to handle command responses */
+        amc_proxy_entry->inst.response_thread = kthread_create(complete_response_thread,
+                                                                &amc_proxy_entry->inst,
+                                                                ap_thread_name);
+        if (IS_ERR(amc_proxy_entry->inst.response_thread)) {
+            PR_ERR("Unable to create the %s thread", ap_thread_name);
+            ret = PTR_ERR(amc_proxy_entry->inst.response_thread);
         } else {
-                PR_ERR("FW_IF open request failed: %d", ret);
-                ret = -EIO;
+            PR_INFO("Successfully created %s kernel thread", ap_thread_name);
+            amc_proxy_entry->inst.response_thread_created = true;
         }
 
-        return ret;
+        if (!ret) {
+            /* Add entry onto the global instance list */
+            list_add_tail(&amc_proxy_entry->list, &(amc_proxy_list_head));
+
+            /* Start response & heartbeat threads */
+            wake_up_process(amc_proxy_entry->inst.response_thread);
+
+            /* Set flag to indicate all initialisation has completed */
+            amc_proxy_entry->inst.initialised = true;
+        }
+
+    } else {
+        PR_ERR("FW_IF open request failed: %d", ret);
+        ret = -EIO;
+    }
+    return ret;
 }
 
 /*
@@ -877,20 +868,19 @@ int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
  */
 int amc_proxy_bind_callback(FW_IF_CFG *fw_if_handle, amc_proxy_event_callback *event_cb)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!fw_if_handle || !event_cb) {
-               return(-EINVAL);
-        }
+    if (!fw_if_handle || !event_cb) {
+       return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(fw_if_handle);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
-                amc_ctxt->inst.event_cb = event_cb;
-                ret = 0;
-        }
-
-        return ret;
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(fw_if_handle);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
+        amc_ctxt->inst.event_cb = event_cb;
+        ret = 0;
+    }
+    return ret;
 }
 
 /*
@@ -899,53 +889,52 @@ int amc_proxy_bind_callback(FW_IF_CFG *fw_if_handle, amc_proxy_event_callback *e
  */
 int amc_proxy_close(const FW_IF_CFG *fw_if_handle)
 {
-        int ret = -EPERM;
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        struct list_head *pos = NULL, *next = NULL;
+    int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    struct list_head *pos = NULL, *next = NULL;
 
-        list_for_each_safe(pos, next, &amc_proxy_list_head) {
+    list_for_each_safe(pos, next, &amc_proxy_list_head) {
 
-               amc_ctxt = list_entry(pos, struct amc_proxy_list_entry, list);
+        amc_ctxt = list_entry(pos, struct amc_proxy_list_entry, list);
 
-                /* Find the matching FW_IF */
-                if (amc_ctxt && amc_ctxt->inst.initialised) {
+        /* Find the matching FW_IF */
+        if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                        if (amc_ctxt->inst.fw_if_handle == fw_if_handle) {
+            if (amc_ctxt->inst.fw_if_handle == fw_if_handle) {
 
-                                /*
-                                 * Drain the submitted command queue before killing
-                                 * the worker thread
-                                 */
-                                while (amc_proxy_submitted_cmds_empty(&amc_ctxt->inst) != true) {
-                                        msleep(AMC_PROXY_MSLEEP_1S);
-                                        amc_proxy_submitted_cmds_drain(&amc_ctxt->inst);
-                                }
-
-                                if(amc_ctxt->inst.response_thread_created == true)
-                                {
-                                        ret = kthread_stop(amc_ctxt->inst.response_thread);
-                                        if (!ret) {
-                                                ret = amc_ctxt->inst.fw_if_handle->close(amc_ctxt->inst.fw_if_handle);
-                                                if(ret) {
-                                                        PR_ERR("FW_IF close request failed: %d", ret);
-                                                        ret = -EIO;
-                                                }
-                                        } else {
-                                                PR_ERR("kthread_stop() failed for thread: %d", ret);
-                                        }
-                                }
-
-                                /* Remove from list and free the memory */
-                                list_del(&amc_ctxt->list);
-                                kfree(amc_ctxt);
-
-                                amc_ctxt->inst.initialised = false;
-                                break;
-                        }
+                /*
+                 * Drain the submitted command queue before killing
+                 * the worker thread
+                 */
+                while (amc_proxy_submitted_cmds_empty(&amc_ctxt->inst) != true) {
+                    msleep(AMC_PROXY_MSLEEP_1S);
+                    amc_proxy_submitted_cmds_drain(&amc_ctxt->inst);
                 }
-        }
 
-        return ret;
+                if(amc_ctxt->inst.response_thread_created == true)
+                {
+                    ret = kthread_stop(amc_ctxt->inst.response_thread);
+                    if (!ret) {
+                        ret = amc_ctxt->inst.fw_if_handle->close(amc_ctxt->inst.fw_if_handle);
+                        if(ret) {
+                            PR_ERR("FW_IF close request failed: %d", ret);
+                            ret = -EIO;
+                        }
+                    } else {
+                        PR_ERR("kthread_stop() failed for thread: %d", ret);
+                    }
+                }
+
+                /* Remove from list and free the memory */
+                list_del(&amc_ctxt->list);
+                kfree(amc_ctxt);
+
+                amc_ctxt->inst.initialised = false;
+                break;
+            }
+        }
+    }
+    return ret;
 }
 
 /*
@@ -953,20 +942,19 @@ int amc_proxy_close(const FW_IF_CFG *fw_if_handle)
  */
 int amc_proxy_request_abort(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = 0;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = 0;
 
-        if (!cmd) {
-               return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
-                /* Remove the command from the submitted queue */
-                amc_proxy_remove_submitted_cmd(&amc_ctxt->inst, cmd);
-        }
-
-        return ret;
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
+        /* Remove the command from the submitted queue */
+        amc_proxy_remove_submitted_cmd(&amc_ctxt->inst, cmd);
+    }
+    return ret;
 }
 
 /*
@@ -974,38 +962,37 @@ int amc_proxy_request_abort(struct amc_proxy_cmd_struct *cmd)
  */
 int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-               return(-EINVAL);
+    if (!cmd) {
+        return(-EINVAL);
+    }
+
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
+
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_IDENTIFY;
+        request_hdr->count = 0; /* No payload for identity request */
+        request_hdr->cid = cmd->cmd_cid;
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                        (uint8_t*)&(request_cmd_entry),
+                                                        sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+            ret = 0;
+        } else {
+            PR_ERR("FW_IF write request failed: %d", ret);
+            ret = -EIO;
         }
-
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
-
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_IDENTIFY;
-                request_hdr->count = 0; /* No payload for identity request */
-                request_hdr->cid = cmd->cmd_cid;
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                                (uint8_t*)&(request_cmd_entry),
-                                                                sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                        ret = 0;
-                } else {
-                        PR_ERR("FW_IF write request failed: %d", ret);
-                        ret = -EIO;
-                }
-        }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1014,46 +1001,45 @@ int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd)
 int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
                              struct amc_proxy_sensor_request *sensor_req)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !sensor_req) {
-                return(-EINVAL);
+    if (!cmd || !sensor_req) {
+        return(-EINVAL);
+    }
+
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
+
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_SENSOR;
+        request_hdr->count = sizeof(request_cmd_entry.sensor_payload);
+        request_hdr->cid = cmd->cmd_cid;
+
+        request_cmd_entry.sensor_payload.address = sensor_req->address;
+        request_cmd_entry.sensor_payload.size = sensor_req->length;
+        request_cmd_entry.sensor_payload.aid = sensor_req->req;
+        request_cmd_entry.sensor_payload.sid = sensor_req->repo;
+        request_cmd_entry.sensor_payload.offset = 0;
+        request_cmd_entry.sensor_payload.addr_type = 0;
+        request_cmd_entry.sensor_payload.sensor_id = sensor_req->sensor_id;
+
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                        (uint8_t*)&(request_cmd_entry),
+                                                        sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+            PR_ERR("FW_IF write request failed; %d", ret);
+            ret = -EIO;
         }
-
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
-
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_SENSOR;
-                request_hdr->count = sizeof(request_cmd_entry.sensor_payload);
-                request_hdr->cid = cmd->cmd_cid;
-
-                request_cmd_entry.sensor_payload.address = sensor_req->address;
-                request_cmd_entry.sensor_payload.size = sensor_req->length;
-                request_cmd_entry.sensor_payload.aid = sensor_req->req;
-                request_cmd_entry.sensor_payload.sid = sensor_req->repo;
-                request_cmd_entry.sensor_payload.offset = 0;
-                request_cmd_entry.sensor_payload.addr_type = 0;
-                request_cmd_entry.sensor_payload.sensor_id = sensor_req->sensor_id;
-
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                                (uint8_t*)&(request_cmd_entry),
-                                                                sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
-        }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1062,53 +1048,52 @@ int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
 int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
                                    struct amc_proxy_pdi_download_request *pdi_download)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !pdi_download) {
-                return(-EINVAL);
+    if (!cmd || !pdi_download) {
+        return(-EINVAL);
+    }
+
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
+
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_PDI_DOWNLOAD;
+        request_hdr->count = sizeof(request_cmd_entry.pdi_payload);
+        request_hdr->cid = cmd->cmd_cid;
+
+        request_cmd_entry.pdi_payload.address = pdi_download->address;
+        request_cmd_entry.pdi_payload.size = pdi_download->length;
+        request_cmd_entry.pdi_payload.remain_size = 0;
+        request_cmd_entry.pdi_payload.boot_device = pdi_download->boot_device;
+        request_cmd_entry.pdi_payload.last_chunk = pdi_download->last_chunk;
+        request_cmd_entry.pdi_payload.chunk = pdi_download->chunk;
+        request_cmd_entry.pdi_payload.chunk_size = pdi_download->chunk_size;
+
+        if (pdi_download->partition == FPT_UPDATE_MAGIC) {
+            request_cmd_entry.pdi_payload.update_fpt = 1;
+        } else {
+            request_cmd_entry.pdi_payload.update_fpt = 0;
+            request_cmd_entry.pdi_payload.partition_sel = pdi_download->partition;
         }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
-
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_PDI_DOWNLOAD;
-                request_hdr->count = sizeof(request_cmd_entry.pdi_payload);
-                request_hdr->cid = cmd->cmd_cid;
-
-                request_cmd_entry.pdi_payload.address = pdi_download->address;
-                request_cmd_entry.pdi_payload.size = pdi_download->length;
-                request_cmd_entry.pdi_payload.remain_size = 0;
-                request_cmd_entry.pdi_payload.boot_device = pdi_download->boot_device;
-                request_cmd_entry.pdi_payload.last_chunk = pdi_download->last_chunk;
-                request_cmd_entry.pdi_payload.chunk = pdi_download->chunk;
-                request_cmd_entry.pdi_payload.chunk_size = pdi_download->chunk_size;
-
-                if (pdi_download->partition == FPT_UPDATE_MAGIC) {
-                        request_cmd_entry.pdi_payload.update_fpt = 1;
-                } else {
-                        request_cmd_entry.pdi_payload.update_fpt = 0;
-                        request_cmd_entry.pdi_payload.partition_sel = pdi_download->partition;
-                }
-
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                                (uint8_t*)&(request_cmd_entry),
-                                                                sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                        (uint8_t*)&(request_cmd_entry),
+                                                        sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+            PR_ERR("FW_IF write request failed; %d", ret);
+            ret = -EIO;
         }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1117,40 +1102,40 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
 int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
                                    struct amc_proxy_pdi_download_request *device_boot)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !device_boot)
-                return -EINVAL;
+    if (!cmd || !device_boot) {
+        return -EINVAL;
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_DEVICE_BOOT;
-                request_hdr->count = sizeof(request_cmd_entry.pdi_payload);
-                request_hdr->cid = cmd->cmd_cid;
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_DEVICE_BOOT;
+        request_hdr->count = sizeof(request_cmd_entry.pdi_payload);
+        request_hdr->cid = cmd->cmd_cid;
 
-                /* Only set the partition */
-                request_cmd_entry.pdi_payload.partition_sel = device_boot->partition;
+        /* Only set the partition */
+        request_cmd_entry.pdi_payload.partition_sel = device_boot->partition;
 
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                                (uint8_t*)&(request_cmd_entry),
-                                                                sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                        (uint8_t*)&(request_cmd_entry),
+                                                        sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+            PR_ERR("FW_IF write request failed; %d", ret);
+            ret = -EIO;
         }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1159,44 +1144,44 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
 int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
                                 struct amc_proxy_partition_copy_request *partition_copy)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !partition_copy)
-                return -EINVAL;
+    if (!cmd || !partition_copy) {
+        return -EINVAL;
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_PARTITION_COPY;
-                request_hdr->count = sizeof(request_cmd_entry.pdi_payload);
-                request_hdr->cid = cmd->cmd_cid;
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_PARTITION_COPY;
+        request_hdr->count = sizeof(request_cmd_entry.pdi_payload);
+        request_hdr->cid = cmd->cmd_cid;
 
-                request_cmd_entry.pdi_payload.src_device = partition_copy->src_device;
-                request_cmd_entry.pdi_payload.src_partition = partition_copy->src_part;
-                request_cmd_entry.pdi_payload.dest_device = partition_copy->dest_device;
-                request_cmd_entry.pdi_payload.dest_partition = partition_copy->dest_part;
-                request_cmd_entry.pdi_payload.address = partition_copy->address;
-                request_cmd_entry.pdi_payload.size = partition_copy->length;
+        request_cmd_entry.pdi_payload.src_device = partition_copy->src_device;
+        request_cmd_entry.pdi_payload.src_partition = partition_copy->src_part;
+        request_cmd_entry.pdi_payload.dest_device = partition_copy->dest_device;
+        request_cmd_entry.pdi_payload.dest_partition = partition_copy->dest_part;
+        request_cmd_entry.pdi_payload.address = partition_copy->address;
+        request_cmd_entry.pdi_payload.size = partition_copy->length;
 
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                                (uint8_t*)&(request_cmd_entry),
-                                                                sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                (uint8_t*)&(request_cmd_entry),
+                                                sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+            PR_ERR("FW_IF write request failed; %d", ret);
+            ret = -EIO;
         }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1205,40 +1190,39 @@ int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
 int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
                                 struct amc_proxy_hearbeat_request *heartbeat)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !heartbeat)
-                return -EINVAL;
+    if (!cmd || !heartbeat) {
+        return -EINVAL;
+    }
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_HEARTBEAT;
+        request_hdr->count = sizeof(request_cmd_entry.heartbeat_payload);
+        request_hdr->cid = cmd->cmd_cid;
 
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_HEARTBEAT;
-                request_hdr->count = sizeof(request_cmd_entry.heartbeat_payload);
-                request_hdr->cid = cmd->cmd_cid;
+        /* Only set the count used to identify the heartbeat message id */
+        request_cmd_entry.heartbeat_payload.request_id = heartbeat->request_id;
 
-                /* Only set the count used to identify the heartbeat message id */
-                request_cmd_entry.heartbeat_payload.request_id = heartbeat->request_id;
-
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                         (uint8_t*)&(request_cmd_entry),
-                                                         sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                    (uint8_t*)&(request_cmd_entry),
+                                                    sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+            PR_ERR("FW_IF write request failed; %d", ret);
+            ret = -EIO;
         }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1247,40 +1231,40 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
 int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
                                         struct amc_proxy_eeprom_rw_request *eeprom_rw)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !eeprom_rw)
-                return -EINVAL;
+    if (!cmd || !eeprom_rw) {
+        return -EINVAL;
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_EEPROM_READ_WRITE;
-                request_hdr->count = sizeof(request_cmd_entry.eeprom_payload);
-                request_hdr->cid = cmd->cmd_cid;
-                request_cmd_entry.eeprom_payload.req_type = eeprom_rw->type;
-                request_cmd_entry.eeprom_payload.address = eeprom_rw->address;
-                request_cmd_entry.eeprom_payload.len= eeprom_rw->length;
-                request_cmd_entry.eeprom_payload.offset = eeprom_rw->offset;
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                         (uint8_t*)&(request_cmd_entry),
-                                                         sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_EEPROM_READ_WRITE;
+        request_hdr->count = sizeof(request_cmd_entry.eeprom_payload);
+        request_hdr->cid = cmd->cmd_cid;
+        request_cmd_entry.eeprom_payload.req_type = eeprom_rw->type;
+        request_cmd_entry.eeprom_payload.address = eeprom_rw->address;
+        request_cmd_entry.eeprom_payload.len= eeprom_rw->length;
+        request_cmd_entry.eeprom_payload.offset = eeprom_rw->offset;
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                    (uint8_t*)&(request_cmd_entry),
+                                                    sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+            PR_ERR("FW_IF write request failed; %d", ret);
+            ret = -EIO;
         }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1289,42 +1273,42 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
 int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
                                         struct amc_proxy_module_rw_request *module_rw)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !module_rw)
-                return -EINVAL;
+    if (!cmd || !module_rw) {
+        return -EINVAL;
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_MODULE_READ_WRITE;
-                request_hdr->count = sizeof(request_cmd_entry.module_payload);
-                request_hdr->cid = cmd->cmd_cid;
-                request_cmd_entry.module_payload.address = module_rw->address;
-                request_cmd_entry.module_payload.device_id = module_rw->device_id;
-                request_cmd_entry.module_payload.page = module_rw->page;
-                request_cmd_entry.module_payload.offset = module_rw->offset;
-                request_cmd_entry.module_payload.len = module_rw->length;
-                request_cmd_entry.module_payload.req_type = module_rw->type;
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                         (uint8_t*)&(request_cmd_entry),
-                                                         sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_MODULE_READ_WRITE;
+        request_hdr->count = sizeof(request_cmd_entry.module_payload);
+        request_hdr->cid = cmd->cmd_cid;
+        request_cmd_entry.module_payload.address = module_rw->address;
+        request_cmd_entry.module_payload.device_id = module_rw->device_id;
+        request_cmd_entry.module_payload.page = module_rw->page;
+        request_cmd_entry.module_payload.offset = module_rw->offset;
+        request_cmd_entry.module_payload.len = module_rw->length;
+        request_cmd_entry.module_payload.req_type = module_rw->type;
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                    (uint8_t*)&(request_cmd_entry),
+                                                    sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+                mutex_lock(&(amc_ctxt->inst.lock));
+                list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+                mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+                PR_ERR("FW_IF write request failed; %d", ret);
+                ret = -EIO;
         }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1332,40 +1316,40 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
  */
 int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t verbosity)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd)
-                return -EINVAL;
+    if (!cmd) {
+        return -EINVAL;
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
-                struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
-                request_hdr = &(request_cmd_entry.hdr);
-                request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
-                request_hdr->opcode = AMC_PROXY_CMD_OPCODE_DEBUG_VERBOSITY;
-                request_hdr->count = sizeof(request_cmd_entry.debug_verbosity_payload);
-                request_hdr->cid = cmd->cmd_cid;
+        struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+        struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+        request_hdr = &(request_cmd_entry.hdr);
+        request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+        request_hdr->opcode = AMC_PROXY_CMD_OPCODE_DEBUG_VERBOSITY;
+        request_hdr->count = sizeof(request_cmd_entry.debug_verbosity_payload);
+        request_hdr->cid = cmd->cmd_cid;
 
-                /* Only set the verbosity level as part of the request */
-                request_cmd_entry.debug_verbosity_payload = verbosity;
+        /* Only set the verbosity level as part of the request */
+        request_cmd_entry.debug_verbosity_payload = verbosity;
 
-                ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                         (uint8_t*)&(request_cmd_entry),
-                                                         sizeof(request_cmd_entry), 0);
-                if (ret == FW_IF_ERRORS_NONE) {
-                        mutex_lock(&(amc_ctxt->inst.lock));
-                        list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
-                        mutex_unlock(&(amc_ctxt->inst.lock));
-                } else {
-                        PR_ERR("FW_IF write request failed; %d", ret);
-                        ret = -EIO;
-                }
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
+                                                    (uint8_t*)&(request_cmd_entry),
+                                                    sizeof(request_cmd_entry), 0);
+        if (ret == FW_IF_ERRORS_NONE) {
+            mutex_lock(&(amc_ctxt->inst.lock));
+            list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
+            mutex_unlock(&(amc_ctxt->inst.lock));
+        } else {
+            PR_ERR("FW_IF write request failed; %d", ret);
+            ret = -EIO;
         }
-
-        return ret;
+    }
+    return ret;
 }
 
 /*
@@ -1374,34 +1358,33 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
 int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
                                     struct amc_proxy_identify_response *identity)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd || !identity) {
-                return(-EINVAL);
-        }
+    if (!cmd || !identity) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                struct amc_proxy_cmd_resp_identify_payload *identity_payload =
-                        (struct amc_proxy_cmd_resp_identify_payload *)&cmd->cmd_response;
+        struct amc_proxy_cmd_resp_identify_payload *identity_payload =
+                (struct amc_proxy_cmd_resp_identify_payload *)&cmd->cmd_response;
 
-                /* AMC version */
-                identity->ver_major = identity_payload->ver_major;
-                identity->ver_minor = identity_payload->ver_minor;
-                identity->ver_patch = identity_payload->ver_patch;
-                identity->local_changes = identity_payload->local_changes;
-                identity->dev_commits = identity_payload->dev_commits;
+        /* AMC version */
+        identity->ver_major = identity_payload->ver_major;
+        identity->ver_minor = identity_payload->ver_minor;
+        identity->ver_patch = identity_payload->ver_patch;
+        identity->local_changes = identity_payload->local_changes;
+        identity->dev_commits = identity_payload->dev_commits;
 
-                /* GCQ version */
-                identity->link_ver_major = identity_payload->link_ver_major;
-                identity->link_ver_minor = identity_payload->link_ver_minor;
+        /* sGCQ version */
+        identity->link_ver_major = identity_payload->link_ver_major;
+        identity->link_ver_minor = identity_payload->link_ver_minor;
 
-                ret = 0;
-        }
-
-        return ret;
+        ret = 0;
+    }
+    return ret;
 }
 
 /*
@@ -1409,22 +1392,21 @@ int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
  */
 int amc_proxy_get_response_sensor(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-                struct amc_proxy_cmd_resp_sensor_payload *sensor_payload =
-                        (struct amc_proxy_cmd_resp_sensor_payload *)&cmd->cmd_response;
-                ret = sensor_payload->result;
-        }
-
-        return ret;
+        struct amc_proxy_cmd_resp_sensor_payload *sensor_payload =
+                (struct amc_proxy_cmd_resp_sensor_payload *)&cmd->cmd_response;
+        ret = sensor_payload->result;
+    }
+    return ret;
 }
 
 /*
@@ -1432,24 +1414,23 @@ int amc_proxy_get_response_sensor(struct amc_proxy_cmd_struct *cmd)
  */
 int amc_proxy_get_response_pdi_download(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised) {
-                /* Payload is currently unused. */
-                // struct amc_proxy_cmd_resp_data_payload *pdi_payload =
-                //         (struct amc_proxy_cmd_resp_data_payload *)&cmd->cmd_response;
-                /* TODO: the count field in the response is not currently being populated */
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised) {
+        /* Payload is currently unused. */
+        // struct amc_proxy_cmd_resp_data_payload *pdi_payload =
+        //         (struct amc_proxy_cmd_resp_data_payload *)&cmd->cmd_response;
+        /* TODO: the count field in the response is not currently being populated */
 
-                ret = amc_result_to_linux_errno(cmd->cmd_response_code);
-        }
-
-        return ret;
+        ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+    }
+    return ret;
 }
 
 /*
@@ -1457,18 +1438,18 @@ int amc_proxy_get_response_pdi_download(struct amc_proxy_cmd_struct *cmd)
  */
 int amc_proxy_get_response_device_boot(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised)
-                ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised)
+        ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
-        return ret;
+    return ret;
 }
 
 /*
@@ -1476,18 +1457,18 @@ int amc_proxy_get_response_device_boot(struct amc_proxy_cmd_struct *cmd)
  */
 int amc_proxy_get_response_partition_copy(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised)
-                ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised)
+        ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
-        return ret;
+    return ret;
 }
 
 /*
@@ -1496,24 +1477,23 @@ int amc_proxy_get_response_partition_copy(struct amc_proxy_cmd_struct *cmd)
 int amc_proxy_get_response_heartbeat(struct amc_proxy_cmd_struct *cmd,
                                      struct amc_proxy_heartbeat_response *heartbeat)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised)
-        {
-                struct amc_proxy_cmd_resp_heartbeat_payload *heartbeat_payload =
-                        (struct amc_proxy_cmd_resp_heartbeat_payload *)&cmd->cmd_response;
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised)
+    {
+        struct amc_proxy_cmd_resp_heartbeat_payload *heartbeat_payload =
+                (struct amc_proxy_cmd_resp_heartbeat_payload *)&cmd->cmd_response;
 
-                heartbeat->request_id = heartbeat_payload->request_id;
-                ret = amc_result_to_linux_errno(cmd->cmd_response_code);
-        }
-
-        return ret;
+        heartbeat->request_id = heartbeat_payload->request_id;
+        ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+    }
+    return ret;
 }
 
 /*
@@ -1521,18 +1501,18 @@ int amc_proxy_get_response_heartbeat(struct amc_proxy_cmd_struct *cmd,
  */
 int amc_proxy_get_response_eeprom_read_write(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised)
-                ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised)
+        ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
-        return ret;
+    return ret;
 }
 
 /*
@@ -1540,18 +1520,18 @@ int amc_proxy_get_response_eeprom_read_write(struct amc_proxy_cmd_struct *cmd)
  */
 int amc_proxy_get_response_module_read_write(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised)
-                ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised)
+        ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
-        return ret;
+    return ret;
 }
 
 /*
@@ -1559,16 +1539,16 @@ int amc_proxy_get_response_module_read_write(struct amc_proxy_cmd_struct *cmd)
  */
 int amc_proxy_get_response_debug_verbosity(struct amc_proxy_cmd_struct *cmd)
 {
-        struct amc_proxy_list_entry *amc_ctxt = NULL;
-        int ret = -EPERM;
+    struct amc_proxy_list_entry *amc_ctxt = NULL;
+    int ret = -EPERM;
 
-        if (!cmd) {
-                return(-EINVAL);
-        }
+    if (!cmd) {
+        return(-EINVAL);
+    }
 
-        amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
-        if (amc_ctxt && amc_ctxt->inst.initialised)
-                ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    if (amc_ctxt && amc_ctxt->inst.initialised)
+        ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
-        return ret;
+    return ret;
 }

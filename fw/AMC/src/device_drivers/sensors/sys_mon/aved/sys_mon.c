@@ -168,7 +168,6 @@ int iSYS_MON_Initialise( void )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION );
     }
-
     return iStatus;
 }
 
@@ -220,7 +219,6 @@ int iSYS_MON_ReadTemperature( float *pfTemperatureInC )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION );
     }
-
     return iStatus;
 }
 
@@ -246,81 +244,42 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
             switch( xVoltageType )
             {
 #ifdef PROFILE_RAVE
-    #ifdef SDT
-            case SYS_MON_VOLTAGES_VCCAUX:
-                iMappedVType = XPAR_SYSMON0_10_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCSOC:
-                iMappedVType = XPAR_SYSMON0_0_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCO302:
-                iMappedVType = XPAR_SYSMON0_5_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCAUXPMC:
-                iMappedVType = XPAR_SYSMON0_6_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCO500:
-                iMappedVType = XPAR_SYSMON0_7_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCPMC:
-                iMappedVType = XPAR_SYSMON0_1_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCPSFP:
-                iMappedVType = XPAR_SYSMON0_8_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCPSLP:
-                iMappedVType = XPAR_SYSMON0_4_REG;
-                break;
-            case SYS_MON_VOLTAGES_VPVN:
-                iMappedVType = XPAR_SYSMON0_2_REG;
-                break;
-            case SYS_MON_VOLTAGES_VCCO703:
-                iMappedVType = XPAR_SYSMON0_9_REG;
-                break;
-            case SYS_MON_VOLTAGES_VAUXCH0:
-                iMappedVType = XPAR_SYSMON0_3_REG;
-                break;
-            //case SYS_MON_VOLTAGES_VCCAUXSMON:
-            //    iMappedVType = VCCAUXPMC;
-            //    break;
-    #else
             case SYS_MON_VOLTAGES_VCCAUX:
                 iMappedVType = VCCAUX;
                 break;
             case SYS_MON_VOLTAGES_VCCSOC:
-                iMappedVType = VCCSOC;
+                iMappedVType = VCC_SOC;
                 break;
             case SYS_MON_VOLTAGES_VCCO302:
-                iMappedVType = VCCO302;
+                iMappedVType = VCCO_302;
                 break;
             case SYS_MON_VOLTAGES_VCCAUXPMC:
-                iMappedVType = VCCAUXPMC;
+                iMappedVType = VCCAUX_PMC;
                 break;
             case SYS_MON_VOLTAGES_VCCO500:
-                iMappedVType = VCCO500;
+                iMappedVType = VCCO_500;
                 break;
             case SYS_MON_VOLTAGES_VCCPMC:
-                iMappedVType = VCCPMC;
+                iMappedVType = VCC_PMC;
                 break;
             case SYS_MON_VOLTAGES_VCCPSFP:
-                iMappedVType = VCCPSFP;
+                iMappedVType = VCC_PSFP;
                 break;
             case SYS_MON_VOLTAGES_VCCPSLP:
-                iMappedVType = VCCPSLP;
+                iMappedVType = VCC_PSLP;
                 break;
             case SYS_MON_VOLTAGES_VPVN:
-                iMappedVType = VPVN;
+                iMappedVType = VP_VN;
                 break;
             case SYS_MON_VOLTAGES_VCCO703:
-                iMappedVType = VCCO703;
+                iMappedVType = VCCO_703;
                 break;
             case SYS_MON_VOLTAGES_VAUXCH0:
-                iMappedVType = VAUXCH0;
+                iMappedVType = VAUX_CH0;
                 break;
             case SYS_MON_VOLTAGES_VCCAUXSMON:
-                iMappedVType = VCCAUXPMC;
+                iMappedVType = VCCAUX_PMC;
                 break;
-    #endif
 #else
             case SYS_MON_VOLTAGES_VCCAUX:
                 iMappedVType = VCCAUX;
@@ -369,7 +328,6 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION );
     }
-
     return iStatus;
 }
 
@@ -403,7 +361,6 @@ int iSYS_MON_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION )
     }
-
     return iStatus;
 }
 
@@ -426,7 +383,6 @@ int iSYS_MON_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION )
     }
-
     return iStatus;
 }
 

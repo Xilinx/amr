@@ -88,7 +88,7 @@
 #define HAL_PSV_PMC_GLOBAL_0_AXI_BASEADDR ( XPAR_PSV_PMC_GLOBAL_0_S_AXI_BASEADDR )
 
 /* FAL */
-/* GCQ */
+/* sGCQ */
 #ifndef HAL_IO_WRITE32
 #define HAL_IO_WRITE32( val, addr ) ( { Xil_Out32( addr, val ); \
                                         Xil_DCacheFlushRange( addr, sizeof( uint32_t ) ); } )

@@ -25,9 +25,9 @@
 #endif
 #if GCQ_DEBUG_ENABLE
 #ifdef __KERNEL__
-#define GCQ_DEBUG( x... )       {  printk( "[GCQ Driver] " x ); }
+#define GCQ_DEBUG( x... )       {  printk( "[sGCQ Driver] " x ); }
 #else
-#define GCQ_DEBUG( x... )       {  vOSAL_Printf( "[GCQ Driver] " x ); }
+#define GCQ_DEBUG( x... )       {  vOSAL_Printf( "[sGCQ Driver] " x ); }
 #endif
 #else
 #define GCQ_DEBUG( x... )       ( void ) ( 0 )

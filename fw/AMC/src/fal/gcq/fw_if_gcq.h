@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This header file containing the FW IF GCQ abstraction definitions.
+ * This header file containing the FW IF sGCQ abstraction definitions.
  *
  * @file fw_if_gcq.h
  */
@@ -31,7 +31,7 @@
 
 /**
  * @enum FW_IF_GCQ_MODE_TYPE
- * @brief Enumeration of GCQ mode as 'producer' or a 'consumer'
+ * @brief Enumeration of sGCQ mode as 'producer' or a 'consumer'
  */
 typedef enum _FW_IF_GCQ_MODE_TYPE
 {
@@ -58,7 +58,7 @@ typedef enum _FW_IF_GCQ_INTERRUPT_MODE_TYPE
 
 /**
  * @enum    FW_IF_GCQ_EVENTS
- * @brief   GCQ events raised in the callback (generic across all GCQ interface)
+ * @brief   sGCQ events raised in the callback (generic across all sGCQ interface)
  */
 typedef enum _FW_IF_GCQ_EVENTS
 {
@@ -70,7 +70,7 @@ typedef enum _FW_IF_GCQ_EVENTS
 
 /**
  * @enum FW_IF_GCQ_ERROR_TYPE
- * @brief Enumeration of GCQ return values
+ * @brief Enumeration of sGCQ return values
  */
 typedef enum _FW_IF_GCQ_ERRORS_TYPE
 {
@@ -95,7 +95,7 @@ typedef enum _FW_IF_GCQ_ERRORS_TYPE
 
 /**
  * @enum _FW_IF_GCQ_IOCTL_TYPE
- * @brief ioctrl options for GCQ interfaces (generic across all GCQ interfaces)
+ * @brief ioctrl options for sGCQ interfaces (generic across all sGCQ interfaces)
  */
 typedef enum _FW_IF_GCQ_IOCTL_TYPE
 {
@@ -113,7 +113,7 @@ typedef enum _FW_IF_GCQ_IOCTL_TYPE
 
 /**
  * @struct  FW_IF_GCQ_INIT_CFG
- * @brief   config options for GCQ initialisation (generic across all GCQ interfaces)
+ * @brief   config options for sGCQ initialisation (generic across all sGCQ interfaces)
  */
 typedef struct _FW_IF_GCQ_INIT_CFG
 {
@@ -123,7 +123,7 @@ typedef struct _FW_IF_GCQ_INIT_CFG
 
 /**
  * @struct  FW_IF_GCQ_CFG
- * @brief   config options for GCQ interfaces (generic across all GCQ interfaces)
+ * @brief   config options for sGCQ interfaces (generic across all sGCQ interfaces)
  */
 typedef struct _FW_IF_GCQ_CFG
 {
@@ -146,7 +146,7 @@ typedef struct _FW_IF_GCQ_CFG
 /*****************************************************************************/
 
 /**
- * @brief   initialisation function for GCQ interfaces (generic across all GCQ interfaces)
+ * @brief   initialisation function for sGCQ interfaces (generic across all sGCQ interfaces)
  *
  * @param   xInitCfg    pointer to the config to initialise the driver with
  *
@@ -155,7 +155,7 @@ typedef struct _FW_IF_GCQ_CFG
 extern uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxInitCfg );
 
 /**
- * @brief   creates an instance of the GCQ interface
+ * @brief   creates an instance of the sGCQ interface
  *
  * @param   xFWIf       fw_if handle to the interface instance
  * @param   xGCQCfg     unique data of this instance

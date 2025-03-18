@@ -22,7 +22,7 @@
  */
 typedef struct OSPI_CFG_TYPE
 {
-    uint32_t ucDeviceId;
+    uint32_t ulBaseAddress;
     uint16_t usPageSize;
 
 } OSPI_CFG_TYPE;

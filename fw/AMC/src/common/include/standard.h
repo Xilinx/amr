@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the standard definitions for the AMC
@@ -38,10 +38,6 @@
 
 #ifndef FALSE
 #define FALSE       ( 0 )
-#endif
-
-#ifndef FOREVER
-#define FOREVER     for( ;; )
 #endif
 
 #ifndef UNUSED

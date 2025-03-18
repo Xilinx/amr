@@ -2,7 +2,7 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains API definitions for HW accesses to GCQ IP.
+ * This file contains API definitions for HW accesses to sGCQ IP.
  *
  * @file gcq_hw.c
  */
@@ -23,9 +23,7 @@
 /*****************************************************************************/
 
 /**
- *
- * @brief    Initial GCQ IP block mode configuration
- *
+ * @brief    Initial sGCQ mode configuration
  */
 GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                             uint64_t ullBaseAddr,
@@ -80,15 +78,14 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
 
         if( GCQ_ERRORS_NONE == xStatus)
         {
-            GCQ_DEBUG( "GCQ IP Block HW Init Complete: (%s) (0x%llx)\r\n", pcGCQModeStr[ xMode ], ullBaseAddr );
+            GCQ_DEBUG( "sGCQ HW Init Complete: (%s) (0x%x)\r\n", pcGCQModeStr[ xMode ], ullBaseAddr );
         }
-
         return xStatus;
     }
 }
 
 /**
- * @brief    Configure the GCQ IP block interrupt mode
+ * @brief    Configure the sGCQ interrupt mode
  */
 GCQ_ERRORS_TYPE xGCQHWConfigureInterruptMode( GCQ_MODE_TYPE xMode,
                                               GCQ_INTERRUPT_MODE_TYPE xIntMode,
@@ -162,15 +159,12 @@ GCQ_ERRORS_TYPE xGCQHWConfigureInterruptMode( GCQ_MODE_TYPE xMode,
             pxGCQIOAccess->xGCQWriteReg32( ullReg, ulValue );
             GCQ_DEBUG( "Interrupt Mode Type Configured: (%s)\r\n", pcGCQInterruptModeStr[ xIntMode ] );
         }
-
         return xStatus;
     }
 }
 
 /**
- *
  * @brief   Trigger an interrupt, used for interrupt reg mode only
- *
  */
 GCQ_ERRORS_TYPE xGCQHWTriggerInterrupt( GCQ_MODE_TYPE xMode,
                                         uint64_t ullBaseAddr,
@@ -203,14 +197,12 @@ GCQ_ERRORS_TYPE xGCQHWTriggerInterrupt( GCQ_MODE_TYPE xMode,
             pxGCQIOAccess->xGCQWriteReg32( ullReg, ulValue );
             GCQ_DEBUG( "Trigger Interrupt [%s]\r\n", pcGCQModeStr[ xMode ] );
         }
-
         return xStatus;
     }
 }
 
 /**
  * @brief   Check the interrupt status, used for interrupt reg mode only
- *
  */
 GCQ_ERRORS_TYPE xGCQHWClearInterrupt( GCQ_MODE_TYPE xMode,
                                       uint64_t ullBaseAddr,
@@ -241,7 +233,6 @@ GCQ_ERRORS_TYPE xGCQHWClearInterrupt( GCQ_MODE_TYPE xMode,
             pxGCQIOAccess->xGCQReadReg32( ullReg );
             GCQ_DEBUG( "Interrupt Cleared [%s]\r\n", pcGCQModeStr[ xMode ] );
         }
-
         return xStatus;
     }
 }

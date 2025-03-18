@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file containing the FW IF OSPI abstraction definitions.
@@ -80,7 +80,7 @@ typedef enum FW_IF_OSPI_STATE
  */
 typedef struct FW_IF_OSPI_INIT_CFG
 {
-    uint32_t    ucOspiDeviceId;
+    uint32_t    ulOspiBaseAddress;
     uint16_t    usPageSize;
 
 } FW_IF_OSPI_INIT_CFG;

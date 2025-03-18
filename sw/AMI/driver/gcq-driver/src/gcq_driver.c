@@ -2,7 +2,7 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the user API definitions for the GCQ driver.
+ * This file contains the user API definitions for the sGCQ driver.
  *
  * @file gcq_driver.c
  */
@@ -299,7 +299,7 @@ static inline GCQ_ERRORS_TYPE prvxGCQConsume( GCQ_INSTANCE_TYPE *pxGCQInstance, 
 }
 
 /**
- * @brief   Attempt to find an uninitialized GCQ instance
+ * @brief   Attempt to find an uninitialized sGCQ instance
  *
  * @param   ppxGCQInstance variable to store the gcq driver instance
  *
@@ -335,9 +335,7 @@ static inline GCQ_ERRORS_TYPE prviGCQFindNextFreeInstance( struct GCQ_INSTANCE_T
 /*****************************************************************************/
 
 /**
- *
- * @brief    Initialise the GCQ standalone driver
- *
+ * @brief    Initialise the sGCQ standalone driver
  */
 GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess,
@@ -410,7 +408,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             uint64_t ullCQProduced = 0;
             uint64_t ullSQProduced = 0;
 
-            /* Init IP block and configure interrupt mode */
+            /* Init sGCQ and configure interrupt mode */
             xGCQHWInit(xMode, ullBaseAddr, ullRingAddr, pxGCQIOAccess );
             xGCQHWConfigureInterruptMode( xMode, xIntMode, ullBaseAddr, pxGCQIOAccess );
 
@@ -446,7 +444,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             }
 
             /* Init SQ & CQ rings */
-            GCQ_DEBUG( "GCQ Init Ring SQ\r\n" );
+            GCQ_DEBUG( "sGCQ Init Ring SQ\r\n" );
             prvvGCQInitRing( *ppxGCQInstance,
                                 &( *ppxGCQInstance )->xGCQSq,
                                 ullSQProduced,
@@ -454,7 +452,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                                 ullRingAddr + sizeof( struct GCQ_HEADER_TYPE ),
                                 ullNumSlots,
                                 ulSQSlotSize);
-            GCQ_DEBUG( "GCQ Init Ring CQ\r\n" );
+            GCQ_DEBUG( "sGCQ Init Ring CQ\r\n" );
             prvvGCQInitRing( *ppxGCQInstance,
                                 &( *ppxGCQInstance )->xGCQCq,
                                 ullCQProduced,
@@ -479,7 +477,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             {
                 xGCQHeader.ulHdrMagic = 0;
                 xGCQHeader.ulHdrVersion = GCQ_VERSION;
-                xGCQHeader.ulHdrSlotNum = ullNumSlots;
+                xGCQHeader.ulHdrNumSlots = ullNumSlots;
                 xGCQHeader.ulHdrSQOffset = ( ( *ppxGCQInstance )->xGCQSq.ullRingSlotAddr - ullRingAddr );
                 xGCQHeader.ulHdrSQSlotSize = ulSQSlotSize;
                 xGCQHeader.ulHdrCQOffset = ( ( *ppxGCQInstance )->xGCQCq.ullRingSlotAddr - ullRingAddr );
@@ -506,9 +504,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
 }
 
 /**
- *
- * @brief    De-initialise a GCQ driver instance
- *
+ * @brief    De-initialise a sGCQ driver instance
  */
 GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
 {
@@ -586,8 +582,8 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
         /* Validate the number of slots matches */
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            uint32_t ullHdrNumSlots = xGCQHeader.ulHdrSlotNum;
-            uint32_t ullNumSlots = pxGCQInstance->xGCQSq.ulRingSlotNum;
+            uint32_t ullHdrNumSlots = xGCQHeader.ulHdrNumSlots;
+            uint32_t ullNumSlots = pxGCQInstance->xGCQSq.ulRingNumSlots;
 
             if( ullNumSlots != ullHdrNumSlots )
             {

@@ -500,7 +500,6 @@ int iAPC_Initialise( uint8_t ucProxyId,
 	{
 		INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INIT_NOT_COMPLETE )
 	}
-
 	return iStatus;
 }
 
@@ -520,7 +519,6 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback )
 	{
 		iStatus = iEVL_BindCallback( pxThis->pxEvlRecord, pxCallback );
 	}
-
 	return iStatus;
 }
 
@@ -561,7 +559,6 @@ int iAPC_PrintStatistics( void )
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -584,7 +581,6 @@ int iAPC_ClearStatistics( void )
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -646,7 +642,6 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -702,7 +697,6 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -766,7 +760,6 @@ int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -814,7 +807,6 @@ int iAPC_SetNextPartition( EVL_SIGNAL *pxSignal, int iPartition )
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -854,7 +846,6 @@ int iAPC_EnableHotReset( EVL_SIGNAL *pxSignal )
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -906,7 +897,6 @@ int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice, APC_PROXY_DRIVER_FPT_HEADER
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -965,7 +955,6 @@ int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, APC_PROX
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -1007,7 +996,6 @@ int iAPC_GetState( MODULE_STATE *pxState )
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
-
 	return iStatus;
 }
 
@@ -1028,7 +1016,7 @@ static void vProxyDriverTask( void *pArg )
 
 	uint32_t ulStartMs = 0;
 
-	FOREVER
+	for( ;; )
 	{
 		ulStartMs = ulOSAL_GetUptimeMs();
 		if( OSAL_ERRORS_NONE == iOSAL_MBox_Pend( pxThis->pvOsalMBoxHdl,
@@ -1043,7 +1031,6 @@ static void vProxyDriverTask( void *pArg )
 			switch( xMBoxData.eMsgType )
 			{
 			case APC_MSG_TYPE_DOWNLOAD_PDI:
-			{
 				INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_PEND )
 
 				xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_STARTED;
@@ -1120,11 +1107,9 @@ static void vProxyDriverTask( void *pArg )
 						INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
 					}
 				}
-			}
-			break;
+				break;
 
 			case APC_MSG_TYPE_COPY_PDI:
-			{
 				INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_COPY_PEND )
 
 				xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_STARTED;
@@ -1169,11 +1154,9 @@ static void vProxyDriverTask( void *pArg )
 						INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
 					}
 				}
-			}
-			break;
+				break;
 
 			case APC_MSG_TYPE_PARTITION_SELECT:
-			{
 				INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_PTN_SELECT_PEND )
 
 				if( OK == iSelectPartition( xMBoxData.iSelectedPartition ) )
@@ -1191,11 +1174,9 @@ static void vProxyDriverTask( void *pArg )
 				{
 					INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
 				}
-			}
-			break;
+				break;
 
 			case APC_MSG_TYPE_ENABLE_HOT_RESET:
-			{
 				INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_PEND )
 
 				if( 0 == pxThis->ulNextBootAddr )
@@ -1218,15 +1199,12 @@ static void vProxyDriverTask( void *pArg )
 					vEnableHotReset();
 					INC_STAT_COUNTER( APC_PROXY_STATS_HOT_RESET_ENABLED )
 				}
-			}
-			break;
+				break;
 
 			default:
-			{
 				INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_PEND_FAILED )
 				PLL_ERR( APC_NAME, "Error: unknown command type (%d)\r\n", xMBoxData.eMsgType );
 				break;
-			}
 			}
 		}
 		pxThis->pulStats[ APC_PROXY_STATS_TASK_TIME_MS ] = UTIL_ELAPSED_TIME_MS( ulStartMs )
@@ -1274,7 +1252,6 @@ static int iRefreshFptData( APC_BOOT_DEVICES xBootDevice )
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_INVALID_BOOT_DEVICE )
 	}
-
 	return iStatus;
 }
 
@@ -1359,7 +1336,6 @@ static int iLoadFpt( APC_BOOT_DEVICES xBootDevice )
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_INVALID_BOOT_DEVICE )
 	}
-
 	return iStatus;
 }
 
@@ -1400,7 +1376,6 @@ static int iLoadFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, uint
 	{
 		INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
 	}
-
 	return iStatus;
 }
 
@@ -1517,7 +1492,6 @@ static int iDownloadImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 			}
 		}
 	}
-
 	return iStatus;
 }
 
@@ -1694,7 +1668,6 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 					PLL_ERR( APC_NAME, "ERROR reading to 0x%08x from 0x%08x\r\n", pxCopyData->ulCpyAddr, ulSrcAddr );
 					break;
 				}
-
 				xImageData.usPacketNum++;
 			}
 
@@ -1756,7 +1729,6 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 			         ulOSAL_GetUptimeMs() - ulStartMs );
 		}
 	}
-
 	return iStatus;
 }
 
@@ -1782,7 +1754,6 @@ static int iSelectPartition( int iPartition )
 
 		iStatus = OK;
 	}
-
 	return iStatus;
 }
 
@@ -1871,6 +1842,5 @@ static int iVerifyDownload( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 		         ( OK == iStatus )?( "complete" ):( "failure" ),
 		         ulOSAL_GetUptimeMs() - ulStartMs );
 	}
-
 	return iStatus;
 }

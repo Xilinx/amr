@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF OSPI Stub abstraction.
@@ -166,7 +166,7 @@ uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *pxInitCfg )
          * Initialise the driver based on the device id supplied in the xparameters.h
          * and the page size 'ospi_flash_init()', The default page size in versal is 256.
          */
-        PLL_DBG( FW_IF_OSPI_NAME, "Device Id:%d\r\n", xLocalCfg.ucOspiDeviceId );
+        PLL_DBG( FW_IF_OSPI_NAME, "Device Addr:%d\r\n", xLocalCfg.ulOspiBaseAddress );
         PLL_DBG( FW_IF_OSPI_NAME, "Page Size:%d\r\n", xLocalCfg.usPageSize );
         iInitialised = FW_IF_TRUE;
     }
