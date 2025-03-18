@@ -10,14 +10,14 @@
 #ifndef _GCQ_VERSION_H_
 #define _GCQ_VERSION_H_
 
-#define GIT_TAG                   "1.1.0"
+#define GIT_TAG                   "1.0.0"
 #define GIT_TAG_VER_MAJOR         (1)
-#define GIT_TAG_VER_MINOR         (1)
+#define GIT_TAG_VER_MINOR         (0)
 #define GIT_TAG_VER_PATCH         (0)
 #define GIT_TAG_VER_DEV_COMMITS   (0)
 
-#define GIT_HASH                  "c318a710ead16bdbff0827301e42a44ace5d5de6"
-#define GIT_DATE                  "20240131"
+#define GIT_HASH                  "6b9a1f03ac135f8390bf562335701cc60806ade8"
+#define GIT_DATE                  "20250317"
 #define GIT_BRANCH                ""
 #define GIT_STATUS                (0)
 
