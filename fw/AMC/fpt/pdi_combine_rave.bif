@@ -5,10 +5,10 @@
 all:
 {
     image {
-      { type=bootimage, file=./build/ve2302_pcie_qdma_base.pdi  }
+      { type=bootimage, file=./amc_bsp/versal-rave-amr-sdt/ve2302_pcie_qdma_base.pdi }
     }
     image {
         id = 0x1c000000, name=rpu_subsystem, delay_handoff
-        { core=r5-0, file=./build/amc.elf  }
+        { core=r5-0, file=./build/amc.elf }
     }
 }

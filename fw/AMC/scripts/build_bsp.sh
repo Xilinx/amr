@@ -46,7 +46,6 @@ function clean() {
 }
 
 
-
 ###                           Script Starting Point                          ###
 
 ### handle options ###
@@ -78,7 +77,6 @@ while [ $# -gt 0 ]; do
 			echo "xsa path set==>$xsa"
 			fi
 		;;
-
 	-os)
 		shift
 		os=$1
@@ -125,9 +123,9 @@ echo "===    Creating BSP    ==="
 cd ..
 mkdir amc_bsp
 cd amc_bsp
-sdtgen -eval "sdtgen set_dt_param -xsa $xsa -dir versal_amr_sdt; generate_sdt"
+sdtgen -eval "sdtgen set_dt_param -xsa $xsa -dir versal-rave-amr-sdt; generate_sdt"
 empyro repo -st ${XILINX_VITIS}/data/embeddedsw
-empyro create_bsp -t empty_application -w amc_bsp -s versal_amr_sdt/system-top.dts -p psv_cortexr5_0 -o freertos
+empyro create_bsp -t empty_application -w amc_bsp -s versal-rave-amr-sdt/system-top.dts -p psv_cortexr5_0 -o freertos
 empyro config_bsp -d amc_bsp -al xilfpga
 empyro config_bsp -d amc_bsp -al xilloader
 empyro config_bsp -d amc_bsp -st freertos freertos_support_static_allocation:True

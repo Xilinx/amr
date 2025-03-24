@@ -3,6 +3,10 @@
 ##
 # Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
+# E.g. Build amc:
+# ./scripts/build.sh -os freertos10_xilinx -profile ${PRODUCT} -xsa $XSA
+#
+# This will build bsp and amc.elf in the build directory
 #
 
 ### store xsa path ###

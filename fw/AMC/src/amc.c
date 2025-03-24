@@ -205,28 +205,31 @@ static void vConfigurePartitionTable( void );
 
 /* Note: the default I2C clock frequency isn't used */
 static I2C_CFG_TYPE xI2cCfg[ I2C_NUM_INSTANCES ] =
-{ {
-      HAL_I2C_BUS_0_DEVICE_ID,
-      ( uint64_t )HAL_I2C_BUS_0_BASEADDR,
-      HAL_I2C_BUS_0_I2C_CLK_FREQ_HZ,
-      HAL_I2C_RETRY_COUNT,
-      HAL_I2C_BUS_0_SW_RESET_OFFSET,
-      HAL_I2C_BUS_0_RESET_ON_INIT,
-      HAL_I2C_BUS_0_HW_RESET_ADDR,
-      HAL_I2C_BUS_0_HW_RESET_MASK,
-      HAL_I2C_BUS_0_HW_DEVICE_RESET
-  },
-  {
-      HAL_I2C_BUS_1_DEVICE_ID,
-      ( uint64_t )HAL_I2C_BUS_1_BASEADDR,
-      HAL_I2C_BUS_1_I2C_CLK_FREQ_HZ,
-      HAL_I2C_RETRY_COUNT,
-      HAL_I2C_BUS_1_SW_RESET_OFFSET,
-      HAL_I2C_BUS_1_RESET_ON_INIT,
-      HAL_I2C_BUS_1_HW_RESET_ADDR,
-      HAL_I2C_BUS_1_HW_RESET_MASK,
-      HAL_I2C_BUS_1_HW_DEVICE_RESET
-  } };
+{
+    {
+        HAL_I2C_BUS_0_DEVICE_ID,
+        ( uint64_t )HAL_I2C_BUS_0_BASEADDR,
+        HAL_I2C_BUS_0_I2C_CLK_FREQ_HZ,
+        HAL_I2C_RETRY_COUNT,
+        HAL_I2C_BUS_0_SW_RESET_OFFSET,
+        HAL_I2C_BUS_0_RESET_ON_INIT,
+        HAL_I2C_BUS_0_HW_RESET_ADDR,
+        HAL_I2C_BUS_0_HW_RESET_MASK,
+        HAL_I2C_BUS_0_HW_DEVICE_RESET
+    },
+    {
+        HAL_I2C_BUS_1_DEVICE_ID,
+        ( uint64_t )HAL_I2C_BUS_1_BASEADDR,
+        HAL_I2C_BUS_1_I2C_CLK_FREQ_HZ,
+        HAL_I2C_RETRY_COUNT,
+        HAL_I2C_BUS_1_SW_RESET_OFFSET,
+        HAL_I2C_BUS_1_RESET_ON_INIT,
+        HAL_I2C_BUS_1_HW_RESET_ADDR,
+        HAL_I2C_BUS_1_HW_RESET_MASK,
+        HAL_I2C_BUS_1_HW_DEVICE_RESET
+    }
+};
+
 static EEPROM_CFG xEepromCfg =
 {
     HAL_EEPROM_I2C_BUS,
@@ -456,25 +459,18 @@ static int iAxcCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        case AXC_PROXY_DRIVER_E_QSFP_PRESENT:
-        {
-            iStatus = OK;
-            break;
-        }
+            case AXC_PROXY_DRIVER_E_QSFP_PRESENT:
+                iStatus = OK;
+                break;
 
-        case AXC_PROXY_DRIVER_E_QSFP_NOT_PRESENT:
-        {
-            iStatus = OK;
-            break;
-        }
+            case AXC_PROXY_DRIVER_E_QSFP_NOT_PRESENT:
+                iStatus = OK;
+                break;
 
-        default:
-        {
-            break;
-        }
+            default:
+                break;
         }
     }
-
     return iStatus;
 }
 
@@ -489,70 +485,48 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        case APC_PROXY_DRIVER_E_DOWNLOAD_STARTED:
-        {
-            iStatus = OK;
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_STARTED:
+                iStatus = OK;
+                break;
 
-        case APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE:
-        {
-            iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE:
+                iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_DOWNLOAD_FAILED:
-        {
-            iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_FAILED:
+                iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
 
-        case APC_PROXY_DRIVER_E_DOWNLOAD_BUSY:
-        {
-            iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_BUSY:
+                iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_STARTED:
-        {
-            iStatus = OK;
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_STARTED:
+                iStatus = OK;
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_COMPLETE:
-        {
-            iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_COMPLETE:
+                iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_FAILED:
-        {
-            iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_FAILED:
+                iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_BUSY:
-        {
-            iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_BUSY:
+                iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_PARTITION_SELECTED:
-        {
-            iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_PARTITION_SELECTED:
+                iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED:
-        {
-            iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED:
+                iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
 
-        default:
-        {
-            break;
-        }
+            default:
+                break;
         }
     }
 
@@ -570,58 +544,57 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        case AMI_PROXY_DRIVER_E_GET_IDENTITY:
-        {
-            PLL_DBG( AMC_NAME, "Event Get Identity (0x%02X)\r\n", pxSignal->ucEventType );
-
-            AMI_PROXY_RESULT xResult = AMI_PROXY_RESULT_SUCCESS;
-
-            GCQ_VERSION_TYPE xGcqVersion =
+            case AMI_PROXY_DRIVER_E_GET_IDENTITY:
             {
-                0
-            };
-            if( OK != iGCQGetVersion( &xGcqVersion ) )
-            {
-                PLL_DBG( AMC_NAME, "Error getting sGCQ version\r\n" );
-                xResult = AMI_PROXY_RESULT_FAILURE;
+                PLL_DBG( AMC_NAME, "Event Get Identity (0x%02X)\r\n", pxSignal->ucEventType );
+
+                AMI_PROXY_RESULT xResult = AMI_PROXY_RESULT_SUCCESS;
+
+                GCQ_VERSION_TYPE xGcqVersion =
+                {
+                    0
+                };
+                if( OK != iGCQGetVersion( &xGcqVersion ) )
+                {
+                    PLL_DBG( AMC_NAME, "Error getting sGCQ version\r\n" );
+                    xResult = AMI_PROXY_RESULT_FAILURE;
+                }
+
+                AMI_PROXY_IDENTITY_RESPONSE xIdentityResponse =
+                {
+                    .ucVerMajor     = ( uint8_t )GIT_TAG_VER_MAJOR,
+                    .ucVerMinor     = ( uint8_t )GIT_TAG_VER_MINOR,
+                    .ucVerPatch     = ( uint8_t )GIT_TAG_VER_PATCH,
+                    .ucLocalChanges = ( uint8_t )( GIT_STATUS )?( 1 ):( 0 ),
+                    .usDevCommits   = ( uint16_t )GIT_TAG_VER_DEV_COMMITS,
+                    .ucLinkVerMajor = xGcqVersion.ucVerMajor,
+                    .ucLinkVerMinor = xGcqVersion.ucVerMinor
+                };
+                iStatus = iAMI_SetIdentityResponse( pxSignal, xResult, &xIdentityResponse );
+
+                /* AMI is ready - enable hot reset */
+                if( OK == iAPC_EnableHotReset( pxSignal ) )
+                {
+                    PLL_DBG( AMC_NAME, "Hot reset enabled\r\n" );
+                }
+
+                if( OK == iPLL_SendBootRecords() )
+                {
+                    PLL_INF( AMC_NAME, "Boot logs sent OK\r\n" );
+                    iStatus = OK;
+                }
+                else
+                {
+                    PLL_ERR( AMC_NAME, "ERROR sending boot logs\r\n" );
+                }
+                break;
             }
 
-            AMI_PROXY_IDENTITY_RESPONSE xIdentityResponse =
+            default:
             {
-                .ucVerMajor     = ( uint8_t )GIT_TAG_VER_MAJOR,
-                .ucVerMinor     = ( uint8_t )GIT_TAG_VER_MINOR,
-                .ucVerPatch     = ( uint8_t )GIT_TAG_VER_PATCH,
-                .ucLocalChanges = ( uint8_t )( GIT_STATUS )?( 1 ):( 0 ),
-                .usDevCommits   = ( uint16_t )GIT_TAG_VER_DEV_COMMITS,
-                .ucLinkVerMajor = xGcqVersion.ucVerMajor,
-                .ucLinkVerMinor = xGcqVersion.ucVerMinor
-            };
-            iStatus = iAMI_SetIdentityResponse( pxSignal, xResult, &xIdentityResponse );
-
-            /* AMI is ready - enable hot reset */
-            if( OK == iAPC_EnableHotReset( pxSignal ) )
-            {
-                PLL_DBG( AMC_NAME, "Hot reset enabled\r\n" );
-            }
-
-            if( OK == iPLL_SendBootRecords() )
-            {
-                PLL_INF( AMC_NAME, "Boot logs sent OK\r\n" );
                 iStatus = OK;
+                break;
             }
-            else
-            {
-                PLL_ERR( AMC_NAME, "ERROR sending boot logs\r\n" );
-            }
-
-            break;
-        }
-
-        default:
-        {
-            iStatus = OK;
-            break;
-        }
         }
     }
 
@@ -639,10 +612,8 @@ static int iBmcCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        default:
-        {
-            break;
-        }
+            default:
+                break;
         }
     }
 
@@ -960,6 +931,7 @@ static int iInitProxies( void )
             }
         }
     }
+
     return iStatus;
 }
 
@@ -1075,6 +1047,7 @@ static int iPlmGetUid(uint32_t* uuid)
     {
         PLL_ERR( AMC_NAME, "PLM UUID Read Failed =%d uuid=%x", iStatus, ImageInfo.UID);
     }
+
     return iStatus;
 }
 

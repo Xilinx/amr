@@ -22,7 +22,7 @@ APP_BIN="ami_tool"
 API_BIN="libami.a"
 
 # This script assumes that it is run from the top level project directory
-ROOT_DIR=$(pwd)
+ROOT_DIR=$(realpath .)
 DRIVER_DIR=$ROOT_DIR/driver
 API_DIR=$ROOT_DIR/api
 APP_DIR=$ROOT_DIR/app

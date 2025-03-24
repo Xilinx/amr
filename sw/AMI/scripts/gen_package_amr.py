@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
 import re
 import os
@@ -418,7 +418,7 @@ def main(args):
         config['package']['usr_bin_dir']        = 'usr/local/bin/'
         config['package']['usr_lib_dir']        = 'usr/local/lib/'
 
-        config['package']['opt_dir']        = 'opt/amd/amr/amd_rave_gen3x4_24.2'
+        config['package']['opt_dir']        = 'opt/amd/amr/amd_rave_gen3x4_25.1'
 
         config['package']['usr_bin'] = config['package']['usr_bin_dir'] + '/ami_tool'
         config['package']['usr_lib'] = config['package']['usr_lib_dir'] + '/libami.a'
@@ -650,8 +650,8 @@ def main(args):
             {'src': os.path.abspath(join(SCRIPT_DIR, 'package_data',  'dkms.conf')),'dst': config['package']['usr_src_dir']},
             {'src': os.path.abspath(join(PROJECT_DIR, 'api',  'build', 'libami.a')),'dst': config['package']['usr_lib_dir']},
             {'src': os.path.abspath(join(PROJECT_DIR, 'app',  'build', 'ami_tool')),'dst': config['package']['usr_bin_dir']},
-            {'src': os.path.abspath(join(ROOT_DIR,    'hw',  'amd_rave_gen3x4_24.2', 'build', 'OSPI_RAVE.bin')),  'dst': config['package']['opt_dir']},
-            {'src': os.path.abspath(join(ROOT_DIR,    'hw',  'amd_rave_gen3x4_24.2', 'build', 'OSPI_RAVE_fpt.bin')),'dst': config['package']['opt_dir']},
+            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'OSPI_RAVE.bin')),  'dst': config['package']['opt_dir']},
+            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'OSPI_RAVE_fpt.bin')),'dst': config['package']['opt_dir']},
             *api_dest,
             *driver_dest
         ]

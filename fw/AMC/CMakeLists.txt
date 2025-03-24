@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 3.5.0)
 project(amc)
 
 add_definitions(-DRUN_TIME)
-add_definitions(-DSDT)
 
 #adds test directories if test flag set to true
 if(TEST_ENABLE)
@@ -54,6 +53,7 @@ else()
 
     if(OS MATCHES "^(FreeRTOS)$")
         if (NOT YOCTO)
+            add_definitions(-DSDT)
             set(CMAKE_C_COMPILER armr5-none-eabi-gcc)
             set(CMAKE_SYSTEM_NAME Generic)
             set(CMAKE_SYSTEM_PROCESSOR arm)
