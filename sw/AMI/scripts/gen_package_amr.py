@@ -650,8 +650,8 @@ def main(args):
             {'src': os.path.abspath(join(SCRIPT_DIR, 'package_data',  'dkms.conf')),'dst': config['package']['usr_src_dir']},
             {'src': os.path.abspath(join(PROJECT_DIR, 'api',  'build', 'libami.a')),'dst': config['package']['usr_lib_dir']},
             {'src': os.path.abspath(join(PROJECT_DIR, 'app',  'build', 'ami_tool')),'dst': config['package']['usr_bin_dir']},
-            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'OSPI_RAVE.bin')),  'dst': config['package']['opt_dir']},
-            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'OSPI_RAVE_fpt.bin')),'dst': config['package']['opt_dir']},
+            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'ospi_rave.bin')),  'dst': config['package']['opt_dir']},
+            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'ospi_rave_fpt.bin')),'dst': config['package']['opt_dir']},
             *api_dest,
             *driver_dest
         ]
