@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * test_ami_sensor.c - Unit test file for ami_sensor.c
- * 
+ *
  * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -53,7 +53,7 @@ static struct ami_sensor_data test_power   = { 0 };
 static struct ami_sensor_data test_current = { 0 };
 static struct ami_sensor_data test_voltage = { 0 };
 
-static struct ami_sensor_internal test_sensor_data = { 
+static struct ami_sensor_internal test_sensor_data = {
 	&test_temp,
 	&test_current,
 	&test_voltage,
@@ -116,11 +116,11 @@ int __wrap_open(const char *pathname, int flags, int mode)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_open(pathname, flags, mode);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -139,11 +139,11 @@ int __wrap_close(int fd)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_close(fd);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -167,11 +167,11 @@ ssize_t __wrap_read(int fildes, void *buf, size_t nbyte)
 		ret = strlen(str);
 		break;
 	}
-	
+
 	case REAL:
 		ret = __real_read(fildes, buf, nbyte);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -192,11 +192,11 @@ ssize_t __wrap_write(int fildes, const void *buf, size_t nbyte)
 		ret = AMI_LINUX_STATUS_OK;
 		break;
 	}
-	
+
 	case REAL:
 		ret = __real_write(fildes, buf, nbyte);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -221,11 +221,11 @@ void *__wrap_calloc(size_t num, size_t size)
 	case REAL:
 		ret = __real_calloc(num, size);
 		break;
-	
+
 	default:
 		break;
 	}
-	
+
 	WRAPPER_DONE(calloc);
 	return ret;
 }
@@ -247,11 +247,11 @@ int __wrap_snprintf(char *str, size_t size, const char *format, ...)
 		va_end(args);
 		break;
 	}
-	
+
 	default:
 		break;
 	}
-	
+
 	WRAPPER_DONE(snprintf);
 	return ret;
 }
@@ -391,13 +391,13 @@ void test_happy_ami_sensor_discover(void **state)
 		"/sys/class/hwmon/hwmon2/temp2_input",
 		"/sys/class/hwmon/hwmon2/temp2_max",
 		"/sys/class/hwmon/hwmon2/in1_input",
-		NULL 
+		NULL
 	};
 
 	char *files_temp[] = {
 		"/sys/class/hwmon/hwmon2/temp1_label",
 		"/sys/class/hwmon/hwmon2/temp1_input",
-		NULL 
+		NULL
 	};
 
 	char *files_voltage[] = {
@@ -444,7 +444,7 @@ void test_happy_ami_sensor_discover(void **state)
 	assert_int_equal(dev.num_sensors, 2);
 	assert_int_equal(dev.num_total_sensors, 3);
 	delete_sensors(&dev);
-	
+
 	/* Happy path - single temperature sensor */
 	WRAPPER_ACTION(OK, open);
 	WRAPPER_ACTION(OK, close);
@@ -946,7 +946,7 @@ void test_happy_ami_sensor_get_temp_value(void **state)
 	enum ami_sensor_status status = AMI_SENSOR_STATUS_INVALID;
 
 	/* IOCTL return data. */
-	struct ami_ioc_sensor_value data = { 
+	struct ami_ioc_sensor_value data = {
 		.status = AMI_SENSOR_OK_STR,
 		.fresh = true,
 		.val = 123
@@ -1029,7 +1029,7 @@ void test_happy_ami_sensor_get_voltage_value(void **state)
 	enum ami_sensor_status status = AMI_SENSOR_STATUS_INVALID;
 
 	/* IOCTL return data. */
-	struct ami_ioc_sensor_value data = { 
+	struct ami_ioc_sensor_value data = {
 		.status = AMI_SENSOR_OK_STR,
 		.fresh = true,
 		.val = 123
@@ -1112,7 +1112,7 @@ void test_happy_ami_sensor_get_current_value(void **state)
 	enum ami_sensor_status status = AMI_SENSOR_STATUS_INVALID;
 
 	/* IOCTL return data. */
-	struct ami_ioc_sensor_value data = { 
+	struct ami_ioc_sensor_value data = {
 		.status = AMI_SENSOR_OK_STR,
 		.fresh = false,
 		.val = 123
@@ -1195,7 +1195,7 @@ void test_happy_ami_sensor_get_power_value(void **state)
 	enum ami_sensor_status status = AMI_SENSOR_STATUS_INVALID;
 
 	/* IOCTL return data. */
-	struct ami_ioc_sensor_value data = { 
+	struct ami_ioc_sensor_value data = {
 		.status = AMI_SENSOR_OK_STR,
 		.fresh = true,
 		.val = 123
@@ -2330,7 +2330,7 @@ void test_fail_ami_sensor_get_power_unit_mod(void **state)
 
 void test_happy_parse_sensor_status(void **state)
 {
-	
+
 	ami_device dev = { 0 };
 	enum ami_sensor_status val = AMI_SENSOR_STATUS_INVALID;
 
@@ -2506,7 +2506,7 @@ void test_fail_get_single_sensor_val(void **state)
 	enum ami_sensor_status status = AMI_SENSOR_STATUS_INVALID;
 
 	/* IOCTL return data. */
-	struct ami_ioc_sensor_value data = { 
+	struct ami_ioc_sensor_value data = {
 		.status = AMI_SENSOR_OK_STR,
 		.fresh = true,
 		.val = 123

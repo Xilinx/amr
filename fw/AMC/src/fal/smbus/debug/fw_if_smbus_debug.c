@@ -5,7 +5,6 @@
  * This file contains the SMBUS debug implementation.
  *
  * @file fw_if_smbus_debug.c
- *
  */
 
 #include "standard.h"

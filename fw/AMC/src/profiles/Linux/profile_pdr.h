@@ -5,7 +5,6 @@
  * This file contains the PLDM PDR profile for Linux
  *
  * @file profile_pdr.h
- *
  */
 
 #ifndef _PROFILE_PDR_H_
@@ -33,7 +32,7 @@
 #define PHYSICAL_PLDM_ENTITY_ADDIN_CARD ( 68 )
 #define LOGICAL_PLDM_ENTITY_ADDIN_CARD  ( 32835 )
 
-/* Macros to set bits for 'ucucRangeFieldSupport' field in PDR */
+/* Macros to set bits for 'ucRangeFieldSupport' field in PDR */
 
 #define NORMAL_MIN_MAX  ( 0x3 << 1 )
 #define RATED_MIN_MAX   ( 0x3 << 3 )
@@ -41,7 +40,7 @@
 #define LOW_THRESHOLDS  ( 0x5 << 4 )
 #define NOMINAL_VALUE   ( 0x1 )
 
-/* Macros to set bits for 'ucucSupportedThresholds' field in PDR */
+/* Macros to set bits for 'ucSupportedThresholds' field in PDR */
 
 #define HAS_LOW_THRESHOLDS  ( 0x7 << 3 )
 #define HAS_HIGH_THRESHOLDS ( 0x7 )
@@ -1974,4 +1973,4 @@ PLDM_NUMERIC_SENSOR_NAME_PDR pxPdrSensorNames[ TOTAL_PDR_NUMERIC_ASCI_SENSORS ] 
     },
 };
 
-#endif
+#endif /* _PROFILE_PDR_H_ */

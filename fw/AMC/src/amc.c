@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the main entry point for the Alveo Managment Controller
  *
  * @file amc.c
- *
  */
 
 /******************************************************************************/
@@ -17,9 +16,7 @@
 #include "util.h"
 #include "amc_cfg.h"
 #include "amc_version.h"
-#ifdef SDT
 #include "xloader_bsp_config.h"
-#endif
 #include "xil_util.h"
 #include "xil_cache.h"
 #include "xloader_defs.h"
@@ -208,28 +205,31 @@ static void vConfigurePartitionTable( void );
 
 /* Note: the default I2C clock frequency isn't used */
 static I2C_CFG_TYPE xI2cCfg[ I2C_NUM_INSTANCES ] =
-{ {
-      HAL_I2C_BUS_0_DEVICE_ID,
-      ( uint64_t )HAL_I2C_BUS_0_BASEADDR,
-      HAL_I2C_BUS_0_I2C_CLK_FREQ_HZ,
-      HAL_I2C_RETRY_COUNT,
-      HAL_I2C_BUS_0_SW_RESET_OFFSET,
-      HAL_I2C_BUS_0_RESET_ON_INIT,
-      HAL_I2C_BUS_0_HW_RESET_ADDR,
-      HAL_I2C_BUS_0_HW_RESET_MASK,
-      HAL_I2C_BUS_0_HW_DEVICE_RESET
-  },
-  {
-      HAL_I2C_BUS_1_DEVICE_ID,
-      ( uint64_t )HAL_I2C_BUS_1_BASEADDR,
-      HAL_I2C_BUS_1_I2C_CLK_FREQ_HZ,
-      HAL_I2C_RETRY_COUNT,
-      HAL_I2C_BUS_1_SW_RESET_OFFSET,
-      HAL_I2C_BUS_1_RESET_ON_INIT,
-      HAL_I2C_BUS_1_HW_RESET_ADDR,
-      HAL_I2C_BUS_1_HW_RESET_MASK,
-      HAL_I2C_BUS_1_HW_DEVICE_RESET
-  } };
+{
+    {
+        HAL_I2C_BUS_0_DEVICE_ID,
+        ( uint64_t )HAL_I2C_BUS_0_BASEADDR,
+        HAL_I2C_BUS_0_I2C_CLK_FREQ_HZ,
+        HAL_I2C_RETRY_COUNT,
+        HAL_I2C_BUS_0_SW_RESET_OFFSET,
+        HAL_I2C_BUS_0_RESET_ON_INIT,
+        HAL_I2C_BUS_0_HW_RESET_ADDR,
+        HAL_I2C_BUS_0_HW_RESET_MASK,
+        HAL_I2C_BUS_0_HW_DEVICE_RESET
+    },
+    {
+        HAL_I2C_BUS_1_DEVICE_ID,
+        ( uint64_t )HAL_I2C_BUS_1_BASEADDR,
+        HAL_I2C_BUS_1_I2C_CLK_FREQ_HZ,
+        HAL_I2C_RETRY_COUNT,
+        HAL_I2C_BUS_1_SW_RESET_OFFSET,
+        HAL_I2C_BUS_1_RESET_ON_INIT,
+        HAL_I2C_BUS_1_HW_RESET_ADDR,
+        HAL_I2C_BUS_1_HW_RESET_MASK,
+        HAL_I2C_BUS_1_HW_DEVICE_RESET
+    }
+};
+
 static EEPROM_CFG xEepromCfg =
 {
     HAL_EEPROM_I2C_BUS,
@@ -368,28 +368,28 @@ static void vTaskFuncMain( void )
              ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucGcqFalInitialised             %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_CREATED         ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED         ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucEmmcFalInitialised            %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucOspiFalInitialised            %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_CREATED        ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucSmbusFalInitialised           %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED       ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED       ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucMuxedDeviceFalCreated         %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_CREATED     ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_CREATED     ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucGcqFalCreated                 %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED             ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_CREATED             ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucEmmcFalCreated                %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_CREATED            ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_CREATED            ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucOspiFalCreated                %s\n\r",
-             ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED            ? "TRUE" : "FALSE" ) );
+             ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_CREATED            ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucSmbusFalCreated               %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_CREATED           ? "TRUE" : "FALSE" ) );
@@ -418,7 +418,7 @@ static void vTaskFuncMain( void )
              "ucOutOfBandInitialised          %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OUT_OF_BAND_INITIALISED      ? "TRUE" : "FALSE" ) );
 
-    FOREVER
+    for( ;; )
     {
         iOSAL_Task_SleepMs( AMC_TASK_SLEEP_MS );
     }
@@ -459,25 +459,18 @@ static int iAxcCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        case AXC_PROXY_DRIVER_E_QSFP_PRESENT:
-        {
-            iStatus = OK;
-            break;
-        }
+            case AXC_PROXY_DRIVER_E_QSFP_PRESENT:
+                iStatus = OK;
+                break;
 
-        case AXC_PROXY_DRIVER_E_QSFP_NOT_PRESENT:
-        {
-            iStatus = OK;
-            break;
-        }
+            case AXC_PROXY_DRIVER_E_QSFP_NOT_PRESENT:
+                iStatus = OK;
+                break;
 
-        default:
-        {
-            break;
-        }
+            default:
+                break;
         }
     }
-
     return iStatus;
 }
 
@@ -492,70 +485,48 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        case APC_PROXY_DRIVER_E_DOWNLOAD_STARTED:
-        {
-            iStatus = OK;
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_STARTED:
+                iStatus = OK;
+                break;
 
-        case APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE:
-        {
-            iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE:
+                iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_DOWNLOAD_FAILED:
-        {
-            iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_FAILED:
+                iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
 
-        case APC_PROXY_DRIVER_E_DOWNLOAD_BUSY:
-        {
-            iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_DOWNLOAD_BUSY:
+                iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_STARTED:
-        {
-            iStatus = OK;
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_STARTED:
+                iStatus = OK;
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_COMPLETE:
-        {
-            iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_COMPLETE:
+                iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_FAILED:
-        {
-            iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_FAILED:
+                iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
 
-        case APC_PROXY_DRIVER_E_COPY_BUSY:
-        {
-            iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_COPY_BUSY:
+                iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_PARTITION_SELECTED:
-        {
-            iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_PARTITION_SELECTED:
+                iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                break;
 
-        case APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED:
-        {
-            iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
-            break;
-        }
+            case APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED:
+                iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
 
-        default:
-        {
-            break;
-        }
+            default:
+                break;
         }
     }
 
@@ -573,58 +544,57 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        case AMI_PROXY_DRIVER_E_GET_IDENTITY:
-        {
-            PLL_DBG( AMC_NAME, "Event Get Identity (0x%02X)\r\n", pxSignal->ucEventType );
-
-            AMI_PROXY_RESULT xResult = AMI_PROXY_RESULT_SUCCESS;
-
-            GCQ_VERSION_TYPE xGcqVersion =
+            case AMI_PROXY_DRIVER_E_GET_IDENTITY:
             {
-                0
-            };
-            if( OK != iGCQGetVersion( &xGcqVersion ) )
-            {
-                PLL_DBG( AMC_NAME, "Error getting GCQ version\r\n" );
-                xResult = AMI_PROXY_RESULT_FAILURE;
+                PLL_DBG( AMC_NAME, "Event Get Identity (0x%02X)\r\n", pxSignal->ucEventType );
+
+                AMI_PROXY_RESULT xResult = AMI_PROXY_RESULT_SUCCESS;
+
+                GCQ_VERSION_TYPE xGcqVersion =
+                {
+                    0
+                };
+                if( OK != iGCQGetVersion( &xGcqVersion ) )
+                {
+                    PLL_DBG( AMC_NAME, "Error getting sGCQ version\r\n" );
+                    xResult = AMI_PROXY_RESULT_FAILURE;
+                }
+
+                AMI_PROXY_IDENTITY_RESPONSE xIdentityResponse =
+                {
+                    .ucVerMajor     = ( uint8_t )GIT_TAG_VER_MAJOR,
+                    .ucVerMinor     = ( uint8_t )GIT_TAG_VER_MINOR,
+                    .ucVerPatch     = ( uint8_t )GIT_TAG_VER_PATCH,
+                    .ucLocalChanges = ( uint8_t )( GIT_STATUS )?( 1 ):( 0 ),
+                    .usDevCommits   = ( uint16_t )GIT_TAG_VER_DEV_COMMITS,
+                    .ucLinkVerMajor = xGcqVersion.ucVerMajor,
+                    .ucLinkVerMinor = xGcqVersion.ucVerMinor
+                };
+                iStatus = iAMI_SetIdentityResponse( pxSignal, xResult, &xIdentityResponse );
+
+                /* AMI is ready - enable hot reset */
+                if( OK == iAPC_EnableHotReset( pxSignal ) )
+                {
+                    PLL_DBG( AMC_NAME, "Hot reset enabled\r\n" );
+                }
+
+                if( OK == iPLL_SendBootRecords() )
+                {
+                    PLL_INF( AMC_NAME, "Boot logs sent OK\r\n" );
+                    iStatus = OK;
+                }
+                else
+                {
+                    PLL_ERR( AMC_NAME, "ERROR sending boot logs\r\n" );
+                }
+                break;
             }
 
-            AMI_PROXY_IDENTITY_RESPONSE xIdentityResponse =
+            default:
             {
-                .ucVerMajor     = ( uint8_t )GIT_TAG_VER_MAJOR,
-                .ucVerMinor     = ( uint8_t )GIT_TAG_VER_MINOR,
-                .ucVerPatch     = ( uint8_t )GIT_TAG_VER_PATCH,
-                .ucLocalChanges = ( uint8_t )( GIT_STATUS )?( 1 ):( 0 ),
-                .usDevCommits   = ( uint16_t )GIT_TAG_VER_DEV_COMMITS,
-                .ucLinkVerMajor = xGcqVersion.ucVerMajor,
-                .ucLinkVerMinor = xGcqVersion.ucVerMinor
-            };
-            iStatus = iAMI_SetIdentityResponse( pxSignal, xResult, &xIdentityResponse );
-
-            /* AMI is ready - enable hot reset */
-            if( OK == iAPC_EnableHotReset( pxSignal ) )
-            {
-                PLL_DBG( AMC_NAME, "Hot reset enabled\r\n" );
-            }
-
-            if( OK == iPLL_SendBootRecords() )
-            {
-                PLL_INF( AMC_NAME, "Boot logs sent OK\r\n" );
                 iStatus = OK;
+                break;
             }
-            else
-            {
-                PLL_ERR( AMC_NAME, "ERROR sending boot logs\r\n" );
-            }
-
-            break;
-        }
-
-        default:
-        {
-            iStatus = OK;
-            break;
-        }
         }
     }
 
@@ -642,10 +612,8 @@ static int iBmcCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        default:
-        {
-            break;
-        }
+            default:
+                break;
         }
     }
 
@@ -670,7 +638,7 @@ static void vGetProjectInfo( void )
     vPLL_Printf( "#                                                             #\r\n" );
     vPLL_Printf( "#                             AMC                             #\r\n" );
     vPLL_Printf( "#                                                             #\r\n" );
-    vPLL_Printf( "# Copyright (c) 2024 Advanced Micro Devices, Inc.             #\r\n" );
+    vPLL_Printf( "# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc.      #\r\n" );
     vPLL_Printf( "# All rights reserved.                                        #\r\n" );
     vPLL_Printf( "#                                                             #\r\n" );
     vPLL_Printf( "# SPDX-License-Identifier: MIT                                #\r\n" );
@@ -963,44 +931,9 @@ static int iInitProxies( void )
             }
         }
     }
+
     return iStatus;
 }
-
-/**
- * @brief   PLM Get image UUID
- */
-static int iPlmGetUid(uint32_t* uuid)
-{
-    int iStatus = XST_SUCCESS;
-    XMailbox MailboxInstance;
-    XLoader_ClientInstance LoaderClientInstance;
-    XLoader_ImageInfo ImageInfo;
-
-#ifndef SDT
-    iStatus = XMailbox_Initialize(&MailboxInstance, 0U);
-#else
-    iStatus = XMailbox_Initialize(&MailboxInstance, XPAR_XIPIPSU_0_BASEADDR);
-#endif
-	if (XST_SUCCESS == iStatus)
-    {
-        iStatus = XLoader_ClientInit(&LoaderClientInstance, &MailboxInstance);
-        if (XST_SUCCESS == iStatus)
-        {
-            iStatus = XLoader_GetImageInfo(&LoaderClientInstance, PL_NODE_ID, &ImageInfo);
-            if (XST_SUCCESS == iStatus)
-            {
-                *uuid = ImageInfo.UID;
-            }
-        }
-	}
-
-    if (XST_SUCCESS != iStatus)
-    {
-        PLL_ERR( AMC_NAME, "PLM UUID Read Failed =%d uuid=%x", iStatus, ImageInfo.UID);
-    }
-    return iStatus;
-}
-
 
 /**
  * @brief   Initialise App layer
@@ -1008,13 +941,6 @@ static int iPlmGetUid(uint32_t* uuid)
 static int iInitApp( void )
 {
     int iStatus = OK;
-    uint32_t uuid;
-
-    iPlmGetUid(&uuid);
-    PLL_ERR( AMC_NAME, "iInitApp uuid=0x%08X\r\n", uuid );
-
-    Xil_Out32(XPAR_BLP_BLP_LOGIC_UUID_REGISTER_BASEADDR, uuid);
-    Xil_DCacheFlushRange(XPAR_BLP_BLP_LOGIC_UUID_REGISTER_BASEADDR, sizeof(uint32_t));
 
     if( AMC_CFG_ASDM_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASDM_PREREQUISITES ) )
     {
@@ -1094,6 +1020,38 @@ static int iInitDebug( void )
 }
 
 /**
+ * @brief   PLM Get image UUID
+ */
+static int iPlmGetUid(uint32_t* uuid)
+{
+    int iStatus = XST_SUCCESS;
+    XMailbox MailboxInstance;
+    XLoader_ClientInstance LoaderClientInstance;
+    XLoader_ImageInfo ImageInfo;
+
+    iStatus = XMailbox_Initialize(&MailboxInstance, XPAR_XIPIPSU_0_BASEADDR);
+	if (XST_SUCCESS == iStatus)
+    {
+        iStatus = XLoader_ClientInit(&LoaderClientInstance, &MailboxInstance);
+        if (XST_SUCCESS == iStatus)
+        {
+            iStatus = XLoader_GetImageInfo(&LoaderClientInstance, PL_NODE_ID, &ImageInfo);
+            if (XST_SUCCESS == iStatus)
+            {
+                *uuid = ImageInfo.UID;
+            }
+        }
+	}
+
+    if (XST_SUCCESS != iStatus)
+    {
+        PLL_ERR( AMC_NAME, "PLM UUID Read Failed =%d uuid=%x", iStatus, ImageInfo.UID);
+    }
+
+    return iStatus;
+}
+
+/**
  * @brief   Configure the partition table stored at the start of
  *          shared memory and used by the AMI to determine the AMC state
  */
@@ -1104,18 +1062,21 @@ static void vConfigurePartitionTable( void )
         0
     };
     uint8_t *pucDestAdd = NULL;
+    uint32_t uuid = 0;
 
     xPartTable.ulMagicNum                  = HAL_PARTITION_TABLE_MAGIC_NO;
     xPartTable.xRingBuffer.ulRingBufferOff = HAL_PARTITION_TABLE_SIZE;
     xPartTable.xRingBuffer.ulRingBufferLen = HAL_RPU_RING_BUFFER_LEN;
     xPartTable.xStatus.ulStatusOff         = HAL_PARTITION_TABLE_SIZE + HAL_RPU_RING_BUFFER_LEN;
     xPartTable.xStatus.ulStatusLen         = sizeof( uint32_t );
+    xPartTable.xUuid.ulUuidOff             = xPartTable.xStatus.ulStatusOff + xPartTable.xStatus.ulStatusLen;
+    xPartTable.xUuid.ulUuidLen             = HAL_UUID_SIZE;
     xPartTable.xLogMsg.ulLogMsgIndex       = 0;
-    xPartTable.xLogMsg.ulLogMsgBufferOff   = xPartTable.xStatus.ulStatusOff + xPartTable.xStatus.ulStatusLen;
+    xPartTable.xLogMsg.ulLogMsgBufferOff   = xPartTable.xUuid.ulUuidOff + xPartTable.xUuid.ulUuidLen;
     xPartTable.xLogMsg.ulLogMsgBufferLen   = PLL_LOG_BUF_LEN;
     xPartTable.xData.ulDataStart           = xPartTable.xLogMsg.ulLogMsgBufferOff +
                                              xPartTable.xLogMsg.ulLogMsgBufferLen;
-    xPartTable.xData.ulDataEnd = HAL_RPU_SHARED_MEMORY_SIZE;
+    xPartTable.xData.ulDataEnd             = HAL_RPU_SHARED_MEMORY_SIZE;
 
     /* Copy the populated table into the start of shared memory */
     pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR );
@@ -1123,14 +1084,11 @@ static void vConfigurePartitionTable( void )
     HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR, sizeof( xPartTable ) );
 
     /* Flush stale logs */
-    if( PLL_LOG_BUF_LEN >= xPartTable.xLogMsg.ulLogMsgBufferLen )
-    {
-        pvOSAL_MemSet( ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff ),
-                       0,
-                       xPartTable.xLogMsg.ulLogMsgBufferLen );
-        HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff,
-                              xPartTable.xLogMsg.ulLogMsgBufferLen );
-    }
+    pvOSAL_MemSet( ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff ),
+                    0,
+                    xPartTable.xLogMsg.ulLogMsgBufferLen );
+    HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff,
+                            xPartTable.xLogMsg.ulLogMsgBufferLen );
 
     /*
      * AMI is waiting for the status to be set to a value of 0x1, currently we have no
@@ -1140,4 +1098,16 @@ static void vConfigurePartitionTable( void )
     pvOSAL_MemSet( pucDestAdd, HAL_ENABLE_AMI_COMMS, xPartTable.xStatus.ulStatusLen );
     HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xStatus.ulStatusOff ),
                           xPartTable.xStatus.ulStatusLen );
+
+    /*
+     * UUID
+     */
+    iPlmGetUid(&uuid);
+    PLL_INF( AMC_NAME, "UUID = 0x%08x\r\n", uuid );
+
+    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xUuid.ulUuidOff );
+    pvOSAL_MemSet( pucDestAdd, 0, xPartTable.xUuid.ulUuidLen );
+    pvOSAL_MemCpy( pucDestAdd, &uuid, sizeof(uuid) );
+    HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xUuid.ulUuidOff ),
+                          xPartTable.xUuid.ulUuidLen );
 }

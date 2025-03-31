@@ -5,7 +5,6 @@
  * This file contains the hal profile for the Linux platform
  *
  * @file profile_hal.h
- *
  */
 
 #ifndef _PROFILE_HAL_H_
@@ -89,7 +88,7 @@ extern const uint64_t HAL_RPU_SHARED_MEMORY_BASE_ADDR;
 #define HAL_FLUSH_CACHE_DATA( addr, size ) ( ( void ) ( 0 ) )
 
 /* FAL */
-/* GCQ */
+/* sGCQ */
 #ifndef HAL_IO_WRITE32
 #define HAL_IO_WRITE32( val, addr ) ( ( void ) ( val ), ( void ) ( addr ) )
 #endif
@@ -114,8 +113,8 @@ extern const uint64_t HAL_RPU_SHARED_MEMORY_BASE_ADDR;
 
 /* Core libs */
 /* PLL */
-const uint64_t HAL_FSBL_LOG_ADDRESS;
-#define HAL_FSBL_LOG_SIZE ( 0x4000 )
+const uint64_t HAL_PLM_LOG_ADDRESS;
+#define HAL_PLM_LOG_SIZE ( 0x4000 )
 
 /**
  * @struct  HAL_PARTITION_TABLE_RING_BUFFER
@@ -182,4 +181,4 @@ typedef struct HAL_PARTITION_TABLE
 
 } HAL_PARTITION_TABLE;
 
-#endif
+#endif /* _PROFILE_HAL_H_ */

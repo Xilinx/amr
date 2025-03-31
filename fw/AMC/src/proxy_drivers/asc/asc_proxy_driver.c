@@ -6,7 +6,6 @@
  * proxy driver.
  *
  * @file asc_proxy_driver.c
- *
  */
 
 /******************************************************************************/
@@ -975,14 +974,14 @@ static void vProxyDriverTask( void *pvArgs )
 
     uint32_t ulStartMs = 0;
 
-    FOREVER
+    for( ;; )
     {
         ulStartMs = ulOSAL_GetUptimeTicks();
         if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_WAIT_FOREVER ) )
         {
             INC_STAT_COUNTER( ASC_PROXY_STATS_TAKE_MUTEX )
 
-            int i = 0;
+            uint8_t i = 0;
             int j = 0;
 
             for( i = 0; i < pxThis->ucNumSensors; i++ )

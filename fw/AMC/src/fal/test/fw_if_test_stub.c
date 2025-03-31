@@ -5,7 +5,6 @@
 * This header file contains the FW IF test interface implementation stubs.
 *
 * @file fw_if_test_stub.c
-*
 */
 
 /*****************************************************************************/
@@ -67,7 +66,7 @@ static uint32_t testOpen( void *pvFwIf )
     CHECK_DRIVER;
 
     FW_IF_TEST_CFG *pxThisTestCfg = ( FW_IF_TEST_CFG* )pxThisIf->cfg;
-        
+
     TEST_PRINT( "FW_IF_open for if.%u (%s)\r\n",
             ( unsigned int )pxThisTestCfg->ifId,
             pxThisTestCfg->ifName );
@@ -89,8 +88,8 @@ static uint32_t testClose( void *pvFwIf )
     CHECK_DRIVER;
 
     FW_IF_TEST_CFG *pxThisTestCfg = ( FW_IF_TEST_CFG* )pxThisIf->cfg;
-    
-    TEST_PRINT( "FW_IF_close for if.%u (%s)\r\n", 
+
+    TEST_PRINT( "FW_IF_close for if.%u (%s)\r\n",
             ( unsigned int )pxThisTestCfg->ifId,
             pxThisTestCfg->ifName );
 
@@ -104,7 +103,8 @@ static uint32_t testClose( void *pvFwIf )
 static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
-    int i = 0;
+    uint32_t i = 0;
+    (void)ulTimeoutMs;
 
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
     CHECK_HDL( pxThisIf );
@@ -115,7 +115,7 @@ static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, 
     if( ( NULL != pucData ) && ( FW_IF_TEST_MAX_DATA >=ulSize ) )
     {
         FW_IF_TEST_CFG *pxThisTestCfg = ( FW_IF_TEST_CFG* )pxThisIf->cfg;
-        
+
         TEST_PRINT( "FW_IF_write from if.%u (%s) to port.%u\r\n",
                 ( unsigned int )pxThisTestCfg->ifId,
                 pxThisTestCfg->ifName,
@@ -128,7 +128,6 @@ static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, 
             {
                 TEST_PRINT( "\r\n[%02x] ", i );
             }
-            
             TEST_PRINT( "%02x ", pucData[ i ] );
         }
         TEST_PRINT( "\r\n" );
@@ -137,7 +136,6 @@ static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, 
     {
         ulStatus = FW_IF_ERRORS_PARAMS;
     }
-
     return ulStatus;
 }
 
@@ -147,7 +145,8 @@ static uint32_t testWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, 
 static uint32_t testRead( void *pvFwIf, uint64_t ullOffset, uint8_t *pucData, uint32_t *pulSize, uint32_t ulTimeoutMs )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
-    int i = 0;
+    uint32_t i = 0;
+    (void)ulTimeoutMs;
 
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
     CHECK_HDL( pxThisIf );
@@ -158,14 +157,14 @@ static uint32_t testRead( void *pvFwIf, uint64_t ullOffset, uint8_t *pucData, ui
     if( ( NULL != pucData ) && ( NULL != pulSize ) && ( FW_IF_TEST_MAX_DATA >= *pulSize ) )
     {
         FW_IF_TEST_CFG *pxThisTestCfg = ( FW_IF_TEST_CFG* )pxThisIf->cfg;
-        
+
         TEST_PRINT( "FW_IF_read at if.%u (%s) from address ullOffset.%u\r\n",
                 ( unsigned int )pxThisTestCfg->ifId,
                 pxThisTestCfg->ifName,
                 ( unsigned int )ullOffset );
 
         pvOSAL_MemCpy( pucData, pucTestRxData+ullOffset, *pulSize );
-        
+
         TEST_PRINT( "Reading %u bytes...", ( unsigned int )*pulSize );
         for( i = 0; i < *pulSize; i++ )
         {
@@ -173,7 +172,6 @@ static uint32_t testRead( void *pvFwIf, uint64_t ullOffset, uint8_t *pucData, ui
             {
                 TEST_PRINT( "\r\n[%02x] ", i );
             }
-            
             TEST_PRINT( "%02x ", pucData[ i ] );
         }
         TEST_PRINT( "\r\n" );
@@ -182,7 +180,6 @@ static uint32_t testRead( void *pvFwIf, uint64_t ullOffset, uint8_t *pucData, ui
     {
         ulStatus = FW_IF_ERRORS_PARAMS;
     }
-
     return ulStatus;
 }
 
@@ -198,9 +195,9 @@ static uint32_t testIoctrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
-    
+
     FW_IF_TEST_CFG *pxThisTestCfg = ( FW_IF_TEST_CFG* )pxThisIf->cfg;
-    
+
     switch( ulOption )
     {
         case FW_IF_COMMON_IOCTRL_FLUSH_TX:
@@ -261,7 +258,7 @@ static uint32_t testIoctrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
                 ulStatus = FW_IF_ERRORS_PARAMS;
             }
             break;
-        
+
         default:
             ulStatus = FW_IF_ERRORS_UNRECOGNISED_OPTION;
             break;
@@ -291,9 +288,9 @@ static uint32_t testBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
     if( NULL != pxNewFunc )
     {
         FW_IF_TEST_CFG *pxThisTestCfg = ( FW_IF_TEST_CFG* )pxThisIf->cfg;
-        
+
         pxThisIf->raiseEvent = pxNewFunc;
-    
+
         TEST_PRINT( "FW_IF_bindCallback called for if.%u (%s)\r\n",
                 ( unsigned int )pxThisTestCfg->ifId,
                 pxThisTestCfg->ifName );
@@ -302,8 +299,6 @@ static uint32_t testBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
     {
         ulStatus = FW_IF_ERRORS_PARAMS;
     }
-
-
     return ulStatus;
 }
 
@@ -336,7 +331,6 @@ uint32_t FW_IF_test_init( FW_IF_TEST_INIT_CFG *pxCfg )
                 ( unsigned int )xMyLocalCfg.driverId,
                 xMyLocalCfg.driverName );
     }
-
     return ulStatus;
 }
 
@@ -372,6 +366,5 @@ uint32_t FW_IF_test_create( FW_IF_CFG *pxFwIf, FW_IF_TEST_CFG *pxTestCfg )
                 ( unsigned int )pxThisTestCfg->ifId,
                 pxThisTestCfg->ifName );
     }
-        
     return ulStatus;
 }

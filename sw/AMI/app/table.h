@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * table.h - This file contains utilities for printing tables
- * 
+ *
  * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
  */
 
@@ -58,7 +58,7 @@ enum table_align {
  * @divider: Should a row separator be printed.
  * @stream: Output stream (defaults to stdout)
  * @col_align: Optional alignment of columns (defaults to left).
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int print_table_row(int num_cols, char* values[],
@@ -74,10 +74,10 @@ int print_table_row(int num_cols, char* values[],
  * @divider_fmt: Row divider printing rule.
  * @stream: Output stream
  * @col_align: Optional alignment of columns (defaults to left).
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int print_table(char* header[], char** values[], int num_cols, int num_rows,
 	enum table_divider_format divider_fmt, FILE *stream, int *col_align);
 
-#endif
+#endif /* AMI_APP_TABLE_H */

@@ -5,7 +5,6 @@
  * This file contains the EMMC debug implementation.
  *
  * @file fw_if_emmc_debug.c
- *
  */
 
 #include "standard.h"
@@ -58,7 +57,7 @@ static void vClearStats( void );
 void vFW_IF_EMMC_DebugInit( DAL_HDL pxParentHandle )
 {
     if( FALSE == iInitialised )
-    {   
+    {
         if( NULL == pxParentHandle )
         {
             pxFwIfEmmcTop = pxDAL_NewDirectory( "fw_if_emmc" );
@@ -73,7 +72,7 @@ void vFW_IF_EMMC_DebugInit( DAL_HDL pxParentHandle )
             pxDAL_NewDebugFunction( "print_all_stats", pxFwIfEmmcTop, vPrintStats );
             pxDAL_NewDebugFunction( "clear_all_stats", pxFwIfEmmcTop, vClearStats );
         }
-        
+
         iInitialised = TRUE;
     }
 }

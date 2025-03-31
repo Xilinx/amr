@@ -5,7 +5,6 @@
  * This file contains the FW IF UART stubbed abstraction.
  *
  * @file fw_if_uart_stub.c
- *
  */
 
 
@@ -123,7 +122,7 @@ static const char* const pcUartStateModeStr[ ] = { FW_IF_UART_STATE_ENTRY( INIT 
 
 static FW_IF_UART_PRIVATE_DATA xLocalData =
 {
-    UART_UPPER_FIREWALL,    /* ulUpperFirewall */   
+    UART_UPPER_FIREWALL,    /* ulUpperFirewall */
 
     { 0 },                  /* xLocalCfg */
     FALSE,                  /* iInitialised */
@@ -142,65 +141,65 @@ static FW_IF_UART_PRIVATE_DATA *pxThis = &xLocalData;
 
 /**
  * @brief   Local implementation of FW_IF_open
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Open( void *pvFwIf );
 
 /**
  * @brief   Local implementation of FW_IF_close
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Close( void *pvFwIf );
 
 /**
  * @brief   Local implementation of FW_IF_write
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   ullDstPort      The port where the data will be written to
  * @param   pucData         Pointer to data buffer to write
  * @param   ulLength        Maximum number of bytes allowed in data buffer. This value is updated to the actual number of bytes written
  * @param   ulTimeout       Time (in ms) to wait for write to complete
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Write( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, uint32_t ulLength, uint32_t ulTimeoutMs );
 
 /**
  * @brief   Local implementation of FW_IF_read
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   ullSrcPort      The port where the data will be read from
  * @param   pucData         Pointer to data buffer to read
  * @param   pulLength       Pointer to maximum number of bytes allowed in data buffer. This value is updated to the actual number of bytes read
  * @param   ulTimeoutMs     Time (in ms) to wait for read to complete
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Read( void *pvFwIf, uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulLength, uint32_t ulTimeoutMs );
 
 /**
  * @brief   Local implementation of FW_IF_ioctrl
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   ulOption        Unique IO Ctrl option to set/get
  * @param   pvValue         Pointer to value to set/get
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Ioctrl( void *pvFwIf, uint32_t ulOption, void *pvValue );
 
 /**
  * @brief   Local implementation of FW_IF_bindCallback
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   pxNewFunc       Function pointer to call
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_BindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc );
@@ -417,9 +416,9 @@ static uint32_t ulFW_IF_UART_BindCallback( void *pvFwIf, FW_IF_callback *pxNewFu
     if( NULL != pxNewFunc )
     {
         FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
-        
+
         pxThisIf->raiseEvent = pxNewFunc;
-    
+
         PLL_DBG( FW_IF_UART_NAME, "UART FW_IF_bindCallback called for port 0x%02X\r\n", pxThisUartCfg->ulPort );
         INC_STAT_COUNTER( FW_IF_UART_STATS_BIND_CALLBACK_CALLED_COUNT );
     }
@@ -459,7 +458,7 @@ uint32_t ulFW_IF_UART_Init( FW_IF_UART_INIT_CFG *pxInitCfg )
 
         PLL_DBG( FW_IF_UART_NAME, "ulFW_IF_UART_Init, Device ID: 0x%08X, Base: %uHz\r\n", pxThis->xMyLocalCfg.ucUartDeviceId );
     }
-    else 
+    else
     {
         ulStatus = FW_IF_ERRORS_PARAMS;
         INC_ERROR_COUNTER( FW_IF_ERRORS_PARAMS_COUNT );
@@ -476,10 +475,10 @@ uint32_t ulFW_IF_UART_Create( FW_IF_CFG *pxFwIf, FW_IF_UART_CFG *pxUartCfg )
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
     CHECK_DRIVER;
-    
+
     if( ( NULL != pxFwIf ) && ( NULL != pxUartCfg ) )
     {
-        FW_IF_CFG myLocalIf = 
+        FW_IF_CFG myLocalIf =
         {
             .upperFirewall  = UART_UPPER_FIREWALL,
             .open           = &ulFW_IF_UART_Open,

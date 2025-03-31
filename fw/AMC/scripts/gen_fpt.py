@@ -2,10 +2,14 @@
 
 # Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
-
+#
+# E.g.:
+#./scripts/gen_fpt.py -f ./fpt/fpt.json
 #
 # Generate FPT binary from JSON file
 #
+
+import os
 import json
 import argparse
 from collections import namedtuple
@@ -52,6 +56,7 @@ def main():
     parser = argparse.ArgumentParser(description='Generate binary file from FPT JSON',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-f', '--file', help='the FPT JSON file')
+    parser.add_argument('-o', '--output_path', help='FPT output path')
     parser.add_argument('-v', '--verbose', help="increase output verbosity")
     args = parser.parse_args()
     if args.file is None:
@@ -63,6 +68,7 @@ def main():
     try:
         if args.verbose:
             print('Input filename:' + args.file)
+            print('Output path:' + args.output_path)
         fp = open(args.file)
     except Exception as e:
         print('Error: Failed to open file: ' + str(e))
@@ -80,7 +86,7 @@ def main():
 
     # Step3: Parse the FPT header from the JSON
     try:
-        fpt_entry_size = data['fpt_header(0)']['fpt_entry_size'] 
+        fpt_entry_size = data['fpt_header(0)']['fpt_entry_size']
         fpt_header_size = data['fpt_header(0)']['fpt_header_size']
         fpt_version = data['fpt_header(0)']['fpt_version']
         magic_word = data['fpt_header(0)']['magic_word']
@@ -158,7 +164,10 @@ def main():
 
     # Step6: Write bytearray to binary file
     try:
-        with open("fpt.bin", 'wb') as fp:
+        fpt_bin_file = os.path.join(args.output_path, "fpt.bin")
+        print('FPT file: ' + fpt_bin_file)
+
+        with open(fpt_bin_file, 'wb') as fp:
             fp.write(fpt_data)
             print('Successfully generated binary fpt.bin...')
     except Exception as e:

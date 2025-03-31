@@ -1,73 +1,44 @@
 #!/usr/bin/env bash
-# (c) Copyright 2024, Advanced Micro Devices, Inc.
+
+# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+# SPDX-License-Identifier: MIT
 #
-# Permission is hereby granted, free of charge, to any person obtaining a
-# copy of this software and associated documentation files (the "Software"),
-# to deal in the Software without restriction, including without limitation
-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following conditions:
+# E.g. Build:
+# ./build_all.sh -xsa <xsa>  <product>
 #
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
+# This will build bsp (amc_bsp), amc.elf and OSPI images
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-# DEALINGS IN THE SOFTWARE.
-############################################################
 set -Eeuo pipefail
 # Build
-# ./build_all.sh <Design name (xsa name without ext)> <product>
+# ./build.sh <xsa> <product>
 
 # Init
-DESIGN=${1:-"ve2302_pcie_qdma_base"}
+XSA=${1:-"ve2302_pcie_qdma_base.xsa"}
 PRODUCT=${2:-"rave"}
-HW_DIR=$(realpath ./hw/amd_rave_gen3x4_24.2)
 FW_DIR=$(realpath ./fw/AMC)
 SW_DIR=$(realpath ./sw/AMI)
-XSA=${XSA:-$(realpath ${HW_DIR})/build/${DESIGN}.xsa}
-
-mkdir -p ${HW_DIR}/build
 
 # Step HW
 if [ "$PRODUCT" != "rave" ]; then
     echo "${DESIGN}"
     echo "${PRODUCT}"
+    HW_DIR=$(realpath ./hw/amd_rave_gen3x4_25.1)
+    mkdir -p ${HW_DIR}/build
     pushd ${HW_DIR}
-        mkdir -p ./build
         vivado -source src/create_design.tcl -source src/build_design.tcl -mode batch -nojournal -log ./build/vivado.log
     popd
 fi
 
 # Step FW
 pushd ${FW_DIR}
-  ./scripts/build.sh -os freertos10_xilinx -profile ${PRODUCT} -xsa $XSA
-  cp -a ${FW_DIR}/build/amc.elf ${HW_DIR}/build
-  # Takes in fpt.json and produces fpt.bin
-popd
-
-
-# Step FPT
-pushd ${FW_DIR}/build
-  ../scripts/gen_fpt.py -f ../scripts/fpt_${PRODUCT}.json
-  cp -a ${FW_DIR}/build/fpt.bin ${HW_DIR}/build
-popd
-
-# Step PDI combine
-# Generate PDI w/ bootgen
-pushd ${HW_DIR}
-  bootgen -arch versal -image ./fpt/pdi_combine_${PRODUCT}.bif -w -o ./build/OSPI_RAVE.bin
-# final pdi generation
-./fpt/fpt_pdi_gen.py --fpt ./build/fpt.bin --pdi ./build/OSPI_RAVE.bin --output ./build/OSPI_RAVE_fpt.bin
+    echo "${FW_DIR}"
+    # Builds AMC/OSPI images
+    ./build_all.sh ${XSA} ${PRODUCT}
 popd
 
 # Generate AMI
 pushd ${SW_DIR}
-echo "${SW_DIR}"
-  ./scripts/build.sh -profile rave
-  ./scripts/gen_package_amr.py -g -n -f
+    echo "${SW_DIR}"
+    ./scripts/build.sh -profile ${PRODUCT}
+    ./scripts/gen_package_amr.py -g -n -f
 popd

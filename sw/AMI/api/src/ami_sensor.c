@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_sensor.c - This file contains the implementation of sensor related logic
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/
@@ -49,7 +49,7 @@
  * @parsed_sid: Pointer to store the parsed sensor ID
  * @parsed_type: Pointer to store parsed sensor type
  * @parsed_attr: Pointer to store parsed sensor attribute
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 static int parse_hwmon(const char *path, int *parsed_sid,
@@ -60,7 +60,7 @@ static int parse_hwmon(const char *path, int *parsed_sid,
  * @path: Variable to hold path, must have AMI_HWMON_PATH_MAX_SIZE bytes.
  * @hwmon_num: Hwmon number as visible in the filesystem.
  * @attr: Human readable name of hwmon attribute as visible in the filesystem.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 static int construct_hwmon(char *path, int hwmon_num, const char *attr);
@@ -71,13 +71,13 @@ static int construct_hwmon(char *path, int hwmon_num, const char *attr);
  * @hwmon_num: Hwmon node number (optional).
  * @attr: Human readable name of hwmon attribute (optional).
  * @mode: File mode (O_RDONLY, O_WRONLY, O_RDWR).
- * 
+ *
  * Note that this function can be called from 2 different contexts:
  *    - If you know the full path of the attribute, set `hwmon` to your path,
  *      `attr` to NULL, and `hwmon_num` to any arbitrary value.
  *    - If you only know the attribute number and hwmon number,
  *      set `hwmon` to NULL and pass in the other arguments as normal.
- * 
+ *
  * Return: The file descriptor (-1 on error).
  */
 static int open_hwmon(const char *hwmon, int hwmon_num, const char *attr, int mode);
@@ -88,11 +88,11 @@ static int open_hwmon(const char *hwmon, int hwmon_num, const char *attr, int mo
  * @hwmon_num: Hwmon node number (optional).
  * @attr: Human readable name of hwmon attribute (optional).
  * @buf: Output buffer, must hold at least AMI_HWMON_MAX_STR bytes.
- * 
+ *
  * The `hwmon`, `hwmon_num`, and `attr` arguments are passed to the `open_hwmon`
  * function. See the definition for an explanation of how these arguments
  * are used.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 static int read_hwmon(const char *hwmon, int hwmon_num, const char *attr, char *buf);
@@ -100,7 +100,7 @@ static int read_hwmon(const char *hwmon, int hwmon_num, const char *attr, char *
 /**
  * read_sensor_attr() - Read a specific sensor attribute.
  * @attr: Pointer to attribute struct.
- * 
+ *
  * This function automatically detects the type of the hwmon attribute
  * and sets the correct variable within the `attr->val` member. For string
  * attribute it sets the `value_s` member which is a buffer of size
@@ -119,12 +119,12 @@ static int read_sensor_attr(struct ami_sensor_attr *attr);
  * @attr: Pointer to sensor attribute to populate.
  * @status_attr: Pointer to status attribute to populate.
  * @fresh: Variable to hold cache status for this value.
- * 
+ *
  * This function is similar to `read_sensor_attr`, however, it makes an IOCTL
  * call instead of reading hwmon files. This eliminates the race condition if a
  * user was interested in reading a sensor value and the status. Currently,
  * this is only supported for the instant sensor value (not max/average).
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 static int get_single_sensor_val(ami_device *dev, enum ami_sensor_type sensor_type,
@@ -132,11 +132,11 @@ static int get_single_sensor_val(ami_device *dev, enum ami_sensor_type sensor_ty
 
 /**
  * find_sensor_data() - Find a specific data struct for a given sensor.
- * @sensors: List of sensor data structs. 
+ * @sensors: List of sensor data structs.
  * @sid: Sensor ID.
  * @type: Sensor type.
  * @data: Output variable to store sensor data.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 static int find_sensor_data(struct ami_sensor_data *sensors, int sid,
@@ -147,7 +147,7 @@ static int find_sensor_data(struct ami_sensor_data *sensors, int sid,
  * @dev: Device handle.
  * @name: Sensor name.
  * @sensor: Pointer to output variable.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 static int find_sensor_by_name(ami_device *dev, const char *name,
@@ -157,9 +157,9 @@ static int find_sensor_by_name(ami_device *dev, const char *name,
  * populate_device_sensors() - Create top level sensor structs from sensor data.
  * @dev: Device handle.
  * @data: All sensor data collected.
- * 
+ *
  * This function should only be called once as pami of the discovery step.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 static int populate_device_sensors(ami_device *dev, struct ami_sensor_data *data);
@@ -167,7 +167,7 @@ static int populate_device_sensors(ami_device *dev, struct ami_sensor_data *data
 /**
  * parse_sensor_status() - Convert a sensor status string to enum.
  * @status: Status string from hwmon.
- * 
+ *
  * Return: enum ami_sensor_status (AMI_SENSOR_STATUS_INVALID on fail).
  */
 static enum ami_sensor_status parse_sensor_status(const char *status);
@@ -188,15 +188,15 @@ static enum ami_sensor_attr_type limit_type_to_attr(enum ami_sensor_limit limit)
  * @type: Sensor type.
  * @val: Output variable to store value.
  * @status: Also fetch the sensor status (optional).
- * 
+ *
  * For numeric values, val must be a `long`.
  * For string values, val must be a `char`*.
  * Sensor status is a special case and requires an `enum ami_sensor_status*`.
- * 
+ *
  * If `status` is not a NULL pointer, we make an ioctl call to fetch the data
  * instead of reading the hwmon files. This eliminates any race condition
  * when a user is interested in BOTH the sensor value and the status.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 static int get_value(ami_device *dev, const char *sensor_name,
@@ -214,7 +214,7 @@ static int construct_hwmon(char *path, int hwmon_num, const char *attr)
 {
 	if (!path || !attr)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	snprintf(
 		path,
 		AMI_HWMON_PATH_MAX_SIZE,
@@ -222,7 +222,7 @@ static int construct_hwmon(char *path, int hwmon_num, const char *attr)
 		hwmon_num,
 		attr
 	);
-	
+
 	return AMI_STATUS_OK;
 }
 
@@ -236,7 +236,7 @@ static int open_hwmon(const char *hwmon, int hwmon_num, const char *attr, int mo
 
 	if (!hwmon && !attr)
 		return file;
-	
+
 	if (attr)
 		construct_hwmon(path, hwmon_num, attr);
 	else
@@ -263,7 +263,7 @@ static int read_hwmon(const char *hwmon, int hwmon_num, const char *attr, char *
 			ret = AMI_STATUS_OK;
 		else
 			ret = AMI_API_ERROR(AMI_ERROR_EIO);
-		
+
 		close(file);
 	} else {
 		ret = AMI_API_ERROR(AMI_ERROR_EBADF);
@@ -290,7 +290,7 @@ static int parse_hwmon(const char *path, int *parsed_sid,
 
 	if (!path)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	/* Check if this path points to a file. */
 	if(stat(path, &path_stat) == AMI_LINUX_STATUS_ERROR)
 		return AMI_API_ERROR(AMI_ERROR_EBADF);
@@ -315,15 +315,15 @@ static int parse_hwmon(const char *path, int *parsed_sid,
 		case 'i':  /* Voltage */
 			*parsed_type = AMI_SENSOR_TYPE_VOLTAGE;
 			break;
-		
+
 		case 'p':  /* Power */
 			*parsed_type = AMI_SENSOR_TYPE_POWER;
 			break;
-		
+
 		case 't':  /* Temperature */
 			*parsed_type = AMI_SENSOR_TYPE_TEMP;
 			break;
-		
+
 		case 'c':  /* Current */
 			*parsed_type = AMI_SENSOR_TYPE_CURRENT;
 			break;
@@ -393,7 +393,7 @@ static int read_sensor_attr(struct ami_sensor_attr *attr)
 			attr->value_s[strcspn(attr->value_s, "\r\n")] = 0;
 			ret = AMI_STATUS_OK;
 			break;
-		
+
 		/* Number */
 		case AMI_SENSOR_ATTR_MAX:
 		case AMI_SENSOR_ATTR_AVG:
@@ -403,7 +403,7 @@ static int read_sensor_attr(struct ami_sensor_attr *attr)
 		case AMI_SENSOR_ATTR_FATAL_LIMIT:
 			ret = ami_convert_num(buf, AMI_BASE_10, &attr->value_l);
 			break;
-		
+
 		default:
 			ret = AMI_API_ERROR(AMI_ERROR_EINVAL);
 			break;
@@ -424,27 +424,27 @@ static int get_single_sensor_val(ami_device *dev, enum ami_sensor_type sensor_ty
 
 	if (!dev || !attr || !status_attr || !fresh)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_open_cdev(dev) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR;
-	
+
 	switch (sensor_type) {
 	case AMI_SENSOR_TYPE_TEMP:
 		val.sensor_type = IOC_SENSOR_TYPE_TEMP;
 		break;
-	
+
 	case AMI_SENSOR_TYPE_CURRENT:
 		val.sensor_type = IOC_SENSOR_TYPE_CURRENT;
 		break;
-	
+
 	case AMI_SENSOR_TYPE_VOLTAGE:
 		val.sensor_type = IOC_SENSOR_TYPE_VOLTAGE;
 		break;
-	
+
 	case AMI_SENSOR_TYPE_POWER:
 		val.sensor_type = IOC_SENSOR_TYPE_POWER;
 		break;
-	
+
 	default:
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
 	}
@@ -557,7 +557,7 @@ static int populate_device_sensors(ami_device *dev, struct ami_sensor_data *data
 
 	if (!dev || dev->sensors)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	while (next) {
 		struct ami_sensor *sensor = NULL;
 		find_sensor_by_name(dev, next->name.value_s, &sensor);
@@ -596,19 +596,19 @@ static int populate_device_sensors(ami_device *dev, struct ami_sensor_data *data
 		case AMI_SENSOR_TYPE_TEMP:
 			sensor->sensor_data->temp = next;
 			break;
-		
+
 		case AMI_SENSOR_TYPE_VOLTAGE:
 			sensor->sensor_data->voltage = next;
 			break;
-		
+
 		case AMI_SENSOR_TYPE_POWER:
 			sensor->sensor_data->power = next;
 			break;
-		
+
 		case AMI_SENSOR_TYPE_CURRENT:
 			sensor->sensor_data->current = next;
 			break;
-		
+
 		default:
 			ret = AMI_API_ERROR(AMI_ERROR_EINVAL);
 			break;
@@ -616,7 +616,7 @@ static int populate_device_sensors(ami_device *dev, struct ami_sensor_data *data
 
 		if (ret != AMI_STATUS_OK)
 			break;
-		
+
 		next = next->next;
 	}
 
@@ -648,13 +648,13 @@ static enum ami_sensor_attr_type limit_type_to_attr(enum ami_sensor_limit limit)
 	switch (limit) {
 	case AMI_SENSOR_LIMIT_WARN:
 		return AMI_SENSOR_ATTR_WARN_LIMIT;
-	
+
 	case AMI_SENSOR_LIMIT_CRIT:
 		return AMI_SENSOR_ATTR_CRIT_LIMIT;
-	
+
 	case AMI_SENSOR_LIMIT_FATAL:
 		return AMI_SENSOR_ATTR_FATAL_LIMIT;
-	
+
 	default:
 		break;
 	}
@@ -675,27 +675,27 @@ static int get_value(ami_device *dev, const char *sensor_name,
 
 	if (!dev || !sensor_name || !val)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (find_sensor_by_name(dev, sensor_name, &sensor) != AMI_STATUS_OK)
 		return AMI_STATUS_ERROR;
-	
+
 	switch (type) {
 	case AMI_SENSOR_TYPE_TEMP:
 		data = sensor->sensor_data->temp;
 		break;
-	
+
 	case AMI_SENSOR_TYPE_POWER:
 		data = sensor->sensor_data->power;
 		break;
-	
+
 	case AMI_SENSOR_TYPE_VOLTAGE:
 		data = sensor->sensor_data->voltage;
 		break;
-	
+
 	case AMI_SENSOR_TYPE_CURRENT:
 		data = sensor->sensor_data->current;
 		break;
-	
+
 	default:
 		break;
 	}
@@ -708,11 +708,11 @@ static int get_value(ami_device *dev, const char *sensor_name,
 	case AMI_SENSOR_ATTR_NAME:
 		*((const char**)val) = data->name.value_s;
 		break;
-	
+
 	/* Number */
 	case AMI_SENSOR_ATTR_STATUS:
 		ret = read_sensor_attr(&data->status);
-		
+
 		if (!ret)
 			*((enum ami_sensor_status*)val) = \
 				parse_sensor_status(data->status.value_s);
@@ -725,7 +725,7 @@ static int get_value(ami_device *dev, const char *sensor_name,
 			bool f = false;
 			ret = get_single_sensor_val(dev, type, data->sid,
 				&data->value, &data->status, &f);
-			
+
 			if (!ret) {
 				*status = parse_sensor_status(data->status.value_s);
 
@@ -741,7 +741,7 @@ static int get_value(ami_device *dev, const char *sensor_name,
 			*((long*)val) = data->value.value_l;
 
 		break;
-	
+
 	case AMI_SENSOR_ATTR_MAX:
 		if (data->max.valid) {
 			ret = read_sensor_attr(&data->max);
@@ -765,7 +765,7 @@ static int get_value(ami_device *dev, const char *sensor_name,
 		}
 
 		break;
-	
+
 	/*
 	 * The limits don't change over the lifetime of a device so we only
 	 * need to read hwmon once - assume that if the limit value is non-zero
@@ -783,7 +783,7 @@ static int get_value(ami_device *dev, const char *sensor_name,
 		}
 
 		break;
-	
+
 	case AMI_SENSOR_ATTR_CRIT_LIMIT:
 		if (data->crit_limit.valid) {
 			if (data->crit_limit.value_l == 0)
@@ -796,7 +796,7 @@ static int get_value(ami_device *dev, const char *sensor_name,
 		}
 
 		break;
-	
+
 	case AMI_SENSOR_ATTR_FATAL_LIMIT:
 		if (data->fatal_limit.valid) {
 			if (data->fatal_limit.value_l == 0)
@@ -907,11 +907,11 @@ int ami_sensor_discover(ami_device *dev)
 			case AMI_SENSOR_TYPE_VOLTAGE:
 				data->mod = AMI_SENSOR_UNIT_MOD_MILLI;
 				break;
-			
+
 			case AMI_SENSOR_TYPE_POWER:
 				data->mod = AMI_SENSOR_UNIT_MOD_MICRO;
 				break;
-			
+
 			default:
 				data->mod = AMI_SENSOR_UNIT_MOD_NONE;
 				break;
@@ -948,15 +948,15 @@ int ami_sensor_discover(ami_device *dev)
 		case AMI_SENSOR_ATTR_VALUE:
 			attribute = &data->value;
 			break;
-		
+
 		case AMI_SENSOR_ATTR_WARN_LIMIT:
 			attribute = &data->warn_limit;
 			break;
-		
+
 		case AMI_SENSOR_ATTR_CRIT_LIMIT:
 			attribute = &data->crit_limit;
 			break;
-		
+
 		case AMI_SENSOR_ATTR_FATAL_LIMIT:
 			attribute = &data->fatal_limit;
 			break;
@@ -983,7 +983,7 @@ int ami_sensor_discover(ami_device *dev)
 			ret = read_sensor_attr(attribute);
 		else
 			ret = AMI_STATUS_OK;
-		
+
 
 		if (ret != AMI_STATUS_OK)
 			break;
@@ -995,7 +995,7 @@ int ami_sensor_discover(ami_device *dev)
 
 	if (ret == AMI_STATUS_OK)
 		return populate_device_sensors(dev, sensors);
-	
+
 	return ret;
 }
 
@@ -1021,7 +1021,7 @@ int ami_sensor_set_refresh(ami_device *dev, uint16_t val)
 		);
 	else
 		ret = AMI_STATUS_OK;
-	
+
 	return ret;
 }
 
@@ -1068,19 +1068,19 @@ int ami_sensor_get_type(ami_device *dev, const char *sensor_name, uint32_t *type
 		if (sensor->sensor_data->temp) {
 			sensor_type |= AMI_SENSOR_TYPE_TEMP;
 		}
-		
+
 		if (sensor->sensor_data->power) {
 			sensor_type |= AMI_SENSOR_TYPE_POWER;
 		}
-		
+
 		if (sensor->sensor_data->current) {
 			sensor_type |= AMI_SENSOR_TYPE_CURRENT;
 		}
-		
+
 		if (sensor->sensor_data->voltage) {
 			sensor_type |= AMI_SENSOR_TYPE_VOLTAGE;
 		}
-		
+
 		ret = AMI_STATUS_OK;
 		*type = sensor_type;
 	}
@@ -1095,7 +1095,7 @@ int ami_sensor_get_sensors(ami_device *dev, struct ami_sensor **sensors, int *nu
 {
 	if (!dev || !sensors || *sensors || !num)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	*sensors = dev->sensors;
 	*num = dev->num_sensors;
 	return AMI_STATUS_OK;
@@ -1105,7 +1105,7 @@ int ami_sensor_get_num_total(ami_device *dev, int *num)
 {
 	if (!dev || !num)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	*num = dev->num_total_sensors;
 	return AMI_STATUS_OK;
 }
@@ -1120,7 +1120,7 @@ int ami_sensor_get_temp_value(ami_device *dev, const char *sensor_name,
 {
 	if (!dev || !sensor_name || !val)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	return get_value(dev, sensor_name, AMI_SENSOR_ATTR_VALUE,
 			AMI_SENSOR_TYPE_TEMP, (void*)val, sensor_status);
 }

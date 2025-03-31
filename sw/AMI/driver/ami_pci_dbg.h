@@ -2,7 +2,7 @@
 /*
  * ami_pci_dbg.h - This file contains PCI debug/printing definitions.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_PCI_DBG_H

@@ -5,7 +5,6 @@
  * This file contains the in band telemetry debug implementation
  *
  * @file out_of_band_telemetry_debug.c
- *
  */
 
 #include "standard.h"

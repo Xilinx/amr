@@ -5,7 +5,6 @@
  * This file contains the bim profile for the Rave
  *
  * @file profile_bim.h
- *
  */
 
 #ifndef _PROFILE_BIM_H_
@@ -104,4 +103,4 @@ BIM_MODULES PROFILE_BIM_MODULE_DATA[ MAX_AMC_CFG_UNIQUE_ID ] =
 
 };
 
-#endif
+#endif /* _PROFILE_BIM_H_ */

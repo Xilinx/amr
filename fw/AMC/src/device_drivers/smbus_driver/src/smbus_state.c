@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the state machine implementation
  * for the SMBus driver.
  *
  * @file smbus_state.c
- *
  */
 
 #include "smbus.h"
@@ -384,12 +383,12 @@ static void vDefaultSMBusFSMSMBusStateControllerReadDone( SMBUS_INSTANCE_TYPE* p
 
 /* Descriptor helper functions */
 
-/******************************************************************************
+/**
 *
 * @brief    Is a conversion function from the state enum to character string
 *           to be used by logging functions
 *
-*****************************************************************************/
+*/
 char* pcStateToString( uint8_t ucState )
 {
     char* pResult = NULL;
@@ -464,11 +463,11 @@ char* pcStateToString( uint8_t ucState )
     return pResult;
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Log an error when an event the FSM does not expect arrives
 *
-*****************************************************************************/
+*/
 static void vSMBusLogUnexpected( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     if( NULL != pxSMBusInstance )
@@ -479,11 +478,11 @@ static void vSMBusLogUnexpected( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t u
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Move current state to previous state and set the newstate as current
 *
-*****************************************************************************/
+*/
 static void vSMBusNextStateDecoder( SMBUS_INSTANCE_TYPE* pxSMBusInstance, SMBus_State_Type xNewState )
 {
     if( NULL != pxSMBusInstance )
@@ -493,12 +492,12 @@ static void vSMBusNextStateDecoder( SMBUS_INSTANCE_TYPE* pxSMBusInstance, SMBus_
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Perform actions on receiving an Prepare To ARP command
 *           Clear AR flag
 *
-*****************************************************************************/
+*/
 static void vSMBusARPPrepareToARP( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
@@ -512,13 +511,13 @@ static void vSMBusARPPrepareToARP( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Perform actions on receiving an ARP reset device command
 *           AV and AR flags will be set dependent on the ARP capabilities
 *           of the instance
 *
-*****************************************************************************/
+*/
 static void vSMBusARPResetDevice( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
@@ -562,11 +561,11 @@ static void vSMBusARPResetDevice( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Write a descriptor to the IP to send a NACK
 *
-*****************************************************************************/
+*/
 static void vSMBusSendNACK( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
@@ -576,12 +575,12 @@ static void vSMBusSendNACK( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is Initial
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateInitial( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -772,12 +771,12 @@ static void vDefaultSMBusFSMSMBusStateInitial( SMBUS_INSTANCE_TYPE* pxSMBusInsta
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    This function swaps the locations of two SMBus instance numbers
 *           within an array of SMBus instances
 *
-*****************************************************************************/
+*/
 static void vInstanceSwap( uint8_t* pucInstanceA, uint8_t* pucInstanceB )
 {
     if( ( NULL != pucInstanceA ) && ( NULL != pucInstanceB ) )
@@ -788,13 +787,13 @@ static void vInstanceSwap( uint8_t* pucInstanceA, uint8_t* pucInstanceB )
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    This function takes an array of SMBus instances
 *           It walks through that array and reorders the instances
 *           in the order that they should respond to a ARP GetUDID general command
 *
-*****************************************************************************/
+*/
 static void vUDIDInstanceSort( SMBUS_PROFILE_TYPE* pxTheProfile, uint8_t pucInstanceIDArray[], uint8_t ucArraySize , uint8_t ucUDIDByteIndex )
 {
     uint8_t ucOuterArrayElement = 0;
@@ -821,12 +820,12 @@ static void vUDIDInstanceSort( SMBUS_PROFILE_TYPE* pxTheProfile, uint8_t pucInst
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is AwaitingCommandByte
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateAwaitingCommandByte( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_INSTANCE_TYPE*    pxMatchedInstance                                   = NULL;
@@ -1346,12 +1345,12 @@ static void vDefaultSMBusFSMSMBusStateAwaitingCommandByte( SMBUS_INSTANCE_TYPE* 
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is AwaitingRead
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateAwaitingRead( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -1457,12 +1456,12 @@ static void vDefaultSMBusFSMSMBusStateAwaitingRead( SMBUS_INSTANCE_TYPE* pxSMBus
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ReadyToSendByte
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateReadyToSendByte( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile  = NULL;
@@ -1570,12 +1569,12 @@ static void vDefaultSMBusFSMSMBusStateReadyToSendByte( SMBUS_INSTANCE_TYPE* pxSM
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is CheckIfPECRequired
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateCheckIfPECRequired( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -1683,12 +1682,12 @@ static void vDefaultSMBusFSMSMBusStateCheckIfPECRequired( SMBUS_INSTANCE_TYPE* p
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is AwaitingDone
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateAwaitingDone( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_INSTANCE_TYPE* pMatched_Instance = NULL;
@@ -2094,12 +2093,12 @@ static void vDefaultSMBusFSMSMBusStateAwaitingDone( SMBUS_INSTANCE_TYPE* pxSMBus
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    This function walks through each instance to determine if
 *           the UDID transmitted matches any one of the active SMBus instances
 *
-*****************************************************************************/
+*/
 static uint8_t ucCheckAtLeastOneMatchFound( SMBUS_PROFILE_TYPE* pxSMBusProfile, SMBUS_INSTANCE_TYPE* pxSMBusInstance )
 {
     uint8_t ucAtLeastOneMatchFound = SMBUS_FALSE;
@@ -2134,15 +2133,15 @@ static uint8_t ucCheckAtLeastOneMatchFound( SMBUS_PROFILE_TYPE* pxSMBusProfile, 
                         pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_DEBUG,
                         ucAtLeastOneMatchFound, __LINE__ );
     }
-    return ( ucAtLeastOneMatchFound );
+    return ucAtLeastOneMatchFound;
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is AwaitingData
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateAwaitingData( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE*     pxTheProfile        = NULL;
@@ -2463,12 +2462,12 @@ static void vDefaultSMBusFSMSMBusStateAwaitingData( SMBUS_INSTANCE_TYPE* pxSMBus
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is AwaitingBlockSize
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateAwaitingBlockSize( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -2597,12 +2596,12 @@ static void vDefaultSMBusFSMSMBusStateAwaitingBlockSize( SMBUS_INSTANCE_TYPE* px
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ControllerSendCommand
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateControllerSendCommand( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -2714,12 +2713,12 @@ static void vDefaultSMBusFSMSMBusStateControllerSendCommand( SMBUS_INSTANCE_TYPE
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ControllerWriteByte
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateControllerWriteByte( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile    = NULL;
@@ -2969,12 +2968,12 @@ static void vDefaultSMBusFSMSMBusStateControllerWriteByte( SMBUS_INSTANCE_TYPE* 
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ControllerSendReadStart
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateControllerSendReadStart( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -3170,12 +3169,12 @@ static void vDefaultSMBusFSMSMBusStateControllerSendReadStart( SMBUS_INSTANCE_TY
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ControllerReadBlockSize
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateControllerReadBlockSize( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -3303,12 +3302,12 @@ static void vDefaultSMBusFSMSMBusStateControllerReadBlockSize( SMBUS_INSTANCE_TY
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ControllerReadByte
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateControllerReadByte( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile    = NULL;
@@ -3528,12 +3527,12 @@ static void vDefaultSMBusFSMSMBusStateControllerReadByte( SMBUS_INSTANCE_TYPE* p
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ControllerReadPEC
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateControllerReadPEC( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile = NULL;
@@ -3612,12 +3611,12 @@ static void vDefaultSMBusFSMSMBusStateControllerReadPEC( SMBUS_INSTANCE_TYPE* px
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Handle any event to the State Machine
 *           when the current state is ControllerReadDone
 *
-*****************************************************************************/
+*/
 static void vDefaultSMBusFSMSMBusStateControllerReadDone( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBUS_PROFILE_TYPE* pxTheProfile    = NULL;
@@ -3905,13 +3904,13 @@ static void vDefaultSMBusFSMSMBusStateControllerReadDone( SMBUS_INSTANCE_TYPE* p
     }
 }
 
-/******************************************************************************
+/**
 *
 * @brief    Is the finite state machine for the specified SMBus instance
 *           The function will look up the current state, bytes sent, bytes received etc
 *           and given the event passed in it will transition to a new state
 *
-*****************************************************************************/
+*/
 void vSMBusFSM( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     if( NULL != pxSMBusInstance )

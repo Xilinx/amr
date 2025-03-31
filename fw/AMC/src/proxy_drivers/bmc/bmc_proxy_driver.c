@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation for the Board Management Controller (BMC) proxy driver
  *
  * @file bmc_proxy_driver.c
- *
  */
 
 /******************************************************************************/
@@ -604,7 +603,6 @@ int iBMC_Initialise( uint8_t ucProxyId,
     {
         INC_ERROR_COUNTER( BMC_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -631,7 +629,6 @@ int iBMC_BindCallback( EVL_CALLBACK *pxCallback )
     {
         INC_ERROR_COUNTER( BMC_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -687,7 +684,6 @@ int iBMC_SendResponseForGetSensor( EVL_SIGNAL *pxSignal,
     {
         INC_ERROR_COUNTER( BMC_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -726,7 +722,6 @@ int iBMC_SetResponse( EVL_SIGNAL *pxSignal, uint16_t usSensorId, BMC_SENSOR_RESP
     {
         INC_ERROR_COUNTER( BMC_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -763,7 +758,6 @@ int iBMC_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( BMC_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -786,7 +780,6 @@ int iBMC_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( BMC_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -817,7 +810,6 @@ int iBMC_GetSensorIdRequest( EVL_SIGNAL *pxSignal, int16_t *pssSensorId, uint8_t
     {
         INC_ERROR_COUNTER( BMC_PROXY_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -900,7 +892,6 @@ static int iCheckSensorValid( uint16_t usSensorId )
             }
         }
     }
-
     return iStatus;
 }
 
@@ -934,7 +925,6 @@ static int iAllocateNumericSensorPDR( PLDM_NUMERIC_SENSOR_PDR *pxIncomingSensorP
             INC_ERROR_COUNTER_WITH_STATE( BMC_PROXY_ERRORS_MEM_ALLOC_FAILED )
         }
     }
-
     return iStatus;
 }
 
@@ -946,7 +936,7 @@ static void vProxyDriverTask( void *pvArgs )
 {
     uint32_t ulStartMs = 0;
 
-    FOREVER
+    for( ;; )
     {
         ulStartMs = ulOSAL_GetUptimeMs();
 
@@ -998,7 +988,6 @@ static void vProxyDriverTask( void *pvArgs )
             vProcessRxMessage();
 
         }
-
         pxThis->pulStatCounters[ BMC_PROXY_STATS_TASK_TIME_MS ] = UTIL_ELAPSED_TIME_MS( ulStartMs )
     }
 }
@@ -1118,7 +1107,6 @@ static int iRaiseBmcEvent( BMC_PROXY_DRIVER_EVENTS xBmcEventId )
                  BMC_PROXY_DRIVER_E_MSG_ARRIVAL );
         INC_ERROR_COUNTER( BMC_PROXY_RAISE_EVENT_FAIL )
     }
-
     return iStatus;
 }
 
@@ -1154,35 +1142,25 @@ int iSetNumericSensorEnable( uint16_t usSensorId,
                 /* Now check the response */
                 switch( pxThis->ucSetNumericSensorEnableResponse )
                 {
-                case BMC_SENSOR_ENABLE_RESP_OK:
-                {
-                    pucResponseMessage[ ( *piResponseSize )++ ] = RESP_PLDM_SUCCESS;
-                    break;
-                }
+                    case BMC_SENSOR_ENABLE_RESP_OK:
+                        pucResponseMessage[ ( *piResponseSize )++ ] = RESP_PLDM_SUCCESS;
+                        break;
 
-                case BMC_SENSOR_ENABLE_RESP_INVALID_SENSOR_ID:
-                {
-                    pucResponseMessage[ ( *piResponseSize )++ ] = RESP_INVALID_SENSOR_ID;
-                    break;
-                }
+                    case BMC_SENSOR_ENABLE_RESP_INVALID_SENSOR_ID:
+                        pucResponseMessage[ ( *piResponseSize )++ ] = RESP_INVALID_SENSOR_ID;
+                        break;
 
-                case BMC_SENSOR_ENABLE_RESP_INVALID_SENSOR_OPERATIONAL_STATE:
-                {
-                    pucResponseMessage[ ( *piResponseSize )++ ] = RESP_INVALID_SENSOR_OPERATIONAL_STATE;
-                    break;
-                }
+                    case BMC_SENSOR_ENABLE_RESP_INVALID_SENSOR_OPERATIONAL_STATE:
+                        pucResponseMessage[ ( *piResponseSize )++ ] = RESP_INVALID_SENSOR_OPERATIONAL_STATE;
+                        break;
 
-                case BMC_SENSOR_ENABLE_RESP_EVENT_GENERATION_NOT_SUPPORTED:
-                {
-                    pucResponseMessage[ ( *piResponseSize )++ ] = RESP_EVENT_GENERATION_NOT_SUPPORTED;
-                    break;
-                }
+                    case BMC_SENSOR_ENABLE_RESP_EVENT_GENERATION_NOT_SUPPORTED:
+                        pucResponseMessage[ ( *piResponseSize )++ ] = RESP_EVENT_GENERATION_NOT_SUPPORTED;
+                        break;
 
-                default:
-                {
-                    pucResponseMessage[ ( *piResponseSize )++ ] = RESP_PLDM_ERROR_GENERIC;
-                    break;
-                }
+                    default:
+                        pucResponseMessage[ ( *piResponseSize )++ ] = RESP_PLDM_ERROR_GENERIC;
+                        break;
                 }
 
             }
@@ -1196,7 +1174,6 @@ int iSetNumericSensorEnable( uint16_t usSensorId,
             pucResponseMessage[ ( *piResponseSize )++ ] = RESP_INVALID_SENSOR_ID;
         }
     }
-
     return iStatus;
 }
 
@@ -1231,37 +1208,27 @@ int iGetNumericSensorReading( uint16_t usSensorId,
                 /* Now check the response */
                 switch( pxThis->ucGetNumericSensorResponse )
                 {
-                case BMC_GET_SENSOR_RESP_OK:
-                {
-                    *pucCompletionCode         = RESP_PLDM_SUCCESS;
-                    *pucSensorOperationalState = pxThis->ucRequestedSensorOperationalState;
-                    *pssReading                = pxThis->ssSensorInfo;
-                    break;
-                }
+                    case BMC_GET_SENSOR_RESP_OK:
+                        *pucCompletionCode         = RESP_PLDM_SUCCESS;
+                        *pucSensorOperationalState = pxThis->ucRequestedSensorOperationalState;
+                        *pssReading                = pxThis->ssSensorInfo;
+                        break;
 
-                case BMC_GET_SENSOR_RESP_INVALID_SENSOR_ID:
-                {
-                    *pucCompletionCode = RESP_INVALID_SENSOR_ID;
-                    break;
-                }
+                    case BMC_GET_SENSOR_RESP_INVALID_SENSOR_ID:
+                        *pucCompletionCode = RESP_INVALID_SENSOR_ID;
+                        break;
 
-                case BMC_GET_SENSOR_RESP_INVALID_SENSOR_OPERATIONAL_STATE:
-                {
-                    *pucCompletionCode = RESP_INVALID_SENSOR_OPERATIONAL_STATE;
-                    break;
-                }
+                    case BMC_GET_SENSOR_RESP_INVALID_SENSOR_OPERATIONAL_STATE:
+                        *pucCompletionCode = RESP_INVALID_SENSOR_OPERATIONAL_STATE;
+                        break;
 
-                case BMC_GET_SENSOR_RESP_REARM_UNAVAILABLE_IN_PRESENT_STATE:
-                {
-                    *pucCompletionCode = RESP_REARM_UNAVAILABLE_IN_PRESENT_STATE;
-                    break;
-                }
+                    case BMC_GET_SENSOR_RESP_REARM_UNAVAILABLE_IN_PRESENT_STATE:
+                        *pucCompletionCode = RESP_REARM_UNAVAILABLE_IN_PRESENT_STATE;
+                        break;
 
-                default:
-                {
-                    *pucCompletionCode = RESP_PLDM_ERROR_GENERIC;
-                    break;
-                }
+                    default:
+                        *pucCompletionCode = RESP_PLDM_ERROR_GENERIC;
+                        break;
                 }
             }
             else
@@ -1274,7 +1241,6 @@ int iGetNumericSensorReading( uint16_t usSensorId,
             *pucCompletionCode = RESP_INVALID_SENSOR_ID;
         }
     }
-
     return iStatus;
 }
 
@@ -1293,7 +1259,6 @@ int iGetNumTemperatureSensors( void )
     {
         iNumber = pxThis->iTotalPdrTemperature;
     }
-
     return iNumber;
 }
 
@@ -1312,7 +1277,6 @@ int iGetNumVoltageSensors( void )
     {
         iNumber = pxThis->iTotalPdrVoltage;
     }
-
     return iNumber;
 }
 
@@ -1331,7 +1295,6 @@ int iGetNumCurrentSensors( void )
     {
         iNumber = pxThis->iTotalPdrCurrent;
     }
-
     return iNumber;
 }
 
@@ -1350,7 +1313,6 @@ int iGetNumPowerSensors( void )
     {
         iNumber = pxThis->iTotalPdrPower;
     }
-
     return iNumber;
 }
 
@@ -1369,7 +1331,6 @@ int iGetNumNameSensors( void )
     {
         iNumber = pxThis->iTotalPdrName;
     }
-
     return iNumber;
 }
 
@@ -1547,7 +1508,6 @@ void vPdrRepoInit( void )
         pxRepo->recordCount++;
         pxRepo->repositorySize   += iCurrRecordSize;
         pxRepo->largestRecordSize = MAX( pxRepo->largestRecordSize, iCurrRecordSize );
-
     }
 }
 
@@ -1602,7 +1562,6 @@ int iResponseDataWrite( uint8_t *pucData, uint16_t usDataSize )
         }
         vPLL_Output( PLL_OUTPUT_LEVEL_DEBUG, "\n\r" );
     }
-
     return iStatus;
 }
 
@@ -1623,7 +1582,6 @@ int iGetUuid( uint8_t *pucUuid )
         pvOSAL_MemCpy( pucUuid, pxThis->pucUuid, HAL_UUID_SIZE );
         iStatus = HAL_UUID_SIZE;
     }
-
     return iStatus;
 }
 
@@ -1665,6 +1623,5 @@ int iBMC_GetState( MODULE_STATE *pxState )
     {
         INC_ERROR_COUNTER( BMC_PROXY_ERRORS_VALIDATION_FAILED )
     }
-
     return iStatus;
 }

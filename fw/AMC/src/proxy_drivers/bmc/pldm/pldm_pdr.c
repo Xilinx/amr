@@ -5,7 +5,6 @@
  * This file contains the PDR functions
  *
  * @file pldm_pdr.c
- *
  */
 
 

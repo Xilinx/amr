@@ -5,7 +5,6 @@
  * This file contains the implementation of the Debug Access Library (DAL)
  *
  * @file dal.c
- *
  */
 
 /******************************************************************************/
@@ -1313,6 +1312,7 @@ static void vProcessCmd( char *pcCmd, int iInputLen )
 static void vDalTask( void *pArg )
 {
     int iInputLen = 0;
+    (void)pArg;
 
     /* Call the initialisation function if provided */
     if( NULL != pxThis->pxInitFunc )
@@ -1320,7 +1320,7 @@ static void vDalTask( void *pArg )
         pxThis->pxInitFunc();
     }
 
-    FOREVER
+    for( ;; )
     {
         iInputLen = iNextInput( pxThis->pcLastCmd, sizeof( pxThis->pcLastCmd ) );
         INC_STAT_COUNTER( DAL_STATS_NEW_COMMAND )

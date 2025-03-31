@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the standard definitions for the AMC
  *
  * @file standard.h
- *
  */
 
 #ifndef _STANDARD_H_
@@ -41,10 +40,6 @@
 #define FALSE       ( 0 )
 #endif
 
-#ifndef FOREVER
-#define FOREVER     for( ;; )
-#endif
-
 #ifndef UNUSED
 #define UNUSED( p ) ( void )( p )
 #endif
@@ -64,4 +59,4 @@ typedef enum MODULE_STATE
 
 } MODULE_STATE;
 
-#endif
+#endif /* _STANDARD_H_ */

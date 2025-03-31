@@ -6,7 +6,6 @@
  * sensor.
  *
  * @file sys_mon.h
- *
  */
 
 #ifndef _SYS_MON_H_
@@ -30,22 +29,22 @@
 typedef enum SYS_MON_VOLTAGES_ENUM
 {
 #ifdef PROFILE_RAVE
-    SYS_MON_VOLTAGES_VCCAUX = 0,
-    SYS_MON_VOLTAGES_VCCSOC,
-    SYS_MON_VOLTAGES_VCCO302,
-    SYS_MON_VOLTAGES_VCCAUXPMC,
-    SYS_MON_VOLTAGES_VCCO500,
-    SYS_MON_VOLTAGES_VCCPMC,
-    SYS_MON_VOLTAGES_VCCPSFP,
-    SYS_MON_VOLTAGES_VCCPSLP,
-    SYS_MON_VOLTAGES_VPVN,
-    SYS_MON_VOLTAGES_VCCO703,
-    SYS_MON_VOLTAGES_VAUXCH0,
-    SYS_MON_VOLTAGES_VCCAUXSMON,
+    SYS_MON_VOLTAGES_VCCAUX     = 0,
+    SYS_MON_VOLTAGES_VCCSOC     = 1,
+    SYS_MON_VOLTAGES_VCCO302    = 2,
+    SYS_MON_VOLTAGES_VCCAUXPMC  = 3,
+    SYS_MON_VOLTAGES_VCCO500    = 4,
+    SYS_MON_VOLTAGES_VCCPMC     = 5,
+    SYS_MON_VOLTAGES_VCCPSFP    = 6,
+    SYS_MON_VOLTAGES_VCCPSLP    = 7,
+    SYS_MON_VOLTAGES_VPVN       = 8,
+    SYS_MON_VOLTAGES_VCCO703    = 9,
+    SYS_MON_VOLTAGES_VAUXCH0    = 10,
+    SYS_MON_VOLTAGES_VCCAUXSMON = 11,
 #else
-    SYS_MON_VOLTAGES_VCCAUX = 0,
-    SYS_MON_VOLTAGES_VCCAUXSMON,
-    SYS_MON_VOLTAGES_VCCAUXPMC,
+    SYS_MON_VOLTAGES_VCCAUX     = 0,
+    SYS_MON_VOLTAGES_VCCAUXSMON = 1,
+    SYS_MON_VOLTAGES_VCCAUXPMC  = 2,
 #endif
     MAX_SYS_MON_VOLTAGE
 } SYS_MON_VOLTAGES_ENUM;
@@ -60,7 +59,7 @@ typedef enum SYS_MON_VOLTAGES_ENUM
  *
  * @return  OK                  SYS_MON was initialised successfully
  *          ERROR               SYS_MON was not initialised
- * 
+ *
  */
 int iSYS_MON_Initialise( void );
 
@@ -71,7 +70,7 @@ int iSYS_MON_Initialise( void );
  *
  * @return  OK                  Temperature read successfully
  *          ERROR               Temperature not read successfully
- * 
+ *
  */
 int iSYS_MON_ReadTemperature( float *pfTemperatureInC );
 
@@ -83,7 +82,7 @@ int iSYS_MON_ReadTemperature( float *pfTemperatureInC );
  *
  * @return  OK                  Voltage read successfully
  *          ERROR               Voltage not read successfully
- * 
+ *
  */
 int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageInMV );
 
@@ -92,7 +91,7 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
  *
  * @return  OK                  Stats retrieved from driver successfully
  *          ERROR               Stats not retrieved successfully
- * 
+ *
  */
 int iSYS_MON_PrintStatistics( void );
 
@@ -101,8 +100,8 @@ int iSYS_MON_PrintStatistics( void );
  *
  * @return  OK                  Stats cleared successfully
  *          ERROR               Stats not cleared successfully
- * 
+ *
  */
 int iSYS_MON_ClearStatistics( void );
 
-#endif
+#endif /* _SYS_MON_H_ */

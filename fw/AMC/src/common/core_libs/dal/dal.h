@@ -5,7 +5,6 @@
  * This file contains the public API of the Debug Access Library (DAL)
  *
  * @file dal.h
- *
  */
 #ifndef _DAL_H_
 #define _DAL_H_
@@ -62,7 +61,7 @@ typedef struct DAL_MENU_OPTION * DAL_HDL;
  *
  * @return  OK if DAL is initialised and running successfully
  *          ERROR if the DAL is not initialised
- */ 
+ */
 int iDAL_Initialise( const char *pcMenuName,
                      uint32_t ulTaskPrio,
                      uint32_t ulStackSize,
@@ -128,10 +127,10 @@ int iDAL_GetIntInRange( const char *pcPrompt, int *piInput, int iMin, int iMax )
 
 /**
  * @brief Retrieve user-inputted float
- * 
+ *
  * @param   pcPrompt    String to display to the user
  * @param   pfInput     Pointer to float value that will be updated from user input
- * 
+ *
  * @return  OK          User inputted a valid value
  *          ERROR       User has not inputted a valid value
  *
@@ -141,12 +140,12 @@ int iDAL_GetFloat( const char *pcPrompt, float *pfInput );
 
 /**
  * @brief Retrieve user-inputted float within range
- * 
+ *
  * @param   pcPrompt    String to display to the user
  * @param   pfInput     Pointer to float value that will be updated from user input
  * @param   fMin        Minimum value allowed (inclusive)
  * @param   fMax        Maximum value allowed (inclusive)
- * 
+ *
  * @return  OK          User inputted a valid value
  *          ERROR       User has not inputted a valid value
  *
@@ -214,4 +213,4 @@ int iDAL_PrintStatistics( void );
  */
 int iDAL_ClearStatistics( void );
 
-#endif
+#endif /* _DAL_H_ */

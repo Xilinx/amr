@@ -5,7 +5,6 @@
  * This file contains the API for the Alveo Programming Control (APC) proxy driver
  *
  * @file apc_proxy_driver.h
- *
  */
 
 #ifndef _APC_PROXY_DRIVER_H_
@@ -106,11 +105,11 @@ typedef struct APC_PROXY_DRIVER_FPT_PARTITION
  *
  * @return  OK          Proxy driver initialised correctly
  *          ERROR       Proxy driver not initialised, or was already initialised
- * 
- * @note    A Primary Firmware Interface handle must be passed to iAPC_Initialise, 
- *          the secondary Firmware Interface handle however is optional 
+ *
+ * @note    A Primary Firmware Interface handle must be passed to iAPC_Initialise,
+ *          the secondary Firmware Interface handle however is optional
  *          and can be set to NULL.
- * 
+ *
  */
 int iAPC_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxPrimaryFwIf, FW_IF_CFG *pxSecondaryFwIf,
                      uint32_t ulTaskPrio, uint32_t ulTaskStack );
@@ -122,7 +121,7 @@ int iAPC_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxPrimaryFwIf, FW_IF_CFG *pxS
  *
  * @return  OK          Callback successfully bound
  *          ERROR       Callback not bound
- * 
+ *
  */
 int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
 
@@ -139,7 +138,7 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
  *
  * @return  OK           Image downloaded successfully
  *          ERROR        Image not downloaded successfully
- * 
+ *
  */
 int iAPC_DownloadImage( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulSrcAddr,
                         uint32_t ulImageSize, uint16_t usPacketNum, uint16_t usPacketSize );
@@ -157,7 +156,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, int 
  *
  * @return  OK           Image downloaded successfully
  *          ERROR        Image not downloaded successfully
- * 
+ *
  */
 int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, uint32_t ulSrcAddr, uint32_t ulImageSize,
                     uint16_t usPacketNum, uint16_t usPacketSize, int iLastPacket );
@@ -175,9 +174,9 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, uint32_t
  *
  * @return  OK          Image copied successfully
  *          ERROR       Image not copied successfully
- * 
+ *
  */
-int iAPC_CopyImage( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xSrcBootDevice, int iSrcPartition, 
+int iAPC_CopyImage( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xSrcBootDevice, int iSrcPartition,
                     APC_BOOT_DEVICES xDestBootDevice, int iDestPartition, uint32_t ulCpyAddr, uint32_t ulAllocatedSize );
 
 /**
@@ -209,7 +208,7 @@ int iAPC_EnableHotReset( EVL_SIGNAL *pxSignal );
  *
  * @return  OK              FPT header retrieved successfully
  *          ERROR           FPT header not retrieved successfully
- * 
+ *
  */
 int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice, APC_PROXY_DRIVER_FPT_HEADER *pxFptHeader );
 
@@ -222,7 +221,7 @@ int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice, APC_PROXY_DRIVER_FPT_HEADER
  *
  * @return  OK              FPT partition retrieved successfully
  *          ERROR           FPT partition not retrieved successfully
- * 
+ *
  */
 int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, APC_PROXY_DRIVER_FPT_PARTITION *pxFptPartition );
 
@@ -231,7 +230,7 @@ int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, APC_PROX
  *
  * @return  OK          Stats retrieved from proxy driver successfully
  *          ERROR       Stats not retrieved successfully
- * 
+ *
  */
 int iAPC_PrintStatistics( void );
 
@@ -240,7 +239,7 @@ int iAPC_PrintStatistics( void );
  *
  * @return  OK          Stats cleared successfully
  *          ERROR       Stats not cleared successfully
- * 
+ *
  */
 int iAPC_ClearStatistics( void );
 
@@ -254,4 +253,4 @@ int iAPC_ClearStatistics( void );
  */
 int iAPC_GetState( MODULE_STATE *pxState );
 
-#endif
+#endif /* _APC_PROXY_DRIVER_H_ */

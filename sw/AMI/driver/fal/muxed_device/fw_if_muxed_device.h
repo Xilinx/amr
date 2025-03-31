@@ -5,7 +5,6 @@
  * This header file contains the FW IF Muxed Device abstraction definitions.
  *
  * @file fw_if_muxed_device.h
- *
  */
 
 #ifndef _FW_IF_MUXED_DEVICE_H_
@@ -156,4 +155,4 @@ extern uint32_t ulFW_IF_MUXED_DEVICE_PrintStatistics( void );
  */
 extern uint32_t ulFW_IF_MUXED_DEVICE_ClearStatistics( void );
 
-#endif
+#endif /* _FW_IF_MUXED_DEVICE_H_ */

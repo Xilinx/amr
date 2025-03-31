@@ -6,7 +6,6 @@
  * for the OSPI driver.
  *
  * @file ospi.h
- *
  */
 
 #ifndef _OSPI_H_
@@ -23,7 +22,7 @@
  */
 typedef struct OSPI_CFG_TYPE
 {
-    uint8_t ucDeviceId;
+    uint32_t ulBaseAddress;
     uint16_t usPageSize;
 
 } OSPI_CFG_TYPE;

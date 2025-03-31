@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the ASDM (Alveo Data Store Model) implementation details
@@ -157,11 +157,7 @@
  */
 static inline int iSensorIsEnabled( void )
 {
-#ifdef PROFILE_RAVE
-	return FALSE;
-#else
     return TRUE;
-#endif
 }
 
 ASC_PROXY_DRIVER_SENSOR_DATA xTotalPowerData[ TOTAL_POWER_NUM_RECORDS ] =
@@ -384,23 +380,23 @@ typedef struct ASDM_RECORD_FIELD
  */
 typedef struct ASDM_BOARD_INFO_RECORD
 {
-    ASDM_RECORD_FIELD xEepromVersion;                                          /* ASCII */
-    ASDM_RECORD_FIELD xProductName;                                            /* ASCII */
-    ASDM_RECORD_FIELD xBoardRev;                                               /* ASCII */
-    ASDM_RECORD_FIELD xBoardSerial;                                            /* ASCII */
-    ASDM_RECORD_FIELD xMacAddressCount;                                        /* Literal/Binary */
-    ASDM_RECORD_FIELD xFirstMacAddress;                                        /* Literal/Binary */
-    ASDM_RECORD_FIELD xActiveState;                                            /* ASCII */
-    ASDM_RECORD_FIELD xConfigMode;                                             /* Literal/Binary */
-    ASDM_RECORD_FIELD xManufacturingDate;                                      /* Literal/Binary */
-    ASDM_RECORD_FIELD xPartNumber;                                             /* ASCII */
-    ASDM_RECORD_FIELD xUuid;                                                   /* Literal/Binary */
-    ASDM_RECORD_FIELD xPcieId;                                                 /* Literal/Binary */
-    ASDM_RECORD_FIELD xMaxPowerMode;                                           /* Literal/Binary */
-    ASDM_RECORD_FIELD xMemorySize;                                             /* ASCII */
-    ASDM_RECORD_FIELD xOemId;                                                  /* Literal/Binary */
-    ASDM_RECORD_FIELD xCapability;                                             /* Literal/Binary */
-    ASDM_RECORD_FIELD xMfgPartNumber;                                          /* ASCII */
+    ASDM_RECORD_FIELD xEepromVersion;       /* ASCII */
+    ASDM_RECORD_FIELD xProductName;         /* ASCII */
+    ASDM_RECORD_FIELD xBoardRev;            /* ASCII */
+    ASDM_RECORD_FIELD xBoardSerial;         /* ASCII */
+    ASDM_RECORD_FIELD xMacAddressCount;     /* Literal/Binary */
+    ASDM_RECORD_FIELD xFirstMacAddress;     /* Literal/Binary */
+    ASDM_RECORD_FIELD xActiveState;         /* ASCII */
+    ASDM_RECORD_FIELD xConfigMode;          /* Literal/Binary */
+    ASDM_RECORD_FIELD xManufacturingDate;   /* Literal/Binary */
+    ASDM_RECORD_FIELD xPartNumber;          /* ASCII */
+    ASDM_RECORD_FIELD xUuid;                /* Literal/Binary */
+    ASDM_RECORD_FIELD xPcieId;              /* Literal/Binary */
+    ASDM_RECORD_FIELD xMaxPowerMode;        /* Literal/Binary */
+    ASDM_RECORD_FIELD xMemorySize;          /* ASCII */
+    ASDM_RECORD_FIELD xOemId;               /* Literal/Binary */
+    ASDM_RECORD_FIELD xCapability;          /* Literal/Binary */
+    ASDM_RECORD_FIELD xMfgPartNumber;       /* ASCII */
 
 } ASDM_BOARD_INFO_RECORD;
 
@@ -410,7 +406,7 @@ typedef struct ASDM_BOARD_INFO_RECORD
  */
 typedef struct ASDM_SDR_RECORD
 {
-    uint8_t           ucId;                                                    /* uniquely identifies each sensor record within the SDR */
+    uint8_t           ucId;                 /* uniquely identifies each sensor record within the SDR */
     ASDM_RECORD_FIELD xSensorName;
     ASDM_RECORD_FIELD xSensorValue;
     ASDM_RECORD_FIELD xSensorBaseUnit;
@@ -507,61 +503,47 @@ typedef struct ASDM_PRIVATE_DATA
 
 static ASDM_PRIVATE_DATA xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    FALSE,                                                                     /* iSensorListInitialised */
-    FALSE,                                                                     /* iInitialised */
-    NULL,                                                                      /* pxAscData */
-    0,                                                                         /* ucAscNumSensors */
+    UPPER_FIREWALL,                  /* ulUpperFirewall */
+    FALSE,                           /* iSensorListInitialised */
+    FALSE,                           /* iInitialised */
+    NULL,                            /* pxAscData */
+    0,                               /* ucAscNumSensors */
     { {
           0
-      } },                                                                     /* pxSensorList */
-    NULL,                                                                      /* pxAsdmSdrInfo */
-    NULL,                                                                      /* pxAsdmSdsInfo */
-    NULL,                                                                      /* pvOsalMutexHdl */
-    0,                                                                         /* ulPowerCalcIterations */
-    0,                                                                         /* ulAveragePower */
-    0,                                                                         /* ulMaxPower */
+      } },                           /* pxSensorList */
+    NULL,                            /* pxAsdmSdrInfo */
+    NULL,                            /* pxAsdmSdsInfo */
+    NULL,                            /* pvOsalMutexHdl */
+    0,                               /* ulPowerCalcIterations */
+    0,                               /* ulAveragePower */
+    0,                               /* ulMaxPower */
     { {
           0
-      } },                                                                     /* pxFptHeader */
+      } },                           /* pxFptHeader */
     {
         NULL
-    },                                                                         /* ppxFptPartitions */
-    NULL,                                                                      /* pxBoardInfo */
+    },                               /* ppxFptPartitions */
+    NULL,                            /* pxBoardInfo */
     {
         0
-    },                                                                         /* pulStatCounters */
+    },                               /* pulStatCounters */
     {
         0
-    },                                                                         /* pulErrorCounters */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall */
+    },                               /* pulErrorCounters */
+    LOWER_FIREWALL                   /* ulLowerFirewall */
 };
 static ASDM_PRIVATE_DATA *pxThis = &xLocalData;
 
 static ASDM_SENSOR_HEADER xAsdmHeaderInfo[] =
 {
-    /* Record Type  | Hdr Version | Record Count | NumBytes */
-    {
-        ASDM_REPOSITORY_TYPE_TEMP,          ASDM_HEADER_VER, 0, 0
-    },
-    {
-        ASDM_REPOSITORY_TYPE_VOLTAGE,       ASDM_HEADER_VER, 0, 0
-    },
-    {
-        ASDM_REPOSITORY_TYPE_CURRENT,       ASDM_HEADER_VER, 0, 0
-    },
-    {
-        ASDM_REPOSITORY_TYPE_POWER,         ASDM_HEADER_VER, 0, 0
-    },                                                                         /* Individual Power Values */
-    {
-        ASDM_REPOSITORY_TYPE_TOTAL_POWER,   ASDM_HEADER_VER, 0, 0
-    },                                                                         /* Total Power */
-    {
-        ASDM_REPOSITORY_TYPE_FPT,           ASDM_HEADER_VER, 0, 0
-    },
-    {
-        ASDM_REPOSITORY_TYPE_BOARD_INFO,    ASDM_HEADER_VER, 0, 0
-    },
+    /* Record Type                     |   Hdr Version  |Record Count| NumBytes */
+    { ASDM_REPOSITORY_TYPE_TEMP,        ASDM_HEADER_VER,      0,          0 },
+    { ASDM_REPOSITORY_TYPE_VOLTAGE,     ASDM_HEADER_VER,      0,          0 },
+    { ASDM_REPOSITORY_TYPE_CURRENT,     ASDM_HEADER_VER,      0,          0 },
+    { ASDM_REPOSITORY_TYPE_POWER,       ASDM_HEADER_VER,      0,          0 },  /* Individual Power Values */
+    { ASDM_REPOSITORY_TYPE_TOTAL_POWER, ASDM_HEADER_VER,      0,          0 },  /* Total Power */
+    { ASDM_REPOSITORY_TYPE_FPT,         ASDM_HEADER_VER,      0,          0 },
+    { ASDM_REPOSITORY_TYPE_BOARD_INFO,  ASDM_HEADER_VER,      0,          0 },
 };
 
 #define MAX_ASDM_SDR_REPO ( sizeof( xAsdmHeaderInfo ) / sizeof( xAsdmHeaderInfo[ 0 ] ) )
@@ -595,36 +577,33 @@ static const char *pcConvertRepoStr[] =
  */
 static inline const char *pcConvertUnitModStr( ASDM_SDR_UNIT_MODIFIER xUnit )
 {
+    char* unitStr;
+
     /* Note: this is stored in the ASDM as -3 to +3*/
     switch( xUnit )
     {
-    case ASDM_SDR_UNIT_MODIFIER_MEGA:
-    {
-        return "Mega";
-    }
+        case ASDM_SDR_UNIT_MODIFIER_MEGA:
+            unitStr = "Mega";
+            break;
 
-    case ASDM_SDR_UNIT_MODIFIER_KILO:
-    {
-        return "Kilo";
-    }
+        case ASDM_SDR_UNIT_MODIFIER_KILO:
+            unitStr = "Kilo";
+            break;
 
-    case ASDM_SDR_UNIT_MODIFIER_MILLI:
-    {
-        return "Milli";
-        break;
-    }
+        case ASDM_SDR_UNIT_MODIFIER_MILLI:
+            unitStr = "Milli";
+            break;
 
-    case ASDM_SDR_UNIT_MODIFIER_MICRO:
-    {
-        return "Micro";
-    }
+        case ASDM_SDR_UNIT_MODIFIER_MICRO:
+            unitStr = "Micro";
+            break;
 
-    case ASDM_SDR_UNIT_MODIFIER_NONE:
-    default:
-    {
-        return "None";
+        case ASDM_SDR_UNIT_MODIFIER_NONE:
+        default:
+            unitStr = "None";
+            break;
     }
-    }
+    return unitStr;
 }
 
 
@@ -1044,7 +1023,6 @@ int iASDM_Initialise( uint8_t ucNumSensors )
             INC_ERROR_COUNTER( ASDM_ERRORS_INIT_OVERALL_FAILED )
         }
     }
-
     return iStatus;
 }
 
@@ -1067,57 +1045,40 @@ int iASDM_PopulateResponse( ASDM_API_ID_TYPE xApiType,
     {
         switch( xApiType )
         {
-        case ASDM_API_ID_TYPE_GET_SDR_SIZE:
-        {
-            iStatus = iPopulateAsdmGetSizeResponse( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
-            break;
-        }
+            case ASDM_API_ID_TYPE_GET_SDR_SIZE:
+                iStatus = iPopulateAsdmGetSizeResponse( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
+                break;
 
-        case ASDM_API_ID_TYPE_GET_SDR:
-        {
-            iStatus = iPopulateAsdmGetSdrResponse( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
-            break;
-        }
+            case ASDM_API_ID_TYPE_GET_SDR:
+                iStatus = iPopulateAsdmGetSdrResponse( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
+                break;
 
-        case ASDM_API_ID_TYPE_GET_SINGLE_SENSOR_DATA:
-        {
-            iStatus = iPopulateAsdmGetSingleSensorResponse( xAsdmRepo, ucSensorId, pucRespBuff, pusRespSizeBytes );
-            break;
-        }
+            case ASDM_API_ID_TYPE_GET_SINGLE_SENSOR_DATA:
+                iStatus = iPopulateAsdmGetSingleSensorResponse( xAsdmRepo, ucSensorId, pucRespBuff, pusRespSizeBytes );
+                break;
 
-        case ASDM_API_ID_TYPE_GET_ALL_SENSOR_DATA:
-        {
-            iStatus = iPopulateAsdmGetAllSensorDataResponse( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
-            break;
-        }
+            case ASDM_API_ID_TYPE_GET_ALL_SENSOR_DATA:
+                iStatus = iPopulateAsdmGetAllSensorDataResponse( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
+                break;
 
-        case ASDM_API_ID_TYPE_GET_SDR_V2:
-        {
-            iStatus = iPopulateAsdmGetSdrResponseV2( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
-            break;
-        }
+            case ASDM_API_ID_TYPE_GET_SDR_V2:
+                iStatus = iPopulateAsdmGetSdrResponseV2( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
+                break;
 
-        case ASDM_API_ID_TYPE_GET_ALL_SENSOR_DATA_V2:
-        {
-            iStatus = iPopulateAsdmGetAllSensorDataResponseV2( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
-            break;
-        }
+            case ASDM_API_ID_TYPE_GET_ALL_SENSOR_DATA_V2:
+                iStatus = iPopulateAsdmGetAllSensorDataResponseV2( xAsdmRepo, pucRespBuff, pusRespSizeBytes );
+                break;
 
-        case ASDM_API_ID_TYPE_CONFIG_WRITES:
-        case ASDM_API_ID_TYPE_SEND_EVENTS:
-        {
-            /* TODO: not sensor related, should be rejected by ASDM */
-            break;
-        }
+            case ASDM_API_ID_TYPE_CONFIG_WRITES:
+            case ASDM_API_ID_TYPE_SEND_EVENTS:
+                /* TODO: not sensor related, should be rejected by ASDM */
+                break;
 
-        default:
-        {
-            /* TODO: unknown request should be rejected */
-            break;
-        }
+            default:
+                /* TODO: unknown request should be rejected */
+                break;
         }
     }
-
     return iStatus;
 }
 
@@ -1148,7 +1109,6 @@ int iASDM_PrintStatistics( void )
 
         iStatus = OK;
     }
-
     return iStatus;
 }
 
@@ -1166,7 +1126,6 @@ int iASDM_ClearStatistics( void )
         pvOSAL_MemSet( pxThis->pulErrorCounters, 0, sizeof( pxThis->pulErrorCounters ) );
         iStatus = OK;
     }
-
     return iStatus;
 }
 
@@ -1182,7 +1141,7 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
         ( NULL != pxThis->pxAsdmSdrInfo ) &&
         ( iRepoIndex < AMC_ASDM_SUPPORTED_REPO_MAX ) )
     {
-        int iSensorIdx = 0;
+        uint8_t iSensorIdx = 0;
 
         iStatus = OK;
 
@@ -1295,13 +1254,12 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                          ucSensorStatus,
                          ucSensorTag );
             }
-
             break;
         }
 
         case AMC_ASDM_SUPPORTED_REPO_FPT:
         {
-            int i = 0;
+            uint8_t i = 0;
             PLL_INF( ASDM_NAME, "Primary Boot Device:\r\n" );
             PLL_INF( ASDM_NAME,
                      "Version: 0x%x\r\n",
@@ -1530,8 +1488,7 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                  "===============================================================================================================\r\n" );
         PLL_INF( ASDM_NAME, "\r\n" );
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -1613,7 +1570,6 @@ static int iAscCallback( EVL_SIGNAL *pxSignal )
         }
         }
     }
-
     return iStatus;
 }
 
@@ -1628,30 +1584,25 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
     {
         switch( pxSignal->ucEventType )
         {
-        case APC_PROXY_DRIVER_E_FPT_UPDATE:
-        {
-            INC_STAT_COUNTER( ASDM_STATS_APC_FPT_UPDATE_EVENT )
+            case APC_PROXY_DRIVER_E_FPT_UPDATE:
+                INC_STAT_COUNTER( ASDM_STATS_APC_FPT_UPDATE_EVENT )
 
-            if( OK == iRefreshFptData() )
-            {
+                if( OK == iRefreshFptData() )
+                {
+                    iStatus = OK;
+                }
+                else
+                {
+                    INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
+                }
+                break;
+
+            default:
+                INC_STAT_COUNTER( ASDM_STATS_AMI_UNSUPPORTED_REQUEST )
                 iStatus = OK;
-            }
-            else
-            {
-                INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
-            }
-            break;
-        }
-
-        default:
-        {
-            INC_STAT_COUNTER( ASDM_STATS_AMI_UNSUPPORTED_REQUEST )
-            iStatus = OK;
-            break;
-        }
+                break;
         }
     }
-
     return iStatus;
 }
 
@@ -1661,7 +1612,7 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
 static int iInitAsdm( uint8_t ucNumSensors )
 {
     int      iStatus           = ERROR;
-    int      iRepoIndex        = 0;
+    uint32_t iRepoIndex        = 0;
     uint16_t usAllocateSizeSdr = 0;
     uint16_t usAllocateSizeSds = 0;
 
@@ -1690,81 +1641,70 @@ static int iInitAsdm( uint8_t ucNumSensors )
                 /* Parse the ASC data list and get the number for each supported repo type */
                 switch( iRepoIndex )
                 {
-                case AMC_ASDM_SUPPORTED_REPO_TEMP:
-                case AMC_ASDM_SUPPORTED_REPO_VOLTAGE:
-                case AMC_ASDM_SUPPORTED_REPO_CURRENT:
-                case AMC_ASDM_SUPPORTED_REPO_POWER:
-                {
-                    iStatus = iPopulateRepoSensorList( ucNumSensors,
-                                                       iRepoIndex,
-                                                       &pxThis->pxSensorList[ iRepoIndex ] );
-                    if( OK != iStatus )
-                    {
-                        /* To deal with invalid sensor data -
-                           force the rest of the ASDM to be populated */
-                        pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
-                        iStatus = OK;
-                    }
-                    break;
-                }
+                    case AMC_ASDM_SUPPORTED_REPO_TEMP:
+                    case AMC_ASDM_SUPPORTED_REPO_VOLTAGE:
+                    case AMC_ASDM_SUPPORTED_REPO_CURRENT:
+                    case AMC_ASDM_SUPPORTED_REPO_POWER:
+                        iStatus = iPopulateRepoSensorList( ucNumSensors,
+                                                        iRepoIndex,
+                                                        &pxThis->pxSensorList[ iRepoIndex ] );
+                        if( OK != iStatus )
+                        {
+                            /* To deal with invalid sensor data -
+                            force the rest of the ASDM to be populated */
+                            pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
+                            iStatus = OK;
+                        }
+                        break;
 
-                /* ASDM headers/EOR still required for non ASC sensor repo types */
-                case AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER:
-                {
-                    if( TRUE == pxThis->iSensorListInitialised )
-                    {
-                        pxThis->pxSensorList[ iRepoIndex ].ucNumFound = TOTAL_POWER_NUM_RECORDS;
-                        iStatus = OK;
-                    }
-                    else
-                    {
-                        /* To deal with invalid sensor data -
-                           force the rest of the ASDM to be populated */
-                        pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
-                        iStatus = OK;
-                    }
+                    /* ASDM headers/EOR still required for non ASC sensor repo types */
+                    case AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER:
+                        if( TRUE == pxThis->iSensorListInitialised )
+                        {
+                            pxThis->pxSensorList[ iRepoIndex ].ucNumFound = TOTAL_POWER_NUM_RECORDS;
+                            iStatus = OK;
+                        }
+                        else
+                        {
+                            /* To deal with invalid sensor data -
+                            force the rest of the ASDM to be populated */
+                            pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
+                            iStatus = OK;
+                        }
+                        break;
 
-                    break;
-                }
+                    case AMC_ASDM_SUPPORTED_REPO_FPT:
+                        iStatus = iGetFptData();
+                        if( OK == iStatus )
+                        {
+                            pxThis->pxSensorList[ iRepoIndex ].ucNumFound = FPT_NUM_RECORDS;
+                        }
+                        else
+                        {
+                            /* To deal with scenario that invalid FTP header is returned -
+                            force the rest of the ASDM to be populated */
+                            pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
+                            iStatus = OK;
+                        }
+                        break;
 
-                case AMC_ASDM_SUPPORTED_REPO_FPT:
-                {
-                    iStatus = iGetFptData();
-                    if( OK == iStatus )
-                    {
-                        pxThis->pxSensorList[ iRepoIndex ].ucNumFound = FPT_NUM_RECORDS;
-                    }
-                    else
-                    {
-                        /* To deal with scenario that invalid FTP header is returned -
-                           force the rest of the ASDM to be populated */
-                        pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
-                        iStatus = OK;
-                    }
-                    break;
-                }
+                    case AMC_ASDM_SUPPORTED_REPO_BOARD_INFO:
+                        iStatus = iGetBoardInfoData();
+                        if( OK == iStatus )
+                        {
+                            pxThis->pxSensorList[ iRepoIndex ].ucNumFound = BOARD_INFO_NUM_RECORDS;
+                        }
+                        else
+                        {
+                            /* To deal with invalid board info data -
+                            force the rest of the ASDM to be populated */
+                            pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
+                            iStatus = OK;
+                        }
+                        break;
 
-                case AMC_ASDM_SUPPORTED_REPO_BOARD_INFO:
-                {
-                    iStatus = iGetBoardInfoData();
-                    if( OK == iStatus )
-                    {
-                        pxThis->pxSensorList[ iRepoIndex ].ucNumFound = BOARD_INFO_NUM_RECORDS;
-                    }
-                    else
-                    {
-                        /* To deal with invalid board info data -
-                           force the rest of the ASDM to be populated */
-                        pxThis->pxSensorList[ iRepoIndex ].ucNumFound = 0;
-                        iStatus = OK;
-                    }
-                    break;
-                }
-
-                default:
-                {
-                    break;
-                }
+                    default:
+                        break;
                 }
 
                 if( OK == iStatus )
@@ -1814,7 +1754,7 @@ static int iInitAsdm( uint8_t ucNumSensors )
                                 ( ASDM_SDS_RECORD * )pvOSAL_MemAlloc( usAllocateSizeSds );
                             if( NULL != pxThis->pxAsdmSdsInfo[ iRepoIndex ].pxSensorRecord )
                             {
-                                int i = 0;
+                                uint8_t i = 0;
 
                                 INC_STAT_COUNTER( ASDM_STATS_MALLOC )
                                 pvOSAL_MemSet( pxThis->pxAsdmSdrInfo[ iRepoIndex ].pxSensorRecord,
@@ -2027,7 +1967,7 @@ static int iUpdateAsdmValues( void )
             for( iRepoIdx = 0; iRepoIdx < AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER; iRepoIdx++ )
             {
                 uint8_t ucTotalNumRecords = pxThis->pxSensorList[ iRepoIdx ].ucNumFound;
-                int     iSensorIdx        = 0;
+                uint8_t iSensorIdx        = 0;
 
                 /* Internal sensor list contains index's into the ASC sensor table  */
                 for( iSensorIdx = 0; iSensorIdx < ucTotalNumRecords; iSensorIdx++ )
@@ -2080,7 +2020,6 @@ static int iUpdateAsdmValues( void )
             iStatus = ERROR;
         }
     }
-
     return iStatus;
 }
 
@@ -2103,53 +2042,41 @@ static int iPopulateRepoSensorList( uint8_t ucNumSensors,
 
         switch( xRepo )
         {
-        case AMC_ASDM_SUPPORTED_REPO_TEMP:
-        {
-            ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_TEMPERATURE;
-            iStatus = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_TEMP:
+                ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_TEMPERATURE;
+                iStatus = OK;
+                break;
 
-        case AMC_ASDM_SUPPORTED_REPO_VOLTAGE:
-        {
-            ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_VOLTAGE;
-            iStatus = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_VOLTAGE:
+                ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_VOLTAGE;
+                iStatus = OK;
+                break;
 
-        case AMC_ASDM_SUPPORTED_REPO_CURRENT:
-        {
-            ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_CURRENT;
-            iStatus = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_CURRENT:
+                ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_CURRENT;
+                iStatus = OK;
+                break;
 
-        case AMC_ASDM_SUPPORTED_REPO_POWER:
-        case AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER:
-        {
-            ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_POWER;
-            iStatus = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_POWER:
+            case AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER:
+                ucBit   = ASC_PROXY_DRIVER_SENSOR_BITFIELD_POWER;
+                iStatus = OK;
+                break;
 
-        case AMC_ASDM_SUPPORTED_REPO_FPT:
-        case AMC_ASDM_SUPPORTED_REPO_BOARD_INFO:
-        {
-            /* Supported but not used in the sensor list from ASC so ignore */
-            iStatus = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_FPT:
+            case AMC_ASDM_SUPPORTED_REPO_BOARD_INFO:
+                /* Supported but not used in the sensor list from ASC so ignore */
+                iStatus = OK;
+                break;
 
-        default:
-        {
-            INC_ERROR_COUNTER( ASDM_ERRORS_ASC_BITFIELD_MAPPING )
-            break;
-        }
+            default:
+                INC_ERROR_COUNTER( ASDM_ERRORS_ASC_BITFIELD_MAPPING )
+                break;
         }
 
         if( OK == iStatus )
         {
-            int i = 0;
+            uint8_t i = 0;
             for( i = 0; i < ucNumSensors; i++ )
             {
                 if( pxThis->pxAscData[ i ].ucSensorType & ucBit )
@@ -2166,7 +2093,6 @@ static int iPopulateRepoSensorList( uint8_t ucNumSensors,
             }
         }
     }
-
     return iStatus;
 }
 
@@ -2303,8 +2229,7 @@ static int iPopulateSdr( uint8_t ucIndex,
             iStatus = ERROR;
         }
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -2372,7 +2297,6 @@ static int iPopulateSds( uint8_t ucIndex,
             iStatus = ERROR;
         }
     }
-
     return iStatus;
 }
 
@@ -2391,63 +2315,46 @@ static int iMapAsdmRepo( ASDM_REPOSITORY_TYPE xAsdmRepo,
         *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_MAX;
         switch( xAsdmRepo )
         {
-        case ASDM_REPOSITORY_TYPE_TEMP:
-        {
-            *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_TEMP;
-            iStatus       = OK;
-            break;
-        }
+            case ASDM_REPOSITORY_TYPE_TEMP:
+                *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_TEMP;
+                iStatus       = OK;
+                break;
 
-        case ASDM_REPOSITORY_TYPE_VOLTAGE:
-        {
-            *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_VOLTAGE;
-            iStatus       = OK;
-            break;
-        }
+            case ASDM_REPOSITORY_TYPE_VOLTAGE:
+                *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_VOLTAGE;
+                iStatus       = OK;
+                break;
 
-        case ASDM_REPOSITORY_TYPE_CURRENT:
-        {
-            *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_CURRENT;
-            iStatus       = OK;
-            break;
-        }
+            case ASDM_REPOSITORY_TYPE_CURRENT:
+                *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_CURRENT;
+                iStatus       = OK;
+                break;
 
-        case ASDM_REPOSITORY_TYPE_POWER:
-        {
-            *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_POWER;
-            iStatus       = OK;
-            break;
-        }
+            case ASDM_REPOSITORY_TYPE_POWER:
+                *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_POWER;
+                iStatus       = OK;
+                break;
 
-        case ASDM_REPOSITORY_TYPE_TOTAL_POWER:
-        {
-            *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER;
-            iStatus       = OK;
-            break;
-        }
+            case ASDM_REPOSITORY_TYPE_TOTAL_POWER:
+                *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER;
+                iStatus       = OK;
+                break;
 
-        case ASDM_REPOSITORY_TYPE_BOARD_INFO:
-        {
-            *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_BOARD_INFO;
-            iStatus       = OK;
-            break;
-        }
+            case ASDM_REPOSITORY_TYPE_BOARD_INFO:
+                *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_BOARD_INFO;
+                iStatus       = OK;
+                break;
 
-        case ASDM_REPOSITORY_TYPE_FPT:
-        {
-            *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_FPT;
-            iStatus       = OK;
-            break;
-        }
+            case ASDM_REPOSITORY_TYPE_FPT:
+                *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_FPT;
+                iStatus       = OK;
+                break;
 
-        default:
-        {
-            INC_ERROR_COUNTER( ASDM_ERRORS_ASDM_REPO_MAPPING )
-            break;
-        }
+            default:
+                INC_ERROR_COUNTER( ASDM_ERRORS_ASDM_REPO_MAPPING )
+                break;
         }
     }
-
     return iStatus;
 }
 
@@ -2467,49 +2374,36 @@ static int iMapUnitModifier( ASC_PROXY_DRIVER_SENSOR_UNIT_MOD xUnitMod,
 
         switch( xUnitMod )
         {
-        case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_MEGA:
-        {
-            *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_MEGA;
-            iStatus   = OK;
-            break;
-        }
+            case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_MEGA:
+                *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_MEGA;
+                iStatus   = OK;
+                break;
 
-        case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_KILO:
-        {
-            *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_KILO;
-            iStatus   = OK;
-            break;
-        }
+            case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_KILO:
+                *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_KILO;
+                iStatus   = OK;
+                break;
 
-        case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_NONE:
-        {
-            *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_NONE;
-            iStatus   = OK;
-            break;
-        }
+            case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_NONE:
+                *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_NONE;
+                iStatus   = OK;
+                break;
 
-        case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_MILLI:
-        {
-            *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_MILLI;
-            iStatus   = OK;
-            break;
-        }
+            case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_MILLI:
+                *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_MILLI;
+                iStatus   = OK;
+                break;
 
-        case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_MICRO:
-        {
-            *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_MICRO;
-            iStatus   = OK;
-            break;
-        }
+            case ASC_PROXY_DRIVER_SENSOR_UNIT_MOD_MICRO:
+                *pxSdrMod = ASDM_SDR_UNIT_MODIFIER_MICRO;
+                iStatus   = OK;
+                break;
 
-        default:
-        {
-            INC_ERROR_COUNTER( ASDM_ERRORS_ASDM_UNIT_MODIFIER_MAPPING )
-            break;
-        }
+            default:
+                INC_ERROR_COUNTER( ASDM_ERRORS_ASDM_UNIT_MODIFIER_MAPPING )
+                break;
         }
     }
-
     return iStatus;
 }
 
@@ -2586,7 +2480,6 @@ static int iPopulateSdrThresholds( ASC_PROXY_DRIVER_SENSOR_DATA *pxData,
         iStatus = OK;
 
     }
-
     return iStatus;
 }
 
@@ -3086,7 +2979,6 @@ static int iPopulateAsdmGetSizeResponse( ASDM_REPOSITORY_TYPE xRepo,
             iStatus = ERROR;
         }
     }
-
     return iStatus;
 }
 
@@ -3189,8 +3081,7 @@ static int iPopulateAsdmGetSingleSensorResponse( ASDM_REPOSITORY_TYPE xRepo,
             }
         }
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3207,7 +3098,7 @@ static int iCalculateTotalPower( void )
     {
         /* Loop around the list of power sensors and calculate the total power */
         uint8_t  ucTotalNumRecords = pxThis->pxSensorList[ AMC_ASDM_SUPPORTED_REPO_POWER ].ucNumFound;
-        int      iSensorIdx        = 0;
+        uint8_t  iSensorIdx        = 0;
         uint32_t ulTotalPower      = 0;
 
         /* Set initial suceess */
@@ -3263,7 +3154,6 @@ static int iCalculateTotalPower( void )
             }
         }
     }
-
     return iStatus;
 }
 
@@ -3339,8 +3229,7 @@ static int iGetFptData( void )
 
         }
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3402,7 +3291,6 @@ static int iPopulateAsdmFpt( uint16_t *pusByteCount )
                     pxThis->ppxFptPartitions[ APC_BOOT_DEVICE_PRIMARY ][ i ].ulPartitionSize;
                 usByteCount += sizeof( ASDM_FPT_ENTRY );
             }
-
             iStatus = OK;
         }
         else
@@ -3437,7 +3325,6 @@ static int iPopulateAsdmFpt( uint16_t *pusByteCount )
                         pxThis->ppxFptPartitions[ APC_BOOT_DEVICE_SECONDARY ][ i ].ulPartitionSize;
                     usByteCount += sizeof( ASDM_FPT_ENTRY );
                 }
-
                 iStatus = OK;
             }
             else
@@ -3448,12 +3335,10 @@ static int iPopulateAsdmFpt( uint16_t *pusByteCount )
                 /* return OK, as secondary FPT is optional */
                 iStatus = OK;
             }
-
             *pusByteCount = usByteCount;
         }
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3756,8 +3641,7 @@ static int iGetBoardInfoData( void )
     {
         INC_ERROR_COUNTER( ASDM_ERRORS_ASDM_POPULATE_BDINFO_FAILED )
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3779,8 +3663,7 @@ static int iPopulateAsdmBoardInfo( uint16_t *pusByteCount )
         *pusByteCount = sizeof( ASDM_BOARD_INFO_RECORD );
         iStatus       = OK;
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -3963,8 +3846,7 @@ static int iPopulateAsdmSdrBoardInfoResponse( ASDM_REPOSITORY_TYPE xRepo,
             iStatus           = OK;
         }
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -4024,8 +3906,7 @@ static int iRefreshFptData( void )
             iStatus = ERROR;
         }
     }
-
-    return ( iStatus );
+    return iStatus;
 }
 
 /**
@@ -4069,7 +3950,6 @@ static int iUpdateAsdmFpt( void )
             iStatus = OK;
         }
     }
-
     return iStatus;
 }
 
@@ -4294,7 +4174,6 @@ static int iPopulateAsdmGetSdrResponseV2( ASDM_REPOSITORY_TYPE xRepo,
             }
         }
     }
-
     return iStatus;
 }
 
@@ -4325,7 +4204,7 @@ static int iPopulateAsdmGetAllSensorDataResponseV2( ASDM_REPOSITORY_TYPE xRepo,
             {
                 uint16_t usByteCount   = 0;
                 uint8_t  ucPayloadSize = 0;
-                int      i             = 0;
+                uint8_t  i             = 0;
 
                 INC_STAT_COUNTER( ASDM_STATS_TAKE_MUTEX )
 
@@ -4401,7 +4280,6 @@ static int iPopulateAsdmGetAllSensorDataResponseV2( ASDM_REPOSITORY_TYPE xRepo,
             }
         }
     }
-
     return iStatus;
 }
 
@@ -4420,42 +4298,31 @@ static int iMapSensorTag( AMC_ASDM_SUPPORTED_REPO xAsdmRepo,
         *pxSensorTag = ASDM_SDS_SENSOR_TAG_MAX;
         switch( xAsdmRepo )
         {
-        case AMC_ASDM_SUPPORTED_REPO_TEMP:
-        {
-            *pxSensorTag = ASDM_SDS_SENSOR_TAG_BOARD_TEMP;
-            iStatus      = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_TEMP:
+                *pxSensorTag = ASDM_SDS_SENSOR_TAG_BOARD_TEMP;
+                iStatus      = OK;
+                break;
 
-        case AMC_ASDM_SUPPORTED_REPO_VOLTAGE:
-        {
-            *pxSensorTag = ASDM_SDS_SENSOR_TAG_VOLTAGE;
-            iStatus      = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_VOLTAGE:
+                *pxSensorTag = ASDM_SDS_SENSOR_TAG_VOLTAGE;
+                iStatus      = OK;
+                break;
 
-        case AMC_ASDM_SUPPORTED_REPO_CURRENT:
-        {
-            *pxSensorTag = ASDM_SDS_SENSOR_TAG_CURRENT;
-            iStatus      = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_CURRENT:
+                *pxSensorTag = ASDM_SDS_SENSOR_TAG_CURRENT;
+                iStatus      = OK;
+                break;
 
-        case AMC_ASDM_SUPPORTED_REPO_POWER:
-        case AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER:
-        {
-            *pxSensorTag = ASDM_SDS_SENSOR_TAG_POWER;
-            iStatus      = OK;
-            break;
-        }
+            case AMC_ASDM_SUPPORTED_REPO_POWER:
+            case AMC_ASDM_SUPPORTED_REPO_TOTAL_POWER:
+                *pxSensorTag = ASDM_SDS_SENSOR_TAG_POWER;
+                iStatus      = OK;
+                break;
 
-        default:
-        {
-            INC_ERROR_COUNTER( ASDM_ERRORS_SENSOR_TAG_MAPPING )
-            break;
-        }
+            default:
+                INC_ERROR_COUNTER( ASDM_ERRORS_SENSOR_TAG_MAPPING )
+                break;
         }
     }
-
     return iStatus;
 }

@@ -5,7 +5,6 @@
  * This file contains the FW IF UART AMC abstraction.
  *
  * @file fw_if_uart_amc.c
- *
  */
 
 
@@ -154,99 +153,99 @@ XUartPsv_Config *pxUartCfg = { 0 };
 
 /**
  * @brief   Local implementation of FW_IF_open
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Open( void *pvFwIf );
 
 /**
  * @brief   Local implementation of FW_IF_close
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Close( void *pvFwIf );
 
 /**
  * @brief   Local implementation of FW_IF_write
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   ullDstPort      The port where the data will be written to
  * @param   pucData         Pointer to data buffer to write
  * @param   ulLength        Maximum number of bytes allowed in data buffer. This value is updated to the actual number of bytes written
  * @param   ulTimeoutMs     Time (in ms) to wait for write to complete
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Write( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, uint32_t ulLength, uint32_t ulTimeoutMs );
 
 /**
  * @brief   Local implementation of FW_IF_read
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   ullSrcPort      The port where the data will be read from
  * @param   pucData         Pointer to data buffer to read
  * @param   pulLength       Pointer to maximum number of bytes allowed in data buffer. This value is updated to the actual number of bytes read
  * @param   ulTimeoutMs     Time (in ms) to wait for read to complete
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Read( void *pvFwIf, uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulLength, uint32_t ulTimeoutMs );
 
 /**
  * @brief   Local implementation of FW_IF_ioctrl
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   ulOption        Unique IO Ctrl option to set/get
  * @param   pvValue         Pointer to value to set/get
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_Ioctrl( void *pvFwIf, uint32_t ulOption, void *pvValue );
 
 /**
  * @brief   Local implementation of FW_IF_bindCallback
- * 
+ *
  * @param   pvFwIf          Pointer to this fw_if
  * @param   pxNewFunc       Function pointer to call
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulFW_IF_UART_BindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc );
 
 /**
  * @brief   Write to the UART.
- * 
+ *
  * @param   ullDstPort      The port where the data will be written to
  * @param   pucData         Pointer to data buffer to write
  * @param   pulLength       Pointer to maximum number of bytes allowed in data buffer. This value is updated to the actual number of bytes written
- * 
+ *
  * @return  Number of bytes written
  */
 static uint32_t ulUART_Write( uint64_t ullDstPort, uint8_t *pucData, uint32_t *pulLength );
 
 /**
  * @brief Read from the UART
- * 
+ *
  * @param   ullSrcPort      The port where the data will be read from
  * @param   pucData         Pointer to data buffer to read
  * @param   pulLength       Pointer to maximum number of bytes allowed in data buffer. This value is updated to the actual number of bytes read
- * 
+ *
  * @return  See FW_IF_ERRORS
 */
 static uint32_t ulUART_Read( uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulLength );
 
 /**
  * @brief   Read from the UART until the timeout runs out.
- * 
+ *
  * @param   ullSrcPort      The port where the data will be read from
  * @param   pucData         Pointer to data buffer to read
  * @param   pulLength       Pointer to maximum number of bytes allowed in data buffer. This value is updated to the actual number of bytes read
  * @param   usTimeoutMs     Time (in ms) to wait for read to complete
- * 
+ *
  * @return  See FW_IF_ERRORS
  */
 static uint32_t ulUART_PollRead( uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulLength, uint16_t usTimeoutMs );
@@ -462,7 +461,7 @@ static uint32_t ulFW_IF_UART_Ioctrl( void *pvFwIf, uint32_t ulOption, void *pvVa
              * Handle common IOCTRL's.
             */
            break;
-        
+
         default:
             ulStatus = FW_IF_ERRORS_UNRECOGNISED_OPTION;
             PLL_ERR( FW_IF_UART_NAME, "UART IOCTL - Unrecognised option\r\n" );
@@ -494,9 +493,9 @@ static uint32_t ulFW_IF_UART_BindCallback( void *pvFwIf, FW_IF_callback *pxNewFu
     if( NULL != pxNewFunc )
     {
         FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
-        
+
         pxThisIf->raiseEvent = pxNewFunc;
-    
+
         PLL_DBG( FW_IF_UART_NAME, "UART FW_IF_bindCallback called for port 0x%02X\r\n", pxThisUartCfg->ulPort );
         INC_STAT_COUNTER( FW_IF_UART_STATS_BIND_CALLBACK_CALLED_COUNT );
     }
@@ -597,7 +596,7 @@ uint32_t ulFW_IF_UART_Init( FW_IF_UART_INIT_CFG *pxInitCfg )
     if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( FW_IF_FALSE == pxThis->iInitialised ) )
-    {  
+    {
         ulStatus = FW_IF_ERRORS_NONE;
 
         if( FW_IF_FALSE != pxThis->iInitialised )
@@ -655,12 +654,12 @@ uint32_t ulFW_IF_UART_Create( FW_IF_CFG *pxFwIf, FW_IF_UART_CFG *pxUartCfg )
 
     CHECK_DRIVER;
 
-    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) && 
+    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         if( ( NULL != pxFwIf ) && ( NULL != pxUartCfg ) )
         {
-            FW_IF_CFG xLocalIf = 
+            FW_IF_CFG xLocalIf =
             {
                 .upperFirewall  = UART_UPPER_FIREWALL,
                 .open           = &ulFW_IF_UART_Open,
@@ -724,7 +723,7 @@ uint32_t ulFW_IF_UART_Create( FW_IF_CFG *pxFwIf, FW_IF_UART_CFG *pxUartCfg )
                     break;
             }
 
-            XUartPsvFormat xFormat = 
+            XUartPsvFormat xFormat =
             {
                 ulBaudRate,
                 ulDataBits,
@@ -760,7 +759,7 @@ int iFW_IF_UART_PrintStatistics( void )
 
     CHECK_DRIVER;
 
-    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) && 
+    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         int i = 0;
@@ -796,7 +795,7 @@ int iFW_IF_UART_ClearStatistics( void )
 
     CHECK_DRIVER;
 
-    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) && 
+    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         PLL_INF( FW_IF_UART_NAME, "Stats have been cleared.\r\n");

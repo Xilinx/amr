@@ -5,7 +5,6 @@
  * This file contains the in band telemetry debug implementation
  *
  * @file in_band_telemetry_debug.c
- *
  */
 
 /* common includes */

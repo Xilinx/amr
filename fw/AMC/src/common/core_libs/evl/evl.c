@@ -5,7 +5,6 @@
  * This file contains the implemenation for the Event Library
  *
  * @file evl.c
- *
  */
 
 /******************************************************************************/

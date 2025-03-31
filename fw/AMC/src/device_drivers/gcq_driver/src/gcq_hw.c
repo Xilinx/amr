@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains API definitions for HW accesses to GCQ IP.
+ * This file contains API definitions for accesses to sGCQ.
  *
  * @file gcq_hw.c
- *
  */
 
 #include "gcq_internal.h"
@@ -25,7 +24,7 @@
 
 /**
  *
- * @brief    Initial GCQ IP block mode configuration
+ * @brief    Initial sGCQ mode configuration
  *
  */
 GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
@@ -50,9 +49,9 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                 /*
                  * In consumer mode we don't perform a soft reset and the HW is owned by the producer
                  */
-                ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW, GCQ_HW_LOWER_32( ullRingAddr ) );
+                ulValue = GCQ_HW_LOWER_32( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_LOW ), ulValue );
-                ulValue = FIELD_SET( GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
+                ulValue = GCQ_HW_UPPER_32 ( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_CONSUMER_CQ_QUEUE_MEM_ADDR_HIGH ), ulValue );
                 break;
 
@@ -61,12 +60,9 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
                  * Performs a soft reset of all submission queue and completion queue registers.
                  * The reset field is self-clearing once set.
                  */
-                ulValue = pxGCQIOAccess->xGCQReadReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ) );
-                ulValue |= FIELD_SET( GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL_ENABLE_MASK, GCQ_INTERRUPT_CTRL_RESET );
-                pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_RESET_INTERRUPT_CTRL ), ulValue );
-                ulValue = FIELD_SET( GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_LOW, GCQ_HW_LOWER_32 ( ullRingAddr ) );
+                ulValue = GCQ_HW_LOWER_32 ( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_LOW ), ulValue );
-                ulValue = FIELD_SET( GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_HIGH, GCQ_HW_UPPER_32 ( ullRingAddr ) );
+                ulValue = GCQ_HW_UPPER_32 ( ullRingAddr );
                 pxGCQIOAccess->xGCQWriteReg32( ( ullBaseAddr + GCQ_PRODUCER_SQ_QUEUE_MEM_ADDR_HIGH ), ulValue );
                 break;
 
@@ -77,16 +73,15 @@ GCQ_ERRORS_TYPE xGCQHWInit( GCQ_MODE_TYPE xMode,
 
         if( GCQ_ERRORS_NONE == xStatus)
         {
-            GCQ_DEBUG( "GCQ IP Block HW Init Complete: (%s) (0x%llx)\r\n", pcGCQModeStr[ xMode ], ullBaseAddr );
+            GCQ_DEBUG( "sGCQ Init Complete: (%s) (0x%llx)\r\n", pcGCQModeStr[ xMode ], ullBaseAddr );
         }
-
-        return ( xStatus );
+        return xStatus;
     }
 }
 
 /**
  *
- * @brief    Configure the GCQ IP block interrupt mode
+ * @brief    Configure the sGCQ interrupt mode
  *
  */
 GCQ_ERRORS_TYPE xGCQHWConfigureInterruptMode( GCQ_MODE_TYPE xMode,
@@ -161,8 +156,7 @@ GCQ_ERRORS_TYPE xGCQHWConfigureInterruptMode( GCQ_MODE_TYPE xMode,
             pxGCQIOAccess->xGCQWriteReg32( ullReg, ulValue );
             GCQ_DEBUG( "Interrupt Mode Type Configured: (%s)\r\n", pcGCQInterruptModeStr[ xIntMode ] );
         }
-
-        return ( xStatus );
+        return xStatus;
     }
 }
 
@@ -202,8 +196,7 @@ GCQ_ERRORS_TYPE xGCQHWTriggerInterrupt( GCQ_MODE_TYPE xMode,
             pxGCQIOAccess->xGCQWriteReg32( ullReg, ulValue );
             GCQ_DEBUG( "Trigger Interrupt [%s]\r\n", pcGCQModeStr[ xMode ] );
         }
-
-        return ( xStatus );
+        return xStatus;
     }
 }
 
@@ -240,7 +233,6 @@ GCQ_ERRORS_TYPE xGCQHWClearInterrupt( GCQ_MODE_TYPE xMode,
             pxGCQIOAccess->xGCQReadReg32( ullReg );
             GCQ_DEBUG( "Interrupt Cleared [%s]\r\n", pcGCQModeStr[ xMode ] );
         }
-
-        return ( xStatus );
+        return xStatus;
     }
 }

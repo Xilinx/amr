@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * test_table.c - Unit test file for table.c
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/
@@ -60,11 +60,11 @@ void *__wrap_calloc(size_t num, size_t size)
 	case REAL:
 		ret = __real_calloc(num, size);
 		break;
-	
+
 	default:
 		break;
 	}
-	
+
 	WRAPPER_DONE(calloc);
 	return ret;
 }

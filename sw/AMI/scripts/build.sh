@@ -22,7 +22,7 @@ APP_BIN="ami_tool"
 API_BIN="libami.a"
 
 # This script assumes that it is run from the top level project directory
-ROOT_DIR=$(pwd)
+ROOT_DIR=$(realpath .)
 DRIVER_DIR=$ROOT_DIR/driver
 API_DIR=$ROOT_DIR/api
 APP_DIR=$ROOT_DIR/app
@@ -113,12 +113,12 @@ function fetch_ami_version() {
 }
 
 function fetch_gcq_version() {
-    echo "=== Fetching GCQ version ==="
+    echo "=== Fetching sGCQ version ==="
     SECTION_START=$SECONDS
     cd $DRIVER_DIR/gcq-driver
     ./getVersion.sh gcq
     cd $ROOT_DIR
-    echo "*** GCQ version update took $((SECONDS - $SECTION_START)) S ***"
+    echo "*** sGCQ version update took $((SECONDS - $SECTION_START)) S ***"
 }
 
 ################################################################################

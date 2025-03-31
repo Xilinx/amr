@@ -5,7 +5,6 @@
  * This file contains the hal profile for the V80
  *
  * @file profile_hal.h
- *
  */
 
 #ifndef _PROFILE_HAL_H_
@@ -93,7 +92,7 @@
 #define HAL_PSV_PMC_GLOBAL_0_AXI_BASEADDR ( XPAR_PSV_PMC_GLOBAL_0_S_AXI_BASEADDR )
 
 /* FAL */
-/* GCQ */
+/* sGCQ */
 #ifndef HAL_IO_WRITE32
 #define HAL_IO_WRITE32( val, addr ) ( { Xil_Out32( addr, val ); \
                                         Xil_DCacheFlushRange( addr, sizeof( uint32_t ) ); } )
@@ -120,8 +119,8 @@
 
 /* Core libs */
 /* PLL */
-#define HAL_FSBL_LOG_ADDRESS ( 0xF2019000 )
-#define HAL_FSBL_LOG_SIZE    ( 0x4000 )
+#define HAL_PLM_LOG_ADDRESS ( 0xF2019000 )
+#define HAL_PLM_LOG_SIZE    ( 0x4000 )
 
 /**
  * @struct  HAL_PARTITION_TABLE_RING_BUFFER
@@ -188,4 +187,4 @@ typedef struct HAL_PARTITION_TABLE
 
 } HAL_PARTITION_TABLE;
 
-#endif
+#endif /* _PROFILE_HAL_H_ */

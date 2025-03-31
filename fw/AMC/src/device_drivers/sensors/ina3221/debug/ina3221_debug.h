@@ -5,7 +5,6 @@
  * This file contains the INA3221 debug access
  *
  * @file ina3221_debug.h
- *
  */
 
 #ifndef _INA3221_DEBUG_H_
@@ -20,11 +19,11 @@
 
 /**
  * @brief   Initialise the INA3221 debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vINA3221_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _INA3221_DEBUG_H_ */

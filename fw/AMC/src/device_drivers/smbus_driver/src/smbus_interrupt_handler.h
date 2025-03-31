@@ -5,7 +5,6 @@
  * This file contains the defintions of the SMBus Interrupts
  *
  * @file smbus_interrupt_handler.h
- *
  */
 
 #ifndef _SMBUS_INTERRUPT_HANDLER_H_
@@ -62,7 +61,7 @@ extern "C"
                                                         SMBUS_INTERRUPT_TGT_DESC_FIFO_EMPTY             |\
                                                         SMBUS_INTERRUPT_TGT_DONE                        |\
                                                         SMBUS_INTERRUPT_TGT_PEC_ERROR                   |\
-                                                        SMBUS_INTERRUPT_TGT_LOA                   
+                                                        SMBUS_INTERRUPT_TGT_LOA
 
 #define SMBUS_INTERRUPT_CTLR_INTERRUPTS                 SMBUS_INTERRUPT_CTLR_DESC_FIFO_ALMOST_EMPTY     |\
                                                         SMBUS_INTERRUPT_CTLR_RX_FIFO_FILL_THRESHOLD     |\
@@ -70,7 +69,7 @@ extern "C"
                                                         SMBUS_INTERRUPT_CTLR_DONE                       |\
                                                         SMBUS_INTERRUPT_CTLR_PEC_ERROR                  |\
                                                         SMBUS_INTERRUPT_CTLR_NACK_ERROR                 |\
-                                                        SMBUS_INTERRUPT_CTLR_LOA                   
+                                                        SMBUS_INTERRUPT_CTLR_LOA
 
 #define SMBUS_INTERRUPT_CTLR_ERROR_INTERRUPTS           SMBUS_ERROR_INTERRUPT_PHY_CTLR_CEXT_TIMEOUT     |\
                                                         SMBUS_ERROR_INTERRUPT_PHY_CTLR_TEXT_TIMEOUT     |\
@@ -80,7 +79,7 @@ extern "C"
                                                         SMBUS_ERROR_INTERRUPT_CTLR_DESC_FIFO_ERROR      |\
                                                         SMBUS_ERROR_INTERRUPT_CTLR_DESC_FIFO_OVERFLOW   |\
                                                         SMBUS_ERROR_INTERRUPT_CTLR_DESC_FIFO_UNDERFLOW  |\
-                                                        SMBUS_ERROR_INTERRUPT_CTLR_DESC_ERROR         
+                                                        SMBUS_ERROR_INTERRUPT_CTLR_DESC_ERROR
 
 #define SMBUS_INTERRUPT_TGT_ERROR_INTERRUPTS            SMBUS_ERROR_INTERRUPT_PHY_TGT_TEXT_TIMEOUT      |\
                                                         SMBUS_ERROR_INTERRUPT_TGT_RX_FIFO_ERROR         |\
@@ -92,7 +91,7 @@ extern "C"
                                                         SMBUS_ERROR_INTERRUPT_TGT_DESC_ERROR            |\
                                                         SMBUS_ERROR_INTERRUPT_PHY_UNEXPTD_BUS_IDLE      |\
                                                         SMBUS_ERROR_INTERRUPT_PHY_SMBDAT_LOW_TIMEOUT    |\
-                                                        SMBUS_ERROR_INTERRUPT_PHY_SMBCLK_LOW_TIMEOUT 
+                                                        SMBUS_ERROR_INTERRUPT_PHY_SMBCLK_LOW_TIMEOUT
 
 #define SMBUS_INTERRUPT_TGT_READ_OR_WRITE_INTERRUPTS    SMBUS_INTERRUPT_TGT_WRITE                       |\
                                                         SMBUS_INTERRUPT_TGT_READ

@@ -5,7 +5,6 @@
  * This file contains the FW IF UART debug access
  *
  * @file fw_if_uart_debug.c
- *
  */
 
 #include "standard.h"
@@ -109,7 +108,7 @@ static uint32_t ulUartTestCallback( uint16_t usEventId, uint8_t *pucData, uint32
 void vFW_IF_UART_DebugInit( DAL_HDL pxParentHandle )
 {
     if( FALSE == iInitialised )
-    {   
+    {
         if( NULL == pxParentHandle )
         {
             pxFwIfUartTop = pxDAL_NewDirectory( "fw_if_uart" );
@@ -130,7 +129,7 @@ void vFW_IF_UART_DebugInit( DAL_HDL pxParentHandle )
             pxDAL_NewDebugFunction( "io_ctrl", pxFwIfUartTop, vUartIoCtrl );
             pxDAL_NewDebugFunction( "bind_callback", pxFwIfUartTop, vUartBindCallback );
         }
-        
+
         iInitialised = TRUE;
     }
 }

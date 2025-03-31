@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF OSPI Stub abstraction.
  *
  * @file fw_if_ospi_stub.c
- *
  */
 
 /*****************************************************************************/
@@ -167,7 +166,7 @@ uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *pxInitCfg )
          * Initialise the driver based on the device id supplied in the xparameters.h
          * and the page size 'ospi_flash_init()', The default page size in versal is 256.
          */
-        PLL_DBG( FW_IF_OSPI_NAME, "Device Id:%d\r\n", xLocalCfg.ucOspiDeviceId );
+        PLL_DBG( FW_IF_OSPI_NAME, "Device Addr:%d\r\n", xLocalCfg.ulOspiBaseAddress );
         PLL_DBG( FW_IF_OSPI_NAME, "Page Size:%d\r\n", xLocalCfg.usPageSize );
         iInitialised = FW_IF_TRUE;
     }
@@ -316,7 +315,7 @@ static uint32_t ulOspiWrite( void *pvFwIf,
             PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_write Offset:0x%x Addr:0x%x\r\n",
                      ulAddrOffset,
                      pxCfg->ulBaseAddress + ulAddrOffset);
-   
+
             xRet = ulValidateAddressRange( pxCfg, ulAddrOffset, ulLength );
             if( FW_IF_ERRORS_NONE == xRet )
             {
@@ -501,7 +500,7 @@ static uint32_t ulValidateAddressRange( FW_IF_OSPI_CFG *pxCfg, uint32_t ulAddrOf
 int iFW_IF_OSPI_PrintStatistics( void )
 {
     FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-    
+
     /* TODO implement print stats */
 
     return xRet;

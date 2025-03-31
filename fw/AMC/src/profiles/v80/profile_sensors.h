@@ -5,7 +5,6 @@
  * This file contains the sensors profile for the V80
  *
  * @file profile_sensors.h
- *
  */
 
 #ifndef _PROFILES_SENSORS_H_
@@ -507,4 +506,4 @@ ASC_PROXY_DRIVER_SENSOR_DATA PROFILE_SENSORS_SENSOR_DATA[ PROFILE_SENSORS_NUM_SE
     }
 };
 
-#endif
+#endif /* _PROFILES_SENSORS_H_ */

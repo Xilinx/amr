@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the user API definitions for the GCQ driver.
+ * This file contains the user API definitions for the sGCQ driver.
  *
  * @file gcq_driver.c
- *
  */
 
 #ifndef __KERNEL__
@@ -41,7 +40,7 @@
 
 /**
  *    @struct  GCQ_PRIVATE_DATA
- * 
+ *
  *    @brief   Structure to hold ths driver's private data
  *
  *    @note    Initialisation status is checked per instance.
@@ -50,11 +49,11 @@
 typedef struct GCQ_PRIVATE_DATA
 {
     uint32_t            ulUpperFirewall;
- 
+
     uint8_t             ucConsumerAttached;
     uint8_t             ucInstancesAllocated;
     GCQ_INSTANCE_TYPE   xGCQInstances[ GCQ_MAX_INSTANCES ];
-    
+
     uint32_t            ulLowerFirewall;
 
 } GCQ_PRIVATE_DATA;
@@ -82,7 +81,6 @@ static GCQ_PRIVATE_DATA *pxThis = &xLocalData;
 /*****************************************************************************/
 
 /**
- *
  * @brief   Calculate the number of slots that can be allocated based on
  *          the length of the ring and the SQ & CQ slot sizes
  *
@@ -91,7 +89,6 @@ static GCQ_PRIVATE_DATA *pxThis = &xLocalData;
  * @param   ulCQSlotSize is the CQ slot size
  *
  * @return  the number of slots that can be allocated
- *
  */
 static inline uint32_t prvulGCQAllocNumSlots( uint64_t ullRingLen,
                                               const uint32_t ulSQSlotSize,
@@ -113,14 +110,12 @@ static inline uint32_t prvulGCQAllocNumSlots( uint64_t ullRingLen,
 }
 
 /**
- *
  * @brief   Fast forward both the producer & consumer
  *
  * @param   pxGCQInstance the gcq driver instance
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  N/A
- * 
  */
 static inline void prvvGCQFastForward( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
@@ -132,20 +127,18 @@ static inline void prvvGCQFastForward( const GCQ_INSTANCE_TYPE *pxGCQInstance, s
 }
 
 /**
- *
  * @brief   Check if the producer has any more free slots
  *
  * @param   pxGCQInstance the gcq driver instance
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  returns true if can produce
- * 
  */
 static inline uint32_t prvucGCQCanProduce( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
     uint32_t ulStatus = GCQ_FALSE;
 
-    if( ( GCQ_FALSE == CHECK_NULL( pxGCQInstance ) ) || 
+    if( ( GCQ_FALSE == CHECK_NULL( pxGCQInstance ) ) ||
         ( GCQ_FALSE == CHECK_NULL( pxRing ) ) )
     {
         if( GCQ_FALSE == likely( prvucGCQRingIsFull( pxRing ) ) )
@@ -159,24 +152,22 @@ static inline uint32_t prvucGCQCanProduce( const GCQ_INSTANCE_TYPE *pxGCQInstanc
         }
     }
 
-    return ( ulStatus );
+    return ulStatus;
 }
 
 /**
- *
  * @brief   Check if the consumer has data that can be consumed
  *
  * @param   pxGCQInstance the gcq driver instance
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  returns GCQ_TRUE if data can be consumed
- *
  */
 static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
     uint32_t ulStatus = GCQ_FALSE;
 
-    if( ( GCQ_FALSE == CHECK_NULL( pxGCQInstance ) ) || 
+    if( ( GCQ_FALSE == CHECK_NULL( pxGCQInstance ) ) ||
         ( GCQ_FALSE == CHECK_NULL( pxRing ) ) )
     {
         /* Check for errors */
@@ -203,11 +194,10 @@ static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstanc
         }
     }
 
-    return ( ulStatus );
+    return ulStatus;
 }
 
 /**
- *
  * @brief   Set consumed to be the same as produced to ignore any existing
  *          commands.
  *
@@ -215,7 +205,6 @@ static inline uint32_t prvucGCQCanConsume( const GCQ_INSTANCE_TYPE *pxGCQInstanc
  * @param   pxRing the sq or cq ring buffer
  *
  * @return  N/A
- *
  */
 static inline void prvvGCQSoftReset( const GCQ_INSTANCE_TYPE *pxGCQInstance, struct GCQ_RING_TYPE *pxRing )
 {
@@ -228,7 +217,6 @@ static inline void prvvGCQSoftReset( const GCQ_INSTANCE_TYPE *pxGCQInstance, str
 }
 
 /**
- *
  * @brief   Attempt to add data into the producer, can fail if no more
  *          free slots
  *
@@ -236,13 +224,12 @@ static inline void prvvGCQSoftReset( const GCQ_INSTANCE_TYPE *pxGCQInstance, str
  * @param   ullSlotAddr is the slot address
  *
  * @return  returns GCQ_TRUE if produced else error
- *
  */
 static inline GCQ_ERRORS_TYPE prvxGCQProduce( GCQ_INSTANCE_TYPE *pxGCQInstance, uint64_t *ullSlotAddr )
 {
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
 
-    if( ( CHECK_NULL( pxGCQInstance ) ) || 
+    if( ( CHECK_NULL( pxGCQInstance ) ) ||
         ( CHECK_NULL( ullSlotAddr ) ) )
     {
         xStatus = GCQ_ERRORS_INVALID_ARG;
@@ -272,7 +259,6 @@ static inline GCQ_ERRORS_TYPE prvxGCQProduce( GCQ_INSTANCE_TYPE *pxGCQInstance, 
 
 
 /**
- *
  * @brief   Attempt to consume data from the consumer, can fail is no data
  *          is available to read
  *
@@ -280,13 +266,12 @@ static inline GCQ_ERRORS_TYPE prvxGCQProduce( GCQ_INSTANCE_TYPE *pxGCQInstance, 
  * @param   ullSlotAddr is the slot address
  *
  * @return  returns GCQ_TRUE if consumed else error
- *
  */
 static inline GCQ_ERRORS_TYPE prvxGCQConsume( GCQ_INSTANCE_TYPE *pxGCQInstance, uint64_t *ullSlotAddr )
 {
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
 
-    if( ( CHECK_NULL( pxGCQInstance ) ) || 
+    if( ( CHECK_NULL( pxGCQInstance ) ) ||
         ( CHECK_NULL( ullSlotAddr ) ) )
     {
         xStatus = GCQ_ERRORS_INVALID_ARG;
@@ -307,26 +292,24 @@ static inline GCQ_ERRORS_TYPE prvxGCQConsume( GCQ_INSTANCE_TYPE *pxGCQInstance, 
         else
         {
             xStatus = GCQ_ERRORS_CONSUMER_NO_DATA_RECEIVED;
-        } 
+        }
     }
 
     return xStatus;
 }
 
 /**
- *
- * @brief   Attempt to find an uninitialized GCQ instance
+ * @brief   Attempt to find an uninitialized sGCQ instance
  *
  * @param   ppxGCQInstance variable to store the gcq driver instance
  *
  * @return  returns GCQ_ERRORS_NONE if instance found, error otherwise
- *
  */
 static inline GCQ_ERRORS_TYPE prviGCQFindNextFreeInstance( struct GCQ_INSTANCE_TYPE **ppxGCQInstance )
 {
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NO_FREE_INSTANCES;
 
-    if( CHECK_NULL( ppxGCQInstance ) || CHECK_NOT_NULL( *ppxGCQInstance ) ) 
+    if( CHECK_NULL( ppxGCQInstance ) || CHECK_NOT_NULL( *ppxGCQInstance ) )
     {
         xStatus = GCQ_ERRORS_INVALID_ARG;
     }
@@ -352,9 +335,7 @@ static inline GCQ_ERRORS_TYPE prviGCQFindNextFreeInstance( struct GCQ_INSTANCE_T
 /*****************************************************************************/
 
 /**
- *
- * @brief    Initialise the GCQ standalone driver
- *
+ * @brief    Initialise the sGCQ standalone driver
  */
 GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                           const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess,
@@ -373,16 +354,16 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
     uint32_t ullNumSlots = 0;
 
     if( ( GCQ_INSTANCE_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) ) 
+        ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         xStatus = GCQ_ERRORS_NONE;
 
-        if( CHECK_NOT_NULL( *ppxGCQInstance ) ) 
+        if( CHECK_NOT_NULL( *ppxGCQInstance ) )
         {
             xStatus = GCQ_ERRORS_INVALID_ARG;
         }
 
-        if( CHECK_REG_IO_ACCESS( pxGCQIOAccess ) ) 
+        if( CHECK_REG_IO_ACCESS( pxGCQIOAccess ) )
         {
             xStatus = GCQ_ERRORS_INVALID_ARG;
         }
@@ -427,7 +408,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             uint64_t ullCQProduced = 0;
             uint64_t ullSQProduced = 0;
 
-            /* Init IP block and configure interrupt mode */
+            /* Init sGCQ and configure interrupt mode */
             xGCQHWInit(xMode, ullBaseAddr, ullRingAddr, pxGCQIOAccess );
             xGCQHWConfigureInterruptMode( xMode, xIntMode, ullBaseAddr, pxGCQIOAccess );
 
@@ -439,8 +420,8 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                 ( *ppxGCQInstance )->pxGCQProducer = &( *ppxGCQInstance )->xGCQCq;
                 ( *ppxGCQInstance )->pxGCQConsumer = &( *ppxGCQInstance )->xGCQSq;
                 /* Set the producer address based on producer AXI register map */
-                ullCQProduced = ( ullBaseAddr + GCQ_PRODUCER_SQ_TAIL_POINTER );
-                ullSQProduced = ( ullBaseAddr + GCQ_PRODUCER_CQ_TAIL_POINTER );
+                ullSQProduced = ( ullBaseAddr + GCQ_PRODUCER_SQ_TAIL_POINTER );
+                ullCQProduced = ( ullBaseAddr + GCQ_PRODUCER_CQ_TAIL_POINTER );
             }
             else
             {
@@ -450,8 +431,8 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                 ( *ppxGCQInstance )->pxGCQProducer = &( *ppxGCQInstance )->xGCQSq;
                 ( *ppxGCQInstance )->pxGCQConsumer = &( *ppxGCQInstance )->xGCQCq;
                 /* Set the producer address based on consumer AXI register map */
-                ullCQProduced = ( ullBaseAddr + GCQ_CONSUMER_SQ_TAIL_POINTER );
-                ullSQProduced = ( ullBaseAddr + GCQ_CONSUMER_CQ_TAIL_POINTER );
+                ullSQProduced = ( ullBaseAddr + GCQ_CONSUMER_SQ_TAIL_POINTER );
+                ullCQProduced = ( ullBaseAddr + GCQ_CONSUMER_CQ_TAIL_POINTER );
             }
 
             /* Check if memory pointers are being used and override */
@@ -463,7 +444,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             }
 
             /* Init SQ & CQ rings */
-            GCQ_DEBUG( "GCQ Init Ring SQ\r\n" );
+            GCQ_DEBUG( "sGCQ Init Ring SQ\r\n" );
             prvvGCQInitRing( *ppxGCQInstance,
                                 &( *ppxGCQInstance )->xGCQSq,
                                 ullSQProduced,
@@ -471,7 +452,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
                                 ullRingAddr + sizeof( struct GCQ_HEADER_TYPE ),
                                 ullNumSlots,
                                 ulSQSlotSize);
-            GCQ_DEBUG( "GCQ Init Ring CQ\r\n" );
+            GCQ_DEBUG( "sGCQ Init Ring CQ\r\n" );
             prvvGCQInitRing( *ppxGCQInstance,
                                 &( *ppxGCQInstance )->xGCQCq,
                                 ullCQProduced,
@@ -496,7 +477,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
             {
                 xGCQHeader.ulHdrMagic = 0;
                 xGCQHeader.ulHdrVersion = GCQ_VERSION;
-                xGCQHeader.ulHdrSlotNum = ullNumSlots;
+                xGCQHeader.ulHdrNumSlots = ullNumSlots;
                 xGCQHeader.ulHdrSQOffset = ( ( *ppxGCQInstance )->xGCQSq.ullRingSlotAddr - ullRingAddr );
                 xGCQHeader.ulHdrSQSlotSize = ulSQSlotSize;
                 xGCQHeader.ulHdrCQOffset = ( ( *ppxGCQInstance )->xGCQCq.ullRingSlotAddr - ullRingAddr );
@@ -523,9 +504,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
 }
 
 /**
- *
- * @brief    De-initialise a GCQ driver instance
- *
+ * @brief    De-initialise a sGCQ driver instance
  */
 GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
 {
@@ -536,9 +515,9 @@ GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
     {
         xStatus = GCQ_ERRORS_NONE;
 
-        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) ) 
+        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) )
         {
-            xStatus = GCQ_ERRORS_INVALID_INSTANCE; 
+            xStatus = GCQ_ERRORS_INVALID_INSTANCE;
         }
         else
         {
@@ -567,9 +546,9 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
     {
         xStatus = GCQ_ERRORS_NONE;
 
-        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) ) 
+        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) )
         {
-            xStatus = GCQ_ERRORS_INVALID_INSTANCE; 
+            xStatus = GCQ_ERRORS_INVALID_INSTANCE;
         }
 
         if( GCQ_ERRORS_NONE == xStatus )
@@ -588,7 +567,7 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
         if( GCQ_ERRORS_NONE == xStatus )
         {
             prvvGCQCopyFromRing( pxGCQInstance->pxGCQIOAccess, ( uint8_t* )&xGCQHeader, pxGCQInstance->ullRingAddr, sizeof( struct GCQ_HEADER_TYPE ) );
-            
+
             if( GIT_TAG_VER_MAJOR != GET_GCQ_MAJOR( xGCQHeader.ulHdrVersion ) )
             {
                 GCQ_DEBUG( "Error: Unexpected version:0x%lx in magic header!\r\n", xGCQHeader.ulHdrVersion );
@@ -603,9 +582,9 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
         /* Validate the number of slots matches */
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            uint32_t ullHdrNumSlots = xGCQHeader.ulHdrSlotNum;
-            uint32_t ullNumSlots = pxGCQInstance->xGCQSq.ulRingSlotNum;
-            
+            uint32_t ullHdrNumSlots = xGCQHeader.ulHdrNumSlots;
+            uint32_t ullNumSlots = pxGCQInstance->xGCQSq.ulRingNumSlots;
+
             if( ullNumSlots != ullHdrNumSlots )
             {
                 GCQ_DEBUG( "Error: Invalid number of slots:%ld found in magic header, expecting: %ld!!\r\n", ullHdrNumSlots, ullNumSlots );
@@ -639,9 +618,7 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance )
 }
 
 /**
- * 
  * @brief    Function to consume data from the ring buffer
- * 
  */
 GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDataLen )
 {
@@ -654,25 +631,25 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
     {
         xStatus = GCQ_ERRORS_NONE;
 
-        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) ) 
+        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) )
         {
-            xStatus = GCQ_ERRORS_INVALID_INSTANCE; 
+            xStatus = GCQ_ERRORS_INVALID_INSTANCE;
         }
 
-        if( CHECK_ATTACHED( pxGCQInstance ) ) 
-        { 
-            xStatus = GCQ_ERRORS_CONSUMER_NOT_ATTACHED; 
+        if( CHECK_ATTACHED( pxGCQInstance ) )
+        {
+            xStatus = GCQ_ERRORS_CONSUMER_NOT_ATTACHED;
         }
 
-        if( CHECK_NULL( pucData ) ) 
-        { 
-            xStatus = GCQ_ERRORS_INVALID_ARG; 
+        if( CHECK_NULL( pucData ) )
+        {
+            xStatus = GCQ_ERRORS_INVALID_ARG;
         }
 
-        if ( !CHECK_32BIT_ALIGNMENT( ulDataLen ) ) 
-        { 
+        if ( !CHECK_32BIT_ALIGNMENT( ulDataLen ) )
+        {
             GCQ_DEBUG( " Error: length 0x%lx is not 32bit aligned\r\n", ulDataLen );
-            xStatus = GCQ_ERRORS_INVALID_ARG; 
+            xStatus = GCQ_ERRORS_INVALID_ARG;
         }
 
         if( ulDataLen > pxGCQInstance->ulConsumerSlotSize )
@@ -689,7 +666,7 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            int offset;
+            uint32_t offset;
             GCQ_DEBUG( "Read data from slot addr:0x%llx len:%ld\r\n", ullSlotAddr, ulDataLen );
 
             /* Process the data & populate the return buffer */
@@ -718,9 +695,7 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 
 
 /**
- *
  * @brief    Function to provide data and populate the ring buffer
- * 
  */
 GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t * pucData, uint32_t ulDataLen )
 {
@@ -733,20 +708,20 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
     {
         xStatus = GCQ_ERRORS_NONE;
 
-        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) ) 
+        if( ( CHECK_INSTANCE( pxGCQInstance ) ) || ( GCQ_FALSE == pxGCQInstance->iInitialised ) )
         {
-            xStatus = GCQ_ERRORS_INVALID_INSTANCE; 
+            xStatus = GCQ_ERRORS_INVALID_INSTANCE;
         }
-        
-        if( CHECK_NULL( pucData ) ) 
+
+        if( CHECK_NULL( pucData ) )
         {
-            xStatus = GCQ_ERRORS_INVALID_ARG; 
+            xStatus = GCQ_ERRORS_INVALID_ARG;
         }
-        
-        if( !CHECK_32BIT_ALIGNMENT( ulDataLen ) ) 
+
+        if( !CHECK_32BIT_ALIGNMENT( ulDataLen ) )
         {
             GCQ_DEBUG( " Error: length 0x%lx is not 32bit aligned\r\n", ulDataLen );
-            xStatus = GCQ_ERRORS_INVALID_ARG; 
+            xStatus = GCQ_ERRORS_INVALID_ARG;
         }
 
         if( ulDataLen > pxGCQInstance->ulProducerSlotSize )
@@ -762,7 +737,7 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 
         if( GCQ_ERRORS_NONE == xStatus )
         {
-            int offset = 0;
+            uint32_t offset;
             GCQ_DEBUG( "Write data to slot addr:0x%llx len:%ld\r\n", ullSlotAddr, ulDataLen );
 
             for( offset = 0; offset < ulDataLen; offset += 4 )
@@ -778,7 +753,7 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
                 xStatus = xGCQHWTriggerInterrupt( pxGCQInstance->xMode,
                                                 pxGCQInstance->ullBaseAddr,
                                                 pxGCQInstance->pxGCQIOAccess );
-                
+
                 if( GCQ_ERRORS_NONE != xStatus )
                 {
                     GCQ_DEBUG( "Error: Interrupt trigger failed with status: %d\r\n", xStatus );
@@ -795,9 +770,7 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
 }
 
 /**
- *
  * @brief    Sets this modules version information
- * 
  */
 int iGCQGetVersion( GCQ_VERSION_TYPE *pxVersion )
 {

@@ -5,7 +5,6 @@
  * This file contains PLDM functions for processing specific message types
  *
  * @file pldm_commands.h
- *
  */
 
 #ifndef PLDM_COMMANDS_H_

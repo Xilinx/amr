@@ -5,7 +5,6 @@
  * This file contains the AVED External Device Control (AXC) debug implementation
  *
  * @file axc_proxy_driver_debug.c
- *
  */
 
 #include "standard.h"

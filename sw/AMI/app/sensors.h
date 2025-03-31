@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * sensors.h - This file contains sensor utilities for the AMI CLI
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_APP_SENSORS_H
@@ -33,7 +33,7 @@
  * @EXTRA_FIELDS_AVG: Average sensor value.
  * @EXTRA_FIELDS_LIMITS: Sensor limits.
  * @EXTRA_FIELDS_ALL: All additional values.
- * 
+ *
  * Note that "Name", "Value", and "Status" are always reported.
  */
 enum extra_sensor_fields {
@@ -65,7 +65,7 @@ struct app_sensor_data {
 /**
  * report_sensors() - Utility function to print sensor information.
  * @options: List of command line options.
- * 
+ *
  * Return: EXIT_SUCCESS or EXIT_FAILURE.
  */
 int report_sensors(struct app_option *options);

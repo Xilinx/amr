@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the FW IF GCQ abstraction for AMC.
+ * This file contains the FW IF sGCQ abstraction for AMC.
  *
  * @file fw_if_gcq_amc.c
- *
  */
 
 /*****************************************************************************/
@@ -86,8 +85,8 @@
 
 /**
  * @struct  FW_IF_GCQ_STATE
- * 
- * @brief   The internal GCQ IF state
+ *
+ * @brief   The internal sGCQ IF state
  */
 typedef enum FW_IF_GCQ_STATE
 {
@@ -137,7 +136,7 @@ typedef struct FW_IF_GCQ_PROFILE_TYPE
 typedef struct FW_IF_GCQ_PRIVATE_DATA
 {
     uint32_t                ulUpperFirewall;
- 
+
     FW_IF_GCQ_INIT_CFG      xLocalCfg;
     GCQ_IO_ACCESS_TYPE      xGcqIoAccess;
     int                     iInitialised;
@@ -158,7 +157,7 @@ typedef struct FW_IF_GCQ_PRIVATE_DATA
 
 static FW_IF_GCQ_PRIVATE_DATA xLocalData =
 {
-    GCQ_UPPER_FIREWALL,     /* ulUpperFirewall */   
+    GCQ_UPPER_FIREWALL,     /* ulUpperFirewall */
 
     { 0 },                  /* xLocalCfg */
     { 0 },                  /* xGcqIoAccess */
@@ -179,48 +178,39 @@ static FW_IF_GCQ_PRIVATE_DATA *pxThis = &xLocalData;
 /*****************************************************************************/
 
 /**
- *
  * @brief   Handle memory & register writes in AMC
  *
  * @param   ullDestAddr is the destination address
  * @param   ulValue is the 32-bit value to write
  *
  * @return  N/A
- * 
- *
  */
 static inline void prvvWriteMemReg32( uint64_t ullDestAddr, uint32_t ulValue )
 {
-    /* PLL_DBG( FW_IF_GCQ_NAME, "W [0x%llx: 0x%lx]\r\n", ullDestAddr, ulValue ); */
+//    PLL_DBG( FW_IF_GCQ_NAME, "W [0x%llx: 0x%lx]\r\n", ullDestAddr, ulValue );
     HAL_IO_WRITE32( ulValue, ullDestAddr );
 }
 
 /**
- *
  * @brief   Handle memory & register reads in AMC
  *
  * @param   ullSrcAddr is the source address
  *
  * @return  the 32-bit value read
- * 
- *
  */
 static inline uint32_t prvulReadMemReg32( uint64_t ullSrcAddr )
 {
     uint32_t ulValue = HAL_IO_READ32( ullSrcAddr );
-    /* PLL_DBG( FW_IF_GCQ_NAME, "R [0x%llx: 0x%lx]\r\n", ullSrcAddr, ulValue ); */
-    return ( ulValue );
+//    PLL_DBG( FW_IF_GCQ_NAME, "R [0x%llx: 0x%lx]\r\n", ullSrcAddr, ulValue );
+    return ulValue;
 }
 
 /**
- *
  * @brief   Map interface error return code
  *
  * @param   error is the return code returned by the gcq driver
  *
  * @return  the mapped interface return code
- * 
- *
  */
 static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
 {
@@ -245,19 +235,15 @@ static FW_IF_GCQ_ERRORS_TYPE prvxMapIFDriverReturnCode( GCQ_ERRORS_TYPE xError )
             assert( 0 );
             break;
     }
-
-    return ( xMappedErr );
+    return xMappedErr;
 }
 
 /**
- *
  * @brief   Map interrupt mode
  *
  * @param   xInterruptMode is the interface interrupt mode
  *
  * @return  the mapped gcq driver interrupt mode
- * 
- *
  */
 static GCQ_INTERRUPT_MODE_TYPE prvxMapInterruptMode( FW_IF_GCQ_INTERRUPT_MODE_TYPE xInterruptMode )
 {
@@ -273,19 +259,15 @@ static GCQ_INTERRUPT_MODE_TYPE prvxMapInterruptMode( FW_IF_GCQ_INTERRUPT_MODE_TY
             assert( 0 );
             break;
     }
-
-    return ( xMappedMode );
+    return xMappedMode;
 }
 
 /**
- *
  * @brief   Map consumer/producer mode
  *
  * @param   xMode is the interface mode (producer/consumer)
  *
  * @return  the mapped gcq driver interface mode
- * 
- *
  */
 static GCQ_MODE_TYPE prvxMapMode( FW_IF_GCQ_MODE_TYPE xMode )
 {
@@ -300,8 +282,7 @@ static GCQ_MODE_TYPE prvxMapMode( FW_IF_GCQ_MODE_TYPE xMode )
             assert( 0 );
             break;
     }
-
-    return ( xMappedMode );
+    return xMappedMode;
 }
 
 /**
@@ -396,7 +377,6 @@ static uint32_t prvGCQOpen( void *pvFWIf )
             INC_ERROR_COUNTER( FW_IF_GCQ_ERRORS_NOT_SUPPORTED_COUNT );
         }
     }
-
     return xRet;
 }
 
@@ -452,7 +432,6 @@ static uint32_t prvGCQClose( void *pvFWIf )
         pxProfile->xState = FW_IF_GCQ_STATE_CLOSED;
         INC_STAT_COUNTER( FW_IF_GCQ_STATS_CLOSE_COUNT );
     }
-
     return xRet;
 }
 
@@ -474,7 +453,6 @@ static uint32_t prvGCQWrite( void *pvFWIf, uint64_t ullDstPort, uint8_t *pucData
     {
         xRet = FW_IF_ERRORS_INVALID_CFG;
         INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_CFG_COUNT );
-
     }
 
     if( CHECK_FIREWALLS( pxThisIf ) )
@@ -488,7 +466,6 @@ static uint32_t prvGCQWrite( void *pvFWIf, uint64_t ullDstPort, uint8_t *pucData
         xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
         INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
     }
-
 
     FW_IF_GCQ_CFG *pxCfg = ( FW_IF_GCQ_CFG* )pxThisIf->cfg;
     if( CHECK_PROFILE( pxCfg ) )
@@ -508,7 +485,7 @@ static uint32_t prvGCQWrite( void *pvFWIf, uint64_t ullDstPort, uint8_t *pucData
     {
         /* vTaskDelay is used outside of function as a block as opposed to a spin on the timeout */
         GCQ_ERRORS_TYPE xStatus = xGCQProduceData( pxProfile->pxGCQInstance, pucData, ulSize );
-        
+
         if( GCQ_ERRORS_NONE == xStatus )
         {
             INC_STAT_COUNTER( FW_IF_GCQ_STATS_READ_COUNT );
@@ -517,7 +494,6 @@ static uint32_t prvGCQWrite( void *pvFWIf, uint64_t ullDstPort, uint8_t *pucData
         /* Map error return code */
         xRet = prvxMapIFDriverReturnCode( xStatus );
     }
-
     return xRet;
 }
 
@@ -570,7 +546,7 @@ static uint32_t prvGCQRead( void *pvFWIf, uint64_t ullSrcPort, uint8_t *pucData,
     {
         FW_IF_GCQ_CFG *pxCfg = ( FW_IF_GCQ_CFG* )pxThisIf->cfg;
         if( CHECK_PROFILE( pxCfg ) )
-        { 
+        {
             xRet = FW_IF_GCQ_ERRORS_INVALID_PROFILE;
             INC_ERROR_COUNTER( FW_IF_GCQ_ERRORS_INVALID_PROFILE_COUNT );
         }
@@ -584,7 +560,7 @@ static uint32_t prvGCQRead( void *pvFWIf, uint64_t ullSrcPort, uint8_t *pucData,
 
         /* vTaskDelay is used outside of function as a block as opposed to a spin on the timeout */
         GCQ_ERRORS_TYPE xStatus = xGCQConsumeData( pxProfile->pxGCQInstance, pucData, *pulSize );
-       
+
         if( GCQ_ERRORS_NONE == xStatus )
         {
             INC_STAT_COUNTER( FW_IF_GCQ_STATS_WRITE_COUNT );
@@ -595,7 +571,6 @@ static uint32_t prvGCQRead( void *pvFWIf, uint64_t ullSrcPort, uint8_t *pucData,
             xRet = prvxMapIFDriverReturnCode( xStatus );
         }
     }
-
     return xRet;
 }
 
@@ -629,7 +604,6 @@ static uint32_t prvGCQIOCtrl( void *pvFWIf, uint32_t ulOption, void *pvValue )
         INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
     }
 
-
     if( prvxMapIFDriverReturnCode( FW_IF_ERRORS_NONE ) == xRet )
     {
         FW_IF_GCQ_CFG *pxCfg = ( FW_IF_GCQ_CFG* )pxThisIf->cfg;
@@ -640,7 +614,6 @@ static uint32_t prvGCQIOCtrl( void *pvFWIf, uint32_t ulOption, void *pvValue )
         }
 
         FW_IF_GCQ_PROFILE_TYPE *pxProfile = ( FW_IF_GCQ_PROFILE_TYPE* ) &pxCfg->pvProfile;
-
 
         /* Specialization options supported outside definition of standard API. */
         switch( ulOption )
@@ -664,25 +637,23 @@ static uint32_t prvGCQIOCtrl( void *pvFWIf, uint32_t ulOption, void *pvValue )
             case FW_IF_GCQ_IOCTRL_SET_OPAQUE_HANDLE:
                 /* Set the opaque handle used by calling API to store a reference. */
                 pxProfile->ulIOHandle = *( uint32_t* )pvValue;
-                PLL_DBG( FW_IF_GCQ_NAME, "GCQ IOCTL - set opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
+                PLL_DBG( FW_IF_GCQ_NAME, "sGCQ IOCTL - set opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
                 break;
 
             case FW_IF_GCQ_IOCTRL_GET_OPAQUE_HANDLE:
                 /* Get the opaque handle used by calling API to retreive a reference. */
-                PLL_DBG( FW_IF_GCQ_NAME, "GCQ IOCTL - get opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
+                PLL_DBG( FW_IF_GCQ_NAME, "sGCQ IOCTL - get opaque handle 0x%lx\r\n", pxProfile->ulIOHandle );
                 *( uint32_t* )pvValue = pxProfile->ulIOHandle;
                 break;
 
             default:
                 xRet = FW_IF_ERRORS_UNRECOGNISED_OPTION;
-                PLL_ERR( FW_IF_GCQ_NAME, "Error:  GCQ IOCTL unrecognised option\r\n" );
+                PLL_ERR( FW_IF_GCQ_NAME, "Error:  sGCQ IOCTL unrecognised option\r\n" );
                 break;
         }
     }
-
     return xRet;
 }
-
 
 /**
  * @brief   Local implementation of FW_IF_bindCallback
@@ -721,7 +692,7 @@ static uint32_t prvGCQBindCallback( void *pvFWIf, FW_IF_callback *pxNewFunc )
         xRet = FW_IF_ERRORS_PARAMS;
         INC_ERROR_COUNTER( FW_IF_ERRORS_PARAMS_COUNT );
     }
-    
+
     if( prvxMapIFDriverReturnCode( FW_IF_ERRORS_NONE ) == xRet )
     {
         /*
@@ -732,7 +703,6 @@ static uint32_t prvGCQBindCallback( void *pvFWIf, FW_IF_callback *pxNewFunc )
         PLL_DBG( FW_IF_GCQ_NAME, "FW_IF_bindCallback called\r\n" );
         INC_STAT_COUNTER( FW_IF_GCQ_STATS_BIND_CALLBACK_CALLED_COUNT );
     }
-
     return xRet;
 }
 
@@ -742,7 +712,7 @@ static uint32_t prvGCQBindCallback( void *pvFWIf, FW_IF_callback *pxNewFunc )
 /*****************************************************************************/
 
 /**
- * @brief   initialisation function for GCQ interfaces (generic across all GCQ interfaces)
+ * @brief   initialisation function for sGCQ interfaces (generic across all sGCQ interfaces)
  */
 uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
 {
@@ -751,7 +721,7 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
     if( ( GCQ_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( GCQ_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( FALSE == pxThis->iInitialised ) )
-    {   
+    {
         xRet = FW_IF_ERRORS_NONE;
 
         if( CHECK_NULL( pxCfg ) )
@@ -771,13 +741,13 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
             xRet = FW_IF_ERRORS_DRIVER_IN_USE;
             INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_IN_USE_COUNT );
         }
-    
+
         if( prvxMapIFDriverReturnCode( FW_IF_ERRORS_NONE ) == xRet )
         {
             /*
             * Bind in register and memory R/W function pointers
             * and assign to the local profile to be used by all
-            * GCQ instances
+            * sGCQ instances
             */
             pxThis->xGcqIoAccess.xGCQReadMem32 = prvulReadMemReg32;
             pxThis->xGcqIoAccess.xGCQWriteMem32 = prvvWriteMemReg32;
@@ -790,12 +760,11 @@ uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxCfg )
             INC_STAT_COUNTER( FW_IF_GCQ_STATS_INIT_OVERALL_COMPLETE_COUNT )
         }
     }
-
     return xRet;
 }
 
 /**
- * @brief   opens an instance of the GCQ interface
+ * @brief   opens an instance of the sGCQ interface
  */
 uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *pxFWIf, FW_IF_GCQ_CFG *pxGCQCfg )
 {
@@ -804,10 +773,10 @@ uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *pxFWIf, FW_IF_GCQ_CFG *pxGCQCfg )
     if( ( GCQ_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( GCQ_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iInitialised ) )
-    {   
+    {
         xRet = FW_IF_ERRORS_NONE;
         if( CHECK_DRIVER )
-        { 
+        {
             xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
             INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
         }
@@ -882,13 +851,13 @@ int iFW_IF_GCQ_PrintStatistics( void )
     {
         int i = 0;
         PLL_INF( FW_IF_GCQ_NAME, "============================================================\r\n" );
-        PLL_INF( FW_IF_GCQ_NAME, "FW IF GCQ Statistics:\n\r" );
+        PLL_INF( FW_IF_GCQ_NAME, "FW IF sGCQ Statistics:\n\r" );
         for( i = 0; i < FW_IF_GCQ_STATS_MAX; i++ )
         {
             PRINT_STAT_COUNTER( i );
         }
         PLL_INF( FW_IF_GCQ_NAME, "------------------------------------------------------------\r\n" );
-        PLL_INF( FW_IF_GCQ_NAME, "FW IF GCQ Errors:\n\r" );
+        PLL_INF( FW_IF_GCQ_NAME, "FW IF sGCQ Errors:\n\r" );
         for( i = 0; i < FW_IF_GCQ_ERRORS_MAX; i++ )
         {
             PRINT_ERROR_COUNTER( i );
@@ -900,7 +869,6 @@ int iFW_IF_GCQ_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( FW_IF_GCQ_ERRORS_VALIDATION_FAILED_COUNT )
     }
-
     return iStatus;
 }
 
@@ -923,6 +891,5 @@ int iFW_IF_GCQ_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( FW_IF_GCQ_ERRORS_VALIDATION_FAILED_COUNT )
     }
-
     return iStatus;
 }

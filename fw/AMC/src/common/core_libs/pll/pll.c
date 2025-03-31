@@ -5,7 +5,6 @@
  * This file contains the implementation of the Printing and Logging Library (PLL)
  *
  * @file pll.c
- *
  */
 
 /******************************************************************************/
@@ -627,22 +626,22 @@ int iPLL_DumpFsblLog( void )
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iIsInitialised ) )
     {
-        char *pcFsblLogBuffer = NULL;
+        char *pcPlmLogBuffer = NULL;
 
         PLL_LOG( PLL_NAME, "FSBL boot logs:\r\n" );
 
-        pcFsblLogBuffer = pvOSAL_MemAlloc( HAL_FSBL_LOG_SIZE );
-        if( NULL != pcFsblLogBuffer )
+        pcPlmLogBuffer = pvOSAL_MemAlloc( HAL_PLM_LOG_SIZE );
+        if( NULL != pcPlmLogBuffer )
         {
             char *pcCurrentMessage = NULL;
             char *pcNextMessage = NULL;
 
             INC_STAT_COUNTER( PLL_STATS_MALLOC )
 
-            pvOSAL_MemCpy( pcFsblLogBuffer, ( uint32_t* )HAL_FSBL_LOG_ADDRESS, HAL_FSBL_LOG_SIZE );
+            pvOSAL_MemCpy( pcPlmLogBuffer, ( uint32_t* )HAL_PLM_LOG_ADDRESS, HAL_PLM_LOG_SIZE );
 
             /* We keep track of two messages to avoid printing any uninitialised data at the end */
-            pcCurrentMessage = strtok( pcFsblLogBuffer, "\r\n" );
+            pcCurrentMessage = strtok( pcPlmLogBuffer, "\r\n" );
             pcNextMessage = strtok( NULL, "\r\n" );
 
             while( NULL != pcNextMessage )
@@ -653,7 +652,7 @@ int iPLL_DumpFsblLog( void )
                 pcNextMessage = strtok( NULL, "\r\n" );
             }
 
-            vOSAL_MemFree( ( void** )&pcFsblLogBuffer );
+            vOSAL_MemFree( ( void** )&pcPlmLogBuffer );
             INC_STAT_COUNTER( PLL_STATS_FREE )
 
             iStatus = OK;
@@ -682,7 +681,7 @@ int iPLL_SendBootRecords( void )
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         int i = 0;
-        char *pcFsblLogBuffer = NULL;
+        char *pcPlmLogBuffer = NULL;
         uintptr_t ulLogMsgAddr = HAL_RPU_SHARED_MEMORY_BASE_ADDR + offsetof( HAL_PARTITION_TABLE, xLogMsg );
 
         HAL_IO_WRITE32( 0, ulLogMsgAddr );
@@ -691,19 +690,19 @@ int iPLL_SendBootRecords( void )
         pxThis->iIsLogReady = TRUE;
 
         /* FSBL records */
-        pcFsblLogBuffer = pvOSAL_MemAlloc( HAL_FSBL_LOG_SIZE );
-        if( NULL != pcFsblLogBuffer )
+        pcPlmLogBuffer = pvOSAL_MemAlloc( HAL_PLM_LOG_SIZE );
+        if( NULL != pcPlmLogBuffer )
         {
             char *pcCurrentMessage = NULL;
             char *pcNextMessage = NULL;
 
             INC_STAT_COUNTER( PLL_STATS_MALLOC )
 
-            pvOSAL_MemCpy( pcFsblLogBuffer, ( uint32_t* )HAL_FSBL_LOG_ADDRESS, HAL_FSBL_LOG_SIZE );
+            pvOSAL_MemCpy( pcPlmLogBuffer, ( uint32_t* )HAL_PLM_LOG_ADDRESS, HAL_PLM_LOG_SIZE );
 
-            pcCurrentMessage = strtok( pcFsblLogBuffer, "\r\n" );
+            pcCurrentMessage = strtok( pcPlmLogBuffer, "\r\n" );
             pcNextMessage    = strtok( NULL, "\r\n" );
-            
+
             while( NULL != pcNextMessage )
             {
                 iLogCollect( pcCurrentMessage );
@@ -712,10 +711,10 @@ int iPLL_SendBootRecords( void )
                 pcNextMessage = strtok( NULL, "\r\n" );
             }
 
-            vOSAL_MemFree( ( void** )&pcFsblLogBuffer );
+            vOSAL_MemFree( ( void** )&pcPlmLogBuffer );
             INC_STAT_COUNTER( PLL_STATS_FREE )
         }
-                
+
         /* Sleep is needed to allow the first chunk to be read fully before we overwrite the ring buffer */
         iOSAL_Task_SleepMs( PLL_SLEEP_INTERVAL_MS );
 
@@ -723,7 +722,7 @@ int iPLL_SendBootRecords( void )
         for( i = 0; i < PLL_LOG_MAX_RECS; i++ )
         {
             if( '\0' != pxThis->pcBootLogs[ i ][ 0 ] )
-            {                
+            {
                 iLogCollect( pxThis->pcBootLogs[ i ] );
             }
         }

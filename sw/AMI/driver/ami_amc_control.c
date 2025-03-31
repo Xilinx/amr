@@ -2,7 +2,7 @@
 /*
  * ami_amc_control.c - This file contains AMC control implementation.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/kthread.h>
@@ -196,7 +196,7 @@ int get_aid(int cmd_req, int flags)
 }
 
 /**
- * gcq_device_is_ready() - check that the GCQ is ready.
+ * gcq_device_is_ready() - check that the sGCQ is ready.
  * @amc_ctrl_ctxt: AMC data struct instance.
  *
  * Wait for gcq service is fully ready after a reset.
@@ -205,7 +205,9 @@ int get_aid(int cmd_req, int flags)
  */
 bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 {
-	int i = 0, retry = DEVICE_READY_RETRY_COUNT, interval = DEVICE_READY_SLEEP_INTERVAL;
+	int i = 0;
+	int retry = DEVICE_READY_RETRY_COUNT;
+	int interval = DEVICE_READY_SLEEP_INTERVAL;
 
 	if (!amc_ctrl_ctxt)
 		return -EINVAL;
@@ -217,7 +219,7 @@ bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 			      sizeof(amc_ctrl_ctxt->amc_shared_mem));
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "************ AMC Shared Memory ***************, virt_addr : %p",
+			 "**** AMC Shared Memory virt_addr ****: %p",
 			 amc_ctrl_ctxt->gcq_payload_base_virt_addr);
 
 		AMI_VDBG(amc_ctrl_ctxt,
@@ -225,39 +227,47 @@ bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 			 amc_ctrl_ctxt->amc_shared_mem.amc_magic_no);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of gcq ring buffer inited by gcq server : 0x%x",
+			 "sGCQ server initiated gcq ring buffer offset   : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Length of gcq ring buffer inited by gcq server : 0x%x",
+			 "sGCQ server initiated gcq ring buffer length   : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_len);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of amc device status                    : 0x%x",
+			 "AMC device status offset                       : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.status.amc_status_off);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Length of amc device status                    : 0x%x",
+			 "AMC device status length                       : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.status.amc_status_len);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Current index of ring buffer log               : 0x%x",
+			 "AMC device uuid offset                         : 0x%x",
+			 amc_ctrl_ctxt->amc_shared_mem.uuid.amc_uuid_off);
+
+		AMI_VDBG(amc_ctrl_ctxt,
+			 "AMC device uuid length                         : 0x%x",
+			 amc_ctrl_ctxt->amc_shared_mem.uuid.amc_uuid_len);
+
+		AMI_VDBG(amc_ctrl_ctxt,
+			 "Debug log message current index                : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_index);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of dbg log                              : 0x%x",
+			 "Debug log offset                               : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_buf_off);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Length of dbg log                              : 0x%x",
+			 "Debug log length                               : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_buf_len);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of data buffer started                  : 0x%x",
+			 "Data buffer start offset                       : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.data.amc_data_start);
 
 		AMI_VDBG(amc_ctrl_ctxt,
-			 "Offset of data buffer ended                    : 0x%x",
+			 "Data buffer end offset                         : 0x%x",
 			 amc_ctrl_ctxt->amc_shared_mem.data.amc_data_end);
 
 		if (amc_ctrl_ctxt->amc_shared_mem.amc_magic_no == AMC_GCQ_MAGIC_NO) {
@@ -272,7 +282,7 @@ bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 			AMI_VDBG(amc_ctrl_ctxt, "Device status value : %x", amc_status);
 			if (amc_status) {
 				AMI_VDBG(amc_ctrl_ctxt,
-					 "AMC GCQ service ready after %d ms",
+					 "AMC sGCQ service ready after %d ms",
 					 interval * i);
 				return true;
 			}
@@ -280,7 +290,7 @@ bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 	}
 
 	AMI_ERR(amc_ctrl_ctxt,
-		"AMC GCQ service not ready after %d ms",
+		"AMC sGCQ service not ready after %d ms",
 		interval * retry);
 
 	return false;
@@ -312,11 +322,12 @@ static int start_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt)
 		goto fail;
 	}
 
-	amc_ctrl_ctxt->gcq_ring_buf_base_virt_addr = amc_ctrl_ctxt->gcq_payload_base_virt_addr +
-						     amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off;
+	amc_ctrl_ctxt->gcq_ring_buf_base_virt_addr =
+		amc_ctrl_ctxt->gcq_payload_base_virt_addr +
+		amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off;
 
 	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- GCQ ring buffer virtual addr   : 0x%p",
+		 "\t- sGCQ ring buffer virtual addr : 0x%p",
 		 amc_ctrl_ctxt->gcq_ring_buf_base_virt_addr);
 
 	/* Start receiving incoming commands */
@@ -636,7 +647,7 @@ static void memcpy_gcq_payload_to_device(struct amc_control_ctxt	*amc_ctrl_ctxt,
 }
 
 /**
- * get_gcq_version() - get the GCQ version.
+ * get_gcq_version() - get the sGCQ version.
  * @amc_ctrl_ctxt: AMC data struct instance.
  * @data_buf: the offset.
  *
@@ -655,17 +666,17 @@ static int get_gcq_version(struct amc_control_ctxt *amc_ctrl_ctxt, char *data_bu
 				 data_buf,
 				 0);
 
-	if (ret)
-		AMI_ERR(amc_ctrl_ctxt, "Failed to get the GCQ version");
-
+	if (ret) {
+		AMI_ERR(amc_ctrl_ctxt, "Failed to get the sGCQ version");
+	}
 	return ret;
 }
 
 /**
- * check_gcq_supported_version() - check if the GCQ version is valid.
+ * check_gcq_supported_version() - check if the sGCQ version is valid.
  * @amc_ctrl_ctxt: AMC data struct instance.
- * @major: the GCQ major version number
- * @minor: the GCQ minor version number
+ * @major: the sGCQ major version number
+ * @minor: the sGCQ minor version number
  *
  * Return: the errno code.
  */
@@ -680,13 +691,13 @@ static int check_gcq_supported_version(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 	if (iGCQGetVersion(&ver) == SUCCESS) {
 		if ((ver.ucVerMajor == major) && (ver.ucVerMinor == minor)) {
-			AMI_INFO(amc_ctrl_ctxt, "GCQ Supported Version : %d.%d", major, minor);
+			AMI_INFO(amc_ctrl_ctxt, "sGCQ Supported Version: %d.%d", major, minor);
 			return SUCCESS;
 		}
 	}
 
 	AMI_ERR(amc_ctrl_ctxt,
-		"Unsupported GCQ Version (expected %d.%d but got %d.%d)",
+		"Unsupported sGCQ Version (expected %d.%d but got %d.%d)",
 		ver.ucVerMajor,
 		ver.ucVerMinor,
 		major,
@@ -807,15 +818,13 @@ static enum amc_cmd_id get_cmd_command_id(enum gcq_submit_cmd_req cmd_req)
  * map_amc_endpoints() - map the IP based on the endpoint.
  * @dev: the device.
  * @amc_ctrl_ctxt: AMC data struct instance.
- * @ep_gcq: The rpu endpoint info.
- * @ep_gcq_payload: The mgmt endpoint info.
+ * @ep_gcq: The mgmt endpoint info.
  *
  * Return: the errno.
  */
 static int map_amc_endpoints(struct pci_dev		*dev,
-			     struct amc_control_ctxt	*amc_ctrl_ctxt,
-			     endpoint_info_struct	ep_gcq,
-			     endpoint_info_struct	ep_gcq_payload)
+				struct amc_control_ctxt	*amc_ctrl_ctxt,
+				endpoint_info_struct	ep_gcq)
 {
 	int ret = 0;
 	struct pf_dev_struct *pf_dev = NULL;
@@ -823,7 +832,7 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 	if (!amc_ctrl_ctxt || !dev)
 		return -EINVAL;
 
-	AMI_VDBG(amc_ctrl_ctxt, "Mapping GCQ endpoints");
+	AMI_VDBG(amc_ctrl_ctxt, "Mapping sGCQ endpoints");
 
 	pf_dev = dev_get_drvdata(&dev->dev);
 
@@ -832,37 +841,38 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 		goto fail;
 	}
 
-	if (pf_dev->pcie_config->header->bar[PCIE_BAR0].requested) {
+	if (pf_dev->pcie_config->header->bar[ep_gcq.bar_num].requested) {
 		ret = -EINVAL;
 		goto fail;
 	}
 
-	/* TODO: do not hardcode which BAR is requested */
+	/* Request region */
 	ret = pci_request_region(amc_ctrl_ctxt->pcie_dev,
-				 PCIE_BAR0,
-				 PCIE_BAR_NAME[PCIE_BAR0]);
+				 ep_gcq.bar_num,
+				 PCIE_BAR_NAME[ep_gcq.bar_num]);
 	if (ret) {
 		AMI_ERR(amc_ctrl_ctxt,
-			"Could not request %s region (SQ_BASE)",
-			PCIE_BAR_NAME[PCIE_BAR0]);
+			"Could not request %s region (BASE)",
+			PCIE_BAR_NAME[ep_gcq.bar_num]);
 		ret = -EIO;
 		goto fail;
 	}
 
-	pf_dev->pcie_config->header->bar[PCIE_BAR0].requested = true;
+	pf_dev->pcie_config->header->bar[ep_gcq.bar_num].requested = true;
 
-	/* Map the GCQ IP Region */
+	/* Map the sGCQ Region */
 	amc_ctrl_ctxt->gcq_base_virt_addr = pci_iomap_range(amc_ctrl_ctxt->pcie_dev,
-							    ep_gcq.bar_num,
-							    ep_gcq.start_addr,
-							    ep_gcq.bar_len);
+									ep_gcq.bar_num,
+									ep_gcq.start_addr,
+									ep_gcq.bar_len);
 
 	if (!(amc_ctrl_ctxt->gcq_base_virt_addr)) {
-		AMI_ERR(amc_ctrl_ctxt, "Could not map GCQ IP into virtual memory");
+		AMI_ERR(amc_ctrl_ctxt, "Could not map sGCQ into virtual memory");
 		ret = -EIO;
 		goto fail;
 	}
 
+	AMI_VDBG(amc_ctrl_ctxt, "Successfully mapped sGCQ");
 	AMI_VDBG(amc_ctrl_ctxt,
 		 "\t- gcq_start_phy          : 0x%llx",
 		 ep_gcq.start_addr);
@@ -872,39 +882,19 @@ static int map_amc_endpoints(struct pci_dev		*dev,
 	AMI_VDBG(amc_ctrl_ctxt,
 		 "\t- gcq_bar_num            : 0x%x",
 		 ep_gcq.bar_num);
-
-	/* Map the GCQ Payload Region */
-	amc_ctrl_ctxt->gcq_payload_base_virt_addr = pci_iomap_range(amc_ctrl_ctxt->pcie_dev,
-								    ep_gcq_payload.bar_num,
-								    ep_gcq_payload.start_addr,
-								    ep_gcq_payload.bar_len);
-
-	if (!(amc_ctrl_ctxt->gcq_payload_base_virt_addr)) {
-		AMI_ERR(amc_ctrl_ctxt, "Could not map GCQ payload into virtual memory");
-		ret = -EIO;
-		goto fail;
-	}
+	AMI_VDBG(amc_ctrl_ctxt,
+		 "\t- sGCQ virtual addr      : 0x%p",
+		 amc_ctrl_ctxt->gcq_base_virt_addr);
 
 	/* Map the Ring Buffer base address */
-	AMI_VDBG(amc_ctrl_ctxt, "Successfully mapped GCQ payload");
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- gcq_payload_start_phy          : 0x%llx",
-		 ep_gcq_payload.start_addr);
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- gcq_payload_len                : 0x%llx",
-		 ep_gcq_payload.bar_len);
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- gcq_payload_bar_num            : 0x%x",
-		 ep_gcq_payload.bar_num);
-	AMI_VDBG(amc_ctrl_ctxt,
-		 "\t- GCQ payload virtual addr       : 0x%p",
-		 amc_ctrl_ctxt->gcq_payload_base_virt_addr);
+	amc_ctrl_ctxt->gcq_payload_base_virt_addr =
+		amc_ctrl_ctxt->gcq_base_virt_addr + XILINX_SGCQ_SIZE_BYTES;
 
-	AMI_VDBG(amc_ctrl_ctxt, "Successfully mapped GCQ endpoints");
+	AMI_VDBG(amc_ctrl_ctxt, "Successfully mapped sGCQ endpoints");
 	return SUCCESS;
 
 fail:
-	AMI_ERR(amc_ctrl_ctxt, "Failed to map GCQ endpoints");
+	AMI_ERR(amc_ctrl_ctxt, "Failed to map sGCQ endpoints");
 	return ret;
 }
 
@@ -1053,8 +1043,9 @@ static int logging_thread(void *data)
 	}
 
 	while (1) {
-		if (logging_failed == false)
+		if (logging_failed == false) {
 			dump_amc_log(amc_ctxt);
+		}
 		msleep(LOGGING_SLEEP_INTERVAL);
 
 		/* only exit from the thread is within the unset_amc context */
@@ -1697,7 +1688,7 @@ done:
 }
 
 /*
- * Stop the GCQ service.
+ * Stop the sGCQ service.
  */
 void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt)
 {
@@ -1724,7 +1715,6 @@ void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt)
 int setup_amc(struct pci_dev		*dev,
 	      struct amc_control_ctxt	**amc_ctrl_ctxt,
 	      endpoint_info_struct	ep_gcq,
-	      endpoint_info_struct	ep_gcq_payload,
 	      amc_event_callback	event_cb,
 	      void			*event_cb_data)
 {
@@ -1736,7 +1726,7 @@ int setup_amc(struct pci_dev		*dev,
 	if (!dev || !amc_ctrl_ctxt)
 		return -EINVAL;
 
-	DEV_VDBG(dev, "Setting up AMC GCQ");
+	DEV_VDBG(dev, "Setting up AMC sGCQ");
 
 	*amc_ctrl_ctxt = kzalloc(sizeof(struct amc_control_ctxt), GFP_KERNEL);
 	if (!(*amc_ctrl_ctxt)) {
@@ -1758,7 +1748,7 @@ int setup_amc(struct pci_dev		*dev,
 	sema_init(&((*amc_ctrl_ctxt)->gcq_data_sema), 1);
 
 	/* Map Endpoints */
-	ret = map_amc_endpoints(dev, *amc_ctrl_ctxt, ep_gcq, ep_gcq_payload);
+	ret = map_amc_endpoints(dev, *amc_ctrl_ctxt, ep_gcq);
 	if (ret)
 		goto fail;
 
@@ -1767,7 +1757,7 @@ int setup_amc(struct pci_dev		*dev,
 	if (ret)
 		goto fail;
 
-	/* Create GCQ instance */
+	/* Create sGCQ instance */
 	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.ullBaseAddress = (uint64_t)(*amc_ctrl_ctxt)->gcq_base_virt_addr;
 	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.xInterruptMode = FW_IF_GCQ_INTERRUPT_MODE_NONE;
 	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.xMode = FW_IF_GCQ_MODE_CONSUMER;
@@ -1812,11 +1802,11 @@ int setup_amc(struct pci_dev		*dev,
 		wake_up_process((*amc_ctrl_ctxt)->logging_thread);
 	}
 
-	/* Getting GCQ Version, Check the GCQ Version so that we don't
+	/* Getting sGCQ Version, Check the sGCQ Version so that we don't
 	 * send unsupported commands to AMC firmware */
 	version_buf = vzalloc(sizeof(char) * VERSION_BUF_SIZE);
 	if (!version_buf) {
-		DEV_ERR(dev, "Failed to allocate memory for GCQ version buffer");
+		DEV_ERR(dev, "Failed to allocate memory for sGCQ version buffer");
 		ret = -ENOMEM;
 		goto fail;
 	}
@@ -1872,8 +1862,7 @@ int setup_amc(struct pci_dev		*dev,
 		}
 	}
 
-	vfree(version_buf);
-
+#if 0 //FixMe
 	/*
 	 * COMPAT MODE: heartbeat disabled, logging disabled.
 	 * When the AMC version does not match the current AMI version, we run
@@ -1900,10 +1889,11 @@ int setup_amc(struct pci_dev		*dev,
 			wake_up_process((*amc_ctrl_ctxt)->heartbeat_thread);
 		}
 	}
-
+#endif
 	if (ret)
 		goto fail;
 
+	vfree(version_buf);
 	return SUCCESS;
 
 fail:
@@ -1912,7 +1902,7 @@ fail:
 
 	unset_amc(dev, amc_ctrl_ctxt);
 	release_amc_mem(amc_ctrl_ctxt);
-	DEV_ERR(dev, "Failed to setup AMC GCQ");
+	DEV_ERR(dev, "Failed to setup AMC sGCQ");
 
 	return ret;
 }
@@ -1956,7 +1946,6 @@ int unset_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt)
 		if (ret)
 			DEV_ERR(dev, "Failed to close the amc proxy %d", ret);
 
-		unmap_pci_io(dev, &((*amc_ctrl_ctxt)->gcq_payload_base_virt_addr));
 		unmap_pci_io(dev, &((*amc_ctrl_ctxt)->gcq_base_virt_addr));
 	}
 

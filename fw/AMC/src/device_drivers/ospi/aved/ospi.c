@@ -5,7 +5,6 @@
  * This file contains the user API definitions for the OSPI device driver.
  *
  * @file ospi.c
- *
  */
 
 /******************************************************************************/
@@ -499,7 +498,7 @@ int iOSPI_FlashInit( OSPI_CFG_TYPE *pxOspiCfg )
         /* Initialize the OSPIPSV driver so that it's ready to use */
         if( OK == iStatus )
         {
-            pxOspiPsvConfig = XOspiPsv_LookupConfig( pxOspiCfg->ucDeviceId );
+            pxOspiPsvConfig = XOspiPsv_LookupConfig( pxOspiCfg->ulBaseAddress );
             if( NULL == pxOspiPsvConfig )
             {
                 PLL_ERR( OSPI_NAME, "Error: XOspiPsv_LookupConfig failed\r\n" );
@@ -685,7 +684,6 @@ int iOSPI_FlashInit( OSPI_CFG_TYPE *pxOspiCfg )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -749,7 +747,6 @@ int iOSPI_FlashErase( uint32_t ulAddr, uint32_t ulLength )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -807,7 +804,6 @@ int iOSPI_FlashRead( uint32_t ulAddr, uint8_t *pucReadBuffer, uint32_t *pulLengt
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1003,7 +999,6 @@ int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLengt
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1023,7 +1018,6 @@ int iOSPI_GetOperationProgress( uint8_t *pucPercentage )
         iStatus        = OK;
         *pucPercentage = pxThis->ucOspiFlashPercentage;
     }
-
     return iStatus;
 }
 
@@ -1057,7 +1051,6 @@ int iOSPI_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1080,7 +1073,6 @@ int iOSPI_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1117,7 +1109,6 @@ static int iFindFctIndex( uint32_t ulReadId, uint8_t *pucFctIndex )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -1151,7 +1142,7 @@ static int iPollTransferWithRetry( XOspiPsv *pxOspiPsvPtr, XOspiPsv_Msg *pxFlash
             else
             {
                 int iCount = 0;
-                FOREVER
+                for( ;; )
                 {
                     iOspiStatus = XOspiPsv_PollTransfer( pxOspiPsvPtr, pxFlashMsg );
                     if( XST_SUCCESS == iOspiStatus || TRUE == pxThis->iAbortPollWait )
@@ -1173,7 +1164,6 @@ static int iPollTransferWithRetry( XOspiPsv *pxOspiPsvPtr, XOspiPsv_Msg *pxFlash
             }
         }
 
-
         if( ( XST_SUCCESS != iOspiStatus ) || ( TRUE == pxThis->iAbortPollWait ) )
         {
             INC_ERROR_COUNTER( OSPI_ERRORS_FLASH_POLL_RETRY_FAILED )
@@ -1185,7 +1175,6 @@ static int iPollTransferWithRetry( XOspiPsv *pxOspiPsvPtr, XOspiPsv_Msg *pxFlash
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -1259,7 +1248,6 @@ static int iFlashReadId( XOspiPsv *pxOspiPsvPtr )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -1386,7 +1374,6 @@ static int iFlashSetSdrDdrModeEdgeMode( XOspiPsv *pxOspiPsvPtr, int iMode )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -1405,20 +1392,11 @@ int iFlashSet4bAddrMode( XOspiPsv *pxOspiPsvPtr, int iEnable )
         {
             0
         };
-        uint8_t ucCommand = 0;
         uint8_t ucFlashStatus[ OSPI_STATUS_BUFFER_SIZE ] __attribute__ ( ( aligned( OSPI_WRITE_BUFFER_ALIGNMENT ) ) ) =
         {
             0
         };
-
-        if( TRUE == iEnable )
-        {
-            ucCommand = ENTER_4B_ADDR_MODE;
-        }
-        else
-        {
-            ucCommand = EXIT_4B_ADDR_MODE;
-        }
+        uint8_t ucCommand = ( TRUE == iEnable ) ? ENTER_4B_ADDR_MODE : EXIT_4B_ADDR_MODE;
 
         xFlashMsg.Opcode      = WRITE_ENABLE_CMD;
         xFlashMsg.Addrsize    = 0;
@@ -1451,13 +1429,12 @@ int iFlashSet4bAddrMode( XOspiPsv *pxOspiPsvPtr, int iEnable )
             {
                 xFlashMsg.Proto = XOSPIPSV_WRITE_8_0_0;
             }
-
             iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
         }
 
         if( XST_SUCCESS == iOspiStatus )
         {
-            FOREVER
+            for( ;; )
             {
                 xFlashMsg.Opcode      = pxFlashConfigTable[ pxThis->ucFctIndex ].ucStatusCmd;
                 xFlashMsg.Addrsize    = 0;
@@ -1493,34 +1470,30 @@ int iFlashSet4bAddrMode( XOspiPsv *pxOspiPsvPtr, int iEnable )
         {
             switch( pxThis->ulFlashMake )
             {
-            case MICRON_OCTAL_ID_BYTE0:
-            {
-                xFlashMsg.Opcode      = WRITE_DISABLE_CMD;
-                xFlashMsg.Addrsize    = 0;
-                xFlashMsg.Addrvalid   = 0;
-                xFlashMsg.TxBfrPtr    = NULL;
-                xFlashMsg.RxBfrPtr    = NULL;
-                xFlashMsg.ByteCount   = 0;
-                xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_TX;
-                xFlashMsg.IsDDROpCode = 0;
-                xFlashMsg.Proto       = 0;
-                if( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
-                {
-                    xFlashMsg.Proto = XOSPIPSV_WRITE_8_0_0;
-                }
+                case MICRON_OCTAL_ID_BYTE0:
+                    xFlashMsg.Opcode      = WRITE_DISABLE_CMD;
+                    xFlashMsg.Addrsize    = 0;
+                    xFlashMsg.Addrvalid   = 0;
+                    xFlashMsg.TxBfrPtr    = NULL;
+                    xFlashMsg.RxBfrPtr    = NULL;
+                    xFlashMsg.ByteCount   = 0;
+                    xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_TX;
+                    xFlashMsg.IsDDROpCode = 0;
+                    xFlashMsg.Proto       = 0;
+                    if( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
+                    {
+                        xFlashMsg.Proto = XOSPIPSV_WRITE_8_0_0;
+                    }
 
-                iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
-                break;
-            }
+                    iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
+                    break;
 
-            default:
-            {
-                PLL_ERR( OSPI_NAME,
-                         "Error: current implementation only supports Mircon flash part, found 0x%x\r\n",
-                         pxThis->ulFlashMake );
-                iOspiStatus = XST_FAILURE;
-                break;
-            }
+                default:
+                    PLL_ERR( OSPI_NAME,
+                            "Error: current implementation only supports Mircon flash part, found 0x%x\r\n",
+                            pxThis->ulFlashMake );
+                    iOspiStatus = XST_FAILURE;
+                    break;
             }
         }
 
@@ -1533,7 +1506,6 @@ int iFlashSet4bAddrMode( XOspiPsv *pxOspiPsvPtr, int iEnable )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -1570,7 +1542,6 @@ static int iGetRealAddr( XOspiPsv *pxOspiPsvPtr, uint32_t ulAddress, uint32_t *p
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -1600,10 +1571,8 @@ static int iGetProtoType( XOspiPsv *pxOspiPsvPtr, int iRead, uint8_t *pucNum )
                 *pucNum = XOSPIPSV_WRITE_1_1_8;
             }
         }
-
         iOspiStatus = XST_SUCCESS;
     }
-
     return iOspiStatus;
 }
 
@@ -1740,7 +1709,6 @@ static int iFlashErase( XOspiPsv *pxOspiPsvPtr,
                  * written to, this needs to be sent as a separate transfer before
                  * the write
                  */
-
                 xFlashMsg.Opcode      = WRITE_ENABLE_CMD;
                 xFlashMsg.Addrsize    = 0;
                 xFlashMsg.Addrvalid   = 0;
@@ -1779,7 +1747,7 @@ static int iFlashErase( XOspiPsv *pxOspiPsvPtr,
 
                 if( XST_SUCCESS == iOspiStatus )
                 {
-                    FOREVER
+                    for( ;; )
                     {
                         xFlashMsg.Opcode      = pxFlashConfigTable[ pxThis->ucFctIndex ].ucStatusCmd;
                         xFlashMsg.Addrsize    = 0;
@@ -1819,7 +1787,6 @@ static int iFlashErase( XOspiPsv *pxOspiPsvPtr,
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -1930,7 +1897,7 @@ static int iFlashWrite( XOspiPsv *pxOspiPsvPtr,
             pucWriteBfrPtr += FLASH_WRITE_BYTE_SIZE;
             ulAddress      += FLASH_WRITE_BYTE_SIZE;
 
-            FOREVER
+            for( ;; )
             {
                 xFlashMsg.Opcode      = pxFlashConfigTable[ pxThis->ucFctIndex ].ucStatusCmd;
                 xFlashMsg.Addrsize    = 0;
@@ -1967,7 +1934,6 @@ static int iFlashWrite( XOspiPsv *pxOspiPsvPtr,
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -2042,7 +2008,6 @@ static int iFlashLinearWrite( XOspiPsv *pxOspiPsvPtr,
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -2172,7 +2137,6 @@ static int iFlashRead( XOspiPsv *pxOspiPsvPtr,
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -2241,7 +2205,7 @@ static int iBulkErase( XOspiPsv *pxOspiPsvPtr )
 
         if( XST_SUCCESS == iOspiStatus )
         {
-            FOREVER
+            for( ;; )
             {
                 xFlashMsg.Opcode      = pxFlashConfigTable[ pxThis->ucFctIndex ].ucStatusCmd;
                 xFlashMsg.Addrsize    = 0;
@@ -2277,7 +2241,6 @@ static int iBulkErase( XOspiPsv *pxOspiPsvPtr )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 
@@ -2350,7 +2313,7 @@ static int iDieErase( XOspiPsv *pxOspiPsvPtr )
 
             if( XST_SUCCESS == iOspiStatus )
             {
-                FOREVER
+                for( ;; )
                 {
                     xFlashMsg.Opcode      = pxFlashConfigTable[ pxThis->ucFctIndex ].ucStatusCmd;
                     xFlashMsg.Addrsize    = 0;
@@ -2387,7 +2350,6 @@ static int iDieErase( XOspiPsv *pxOspiPsvPtr )
     {
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
-
     return iOspiStatus;
 }
 

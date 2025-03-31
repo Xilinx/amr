@@ -5,7 +5,6 @@
  * This file contains the ASDM debug access
  *
  * @file asdm_debug.h
- *
  */
 
 #ifndef _ASDM_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the ASDM application debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vASDM_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _ASDM_DEBUG_H_ */
 

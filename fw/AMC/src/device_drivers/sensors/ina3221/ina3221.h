@@ -6,7 +6,6 @@
  * sensor.
  *
  * @file ina3221.h
- *
  */
 
 #ifndef _INA3221_H_
@@ -33,7 +32,7 @@
  *
  * @return  OK             Voltage read successfully
  *          ERROR          Voltage not read successfully
- * 
+ *
  */
 int iINA3221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfVoltageInMV );
 
@@ -47,7 +46,7 @@ int iINA3221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChann
  *
  * @return  OK             Current read successfully
  *          ERROR          Current not read successfully
- * 
+ *
  */
 int iINA3221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfCurrentInmA );
 
@@ -61,7 +60,7 @@ int iINA3221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChann
  *
  * @return  OK            Power read successfully
  *          ERROR         Power not read successfully
- * 
+ *
  */
 int iINA3221_ReadPower( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfPowerInmW );
 
@@ -70,7 +69,7 @@ int iINA3221_ReadPower( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannel
  *
  * @return  OK                  Stats retrieved from driver successfully
  *          ERROR               Stats not retrieved successfully
- * 
+ *
  */
 int iINA3221_PrintStatistics( void );
 
@@ -79,8 +78,8 @@ int iINA3221_PrintStatistics( void );
  *
  * @return  OK                  Stats cleared successfully
  *          ERROR               Stats not cleared successfully
- * 
+ *
  */
 int iINA3221_ClearStatistics( void );
 
-#endif
+#endif /* _INA3221_H_ */

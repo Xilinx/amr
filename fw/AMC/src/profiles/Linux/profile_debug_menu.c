@@ -5,7 +5,6 @@
  * This file contains the profile debug menu for the Linux
  *
  * @file profile_debug_menu.c
- *
  */
 
 /*****************************************************************************/

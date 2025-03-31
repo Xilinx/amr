@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_mem_access.h- This file contains the public interface for AMI memory access logic
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_MEM_ACCESS_H
@@ -32,7 +32,7 @@ extern "C" {
  * @idx: Bar index.
  * @offset: Register offset within BAR.
  * @val: Variable to store register value.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_mem_bar_read(ami_device *dev, uint8_t idx, uint64_t offset, uint32_t *val);
@@ -43,7 +43,7 @@ int ami_mem_bar_read(ami_device *dev, uint8_t idx, uint64_t offset, uint32_t *va
  * @idx: Bar index.
  * @offset: Register offset within BAR.
  * @val: Value to write.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_mem_bar_write(ami_device *dev, uint8_t idx, uint64_t offset, uint32_t val);
@@ -55,7 +55,7 @@ int ami_mem_bar_write(ami_device *dev, uint8_t idx, uint64_t offset, uint32_t va
  * @offset: First register offset within BAR.
  * @num: Number of registers to read.
  * @val: Buffer to store register values.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_mem_bar_read_range(ami_device *dev, uint8_t idx, uint64_t offset,
@@ -68,7 +68,7 @@ int ami_mem_bar_read_range(ami_device *dev, uint8_t idx, uint64_t offset,
  * @offset: First register offset within BAR.
  * @num: Number of registers to write to.
  * @val: Register values to write.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_mem_bar_write_range(ami_device *dev, uint8_t idx, uint64_t offset,

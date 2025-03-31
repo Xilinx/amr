@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_sensor_internal.h - This file contains the private interface for sensor logic
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_SENSOR_INTERNAL_H
@@ -104,7 +104,7 @@ struct ami_sensor_attr {
  * @average: average value
  * @max: max value
  * @next: pointer to next sensor data struct
- * 
+ *
  * The difference between this and a top level sensor is that a single
  * `ami_sensor` type may be composed of multiple `ami_sensor_data` structs.
  * For example, a vccint sensor may have a sensor data struct for current,
@@ -131,7 +131,7 @@ struct ami_sensor_data {
  * @current: current data
  * @voltage: voltage data
  * @power: power data
- * 
+ *
  * Note that not all data structs may be valid for a given sensor.
  */
 struct ami_sensor_internal {

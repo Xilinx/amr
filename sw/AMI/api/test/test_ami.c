@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * test_ami.c -  Unit test file for ami.c
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/
@@ -54,11 +54,11 @@ int __wrap_open(const char *pathname, int flags, int mode)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_open(pathname, flags, mode);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -77,11 +77,11 @@ int __wrap_close(int fd)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_close(fd);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -105,11 +105,11 @@ ssize_t __wrap_read(int fildes, void *buf, size_t nbyte)
 		ret = strlen(str);
 		break;
 	}
-	
+
 	case REAL:
 		ret = __real_read(fildes, buf, nbyte);
 		break;
-	
+
 	default:
 		break;
 	}

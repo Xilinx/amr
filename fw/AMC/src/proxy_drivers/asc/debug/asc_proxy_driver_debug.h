@@ -5,7 +5,6 @@
  * This file contains the AVED Sensor Control (ASC) debug access
  *
  * @file asc_proxy_driver_debug.h
- *
  */
 
 #ifndef _ASC_PROXY_DRIVER_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the ASC debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vASC_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _ASC_PROXY_DRIVER_DEBUG_H_ */
 

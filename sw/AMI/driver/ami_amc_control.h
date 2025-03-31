@@ -2,7 +2,7 @@
 /*
  * ami_amc_control.h - This file contains AMC control defintions.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_AMC_CONTROL_H
@@ -80,7 +80,7 @@
 /******************************************************************************************/
 
 /**
- * enum gcq_submit_cmd_flags - QCQ command-specific flags.
+ * enum gcq_submit_cmd_flags - sGCQ command-specific flags.
  * @GCQ_CMD_FLAG_NONE: No flags.
  * @GCQ_CMD_FLAG_REPO_TYPE_BD_INFO: Command relates to the board info SDR.
  * @GCQ_CMD_FLAG_REPO_TYPE_TEMP: Command relates to the temperature SDR.
@@ -103,9 +103,9 @@ enum gcq_submit_cmd_flags {
 };
 
 /**
- * enum gcq_submit_cmd_req - Type of GCQ command to submit
+ * enum gcq_submit_cmd_req - Type of sGCQ command to submit
  * @GCQ_SUBMIT_CMD_RSVD: Reserved
- * @CQ_SUBMIT_CMD_GET_GCQ_VERSION: Get GCQ vesion
+ * @CQ_SUBMIT_CMD_GET_GCQ_VERSION: Get sGCQ vesion
  * @GCQ_SUBMIT_CMD_GET_SDR_SIZE: Get SDR size
  * @GCQ_SUBMIT_CMD_GET_SDR: Get SDR
  * @GCQ_SUBMIT_CMD_DOWNLOAD_PDI: Download PDI
@@ -429,7 +429,7 @@ struct sdr_record {
 	uint8_t unit_type;
 	uint8_t unit_len;
 	uint8_t unit[SDR_VALUE_MAX_LEN];
-	char	unit_mod;
+	char    unit_mod;
 	uint8_t threshold_support;
 	uint8_t lower_fatal_limit[SDR_THRESHOLD_MAX_LEN];
 	uint8_t lower_crit_limit[SDR_THRESHOLD_MAX_LEN];
@@ -464,9 +464,9 @@ struct fpt_header {
  * @partition_size: Partition size
  */
 struct fpt_partition {
-	uint32_t	type;
-	uint32_t	base_addr;
-	uint32_t	partition_size;
+	uint32_t type;
+	uint32_t base_addr;
+	uint32_t partition_size;
 };
 
 /**
@@ -475,10 +475,10 @@ struct fpt_partition {
  * @partition: List of partitions
  */
 struct fpt_record {
-	struct fpt_header	hdr_primary;
-	struct fpt_partition	*partition_primary;
-	struct fpt_header	hdr_secondary;
-	struct fpt_partition	*partition_secondary;
+	struct fpt_header     hdr_primary;
+	struct fpt_partition  *partition_primary;
+	struct fpt_header     hdr_secondary;
+	struct fpt_partition  *partition_secondary;
 };
 
 /**
@@ -580,6 +580,16 @@ struct amc_status {
 };
 
 /**
+ * struct amc_uuid - Stores AMC UUID information - part of the partition table.
+ * @amc_uuid_off:     the offset of amc device status
+ * @amc_uuid_len:     the length of amc device status
+ */
+struct amc_uuid {
+	uint32_t	amc_uuid_off;
+	uint32_t	amc_uuid_len;
+};
+
+/**
  * struct amc_log_msg - Stores AMC logs and information - part of the partition table.
  * @log_msg_index:      the current index of ring buffer log
  * @log_msg_buf_off:    the offset of dbg log
@@ -602,13 +612,14 @@ struct amc_data {
 };
 
 /**
- * struct amc_shared_mem - GCQ memory partition table, should be positioned at shared memory offset 0,
+ * struct amc_shared_mem - sGCQ memory partition table, should be positioned at shared memory offset 0,
  *     and initialized by AMC software on RPU device.
  * We use the memory partition table for sharing info between host and RPU.
  * Including:
  * @amc_magic_no:       magic number.
  * @amc_ring_buffer:    ring buffer struct.
  * @amc_status:         amc status struct.
+ * @amc_uuid:           amc uuid struct.
  * @amc_log_msg:        amc log struct.
  * @amc_data:           amc data struct.
  */
@@ -616,6 +627,7 @@ struct amc_shared_mem {
 	uint32_t		amc_magic_no;
 	struct amc_ring_buffer	ring_buffer;
 	struct amc_status	status;
+	struct amc_uuid		uuid;
 	struct amc_log_msg	log_msg;
 	struct amc_data		data;
 };
@@ -639,12 +651,12 @@ struct amc_version {
 /**
  * struct amc_control_ctxt - context for the AMC.
  * @pcie_dev: the physical function
+ * @gcq_base_virt_addr: the virtual sq base address
  * @gcq_payload_base_virt_addr: payload virtual base address
- * @gcq_base_virt_addr: the virtual base address
- * @amc_shared_mem: the shared memory base address
  * @gcq_ring_buf_base_virt_addr: the ring buffer virtual address
+ * @amc_shared_mem: the shared memory base address
  * @fw_if_cfg: fal configuration
- * @fw_if_gcq_consumer: handle to the GCQ consumer
+ * @fw_if_gcq_consumer: handle to the sGCQ consumer
  * @lock: lock to protect cid creation
  * @gcq_cmd_lock: protect concurrent gcq commands
  * @gcq_halted: block/allow request messages
@@ -664,26 +676,26 @@ struct amc_version {
  */
 struct amc_control_ctxt {
 	struct pci_dev		*pcie_dev;
-	void __iomem		*gcq_payload_base_virt_addr;
 	void __iomem		*gcq_base_virt_addr;
-	struct amc_shared_mem	amc_shared_mem;
+	void __iomem		*gcq_payload_base_virt_addr;
 	void __iomem		*gcq_ring_buf_base_virt_addr;
-	FW_IF_CFG		fw_if_cfg;
+	struct amc_shared_mem	amc_shared_mem;
+	FW_IF_CFG			fw_if_cfg;
 	FW_IF_GCQ_CFG		fw_if_gcq_consumer;
 	struct mutex		lock;
 	struct mutex		gcq_cmd_lock;
-	bool			gcq_halted;
+	bool				gcq_halted;
 	struct semaphore	gcq_log_page_sema;
 	struct semaphore	gcq_data_sema;
 	struct amc_version	version;
 	struct task_struct	*heartbeat_thread;
-	bool			heartbeat_thread_created;
+	bool				heartbeat_thread_created;
 	amc_event_callback	event_cb;
-	void			*event_cb_data;
+	void				*event_cb_data;
 	struct task_struct	*logging_thread;
-	bool			logging_thread_created;
-	int			last_printed_msg_index;
-	bool			compat_mode;
+	bool				logging_thread_created;
+	int					last_printed_msg_index;
+	bool				compat_mode;
 };
 
 
@@ -735,15 +747,15 @@ void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt);
  * setup_amc() - Init setup & configuration for the AMC.
  * @dev: the pci device.
  * @amc_ctrl_ctxt: Pointer to top level AMC data struct.
- * @ep_gcq: The rpu endpoint info.
- * @ep_gcq_payload: The mgmt endpoint info.
+ * @ep_gcq: The mgmt endpoint info.
  * @event_cb: Callback to be invoked when event occurs.
  * @event_cb_data: Private data to be passed into the event callback.
  *
  * Return: 0 or negative error code.
  */
-int setup_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt, endpoint_info_struct ep_gcq,
-	      endpoint_info_struct ep_gcq_payload, amc_event_callback event_cb, void *event_cb_data);
+int setup_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt,
+			endpoint_info_struct ep_gcq,
+			amc_event_callback event_cb, void *event_cb_data);
 
 /**
  * unset_amc() - Stop the service, close proxy and tidy up PCI

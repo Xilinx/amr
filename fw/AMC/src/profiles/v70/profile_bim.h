@@ -5,7 +5,6 @@
  * This file contains the bim profile for the V70
  *
  * @file profile_bim.h
- *
  */
 
 #ifndef _PROFILE_BIM_H_
@@ -89,4 +88,4 @@ BIM_MODULES PROFILE_BIM_MODULE_DATA[ MAX_AMC_CFG_UNIQUE_ID ] =
       MAX_AMI_PROXY_DRIVER_EVENTS }
 };
 
-#endif
+#endif /* _PROFILE_BIM_H_ */

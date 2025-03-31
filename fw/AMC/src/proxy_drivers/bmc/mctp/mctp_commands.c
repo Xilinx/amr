@@ -5,7 +5,6 @@
  * This file contains the MCTP message handling functions
  *
  * @file mctp_commands.c
- *
  */
 
 

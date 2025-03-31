@@ -5,7 +5,6 @@
  * This file contains the EMMC driver debug implementation
  *
  * @file emmc_debug.c
- *
  */
 
 #include "standard.h"

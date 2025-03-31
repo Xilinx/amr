@@ -5,7 +5,6 @@
  * This file contains the System Monitoring (SYS_MON) debug implementation
  *
  * @file sys_mon_debug.c
- *
  */
 
 #include "standard.h"

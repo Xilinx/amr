@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_internal.h - This file contains generic private API definitions
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_INTERNAL_H
@@ -103,7 +103,7 @@ extern volatile enum ami_error ami_last_error;
  * @buf: String buffer to convert from.
  * @base: Base of the number
  * @out: Pointer to output variable
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_convert_num(const char *buf, int base, long *out);
@@ -123,7 +123,7 @@ int ami_msleep(long msec);
  *
  * Prefer to use the AMI_API_ERROR and AMI_API_ERROR_M macros instead of
  * calling this function directly.
- * 
+ *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR
  */
 int ami_set_last_error(enum ami_error err, const char *ctxt, ...);

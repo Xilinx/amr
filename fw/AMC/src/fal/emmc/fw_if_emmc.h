@@ -5,7 +5,6 @@
 * This header file contains the FW IF EMMC abstraction definitions.
 *
 * @file fw_if_emmc.h
-*
 */
 
 #ifndef _FW_IF_EMMC_H_
@@ -44,9 +43,9 @@ typedef enum FW_IF_EMMC_IOCTRL
 {
     FW_IF_EMMC_IOCTRL_PRINT_INSTANCE_DETAILS = MAX_FW_IF_COMMON_IOCTRL_OPTION,
     FW_IF_EMMC_IOCTRL_ERASE_ALL,
-                            
+
     MAX_FW_IF_EMMC_IOCTRL_OPTION
-                                    
+
 } FW_IF_EMMC_IOCTRL;
 
 /**
@@ -138,4 +137,4 @@ extern int iFW_IF_EMMC_PrintStatistics( void );
  */
 extern int iFW_IF_EMMC_ClearStatistics( void );
 
-#endif
+#endif /* _FW_IF_EMMC_H_ */

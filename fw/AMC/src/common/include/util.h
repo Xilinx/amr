@@ -5,7 +5,6 @@
  * This file contains the utility definitions for the AMC
  *
  * @file util.h
- *
  */
 
 #ifndef _UTIL_H_
@@ -57,4 +56,4 @@
 
 #define UTIL_ELAPSED_TIME_MS( x ) ( ulOSAL_GetUptimeMs() - x );
 
-#endif
+#endif /* _UTIL_H_ */

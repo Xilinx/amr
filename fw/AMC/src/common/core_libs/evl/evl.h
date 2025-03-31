@@ -5,7 +5,6 @@
  * This file contains the public API for the Event Library
  *
  * @file evl.h
- *
  */
 
 #ifndef _EVL_H_
@@ -155,4 +154,4 @@ int iEVL_PrintLog( void );
  */
 void vEVL_SetVerbosity( int iVerbosity );
 
-#endif
+#endif /* _EVL_H_ */

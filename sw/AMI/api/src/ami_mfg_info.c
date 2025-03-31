@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_mfg_info.c - This file contains the public interface for board info logic.
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/
@@ -78,12 +78,12 @@ int ami_mfg_get_info(ami_device *dev, enum ami_mfg_field field,
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	/* Get the sysfs field name */
 	field_name = get_name_for_mfg_field(field);
 	if (!field_name || !strlen(field_name))
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
-	
+
 	if (ami_read_sysfs(dev, field_name, raw_buf) == AMI_STATUS_OK) {
 		/* Strip newline */
 		raw_buf[strcspn(raw_buf, "\r\n")] = 0;

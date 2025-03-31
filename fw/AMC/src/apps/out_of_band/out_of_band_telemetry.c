@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the amc oo band telemetry implementation
@@ -123,16 +123,16 @@ typedef struct OUT_OF_BAND_PRIVATE_DATA
 
 static OUT_OF_BAND_PRIVATE_DATA xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall      */
-    FALSE,                                                                     /* iInitialised         */
-    NULL,                                                                      /* pvOsalMutexHdl       */
+    UPPER_FIREWALL,             /* ulUpperFirewall      */
+    FALSE,                      /* iInitialised         */
+    NULL,                       /* pvOsalMutexHdl       */
     {
         0
-    },                                                                         /* pulStatCounters       */
+    },                          /* pulStatCounters       */
     {
         0
-    },                                                                         /* pulErrorCounters      */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall      */
+    },                          /* pulErrorCounters      */
+    LOWER_FIREWALL              /* ulLowerFirewall      */
 };
 static OUT_OF_BAND_PRIVATE_DATA *pxThis = &xLocalData;
 

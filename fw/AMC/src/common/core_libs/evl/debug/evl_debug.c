@@ -5,7 +5,6 @@
  * This file contains the Event Library (EVL) debug implementation
  *
  * @file evl_debug.c
- *
  */
 
 #include "standard.h"

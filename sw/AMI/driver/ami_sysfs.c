@@ -2,7 +2,7 @@
 /*
  * ami_sysfs.c - This file contains sysfs-related logic for the AMI driver.
  *
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/device.h>

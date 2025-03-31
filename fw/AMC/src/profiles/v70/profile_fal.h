@@ -5,7 +5,6 @@
  * This file contains the fal profile for the V70
  *
  * @file profile_fal.h
- *
  */
 
 #ifndef _PROFILE_FAL_H_
@@ -72,4 +71,4 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus );
  */
 void vFAL_DebugInitialise( void );
 
-#endif
+#endif /* _PROFILE_FAL_H_ */

@@ -5,7 +5,6 @@
  * This file contains the profile debug menu for the Rave
  *
  * @file profile_debug_menu.h
- *
  */
 
 /*****************************************************************************/

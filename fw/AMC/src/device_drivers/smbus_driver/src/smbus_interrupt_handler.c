@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the interrupt handler function which must be bound by
@@ -8,7 +8,6 @@
  * which in turn will drive the state machine
  *
  * @file smbus_interrupt_handler.c
- *
  */
 
 #include "smbus.h"
@@ -47,12 +46,10 @@ static uint8_t ucSMBusDetermineInstanceFromTargetAddress( SMBUS_PROFILE_TYPE* px
 static void prvvSMBusClearInterrupts( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulISR_RegisterValue,
                                     uint32_t ulERR_ISR_RegisterValue );
 
-/*******************************************************************************
-*
+/**
 * @brief    Walk through the list of active instances and determine which
 *           instance the address corresponds to
-*
-*******************************************************************************/
+*/
 static uint8_t ucSMBusDetermineInstanceFromTargetAddress( SMBUS_PROFILE_TYPE* pxSMBusProfile )
 {
     uint8_t ucInstance = SMBUS_INVALID_INSTANCE;
@@ -75,15 +72,13 @@ static uint8_t ucSMBusDetermineInstanceFromTargetAddress( SMBUS_PROFILE_TYPE* px
         }
     }
 
-    return ( ucInstance );
+    return ucInstance;
 }
 
-/*******************************************************************************
-*
+/**
 * @brief    Function clears any set bits in the ISR and ERR_ISR registers
-*
-*******************************************************************************/
-static void prvvSMBusClearInterrupts( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulISR_RegisterValue, 
+*/
+static void prvvSMBusClearInterrupts( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32_t ulISR_RegisterValue,
                                     uint32_t ulERR_ISR_RegisterValue )
 {
     if( NULL != pxSMBusProfile )
@@ -94,14 +89,12 @@ static void prvvSMBusClearInterrupts( SMBUS_PROFILE_TYPE* pxSMBusProfile, uint32
     }
 }
 
-/*******************************************************************************
-*
+/**
 * @brief    Function will be a callback called from the interrupt handler
 *           It will determine what interrupts are present from those add
 *           events on the event queue and then trigger the handling of the
 *           events by the state machine
-*
-*******************************************************************************/
+*/
 void vSMBusInterruptHandler( void* pvCallBackRef )
 {
     uint32_t ulISR_RegisterValue        = 0;
@@ -123,7 +116,7 @@ void vSMBusInterruptHandler( void* pvCallBackRef )
             ( SMBUS_SMBDAT_LOW_TIMEOUT_DETECTED != ulSMBusHWReadPHYStatusSMBDATLowTimeout( pxSMBusProfile ) ) )
         {
             /* Re-enable all ERR_IRQ_IER interrupts */
-            vSMBusHWWriteERRIRQIER( pxSMBusProfile, 0x000FFFFF );   
+            vSMBusHWWriteERRIRQIER( pxSMBusProfile, 0x000FFFFF );
         }
 
         /* Disable the interrupt */
@@ -158,7 +151,7 @@ void vSMBusInterruptHandler( void* pvCallBackRef )
             }
         }
 
-        vLogAddEntry( pxSMBusProfile, SMBUS_LOG_LEVEL_INFO, 
+        vLogAddEntry( pxSMBusProfile, SMBUS_LOG_LEVEL_INFO,
                         SMBUS_INSTANCE_UNDETERMINED, SMBUS_LOG_EVENT_INTERRUPT_EVENT, ulISR_RegisterValue, ulERR_ISR_RegisterValue );
 
         if( 0 != ( ( ulInterruptVector ) & ( SMBUS_INTERRUPT_TGT_INTERRUPTS | SMBUS_INTERRUPT_ERROR_IRQ ) ) )

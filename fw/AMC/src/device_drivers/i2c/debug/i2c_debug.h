@@ -5,7 +5,6 @@
  * This file contains the i2c driver debug access
  *
  * @file i2c_debug.h
- *
  */
 
 #ifndef _I2C_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the i2c driver debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vI2C_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _I2C_DEBUG_H_ */
 

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami.h - This file contains generic public API definitions
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_H
@@ -118,12 +118,12 @@ enum ami_boot_devices {
  * @status: Event status
  * @ctr: Data read back from the event file descriptor
  * @data: Generic data pointer - may be NULL (depends on function)
- * 
+ *
  * Some API functions accept an event handler to receive AMI driver events.
  * This can be useful, for example, for tracking the progress of long running
  * commands, such as PDI downloads. Note that this function will be called
  * from within a thread.
- * 
+ *
  * Return: None
  */
 typedef void (*ami_event_handler)(enum ami_event_status status, uint64_t ctr, void *data);
@@ -170,11 +170,11 @@ int ami_get_api_version(struct ami_version *ami_version);
 
 /**
  * ami_get_last_error() - Get a human readable string of the last error code.
- * 
+ *
  * This function should only be called if the function you called returned
  * AMI_STATUS_ERROR - otherwise, you may get the string for an error
  * from a previous, unrelated function call.
- * 
+ *
  * Return: Error code string.
  */
 const char *ami_get_last_error(void);
@@ -182,7 +182,7 @@ const char *ami_get_last_error(void);
 /**
  * ami_parse_bdf() - Parse a BDF string into a uint16 representation.
  * @bdf: String representation of the BDf to parse
- * 
+ *
  * Note that this function tries to parse as much of a BDF string as it can.
  * This means that if the string "c1" is given, it will assume that the bus
  * number is 0xC1, while the device and function are both 0.

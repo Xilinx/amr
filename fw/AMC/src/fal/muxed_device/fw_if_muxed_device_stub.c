@@ -5,7 +5,6 @@
  * This file contains the FW IF QSFP Stub abstraction.
  *
  * @file fw_if_qsfp_stub.c
- *
  */
 
 /*****************************************************************************/

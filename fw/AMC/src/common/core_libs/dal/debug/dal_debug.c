@@ -5,7 +5,6 @@
  * This file contains the Debug Access Library (DAL) debug implementation
  *
  * @file dal_debug.c
- *
  */
 
 #include "standard.h"
@@ -60,42 +59,42 @@ static void vClearStats( void );
 
 /**
  * @brief   Debug function to check iDAL_GetInt
- * 
+ *
  * @return N/A
  */
 static void vGetInt( void );
 
 /**
  * @brief   Debug function to check iDAL_GetIntInRange
- * 
+ *
  * @return N/A
  */
 static void vGetIntInRange( void );
 
 /**
  * @brief   Debug function to check iDAL_GetFloat
- * 
+ *
  * @return N/A
  */
 static void vGetFloat( void );
 
 /**
  * @brief   Debug function to check iDAL_GetFloatInRange
- * 
+ *
  * @return N/A
  */
 static void vGetFloatInRange( void );
 
 /**
  * @brief   Debug function to check iDAL_GetHex
- * 
+ *
  * @return N/A
  */
 static void vGetHex( void );
 
 /**
  * @brief   Debug function to check iDAL_GetHexInRange
- * 
+ *
  * @return N/A
  */
 static void vGetHexInRange( void );
@@ -103,7 +102,7 @@ static void vGetHexInRange( void );
 
 /**
  * @brief   Debug function to check iDAL_GetString
- * 
+ *
  * @return N/A
  */
 static void vGetString( void );
@@ -144,7 +143,7 @@ void vDAL_DebugInit( DAL_HDL pxParentHandle )
                 pxDAL_NewDebugFunction( "iDAL_GetHex", pxDalGetDir, vGetHex );
                 pxDAL_NewDebugFunction( "iDAL_GetHexInRange", pxDalGetDir, vGetHexInRange );
                 pxDAL_NewDebugFunction( "iDAL_GetString", pxDalGetDir, vGetString );
-            }            
+            }
         }
 
         iIsInitialised = TRUE;

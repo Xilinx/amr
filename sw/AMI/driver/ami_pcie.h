@@ -2,7 +2,7 @@
 /*
  * ami_pcie.h - This file contains PCI reading/writing definitions.
  *
- * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_PCIE_H
@@ -35,6 +35,7 @@
  * @AMI_PCIE_DEVICE_ID_VCK5000_PF0: VCK5000 PF0
  * @AMI_PCIE_DEVICE_ID_V80: V80
  * @AMI_PCIE_DEVICE_ID_V80P: V80P
+ * @AMI_PCIE_DEVICE_ID_RAVE: RAVE
  *
  * Note, if you want the driver to pick up these ID's they must be added to
  * the array at the top of `ami_pcie.c`.
@@ -59,8 +60,8 @@ enum AMI_PCIE_DEVICE_ID {
 
 #define CAP_NOT_FOUND 0
 
-#define PCI_GPIO_RESET_OFFSET               (0x1040000)
-#define PCI_GPIO_RESET_BAR                  (0)
+#define PCI_GPIO_RESET_OFFSET               (0x4000)
+#define PCI_GPIO_RESET_BAR                  (1)
 
 /* Command Register Offsets */
 #define  PCI_COMMAND_IO_OFFSET              0x0
@@ -90,15 +91,15 @@ enum AMI_PCIE_DEVICE_ID {
 #define  PCI_STATUS_DETECTED_PARITY_OFFSET  0xF
 
 /* Class Revision Register Offsets */
-#define PCI_CLASS_REVISION_ID           0x0
-#define PCI_CLASS_REVISION_PROG_IF      0x8
-#define PCI_CLASS_REVISION_SUBCLASS     0x10
-#define PCI_CLASS_REVISION_CLASSCODE    0x18
+#define PCI_CLASS_REVISION_ID               0x0
+#define PCI_CLASS_REVISION_PROG_IF          0x8
+#define PCI_CLASS_REVISION_SUBCLASS         0x10
+#define PCI_CLASS_REVISION_CLASSCODE        0x18
 
-#define PCI_CLASS_REVISION_ID_MASK              0xFF
-#define PCI_CLASS_REVISION_PROG_IF_MASK         0xFF
-#define PCI_CLASS_REVISION_SUBCLASS_MASK        0xFF
-#define PCI_CLASS_REVISION_CLASSCODE_MASK       0xFF
+#define PCI_CLASS_REVISION_ID_MASK          0xFF
+#define PCI_CLASS_REVISION_PROG_IF_MASK     0xFF
+#define PCI_CLASS_REVISION_SUBCLASS_MASK    0xFF
+#define PCI_CLASS_REVISION_CLASSCODE_MASK   0xFF
 
 #define CLASS_CODE_PROCESSING_ACCELERATOR   0x12
 
@@ -296,17 +297,17 @@ enum AMI_PCIE_DEVICE_ID {
 #define PCIE_CAP_LINK_CAPABILITIES_ASPM_OPTIONAL_COMPLIANCE_OFFSET  0x16
 #define PCIE_CAP_LINK_CAPABILITIES_PORT_NUM_OFFSET                  0x18
 
-#define PCIE_CAP_LINK_CAPABILITIES_MAX_LINK_SPEED_MASK                     0x0F
-#define PCIE_CAP_LINK_CAPABILITIES_MAX_PCIE_CAP_LINK_WIDTH_MASK            0x3F
-#define PCIE_CAP_LINK_CAPABILITIES_PCIE_CAP_ASPM_SUPPORT_MASK              0x03
-#define PCIE_CAP_LINK_CAPABILITIES_L0_EXIT_LATENCY_MASK                    0x07
-#define PCIE_CAP_LINK_CAPABILITIES_L1_EXIT_LATENCY_MASK                    0x07
-#define PCIE_CAP_LINK_CAPABILITIES_CLK_PWR_MGMNT_MASK                      0x01
-#define PCIE_CAP_LINK_CAPABILITIES_SURP_DOWN_ERR_REPORT_CAP_MASK           0x01
-#define PCIE_CAP_LINK_CAPABILITIES_DLLL_ACTIVE_REPORT_CAP_MASK             0x01
-#define PCIE_CAP_LINK_CAPABILITIES_LINK_BW_NOT_CAP_MASK                    0x01
-#define PCIE_CAP_LINK_CAPABILITIES_ASPM_OPTIONAL_COMPLIANCE_MASK           0x01
-#define PCIE_CAP_LINK_CAPABILITIES_PORT_NUM_MASK                           0xFF
+#define PCIE_CAP_LINK_CAPABILITIES_MAX_LINK_SPEED_MASK              0x0F
+#define PCIE_CAP_LINK_CAPABILITIES_MAX_PCIE_CAP_LINK_WIDTH_MASK     0x3F
+#define PCIE_CAP_LINK_CAPABILITIES_PCIE_CAP_ASPM_SUPPORT_MASK       0x03
+#define PCIE_CAP_LINK_CAPABILITIES_L0_EXIT_LATENCY_MASK             0x07
+#define PCIE_CAP_LINK_CAPABILITIES_L1_EXIT_LATENCY_MASK             0x07
+#define PCIE_CAP_LINK_CAPABILITIES_CLK_PWR_MGMNT_MASK               0x01
+#define PCIE_CAP_LINK_CAPABILITIES_SURP_DOWN_ERR_REPORT_CAP_MASK    0x01
+#define PCIE_CAP_LINK_CAPABILITIES_DLLL_ACTIVE_REPORT_CAP_MASK      0x01
+#define PCIE_CAP_LINK_CAPABILITIES_LINK_BW_NOT_CAP_MASK             0x01
+#define PCIE_CAP_LINK_CAPABILITIES_ASPM_OPTIONAL_COMPLIANCE_MASK    0x01
+#define PCIE_CAP_LINK_CAPABILITIES_PORT_NUM_MASK                    0xFF
 
 #define PCIE_CAP_LINK_STATUS_CUR_LINK_SPEED_OFFSET              0x00
 #define PCIE_CAP_LINK_STATUS_NEG_PCIE_CAP_LINK_WIDTH_OFFSET     0x04
@@ -578,21 +579,21 @@ enum AMI_PCIE_DEVICE_ID {
 /*
  * PCI Code and ID Assignment Specification as per Rev 1.1 (Codes not included in pci_regs.h)
  */
-#define PCI_EXT_CAP_ID_LANE_MERGE_REC          0x27     /* Lane merging at receiver */
-#define PCI_EXT_CAP_ID_HIERARCHY_ID            0x28     /* Hierarchy ID */
-#define PCI_EXT_CAP_ID_NPEM                    0x29     /* Native PCIe enclosure management */
-#define PCI_EXT_CAP_ID_PHY_LAYER_32_GTS        0x2A     /* Physical Layer 32.0 GT/s */
-#define PCI_EXT_CAP_ID_ALT_PROTOCOL            0x2B     /* Alternate Protocol */
-#define PCI_EXT_CAP_SFI                        0x2C     /* System Firmware Intermediary */
+#define PCI_EXT_CAP_ID_LANE_MERGE_REC   0x27 /* Lane merging at receiver */
+#define PCI_EXT_CAP_ID_HIERARCHY_ID     0x28 /* Hierarchy ID */
+#define PCI_EXT_CAP_ID_NPEM             0x29 /* Native PCIe enclosure management */
+#define PCI_EXT_CAP_ID_PHY_LAYER_32_GTS 0x2A /* Physical Layer 32.0 GT/s */
+#define PCI_EXT_CAP_ID_ALT_PROTOCOL     0x2B /* Alternate Protocol */
+#define PCI_EXT_CAP_SFI                 0x2C /* System Firmware Intermediary */
 
 /* CG added */
 
-#define PCI_STATUS_IMM_READY    0x01                    /* Immediate Readiness */
+#define PCI_STATUS_IMM_READY    0x01         /* Immediate Readiness */
 
-#define PCI_EXT_CAP_ID_L1SS                   0x1E      /* L1 PM Substates */
-#define PCI_EXT_CAP_ID_PTM                    0x1F      /* Precision Time Measurement */
-#define PCI_EXT_CAP_ID_DLF                    0x25      /* Data Link Feature */
-#define PCI_EXT_CAP_ID_PL_16GT                0x26      /* Physical Layer 16.0 GT/s */
+#define PCI_EXT_CAP_ID_L1SS             0x1E /* L1 PM Substates */
+#define PCI_EXT_CAP_ID_PTM              0x1F /* Precision Time Measurement */
+#define PCI_EXT_CAP_ID_DLF              0x25 /* Data Link Feature */
+#define PCI_EXT_CAP_ID_PL_16GT          0x26 /* Physical Layer 16.0 GT/s */
 
 /* Config */
 
@@ -750,20 +751,20 @@ typedef struct {
 
 typedef struct {
 	pcie_ext_header_struct	aer_header;
-	uint32_t		aer_uncorrectable_err_status_reg;
-	uint32_t		aer_uncorrectable_err_mask_reg;
-	uint32_t		aer_uncorrectable_err_sev_reg;
-	uint32_t		aer_correctable_err_status_reg;
-	uint32_t		aer_correctable_err_mask_reg;
-	uint32_t		aer_advanced_err_cap_cntrl_reg;
-	uint32_t		aer_header_log_reg[4];
-	uint32_t		aer_root_err_cmd_reg;
-	uint32_t		aer_root_err_status_reg;
-	uint32_t		aer_err_source_id_reg;
-	uint32_t		aer_first_tlp_prefix_log_reg;
-	uint32_t		aer_second_tlp_prefix_log_reg;
-	uint32_t		aer_third_tlp_prefix_log_reg;
-	uint32_t		aer_fourth_tlp_prefix_log_reg;
+	uint32_t	aer_uncorrectable_err_status_reg;
+	uint32_t	aer_uncorrectable_err_mask_reg;
+	uint32_t	aer_uncorrectable_err_sev_reg;
+	uint32_t	aer_correctable_err_status_reg;
+	uint32_t	aer_correctable_err_mask_reg;
+	uint32_t	aer_advanced_err_cap_cntrl_reg;
+	uint32_t	aer_header_log_reg[4];
+	uint32_t	aer_root_err_cmd_reg;
+	uint32_t	aer_root_err_status_reg;
+	uint32_t	aer_err_source_id_reg;
+	uint32_t	aer_first_tlp_prefix_log_reg;
+	uint32_t	aer_second_tlp_prefix_log_reg;
+	uint32_t	aer_third_tlp_prefix_log_reg;
+	uint32_t	aer_fourth_tlp_prefix_log_reg;
 } pcie_ext_cap_aer_struct;
 
 typedef struct {
@@ -785,12 +786,12 @@ typedef struct {
 
 typedef struct {
 	pcie_ext_header_struct	phy_16_gts_header;
-	uint32_t		phy_16_gts_cap_reg;
-	uint32_t		phy_16_gts_cntrl_reg;
-	uint32_t		phy_16_gts_status_reg;
-	uint32_t		phy_16_gts_local_parity_mismatch_status_reg;
-	uint32_t		phy_16_gts_first_data_parity_mismatch_status_reg;
-	uint32_t		phy_16_gts_second_data_parity_mismatch_status_reg;
+	uint32_t	phy_16_gts_cap_reg;
+	uint32_t	phy_16_gts_cntrl_reg;
+	uint32_t	phy_16_gts_status_reg;
+	uint32_t	phy_16_gts_local_parity_mismatch_status_reg;
+	uint32_t	phy_16_gts_first_data_parity_mismatch_status_reg;
+	uint32_t	phy_16_gts_second_data_parity_mismatch_status_reg;
 } pcie_ext_cap_phy_16_gts_struct;
 
 typedef struct {
@@ -959,10 +960,10 @@ int write_pcie_bar(struct pci_dev *dev, uint8_t bar_idx, uint64_t offset, uint32
 								      PCIE_CAP_MSI_MSG_CTRL_CONFIG_EN_MASK)
 #define get_pcie_cap_msi_msg_ctrl_mul_msg_cap(msi_config_status)     ((msi_config_status >> \
 								       PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_CAP_OFFSET)& \
-								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_CAP_MASK)                                                                    /* Max interrupt vectors the function is capable of supporting */
+								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_CAP_MASK)    /* Max interrupt vectors the function is capable of supporting */
 #define get_pcie_cap_msi_msg_ctrl_mul_msg_en(msi_config_status)      ((msi_config_status >> \
 								       PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_EN_OFFSET)& \
-								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_EN_MASK)                                                                    /* Num of Interrupt vectors the function is supporting */
+								      PCIE_CAP_MSI_MSG_CTRL_MUL_MSG_EN_MASK)     /* Num of Interrupt vectors the function is supporting */
 #define get_pcie_cap_msi_msg_ctrl_64_bit_addr(msi_config_status)     ((msi_config_status >> \
 								       PCIE_CAP_MSI_MSG_CTRL_64_BIT_ADDR_OFFSET)& \
 								      PCIE_CAP_MSI_MSG_CTRL_64_BIT_ADDR_MASK)

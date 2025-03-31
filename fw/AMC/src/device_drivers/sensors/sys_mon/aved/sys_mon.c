@@ -6,7 +6,6 @@
  * sensor.
  *
  * @file sys_mon.c
- *
  */
 
 /******************************************************************************/
@@ -169,7 +168,6 @@ int iSYS_MON_Initialise( void )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION );
     }
-
     return iStatus;
 }
 
@@ -221,7 +219,6 @@ int iSYS_MON_ReadTemperature( float *pfTemperatureInC )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION );
     }
-
     return iStatus;
 }
 
@@ -251,37 +248,37 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
                 iMappedVType = VCCAUX;
                 break;
             case SYS_MON_VOLTAGES_VCCSOC:
-                iMappedVType = VCCSOC;
+                iMappedVType = VCC_SOC;
                 break;
             case SYS_MON_VOLTAGES_VCCO302:
-                iMappedVType = VCCO302;
+                iMappedVType = VCCO_302;
                 break;
             case SYS_MON_VOLTAGES_VCCAUXPMC:
-                iMappedVType = VCCAUXPMC;
+                iMappedVType = VCCAUX_PMC;
                 break;
             case SYS_MON_VOLTAGES_VCCO500:
-                iMappedVType = VCCO500;
+                iMappedVType = VCCO_500;
                 break;
             case SYS_MON_VOLTAGES_VCCPMC:
-                iMappedVType = VCCPMC;
+                iMappedVType = VCC_PMC;
                 break;
             case SYS_MON_VOLTAGES_VCCPSFP:
-                iMappedVType = VCCPSFP;
+                iMappedVType = VCC_PSFP;
                 break;
             case SYS_MON_VOLTAGES_VCCPSLP:
-                iMappedVType = VCCPSLP;
+                iMappedVType = VCC_PSLP;
                 break;
             case SYS_MON_VOLTAGES_VPVN:
-                iMappedVType = VPVN;
+                iMappedVType = VP_VN;
                 break;
             case SYS_MON_VOLTAGES_VCCO703:
-                iMappedVType = VCCO703;
+                iMappedVType = VCCO_703;
                 break;
             case SYS_MON_VOLTAGES_VAUXCH0:
-                iMappedVType = VAUXCH0;
+                iMappedVType = VAUX_CH0;
                 break;
             case SYS_MON_VOLTAGES_VCCAUXSMON:
-                iMappedVType = VCCAUXPMC;
+                iMappedVType = VCCAUX_PMC;
                 break;
 #else
             case SYS_MON_VOLTAGES_VCCAUX:
@@ -331,7 +328,6 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION );
     }
-
     return iStatus;
 }
 
@@ -365,7 +361,6 @@ int iSYS_MON_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION )
     }
-
     return iStatus;
 }
 
@@ -388,7 +383,6 @@ int iSYS_MON_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( SYS_MON_ERRORS_VALIDATION )
     }
-
     return iStatus;
 }
 

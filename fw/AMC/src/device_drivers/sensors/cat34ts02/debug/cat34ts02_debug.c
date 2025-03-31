@@ -5,7 +5,6 @@
  * This file contains the CAT34TS02 debug implementation
  *
  * @file cat34ts02_debug.c
- *
  */
 
 #include "standard.h"
@@ -80,7 +79,7 @@ void vCAT34TS02_DebugInit( DAL_HDL pxParentHandle )
         {
             pxCat34ts02Top = pxDAL_NewSubDirectory( "cat34ts02", pxParentHandle );
         }
-        
+
         if( NULL != pxCat34ts02Top )
         {
             pxDAL_NewDebugFunction( "print_stats",    pxCat34ts02Top, vPrintStats );

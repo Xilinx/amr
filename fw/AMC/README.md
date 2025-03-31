@@ -1,4 +1,4 @@
-Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: MIT
 
 # AVED Management Control (AMC)
@@ -7,7 +7,7 @@ Refer to https://pages.gitenterprise.xilinx.com/XBB/AMC/ for the Architecture an
 
 ## Overview
 
-The AVED Management Controller (AMC) provides management and control of the AVED RPU. Its basic features include, but are not limited to:
+The AVED Management Controller (AMC) provides management and control of the AMR on RPU-0. Its basic features include, but are not limited to:
 
 - In-Band Telemetry
 - Built in Monitoring 
@@ -47,7 +47,7 @@ module switch xilinx/ta/<selected_version>
 
 To build from clean:
 ```
-$ ./scripts/build.sh -os <target os (freertos10_xilinx, standalone etc.)> -profile <target profile (v70, v80 etc.)> -xsa <path to xsa>
+$ ./scripts/build.sh -os <target os (freertos10_xilinx, standalone etc.)> -profile <target profile (v70, v80, rave etc.)> -xsa <path to xsa>
 ```
 -xsa parameter is not required for Linux builds, or if building with the "-amc" option.
 

@@ -5,7 +5,6 @@
  * This file contains the (OSAL) API implementation for FreeRTOS.
  *
  * @file osal_FreeRTOS.c
- *
  */
 
 /*****************************************************************************/
@@ -64,8 +63,8 @@
 
 /**
  * @struct OSAL_TASK_MEMORY
- * 
- * @brief Struct to store task's stack, TCB (Task control block) and handle. 
+ *
+ * @brief Struct to store task's stack, TCB (Task control block) and handle.
  *        Used for static task allocation.
  */
 typedef struct OSAL_TASK_MEMORY
@@ -186,7 +185,7 @@ typedef struct OSAL_OS_STATS
 
 } OSAL_OS_STATS;
 
-static OSAL_OS_STATS xOsStatsHandle = 
+static OSAL_OS_STATS xOsStatsHandle =
 {
     NULL,   /* pxTaskHead */
     NULL,   /* pxSemHead */
@@ -401,7 +400,6 @@ int iOSAL_GetOsVersion( char pcOs[ OSAL_OS_NAME_LEN ],
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -433,7 +431,7 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
         ( NULL == pvGetCharMutexHandle ) &&
         ( NULL == pvMemSetSemHandle    ) &&
         ( NULL == pvMemCpySemHandle    ) &&
-        ( NULL == pvStrNCpySemHandle   ) && 
+        ( NULL == pvStrNCpySemHandle   ) &&
         ( NULL == pvMemCmpSemHandle    ) &&
         ( NULL == pvMemMoveSemHandle   ) )
     {
@@ -547,7 +545,6 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-
     return iStatus;
 }
 
@@ -684,7 +681,6 @@ int iOSAL_Task_Create( void**      ppvTaskHandle,
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-
     return iStatus;
 }
 
@@ -733,7 +729,6 @@ int iOSAL_Task_Delete( void** ppvTaskHandle )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -758,7 +753,6 @@ int iOSAL_Task_Suspend( void* pvTaskHandle )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -783,7 +777,6 @@ int iOSAL_Task_Resume( void* pvTaskHandle )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -801,7 +794,6 @@ int iOSAL_Task_SleepTicks( uint32_t ulSleepTicks )
         vTaskDelay( ( TickType_t )ulSleepTicks );
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -826,7 +818,6 @@ int iOSAL_Task_SleepMs( uint32_t ulSleepMs )
         vTaskDelay( xSleepTicks );
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -879,7 +870,6 @@ int iOSAL_Semaphore_Create( void** ppvSemHandle,
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-
     return iStatus;
 }
 
@@ -910,7 +900,6 @@ int iOSAL_Semaphore_Destroy( void** ppvSemHandle )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -963,7 +952,6 @@ int iOSAL_Semaphore_Pend( void* pvSemHandle, uint32_t ulTimeoutMs )
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -995,7 +983,6 @@ int iOSAL_Semaphore_Post( void* pvSemHandle )
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -1030,7 +1017,6 @@ int iOSAL_Semaphore_PostFromISR( void* pvSemHandle )
             portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
         }
     }
-
     return iStatus;
 }
 
@@ -1080,7 +1066,6 @@ int iOSAL_Mutex_Create( void**      ppvMutexHandle,
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-
     return iStatus;
 }
 
@@ -1111,7 +1096,6 @@ int iOSAL_Mutex_Destroy( void** ppvMutexHandle )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -1167,7 +1151,6 @@ int iOSAL_Mutex_Take( void*    pvMutexHandle,
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -1203,7 +1186,6 @@ int iOSAL_Mutex_Release( void* pvMutexHandle )
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -1259,7 +1241,6 @@ int iOSAL_MBox_Create( void**      ppvMBoxHandle,
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-
     return iStatus;
 }
 
@@ -1290,7 +1271,6 @@ int iOSAL_MBox_Destroy( void** ppvMBoxHandle )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -1351,7 +1331,6 @@ int iOSAL_MBox_Pend( void*    pvMBoxHandle,
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -1412,7 +1391,6 @@ int iOSAL_MBox_Post( void*    pvMBoxHandle,
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -1452,7 +1430,6 @@ int iOSAL_MBox_PostFromISR( void* pvMBoxHandle, void* pvMBoxItem )
             portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
         }
     }
-
     return iStatus;
 }
 
@@ -1502,7 +1479,6 @@ int iOSAL_EventFlag_Create( void** ppvEventFlagHandle, const char* pcEventFlagNa
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-
     return iStatus;
 }
 
@@ -1533,7 +1509,6 @@ int iOSAL_EventFlag_Destroy( void** ppvEventFlagHandle )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -1582,7 +1557,6 @@ int iOSAL_EventFlag_Pend( void* pvEventFlagHandle, uint32_t ulFlagWait, uint32_t
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -1608,7 +1582,6 @@ int iOSAL_EventFlag_Post( void* pvEventFlagHandle, uint32_t ulFlagSet )
 
         iStatus = OSAL_ERRORS_NONE;
     }
-
     return iStatus;
 }
 
@@ -1643,7 +1616,6 @@ int iOSAL_EventFlag_PostFromISR( void* pvEventFlagHandle, uint32_t ulFlagSet )
             portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
         }
     }
-
     return iStatus;
 }
 
@@ -1714,7 +1686,6 @@ int iOSAL_Timer_Create( void** ppvTimerHandle,
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-
     return iStatus;
 }
 
@@ -1810,7 +1781,6 @@ int iOSAL_Timer_Start( void* pvTimerHandle, uint32_t ulDurationMs )
             }
         }
     }
-
     return iStatus;
 }
 
@@ -1839,7 +1809,6 @@ int iOSAL_Timer_Stop( void* pvTimerHandle )
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -1894,7 +1863,6 @@ int iOSAL_Timer_Reset( void* pvTimerHandle, uint32_t ulDurationMs )
             }
         }
     }
-
     return iStatus;
 }
 
@@ -1927,7 +1895,6 @@ int iOSAL_Interrupt_Setup( uint8_t ucInterruptID,
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-
     return iStatus;
 }
 
@@ -2006,7 +1973,6 @@ void* pvOSAL_MemAlloc( uint16_t xSize )
 
         pxOsStatsHandle->iMemAllocCallCount++;
     }
-
     return pvMemory;
 }
 
@@ -2039,7 +2005,6 @@ void* pvOSAL_MemSet( void* pvDestination, int iValue, uint16_t usSize )
             pvSetMemory = memset( pvDestination, iValue, ( size_t )usSize );
         }
     }
-
     return pvSetMemory;
 }
 
@@ -2073,7 +2038,6 @@ void* pvOSAL_MemCpy( void* pvDestination, const void* pvSource, uint16_t usSize 
             pvSetMemory = memcpy( pvDestination, pvSource, ( size_t )usSize );
         }
     }
-
     return pvSetMemory;
 }
 
@@ -2138,7 +2102,6 @@ void vOSAL_MemFree( void** ppv )
                 *ppv = NULL;
             }
         }
-
         pxOsStatsHandle->iMemFreeCallCount++;
     }
 }
@@ -2203,7 +2166,6 @@ char cOSAL_GetChar( void )
         /* read character, note: Not thread safe */
         cInput = inbyte();
     }
-
     return cInput;
 }
 
@@ -2214,8 +2176,8 @@ char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize
 {
     char *pcSetString = NULL;
 
-    if( ( NULL != pcDestination ) && 
-        ( NULL != pcSource ) && 
+    if( ( NULL != pcDestination ) &&
+        ( NULL != pcSource ) &&
         ( 0 < usSize ) )
     {
         if( TRUE == iOsStarted )
@@ -2238,7 +2200,6 @@ char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize
             pcSetString = strncpy( pcDestination, pcSource, ( size_t )usSize );
         }
     }
-
     return pcSetString;
 }
 
@@ -2249,7 +2210,7 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usS
 {
     int iStatus = ERROR;
 
-    if( ( NULL != pvMemoryOne ) && 
+    if( ( NULL != pvMemoryOne ) &&
         ( NULL != pvMemoryTwo ) &&
         ( 0 < usSize ) )
     {
@@ -2273,7 +2234,6 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usS
             iStatus = memcmp( pvMemoryOne, pvMemoryTwo, ( size_t )usSize );
         }
     }
-
     return iStatus;
 }
 
@@ -2296,11 +2256,10 @@ static OSAL_TASK_MEMORY* pxAllocateTaskMemory( void )
         {
             xTaskMemoryUsed[ i ] = MEM_USED;
             pxMemory = &xTaskMemoryPool[ i ];
-            break; 
+            break;
         }
     }
-
-    return pxMemory; 
+    return pxMemory;
 }
 
 /**
@@ -2399,7 +2358,6 @@ void vOSAL_ClearAllStats( void )
             free( pxTemp->pcStatus );
             vOSAL_MemFree( ( void** ) &pxTemp );
         }
-
         pxOsStatsHandle->pxTaskHead = NULL;
 
         OSAL_SEM_STATS_LINKED_LIST* pxCurrentSem = pxOsStatsHandle->pxSemHead;
@@ -2413,7 +2371,6 @@ void vOSAL_ClearAllStats( void )
             free( pxTemp->pcStatus );
             vOSAL_MemFree( ( void** )&pxTemp );
         }
-        
         pxOsStatsHandle->pxSemHead = NULL;
 
         OSAL_MUTEX_STATS_LINKED_LIST* pxCurrentMutex = pxOsStatsHandle->pxMutexHead;
@@ -2427,7 +2384,6 @@ void vOSAL_ClearAllStats( void )
             free( pxTemp->pcStatus );
             vOSAL_MemFree( ( void** )&pxTemp );
         }
-
         pxOsStatsHandle->pxMutexHead = NULL;
 
         OSAL_MBOX_STATS_LINKED_LIST* pxCurrentMailbox = pxOsStatsHandle->pxMailboxHead;
@@ -2441,7 +2397,6 @@ void vOSAL_ClearAllStats( void )
             free( pxTemp->pcStatus );
             vOSAL_MemFree( ( void** )&pxTemp );
         }
-
         pxOsStatsHandle->pxMailboxHead = NULL;
 
         OSAL_EVENT_STATS_LINKED_LIST* pxCurrentEvent = pxOsStatsHandle->pxEventHead;
@@ -2455,7 +2410,6 @@ void vOSAL_ClearAllStats( void )
             free( pxTemp->pcStatus );
             vOSAL_MemFree( ( void** )&pxTemp );
         }
-
         pxOsStatsHandle->pxEventHead = NULL;
 
         OSAL_TIMER_STATS_LINKED_LIST* pxCurrentTimer = pxOsStatsHandle->pxTimerHead;
@@ -2470,7 +2424,6 @@ void vOSAL_ClearAllStats( void )
             free( pxTemp->pcStatus );
             vOSAL_MemFree( ( void** )&pxTemp );
         }
-
         pxOsStatsHandle->pxTimerHead = NULL;
     }
 }
@@ -2934,7 +2887,6 @@ static OSAL_TASK_STATS_LINKED_LIST* pxFindTask( void* pvTaskHandle )
             pxTaskNode = pxCurrentNode;
         }
     }
-
     return pxTaskNode;
 }
 
@@ -2959,7 +2911,6 @@ static OSAL_SEM_STATS_LINKED_LIST* pxFindSem( void* pvSemHandle )
             pxSemNode = pxCurrentNode;
         }
     }
-
     return pxSemNode;
 }
 
@@ -2984,7 +2935,6 @@ static OSAL_MUTEX_STATS_LINKED_LIST* pxFindMutex( void* pvMutexHandle )
             pxMutexNode = pxCurrentNode;
         }
     }
-
     return pxMutexNode;
 }
 
@@ -3009,7 +2959,6 @@ static OSAL_MBOX_STATS_LINKED_LIST* pxFindMailbox( void* pvMailboxHandle )
             pxMailboxNode = pxCurrentNode;
         }
     }
-
     return pxMailboxNode;
 }
 
@@ -3034,7 +2983,6 @@ static OSAL_EVENT_STATS_LINKED_LIST* pxFindEvent( void* pvEventHandle )
             pxEventNode = pxCurrentNode;
         }
     }
-
     return pxEventNode;
 }
 
@@ -3059,7 +3007,6 @@ static OSAL_TIMER_STATS_LINKED_LIST* pxFindTimer( void* pvTimerHandle )
             pxTimerNode = pxCurrentNode;
         }
     }
-
     return pxTimerNode;
 }
 
@@ -3116,7 +3063,7 @@ static void vCalculateStackWatermark( void )
     {
         uxArraySize = uxTaskGetSystemState( pxTaskStatusArray, uxArraySize, &ulTotalRunTime );
 
-        int i = 0;
+        UBaseType_t i = 0;
 
         for ( i = 0; i < uxArraySize; i++ )
         {
@@ -3127,7 +3074,6 @@ static void vCalculateStackWatermark( void )
                 pxCurrent->usTaskStackWaterMark = pxCurrent->usTaskStackSize - pxTaskStatusArray[ i ].usStackHighWaterMark * sizeof( StackType_t );
             }
         }
-
         vOSAL_MemFree( ( void ** )&pxTaskStatusArray );
     }
 }
@@ -3174,7 +3120,6 @@ static void vCalculateCpuUsage( void )
 
         vOSAL_MemFree( ( void ** )&pxTaskStatusArray );
     }
-
     vOSAL_ExitCritical();
 }
 #endif

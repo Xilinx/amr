@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of the Built in Monitoring (BIM) Application.
@@ -794,8 +794,7 @@ static int iAscCallback( EVL_SIGNAL *pxSignal )
 
                         /* Call into the ASC to set the new threshold state */
                         if( OK == iASC_SetSingleSensorThresholdStatusById( pxSignal->ucInstance,
-                                                                           ASC_PROXY_DRIVER_SENSOR_THRESHOLD_STATUS_WARNING )
-                            )
+                                                                           ASC_PROXY_DRIVER_SENSOR_THRESHOLD_STATUS_WARNING ) )
                         {
                             INC_STAT_COUNTER( BIM_STATS_ASC_SENSOR_SET_THRESHOLD_STATUS_SUCCESS );
                         }
@@ -831,8 +830,7 @@ static int iAscCallback( EVL_SIGNAL *pxSignal )
 
                         /* Call into the ASC to set the new threshold state */
                         if( OK == iASC_SetSingleSensorThresholdStatusById( pxSignal->ucInstance,
-                                                                           ASC_PROXY_DRIVER_SENSOR_THRESHOLD_STATUS_CRITICAL )
-                            )
+                                                                           ASC_PROXY_DRIVER_SENSOR_THRESHOLD_STATUS_CRITICAL ) )
                         {
                             INC_STAT_COUNTER( BIM_STATS_ASC_SENSOR_SET_THRESHOLD_STATUS_SUCCESS );
                         }
@@ -868,8 +866,7 @@ static int iAscCallback( EVL_SIGNAL *pxSignal )
 
                         /* Call into the ASC to set the new threshold state */
                         if( OK == iASC_SetSingleSensorThresholdStatusById( pxSignal->ucInstance,
-                                                                           ASC_PROXY_DRIVER_SENSOR_THRESHOLD_STATUS_FATAL )
-                            )
+                                                                           ASC_PROXY_DRIVER_SENSOR_THRESHOLD_STATUS_FATAL ) )
                         {
                             INC_STAT_COUNTER( BIM_STATS_ASC_SENSOR_SET_THRESHOLD_STATUS_SUCCESS );
                         }

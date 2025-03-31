@@ -5,7 +5,6 @@
  * This file contains the OSPI driver debug implementation
  *
  * @file ospi_debug.c
- *
  */
 
 #include "standard.h"
@@ -207,7 +206,7 @@ static void vSetFlashWrite( void )
             {
                 uint32_t ulTemp = 0;
 
-                if( OK != iDAL_GetHex( "Enter byte to send (hex):", &ulTemp ) || 
+                if( OK != iDAL_GetHex( "Enter byte to send (hex):", &ulTemp ) ||
                   ( ulTemp > 0xFF ) )
                 {
                     PLL_DAL( OSPI_DBG_NAME, "Invalid input\r\n" );
@@ -240,7 +239,7 @@ static void vSetFlashWrite( void )
 static void vGetFlashRead( void )
 {
     int iLength = 0;
-    uint32_t ulAddr = 0;  
+    uint32_t ulAddr = 0;
     uint8_t *pucReadBuff = NULL;
 
     if( OK != iDAL_GetHex( "Enter address to read:", &ulAddr ) )
@@ -264,7 +263,7 @@ static void vGetFlashRead( void )
             else
             {
                 int i = 0;
-                
+
                 PLL_DAL( OSPI_DBG_NAME, "Successfully read address 0x%08X\r\n", ulAddr );
                 PLL_DAL( OSPI_DBG_NAME, "Buffer: \r\n" );
                 for(i = 0; i < iLength; i++)
@@ -279,7 +278,7 @@ static void vGetFlashRead( void )
         }
         else
         {
-            PLL_DAL( OSPI_DBG_NAME, "Malloc for read buffer failed" );    
+            PLL_DAL( OSPI_DBG_NAME, "Malloc for read buffer failed" );
         }
     }
 }

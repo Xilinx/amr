@@ -5,7 +5,6 @@
  * This file contains the (OSAL) API implementation for Linux.
  *
  * @file osal_Linux.c
- *
  */
 
 
@@ -30,7 +29,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/stat.h>
-#include <assert.h> 
+#include <assert.h>
 #include <sys/sem.h>
 #include <sys/ipc.h>
 #include <sys/types.h>
@@ -44,7 +43,7 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define DEFAULT_TASK_PRIORITY                ( 5 )  
+#define DEFAULT_TASK_PRIORITY                ( 5 )
 #define MAX_TASK_NAME_LEN                    ( 30 )
 #define NULL_CHARACTER_LEN                   ( 1 )
 #define NAME_OFFSET                          ( 1 )
@@ -138,7 +137,7 @@ typedef struct OSAL_TASK_STRUCT
  * @struct  OSAL_MAILBOX_ITEM
  * @brief   Stores the OSAL Mailbox Item information
  */
-typedef struct OSAL_MAILBOX_ITEM 
+typedef struct OSAL_MAILBOX_ITEM
 {
     void *pvItem;
     struct OSAL_MAILBOX_ITEM *pxNext;
@@ -157,7 +156,7 @@ typedef struct OSAL_MAILBOX
     char cName[ MAX_TASK_NAME_LEN ];
     OSAL_MAILBOX_ITEM *pxHead;
     OSAL_MAILBOX_ITEM *pxTail;
-    size_t ulItemSize; 
+    size_t ulItemSize;
 
 } OSAL_MAILBOX;
 
@@ -274,15 +273,15 @@ int iOSAL_GetOsVersion( char pcOs[ OSAL_OS_NAME_LEN ],
  */
 int iOSAL_StartOS( int         iRoundRobinEnabled,
                    void**      ppvTaskHandle,
-                   void        ( *pvStartTask )( void ), 
+                   void        ( *pvStartTask )( void ),
                    uint16_t    usStartTaskStackSize,
                    uint32_t    ulStartTaskPriority )
 {
     int iStatus = OSAL_ERRORS_PARAMS;
 
-    if( ( NULL != ppvTaskHandle      ) && 
-        ( NULL != pvStartTask        ) && 
-        ( 0 != usStartTaskStackSize  ) && 
+    if( ( NULL != ppvTaskHandle      ) &&
+        ( NULL != pvStartTask        ) &&
+        ( 0 != usStartTaskStackSize  ) &&
         ( CHECK_32BIT_ALIGNMENT( usStartTaskStackSize ) ) &&
         ( FALSE == iOsStarted ) )
     {
@@ -293,11 +292,11 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
             /* Creating pthread attribute object */
             pthread_attr_t xAttr = { { 0 } };
             assert( OK == pthread_attr_init( &xAttr ) );
-            
+
             /* Creating scheduling parameter struct */
             struct sched_param xParam = { 0 };
             xParam.sched_priority = ulStartTaskPriority;
-            
+
             if( PTHREAD_STACK_MIN > usStartTaskStackSize )
             {
                 usStartTaskStackSize = PTHREAD_STACK_MIN;
@@ -307,7 +306,7 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
             assert( OK == pthread_attr_setschedpolicy( &xAttr, SCHED_FIFO ) );
             assert( OK == pthread_attr_setschedparam( &xAttr, &xParam ) );
             assert( OK == pthread_attr_setstacksize( &xAttr, (size_t)usStartTaskStackSize ) );
-            if( OSAL_ERRORS_NONE == pthread_create( &pxTask->xThread, 
+            if( OSAL_ERRORS_NONE == pthread_create( &pxTask->xThread,
                                         &xAttr,
                                         ( void* )*pvStartTask,
                                         "main" ) )
@@ -323,7 +322,7 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
                 vOSAL_InitUptime();
 
                 /* mimicking freeRTOS vTaskStartScheduler blocking call - stops main thread from exiting */
-                do 
+                do
                 {
                     iOSAL_Task_SleepMs( 1000 );
                 } while( TRUE );
@@ -354,11 +353,11 @@ uint32_t ulOSAL_GetUptimeTicks( void )
 
     if( OK == clock_gettime( CLOCK_MONOTONIC, &xNow ) )
     {
-        /* 10ms/tick */ 
+        /* 10ms/tick */
         uptime_ticks = ( xNow.tv_sec - OSAL_GLOBAL_START_TIME.tv_sec ) * SECONDS_TO_TICKS_FACTOR
                             + ( xNow.tv_nsec - OSAL_GLOBAL_START_TIME.tv_nsec ) / NANOSECONDS_TO_TICKS_FACTOR;
     }
-    
+
     return ( uint32_t )uptime_ticks;
 }
 
@@ -408,26 +407,26 @@ uint32_t ulOSAL_GetUptimeMsFromISR( void )
  * @brief   Create a new OSAL task.
  */
 int iOSAL_Task_Create( void**      ppvTaskHandle,
-                       void        ( *pvTaskFunction )( void* pvTaskParam ),  
+                       void        ( *pvTaskFunction )( void* pvTaskParam ),
                        uint16_t    usTaskStackSize,
-                       void*       pvTaskParam, 
-                       uint32_t    ulTaskPriority, 
+                       void*       pvTaskParam,
+                       uint32_t    ulTaskPriority,
                        const char* pcTaskName )
 {
     int iStatus = OSAL_ERRORS_PARAMS;
 
     RETURN_IF_OS_NOT_STARTED;
 
-    if( ( NULL != ppvTaskHandle  ) && 
-        ( NULL != pvTaskFunction ) && 
-        ( 0 != usTaskStackSize   ) && 
+    if( ( NULL != ppvTaskHandle  ) &&
+        ( NULL != pvTaskFunction ) &&
+        ( 0 != usTaskStackSize   ) &&
         ( CHECK_32BIT_ALIGNMENT( usTaskStackSize ) ) &&
         ( NULL != pcTaskName ) )
     {
         OSAL_TASK_STRUCT* pxTask = ( OSAL_TASK_STRUCT* ) pvOSAL_MemAlloc( sizeof( OSAL_TASK_STRUCT ) );
-        
+
         if( NULL != pxTask )
-        { 
+        {
             /* Creating pthread attribute object */
             pthread_attr_t xAttr = { { 0 } };
             assert( OK == pthread_attr_init( &xAttr ) );
@@ -458,7 +457,7 @@ int iOSAL_Task_Create( void**      ppvTaskHandle,
             }
             else
             {
-                /* The task was not created. */ 
+                /* The task was not created. */
                 iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
                 free( pxTask );
             }
@@ -566,7 +565,7 @@ int iOSAL_Task_SleepMs( uint32_t ulSleepMs )
  */
 
 
-int iOSAL_Semaphore_Create( void** ppvSemHandle, uint32_t ullCount, 
+int iOSAL_Semaphore_Create( void** ppvSemHandle, uint32_t ullCount,
                             uint32_t ulBucket, const char* pcSemName )
 {
     int iStatus = OSAL_ERRORS_PARAMS;
@@ -574,9 +573,9 @@ int iOSAL_Semaphore_Create( void** ppvSemHandle, uint32_t ullCount,
     uint32_t ulSemFlg = SEMAPHORE_PERMISSIONS | IPC_CREAT;    /* semflg to pass to semget() */
     uint32_t ulSemId = 0;
     int iTmpId = 0;
-    
+
     key_t xKeys = ulSemNo;
-    union xSemUnion  
+    union xSemUnion
     {
         int iVal;
         struct semid_ds *xIdStruct;
@@ -598,11 +597,11 @@ int iOSAL_Semaphore_Create( void** ppvSemHandle, uint32_t ullCount,
             ulSemId = ( uint32_t )iTmpId;
             ulSemNo++;
             xSemAttr.iVal = ullCount;
-            if( SEM_ERROR == semctl( ulSemId, 0, SETVAL, xSemAttr ) ) 
+            if( SEM_ERROR == semctl( ulSemId, 0, SETVAL, xSemAttr ) )
             {
                 iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
             }
-            else 
+            else
             {
                 OSAL_SEM_STRUCT* pxSemData = ( OSAL_SEM_STRUCT* ) pvOSAL_MemAlloc( sizeof( OSAL_SEM_STRUCT ) );
 
@@ -611,7 +610,7 @@ int iOSAL_Semaphore_Create( void** ppvSemHandle, uint32_t ullCount,
                     pxSemData->ulSemId = ulSemId;
                     pxSemData->ulBucket = ulBucket;
                     pxSemData->pcName = strdup( pcSemName );
-                
+
                     *ppvSemHandle = pxSemData;
 
                     /* ppvSemHandle has already been null checked*/
@@ -630,7 +629,7 @@ int iOSAL_Semaphore_Create( void** ppvSemHandle, uint32_t ullCount,
 }
 
 /**
- * @brief   Deletes the binary or counting semaphore, to which the handle refers. 
+ * @brief   Deletes the binary or counting semaphore, to which the handle refers.
  */
 int iOSAL_Semaphore_Destroy( void** ppvSemHandle )
 {
@@ -641,7 +640,7 @@ int iOSAL_Semaphore_Destroy( void** ppvSemHandle )
     {
         OSAL_SEM_STRUCT* pxSemData = ( OSAL_SEM_STRUCT* )*ppvSemHandle;
 
-        if( SEM_ERROR == semctl( pxSemData->ulSemId, 0, IPC_RMID, 0 ) ) 
+        if( SEM_ERROR == semctl( pxSemData->ulSemId, 0, IPC_RMID, 0 ) )
         {
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
@@ -661,7 +660,7 @@ int iOSAL_Semaphore_Destroy( void** ppvSemHandle )
 }
 
 /**
- * @brief   Pends to / obtains a previously created semaphore, to which the handle refers. 
+ * @brief   Pends to / obtains a previously created semaphore, to which the handle refers.
  */
 int iOSAL_Semaphore_Pend( void* pvSemHandle, uint32_t ulTimeoutMs )
 {
@@ -693,7 +692,7 @@ int iOSAL_Semaphore_Pend( void* pvSemHandle, uint32_t ulTimeoutMs )
 
             if( OK == clock_gettime( CLOCK_REALTIME, &xTimeoutTime ) )
             {
-            
+
                 if( ulTimeoutMs < MINIMUM_TIMEOUT_MS )
                 {
                     ulTimeoutMs = MINIMUM_TIMEOUT_MS;
@@ -714,14 +713,14 @@ int iOSAL_Semaphore_Pend( void* pvSemHandle, uint32_t ulTimeoutMs )
             else
             {
                 iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
-            }     
+            }
         }
     }
     return iStatus;
 }
 
 /**
- * @brief   Posts / Releases a previously created semaphore, to which the handle refers. 
+ * @brief   Posts / Releases a previously created semaphore, to which the handle refers.
  */
 int iOSAL_Semaphore_Post( void* pvSemHandle )
 {
@@ -785,7 +784,7 @@ int iOSAL_Mutex_Create( void** ppvMutexHandle, const char* pcMutexName )
 
     RETURN_IF_OS_NOT_STARTED;
 
-    if( ( NULL != ppvMutexHandle  ) && 
+    if( ( NULL != ppvMutexHandle  ) &&
         ( NULL == *ppvMutexHandle ) &&
         ( NULL != pcMutexName ) )
     {
@@ -807,7 +806,7 @@ int iOSAL_Mutex_Create( void** ppvMutexHandle, const char* pcMutexName )
             else
             {
                 iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
-            }        
+            }
         }
         else
         {
@@ -826,7 +825,7 @@ int iOSAL_Mutex_Destroy( void** ppvMutexHandle )
     int iStatus = OSAL_ERRORS_INVALID_HANDLE;
 
     RETURN_IF_OS_NOT_STARTED;
-    
+
     if( ( NULL != ppvMutexHandle ) &&
         ( NULL != *ppvMutexHandle ) )
     {
@@ -903,7 +902,7 @@ int iOSAL_Mutex_Take( void* pvMutexHandle, uint32_t ulTimeout )
                 }
             }
             else
-            {   
+            {
                 iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
             }
         }
@@ -913,14 +912,14 @@ int iOSAL_Mutex_Take( void* pvMutexHandle, uint32_t ulTimeout )
 }
 
 /**
- * @brief   Releases a previously created Mutex, to which the handle refers. 
+ * @brief   Releases a previously created Mutex, to which the handle refers.
  */
 int iOSAL_Mutex_Release( void* pvMutexHandle )
 {
     int iStatus = OSAL_ERRORS_INVALID_HANDLE;
 
     RETURN_IF_OS_NOT_STARTED;
-    
+
     if( NULL != pvMutexHandle )
     {
         OSAL_MUTEX_STRUCT *pxMutexData = ( OSAL_MUTEX_STRUCT* ) pvMutexHandle;
@@ -971,7 +970,7 @@ int iOSAL_MBox_Create( void **ppvMBoxHandle, uint32_t ulMBoxLength, uint32_t ulI
                 *ppvMBoxHandle = pxMailbox;
 
                 /* ppvMBoxHandle has already been null checked */
-                
+
                 /* MBox created successfully */
                 iStatus = OSAL_ERRORS_NONE;
             }
@@ -991,7 +990,7 @@ int iOSAL_MBox_Create( void **ppvMBoxHandle, uint32_t ulMBoxLength, uint32_t ulI
 }
 
 /**
- * @brief   Resets a MailBox, to which the handle refers. 
+ * @brief   Resets a MailBox, to which the handle refers.
  */
 int iOSAL_MBox_Destroy( void **ppvMBoxHandle )
 {
@@ -1032,7 +1031,7 @@ int iOSAL_MBox_Destroy( void **ppvMBoxHandle )
 }
 
 /**
- * @brief   Recieve an item from a message Mailbox, to which the handle refers. 
+ * @brief   Recieve an item from a message Mailbox, to which the handle refers.
  */
 int iOSAL_MBox_Pend( void *pvMBoxHandle, void *pvMBoxBuffer, uint32_t ulTimeoutMs )
 {
@@ -1050,7 +1049,7 @@ int iOSAL_MBox_Pend( void *pvMBoxHandle, void *pvMBoxBuffer, uint32_t ulTimeoutM
         {
             OSAL_MAILBOX_ITEM *pxMailboxItem = pxMailbox->pxHead;
 
-            if( ( NULL != pxMailboxItem ) && 
+            if( ( NULL != pxMailboxItem ) &&
                 ( NULL != pxMailboxItem->pvItem ) )
             {
                 pvOSAL_MemCpy( pvMBoxBuffer, pxMailboxItem->pvItem, pxMailbox->ulItemSize );
@@ -1066,7 +1065,7 @@ int iOSAL_MBox_Pend( void *pvMBoxHandle, void *pvMBoxBuffer, uint32_t ulTimeoutM
             {
                 pxMailbox->pxHead = pxMailbox->pxHead->pxNext;
             }
-            
+
             if( ( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( ( void* )pxMailbox->xMutex ) ) &&
                 ( OSAL_ERRORS_NONE == iOSAL_Semaphore_Post( ( void* )pxMailbox->pxEmpty ) ) )
             {
@@ -1087,7 +1086,7 @@ int iOSAL_MBox_Pend( void *pvMBoxHandle, void *pvMBoxBuffer, uint32_t ulTimeoutM
 }
 
 /**
- * @brief   Posts an item onto a MailBox, to which the handle refers. 
+ * @brief   Posts an item onto a MailBox, to which the handle refers.
  */
 int iOSAL_MBox_Post( void *pvMBoxHandle, void *pvMBoxItem, uint32_t ulTimeoutMs )
 {
@@ -1101,7 +1100,7 @@ int iOSAL_MBox_Post( void *pvMBoxHandle, void *pvMBoxItem, uint32_t ulTimeoutMs 
         OSAL_MAILBOX *pxMailbox = ( OSAL_MAILBOX* )pvMBoxHandle;
         OSAL_MAILBOX_ITEM *pxNewMailboxItem = ( OSAL_MAILBOX_ITEM* )pvOSAL_MemAlloc( sizeof( OSAL_MAILBOX_ITEM ) );
 
-        if( ( NULL != pxMailbox ) && 
+        if( ( NULL != pxMailbox ) &&
             ( NULL != pxNewMailboxItem ) )
         {
             pxNewMailboxItem->pvItem = pvOSAL_MemAlloc( pxMailbox->ulItemSize );
@@ -1131,7 +1130,7 @@ int iOSAL_MBox_Post( void *pvMBoxHandle, void *pvMBoxItem, uint32_t ulTimeoutMs 
                 {
                     iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
                     free( pxNewMailboxItem );
-                }   
+                }
             }
             else
             {
@@ -1352,7 +1351,7 @@ int iOSAL_Timer_Create( void** ppvTimerHandle,
         ( NULL != pcTimerName ) )
     {
         struct OSAL_TIMER_STRUCT* pxTimerHandle = pvOSAL_MemAlloc( sizeof( struct OSAL_TIMER_STRUCT ) );
-        
+
         if( NULL != pxTimerHandle )
         {
             struct sigevent xSev = { { 0 } };
@@ -1381,7 +1380,7 @@ int iOSAL_Timer_Create( void** ppvTimerHandle,
             iStatus = OSAL_ERRORS_OS_IMPLEMENTATION;
         }
     }
-    
+
     return iStatus;
 }
 
@@ -1504,7 +1503,7 @@ int iOSAL_Timer_Reset( void* pvTimerHandle, uint32_t ulDurationMs )
             iStatus = OSAL_ERRORS_NONE;
         }
     }
-    
+
     return iStatus;
 }
 
@@ -1525,7 +1524,7 @@ void vOSAL_EnterCritical( void )
  * @brief   Mark the end of critical code region.
  */
 void vOSAL_ExitCritical( void )
-{   
+{
     assert( OK == pthread_mutex_unlock( &xCriticalSectionMutexHandle ) );
 }
 
@@ -1538,7 +1537,7 @@ void* pvOSAL_MemAlloc( uint16_t usSize )
 
     if( 0 != usSize )
     {
-        if( TRUE == iOsStarted ) 
+        if( TRUE == iOsStarted )
         {
             if( OK == pthread_mutex_lock( &xMemAllocMutexHandle ) )
             {
@@ -1565,7 +1564,7 @@ void vOSAL_MemFree( void** ppv )
         ( NULL != *ppv ) )
     {
         if( TRUE == iOsStarted )
-        { 
+        {
             if( OK == pthread_mutex_lock( &xMemFreeMutexHandle ) )
             {
                 free( *ppv );
@@ -1592,8 +1591,8 @@ void* pvOSAL_MemSet( void* pvDestination, int iValue, uint16_t usSize )
 
     if( NULL != pvDestination )
     {
-        if( TRUE == iOsStarted )  
-        {  
+        if( TRUE == iOsStarted )
+        {
             if( OK == pthread_mutex_lock( &xMemSetMutexHandle ) )
             {
                 pvSetMemory = memset( pvDestination, iValue, ( size_t )usSize );
@@ -1603,7 +1602,7 @@ void* pvOSAL_MemSet( void* pvDestination, int iValue, uint16_t usSize )
         else
         {
             /* Not thread safe */
-            pvSetMemory = memset( pvDestination, iValue, ( size_t )usSize );        
+            pvSetMemory = memset( pvDestination, iValue, ( size_t )usSize );
         }
     }
 
@@ -1620,8 +1619,8 @@ void* pvOSAL_MemCpy( void* pvDestination, const void* pvSource, uint16_t usSize 
     if( ( NULL != pvDestination ) &&
         ( NULL != pvSource ) )
     {
-        if( TRUE == iOsStarted ) 
-        { 
+        if( TRUE == iOsStarted )
+        {
             if( OK == pthread_mutex_lock( &xMemCpyMutexHandle ) )
             {
                 pvSetMemory = memcpy( pvDestination, pvSource, ( size_t )usSize );
@@ -1681,7 +1680,7 @@ void vOSAL_Printf( const char* pcFormat, ... )
         vsnprintf( pcBuffer, PRINT_BUFFER_SIZE, pcFormat, args );
 
         if( TRUE == iOsStarted )
-        { 
+        {
             if( OK == pthread_mutex_lock( &xPrintfMutexHandle ) )
             {
                 printf( "%s", pcBuffer );
@@ -1705,12 +1704,12 @@ char cOSAL_GetChar( void )
     char cInput = '\0';
 
     if( TRUE == iOsStarted )
-    { 
+    {
         /* take Mutex */
         if( OK == pthread_mutex_lock( &xGetCharMutexHandle ) )
         {
             /* Mutex taken successfully, read character */
-            cInput =  ( char )getchar(); 
+            cInput =  ( char )getchar();
 
             /* release Mutex */
             assert( OK == pthread_mutex_unlock( &xGetCharMutexHandle ) );
@@ -1719,9 +1718,9 @@ char cOSAL_GetChar( void )
     else
     {
         /* read character, note: Not thread safe */
-        cInput = ( char )getchar(); 
+        cInput = ( char )getchar();
     }
-    
+
     return cInput;
 }
 
@@ -1732,8 +1731,8 @@ char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize
 {
     char *pcSetString = NULL;
 
-    if( ( NULL != pcDestination ) && 
-        ( NULL != pcSource ) && 
+    if( ( NULL != pcDestination ) &&
+        ( NULL != pcSource ) &&
         ( 0 < usSize ) )
     {
         if( TRUE == iOsStarted )
@@ -1765,7 +1764,7 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usS
 {
     int iStatus = OSAL_ERRORS_PARAMS;
 
-    if( ( NULL != pvMemoryOne ) && 
+    if( ( NULL != pvMemoryOne ) &&
         ( NULL != pvMemoryTwo ) &&
         ( 0 < usSize ) )
     {
@@ -1799,7 +1798,7 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usS
 /**
  * @brief   Sets up interrupt handler callback with appropriate interrupt ID
  */
-int iOSAL_Interrupt_Setup( uint8_t ucInterruptID, 
+int iOSAL_Interrupt_Setup( uint8_t ucInterruptID,
                            void    ( *pvInterruptHandler )( void* pvCallBackRef ),
                            void*   pvCallBackRef )
 {

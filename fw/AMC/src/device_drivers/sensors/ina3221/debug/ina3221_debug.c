@@ -5,7 +5,6 @@
  * This file contains the INA3221 debug implementation
  *
  * @file ina3221_debug.c
- *
  */
 
 #include "standard.h"

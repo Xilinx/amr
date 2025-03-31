@@ -5,7 +5,6 @@
  * This file contains the Printing and Logging Library (PLL) debug implementation
  *
  * @file pll_debug.c
- *
  */
 
 #include "standard.h"
@@ -70,12 +69,12 @@ static void vPLL_SetOutputLevel( void );
 static void vPLL_SetLoggingLevel( void );
 
 /**
- * @brief   Function to test the PPL print macros 
+ * @brief   Function to test the PPL print macros
  */
 static void vTestPrint( void );
 
 /**
- * @brief   Dumps log from shared memory 
+ * @brief   Dumps log from shared memory
  */
 static void vPLL_DumpLog( void );
 
@@ -85,7 +84,7 @@ static void vPLL_DumpLog( void );
 static void vPLL_DumpFsblLog( void );
 
 /**
- * @brief   Clears shared memory log 
+ * @brief   Clears shared memory log
  */
 static void vPLL_ClearLog( void );
 
@@ -162,12 +161,12 @@ static void vClearStats( void )
 }
 
 /**
- * @brief   Debug function to get current PLL verbosity level 
+ * @brief   Debug function to get current PLL verbosity level
  */
 static void vPLL_GetOutputLevel( void )
 {
     PLL_OUTPUT_LEVEL *pxVerbosity = pvOSAL_MemAlloc( sizeof( PLL_OUTPUT_LEVEL ) );
-    
+
     if( NULL != pxVerbosity )
     {
         if( OK != iPLL_GetOutputLevel( pxVerbosity ) )
@@ -184,12 +183,12 @@ static void vPLL_GetOutputLevel( void )
 }
 
 /**
- * @brief   Debug function to get current PLL verbosity level 
+ * @brief   Debug function to get current PLL verbosity level
  */
 static void vPLL_GetLoggingLevel( void )
 {
     PLL_OUTPUT_LEVEL *pxVerbosity = pvOSAL_MemAlloc( sizeof( PLL_OUTPUT_LEVEL ) );
-    
+
     if( NULL != pxVerbosity )
     {
         if( OK != iPLL_GetLoggingLevel( pxVerbosity ) )
@@ -206,12 +205,12 @@ static void vPLL_GetLoggingLevel( void )
 }
 
 /**
- * @brief   Debug function to set PLL verbosity level 
+ * @brief   Debug function to set PLL verbosity level
  */
 static void vPLL_SetOutputLevel( void )
 {
     int iVerbosity = 0;
-    
+
     vPLL_Printf( "\r\n     %d: PLL_OUTPUT_LEVEL_LOGGING    ", PLL_OUTPUT_LEVEL_LOGGING );
     vPLL_Printf( "\r\n     %d: PLL_OUTPUT_LEVEL_INFO       ", PLL_OUTPUT_LEVEL_INFO );
     vPLL_Printf( "\r\n     %d: PLL_OUTPUT_LEVEL_ERROR      ", PLL_OUTPUT_LEVEL_ERROR );
@@ -234,12 +233,12 @@ static void vPLL_SetOutputLevel( void )
 }
 
 /**
- * @brief   Debug function to set PLL verbosity level 
+ * @brief   Debug function to set PLL verbosity level
  */
 static void vPLL_SetLoggingLevel( void )
 {
     int iVerbosity = 0;
-    
+
     vPLL_Printf( "\r\n     %d: PLL_OUTPUT_LEVEL_LOGGING    ", PLL_OUTPUT_LEVEL_LOGGING );
     vPLL_Printf( "\r\n     %d: PLL_OUTPUT_LEVEL_INFO       ", PLL_OUTPUT_LEVEL_INFO );
     vPLL_Printf( "\r\n     %d: PLL_OUTPUT_LEVEL_ERROR      ", PLL_OUTPUT_LEVEL_ERROR );

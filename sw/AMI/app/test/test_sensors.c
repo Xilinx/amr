@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * test_sensors.c - Unit test file for sensors.c
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/
@@ -63,11 +63,11 @@ int __wrap_fclose(FILE *stream)
 	case OK:
 		ret = AMI_LINUX_STATUS_OK;
 		break;
-	
+
 	case REAL:
 		ret = __real_fclose(stream);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -88,11 +88,11 @@ void *__wrap_malloc(size_t size)
 	case REAL:
 		ret = __real_malloc(size);
 		break;
-	
+
 	default:
 		break;
 	}
-	
+
 	WRAPPER_DONE(malloc);
 	return ret;
 }
@@ -109,11 +109,11 @@ void *__wrap_calloc(size_t nmemb, size_t size)
 	case REAL:
 		ret = __real_calloc(nmemb, size);
 		break;
-	
+
 	default:
 		break;
 	}
-	
+
 	WRAPPER_DONE(calloc);
 	return ret;
 }
@@ -573,7 +573,7 @@ void test_happy_report_sensors(void **state)
 		report_sensors(NULL),
 		EXIT_SUCCESS
 	);
-	
+
 	/* Happy path - verbose option specified */
 	will_return(__wrap_parse_output_options, APP_OUT_FORMAT_TABLE); /* fmt */
 	will_return(__wrap_parse_output_options, true);                 /* verbose */
@@ -1398,7 +1398,7 @@ void test_fail_static_construct_sensor_table(void **state)
 
 	for (i = 0; i < 5; i++)
 		free(row[i]);
-	
+
 	free(values);
 }
 
@@ -1545,7 +1545,7 @@ void test_happy_static_populate_sensor_values(void **state)
 	values = calloc(1, sizeof(values));
 	assert_non_null(values);
 	values[0] = row;
-	
+
 	/* Happy path - table format, all fields */
 	will_return(__wrap_ami_sensor_get_type, AMI_SENSOR_TYPE_TEMP);
 	will_return(__wrap_ami_sensor_get_type, AMI_STATUS_OK);
@@ -1621,7 +1621,7 @@ void test_happy_static_populate_sensor_values(void **state)
 
 	for (i = 0; i < 5; i++)
 		free(row[i]);
-	
+
 	free(values);
 }
 

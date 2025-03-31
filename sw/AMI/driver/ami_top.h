@@ -2,7 +2,7 @@
 /*
  * ami_top.h - This file contains common AMI driver definitions.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_TOP_H
@@ -22,13 +22,13 @@
 #include "ami_amc_control.h"
 
 /* Device state strings. */
-#define STATE_NAME_INIT       	"INIT"
-#define STATE_NAME_READY      	"READY"
-#define STATE_NAME_MISSING_INFO "MISSING_INFO"
-#define STATE_NAME_NO_AMC     	"NO_AMC"
-#define STATE_NAME_INIT_ERROR 	"INIT_ERROR"
-#define STATE_NAME_SHUTDOWN   	"SHUTDOWN"
-#define STATE_NAME_COMPAT     	"COMPAT"
+#define STATE_NAME_INIT		"INIT"
+#define STATE_NAME_READY	"READY"
+#define STATE_NAME_MISSING_INFO	"MISSING_INFO"
+#define STATE_NAME_NO_AMC	"NO_AMC"
+#define STATE_NAME_INIT_ERROR	"INIT_ERROR"
+#define STATE_NAME_SHUTDOWN	"SHUTDOWN"
+#define STATE_NAME_COMPAT	"COMPAT"
 
 /**
  * enum pf_dev_state - List of possible device states.
@@ -39,7 +39,7 @@
  * @PF_DEV_STATE_INIT_ERROR: AMC setup and device may be used but with no data.
  * @PF_DEV_STATE_SHUTDOWN: All services have been shutdown.
  * @PF_DEV_STATE_COMPAT: Compatibility mode - most functions unavailable.
- * 
+ *
  * Note that, currently, PF_DEV_STATE_INIT is only used temporarily within
  * the device probe function so a user is unlikely to ever see this state.
  */
@@ -89,7 +89,7 @@ enum pf_dev_cache_type {
  * @state: Current device state.
  * @pci: PCI device struct.
  * @pcie_config: PCI specific data
- * @endpoints: PCI endpoints (UUID, GCQ, etc...)
+ * @endpoints: PCI endpoints (UUID, sGCQ, etc...)
  * @amc_ctrl_ctxt: AMC data struct.
  * @ioctl_sema: Semaphore used by the IOCTL handler.
  * @sensor_refresh: Sensor update interval in milliseconds.
@@ -175,7 +175,7 @@ int add_pf_dev_app(struct pf_dev_struct *pf_dev, struct task_struct *task);
  * delete_pf_dev_app() - Remove a user application from a device.
  * @pf_dev: The device handle.
  * @task: The task struct this application belongs to.
- * 
+ *
  * If the application does not exist, this function does nothing and
  * returns success.
  *
@@ -195,7 +195,7 @@ struct pf_dev_struct *get_pf_dev_entry(void *cache, enum pf_dev_cache_type cache
 /**
  * put_pf_dev_entry() - Decrement the reference count of a pf_dev_struct
  * @pf_dev: Pointer to data struct.
- * 
+ *
  * If this is the last pointer reference, all device data will be deleted.
  *
  * Return: None

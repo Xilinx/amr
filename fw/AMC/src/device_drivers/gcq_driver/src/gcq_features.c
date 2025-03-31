@@ -2,10 +2,9 @@
  * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains API definitions for GCQ feature flags.
+ * This file contains API definitions for sGCQ feature flags.
  *
  * @file gcq_features.c
- *
  */
 
 #include "gcq_internal.h"
@@ -16,11 +15,9 @@
 /*****************************************************************************/
 
 /**
- *
  * @brief    Currently, this is only used as a workaround for the BRAM read/write
  *           collision HW issue on MB ERT, which will cause ERT to read incorrect value
  *           from CQ. We only trust the value until we read twice and got the same value.
- *
  */
 uint32_t ulGCQFeaturesHandleDoubleRead32( const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess, uint64_t ullAddr )
 {
@@ -36,13 +33,12 @@ uint32_t ulGCQFeaturesHandleDoubleRead32( const GCQ_IO_ACCESS_TYPE *pxGCQIOAcces
         {
             ulValue[ i++ & 0x1 ] = pxGCQIOAccess->xGCQReadMem32( ullAddr );
 
-            if( GCQ_FEATURES_DOUBLE_MEM_READ_RETRY_COUNT < i ) 
+            if( GCQ_FEATURES_DOUBLE_MEM_READ_RETRY_COUNT < i )
             {
                 gcq_assert( 0 );
                 break;
             }
         }
-
         return ( ulValue[ 0 ] );
     }
 }

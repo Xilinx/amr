@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This implenents the functions for accessing the
  * manufacturing eeprom.
  *
  * @file eeprom.c
- *
  */
 
 /******************************************************************************/
@@ -2155,6 +2154,6 @@ static int iEepromDumpContents( void )
 		vPLL_Printf( "\r\n" );
 	}
 
-	return ( iStatus );
+	return iStatus;
 }
-#endif
+#endif /* EEPROM_VERBOSE_DEBUG_ENABLE */

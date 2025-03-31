@@ -1,11 +1,10 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the amc in band telemetry implementation
  *
  * @file in_band_telemetry.c
- *
  */
 
 /******************************************************************************/
@@ -139,18 +138,18 @@ typedef struct IN_BAND_PRIVATE_DATA
 
 static IN_BAND_PRIVATE_DATA xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    NULL,                                                                      /* pvOsalMutexHdl */
-    0,                                                                         /* ullSharedMemBaseAddr*/
+    UPPER_FIREWALL,             /* ulUpperFirewall */
+    NULL,                       /* pvOsalMutexHdl */
+    0,                          /* ullSharedMemBaseAddr*/
     {
         0
-    },                                                                         /* pulStatCounters */
+    },                          /* pulStatCounters */
     {
         0
-    },                                                                         /* pulErrorCounters */
-    FALSE,                                                                     /* iInitialised */
-    FALSE,                                                                     /* iInBandTestMode */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall */
+    },                          /* pulErrorCounters */
+    FALSE,                      /* iInitialised */
+    FALSE,                      /* iInBandTestMode */
+    LOWER_FIREWALL              /* ulLowerFirewall */
 
 };
 static IN_BAND_PRIVATE_DATA *pxThis = &xLocalData;
@@ -229,7 +228,6 @@ int iIN_BAND_TELEMETRY_Initialise( uint64_t ullSharedMemBaseAddr )
             }
         }
     }
-
     return iStatus;
 }
 
@@ -266,7 +264,6 @@ int iIN_BAND_TELEMETRY_PrintStatistics( void )
 
         iStatus = OK;
     }
-
     return iStatus;
 }
 
@@ -285,7 +282,6 @@ int iIN_BAND_TELEMETRY_ClearStatistics( void )
         pvOSAL_MemSet( pxThis->pulErrorCounters, 0, sizeof( pxThis->pulErrorCounters ) );
         iStatus = OK;
     }
-
     return iStatus;
 }
 
@@ -302,7 +298,6 @@ int iIN_BAND_TELEMETRY_TestMode( int iActivate )
     {
         pxThis->iInBandTestMode = iActivate;
     }
-
     return iStatus;
 }
 
@@ -364,56 +359,46 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                         /* Populate the response back to the AMI */
                         switch( xSensorRequest.xRequest )
                         {
-                        case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SIZE:
-                        {
-                            /* Return the size of the SDR, including Header, Sensor Records and End of Repo marker */
-                            iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_SDR_SIZE,
-                                                              xRepo,
-                                                              INVALID_SENSOR_ID,
-                                                              ucRespBuffer,
-                                                              &usResponseSize );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SIZE:
+                                /* Return the size of the SDR, including Header, Sensor Records and End of Repo marker */
+                                iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_SDR_SIZE,
+                                                                xRepo,
+                                                                INVALID_SENSOR_ID,
+                                                                ucRespBuffer,
+                                                                &usResponseSize );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SDR:
-                        {
-                            /* Return the entire SDR – Header, Sensor Records and End of Repo marker. */
-                            iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_SDR,
-                                                              xRepo,
-                                                              INVALID_SENSOR_ID,
-                                                              ucRespBuffer,
-                                                              &usResponseSize );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SDR:
+                                /* Return the entire SDR – Header, Sensor Records and End of Repo marker. */
+                                iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_SDR,
+                                                                xRepo,
+                                                                INVALID_SENSOR_ID,
+                                                                ucRespBuffer,
+                                                                &usResponseSize );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SINGLE_SDR:
-                        {
-                            /* Return the instantaneous sensor data based on the input sensor ID */
-                            iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_SINGLE_SENSOR_DATA,
-                                                              xRepo,
-                                                              xSensorRequest.ulSensorId,
-                                                              ucRespBuffer,
-                                                              &usResponseSize );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SINGLE_SDR:
+                                /* Return the instantaneous sensor data based on the input sensor ID */
+                                iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_SINGLE_SENSOR_DATA,
+                                                                xRepo,
+                                                                xSensorRequest.ulSensorId,
+                                                                ucRespBuffer,
+                                                                &usResponseSize );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REQUEST_ALL_SDR:
-                        {
-                            /* Return the instantaneous sensor data for all sensors in a given SDR */
-                            iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_ALL_SENSOR_DATA,
-                                                              xRepo,
-                                                              INVALID_SENSOR_ID,
-                                                              ucRespBuffer,
-                                                              &usResponseSize );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REQUEST_ALL_SDR:
+                                /* Return the instantaneous sensor data for all sensors in a given SDR */
+                                iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_ALL_SENSOR_DATA,
+                                                                xRepo,
+                                                                INVALID_SENSOR_ID,
+                                                                ucRespBuffer,
+                                                                &usResponseSize );
+                                break;
 
-                        default:
-                        {
-                            INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_UNKNOWN_API )
-                            iStatus = ERROR;
-                            break;
-                        }
+                            default:
+                                INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_UNKNOWN_API )
+                                iStatus = ERROR;
+                                break;
                         }
                     }
                     else
@@ -442,7 +427,6 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                     pucDestAdd[ ASDM_SDR_RESP_BYTE_SIZE ] = 1;
                     INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_FAILED )
                 }
-
                 iStatus = iAMI_SetSensorCompleteResponse( pxSignal, xResult );
             }
             break;
@@ -465,47 +449,34 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
 
                 switch( xEepromReadWriteRequest.xRequest )
                 {
-                case AMI_PROXY_CMD_RW_REQUEST_READ:
-                {
-                    iStatus = iEEPROM_ReadRawValue( pucDestAddr,
-                                                    xEepromReadWriteRequest.ulLength,
-                                                    xEepromReadWriteRequest.ulOffset );
+                    case AMI_PROXY_CMD_RW_REQUEST_READ:
+                        iStatus = iEEPROM_ReadRawValue( pucDestAddr,
+                                                        xEepromReadWriteRequest.ulLength,
+                                                        xEepromReadWriteRequest.ulOffset );
 
-                    /* Flush shared memory so the latest data is available in cache. */
-                    HAL_FLUSH_CACHE_DATA(
-                        ullDestAddr,
-                        xEepromReadWriteRequest.ulLength
-                        );
-                    break;
-                }
+                        /* Flush shared memory so the latest data is available in cache. */
+                        HAL_FLUSH_CACHE_DATA( ullDestAddr, xEepromReadWriteRequest.ulLength );
+                        break;
 
-                case AMI_PROXY_CMD_RW_REQUEST_WRITE:
-                {
-                    /* Flush shared memory so the latest data is available in cache. */
-                    HAL_FLUSH_CACHE_DATA(
-                        ullDestAddr,
-                        xEepromReadWriteRequest.ulLength
-                        );
+                    case AMI_PROXY_CMD_RW_REQUEST_WRITE:
+                        /* Flush shared memory so the latest data is available in cache. */
+                        HAL_FLUSH_CACHE_DATA( ullDestAddr, xEepromReadWriteRequest.ulLength );
 
-                    iStatus = iEEPROM_WriteRawValue( pucDestAddr,
-                                                     xEepromReadWriteRequest.ulLength,
-                                                     xEepromReadWriteRequest.ulOffset );
-                    break;
-                }
+                        iStatus = iEEPROM_WriteRawValue( pucDestAddr,
+                                                        xEepromReadWriteRequest.ulLength,
+                                                        xEepromReadWriteRequest.ulOffset );
+                        break;
 
-                default:
-                {
-                    INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_EEPROM_RW_UNKNOWN_REQ )
-                    iStatus = ERROR;
-                    break;
-                }
+                    default:
+                        INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_EEPROM_RW_UNKNOWN_REQ )
+                        iStatus = ERROR;
+                        break;
                 }
 
                 if( OK == iStatus )
                 {
                     xResult = AMI_PROXY_RESULT_SUCCESS;
                 }
-
                 iStatus = iAMI_SetEepromReadWriteCompleteResponse( pxSignal, xResult );
             }
             break;
@@ -527,68 +498,56 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 AMI_PROXY_RESULT xResult      = AMI_PROXY_RESULT_FAILURE;
 
                 /* Check if the request is valid */
-                iStatus = iAXC_ValidateRequest(
-                    xModuleReadWriteRequest.ucExDeviceId,
-                    xModuleReadWriteRequest.ucPage,
-                    xModuleReadWriteRequest.ucByteOffset
-                    );
+                iStatus = iAXC_ValidateRequest( xModuleReadWriteRequest.ucExDeviceId,
+                                xModuleReadWriteRequest.ucPage,
+                                xModuleReadWriteRequest.ucByteOffset );
 
                 if( OK == iStatus )
                 {
                     switch( xModuleReadWriteRequest.xRequest )
                     {
-                    case AMI_PROXY_CMD_RW_REQUEST_READ:
-                    {
-                        if( 1 < xModuleReadWriteRequest.ucLength )
-                        {
-                            /* TODO: Implement block read. */
+                        case AMI_PROXY_CMD_RW_REQUEST_READ:
+                            if( 1 < xModuleReadWriteRequest.ucLength )
+                            {
+                                /* TODO: Implement block read. */
+                                iStatus = ERROR;
+                            }
+                            else
+                            {
+                                /* Single byte read. */
+                                iStatus = iAXC_GetByte( xModuleReadWriteRequest.ucExDeviceId,
+                                            xModuleReadWriteRequest.ucPage,
+                                            xModuleReadWriteRequest.ucByteOffset,
+                                            pucDestAddr );
+                            }
+
+                            /* Flush shared memory so the latest data is available in cache. */
+                            HAL_FLUSH_CACHE_DATA( ullDestAddr, xModuleReadWriteRequest.ucLength );
+                            break;
+
+                        case AMI_PROXY_CMD_RW_REQUEST_WRITE:
+                            /* Flush shared memory so the latest data is available in cache. */
+                            HAL_FLUSH_CACHE_DATA( ullDestAddr, xModuleReadWriteRequest.ucLength );
+
+                            if( 1 < xModuleReadWriteRequest.ucLength )
+                            {
+                                /* TODO: Implement block write. */
+                                iStatus = ERROR;
+                            }
+                            else
+                            {
+                                /* Single byte write. */
+                                iStatus = iAXC_SetByte( xModuleReadWriteRequest.ucExDeviceId,
+                                                xModuleReadWriteRequest.ucPage,
+                                                xModuleReadWriteRequest.ucByteOffset,
+                                                pucDestAddr[ 0 ] );
+                            }
+                            break;
+
+                        default:
+                            INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_MODULE_RW_UNKNOWN_REQ )
                             iStatus = ERROR;
-                        }
-                        else
-                        {
-                            /* Single byte read. */
-                            iStatus = iAXC_GetByte(
-                                xModuleReadWriteRequest.ucExDeviceId,
-                                xModuleReadWriteRequest.ucPage,
-                                xModuleReadWriteRequest.ucByteOffset,
-                                pucDestAddr
-                                );
-                        }
-
-                        /* Flush shared memory so the latest data is available in cache. */
-                        HAL_FLUSH_CACHE_DATA( ullDestAddr, xModuleReadWriteRequest.ucLength );
-                        break;
-                    }
-
-                    case AMI_PROXY_CMD_RW_REQUEST_WRITE:
-                    {
-                        /* Flush shared memory so the latest data is available in cache. */
-                        HAL_FLUSH_CACHE_DATA( ullDestAddr, xModuleReadWriteRequest.ucLength );
-
-                        if( 1 < xModuleReadWriteRequest.ucLength )
-                        {
-                            /* TODO: Implement block write. */
-                            iStatus = ERROR;
-                        }
-                        else
-                        {
-                            /* Single byte write. */
-                            iStatus = iAXC_SetByte(
-                                xModuleReadWriteRequest.ucExDeviceId,
-                                xModuleReadWriteRequest.ucPage,
-                                xModuleReadWriteRequest.ucByteOffset,
-                                pucDestAddr[ 0 ]
-                                );
-                        }
-                        break;
-                    }
-
-                    default:
-                    {
-                        INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_MODULE_RW_UNKNOWN_REQ )
-                        iStatus = ERROR;
-                        break;
-                    }
+                            break;
                     }
                 }
                 else
@@ -600,7 +559,6 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 {
                     xResult = AMI_PROXY_RESULT_SUCCESS;
                 }
-
                 iStatus = iAMI_SetModuleReadWriteCompleteResponse( pxSignal, xResult );
             }
             break;
@@ -775,14 +733,11 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
         case AMI_PROXY_DRIVER_E_GET_IDENTITY:
         case AMI_PROXY_DRIVER_E_HEARTBEAT:
         default:
-        {
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_UNSUPPORTED_REQUEST )
             iStatus = OK;
             break;
         }
-        }
     }
-
     return iStatus;
 }
 
@@ -799,65 +754,48 @@ static int iMapAmiProxyRequestRepo( AMI_PROXY_CMD_SENSOR_REPO xRepo, ASDM_REPOSI
     {
         switch( xRepo )
         {
-        case AMI_PROXY_CMD_SENSOR_REPO_BDINFO:
-        {
-            *pxRepo = ASDM_REPOSITORY_TYPE_BOARD_INFO;
-            iStatus = OK;
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_BDINFO:
+                *pxRepo = ASDM_REPOSITORY_TYPE_BOARD_INFO;
+                iStatus = OK;
+                break;
 
-        case AMI_PROXY_CMD_SENSOR_REPO_TEMP:
-        {
-            *pxRepo = ASDM_REPOSITORY_TYPE_TEMP;
-            iStatus = OK;
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_TEMP:
+                *pxRepo = ASDM_REPOSITORY_TYPE_TEMP;
+                iStatus = OK;
+                break;
 
-        case AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE:
-        {
-            *pxRepo = ASDM_REPOSITORY_TYPE_VOLTAGE;
-            iStatus = OK;
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE:
+                *pxRepo = ASDM_REPOSITORY_TYPE_VOLTAGE;
+                iStatus = OK;
+                break;
 
-        case AMI_PROXY_CMD_SENSOR_REPO_CURRENT:
-        {
-            *pxRepo = ASDM_REPOSITORY_TYPE_CURRENT;
-            iStatus = OK;
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_CURRENT:
+                *pxRepo = ASDM_REPOSITORY_TYPE_CURRENT;
+                iStatus = OK;
+                break;
 
-        case AMI_PROXY_CMD_SENSOR_REPO_POWER:
-        {
-            *pxRepo = ASDM_REPOSITORY_TYPE_POWER;
-            iStatus = OK;
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_POWER:
+                *pxRepo = ASDM_REPOSITORY_TYPE_POWER;
+                iStatus = OK;
+                break;
 
-        case AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER:
-        {
-            /* return the total power repo as opposed to the individual power sensor values */
-            *pxRepo = ASDM_REPOSITORY_TYPE_TOTAL_POWER;
-            iStatus = OK;
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER:
+                /* return the total power repo as opposed to the individual power sensor values */
+                *pxRepo = ASDM_REPOSITORY_TYPE_TOTAL_POWER;
+                iStatus = OK;
+                break;
 
-        case AMI_PROXY_CMD_SENSOR_REPO_FPT:
-        {
-            *pxRepo = ASDM_REPOSITORY_TYPE_FPT;
-            iStatus = OK;
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_FPT:
+                *pxRepo = ASDM_REPOSITORY_TYPE_FPT;
+                iStatus = OK;
+                break;
 
-        default:
-        case AMI_PROXY_CMD_SENSOR_REPO_ALL:
-        case AMI_PROXY_CMD_SENSOR_REPO_GET_SIZE:
-        {
-            INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_UNSUPPORTED_REPO )
-            break;
-        }
+            case AMI_PROXY_CMD_SENSOR_REPO_ALL:
+            case AMI_PROXY_CMD_SENSOR_REPO_GET_SIZE:
+            default:
+                INC_ERROR_COUNTER( IN_BAND_ERRORS_AMI_UNSUPPORTED_REPO )
+                break;
         }
     }
-
-    return ( iStatus );
+    return iStatus;
 }

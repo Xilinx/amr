@@ -2,7 +2,7 @@
 /*
  * ami_top.c - This file contains the main entry point for the AMI driver.
  *
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/module.h>
@@ -124,7 +124,7 @@ static void amc_event_cb(enum amc_event_id id, void *data)
 		struct pci_dev *dev = NULL;
 		struct pf_dev_struct *pf_dev = NULL;
 
-		PR_ERR("AMC Heartbeat fatal event received, stopping GCQ...");
+		PR_ERR("AMC Heartbeat fatal event received, stopping sGCQ...");
 
 		if (!data) {
 			PR_ERR("AMC Heartbeat callback received invalid data!");
@@ -237,16 +237,11 @@ static int create_pf_dev_data(struct pci_dev *dev)
 		goto delete_data;
 
 	/* Read vendor specific information */
-	if (pf_dev->pcie_config->ext_cap->vsec_base_addr_found) {
-		ret = read_vsec(dev,
-				pf_dev->pcie_config->ext_cap->vsec_base_addr,
-				&pf_dev->endpoints);
-		if (ret)
-			goto delete_data;
-	} else {
-		ret = -EINVAL;
+	ret = read_vsec(dev,
+			pf_dev->pcie_config->ext_cap->vsec_base_addr,
+			&pf_dev->endpoints);
+	if (ret)
 		goto delete_data;
-	}
 
 	/* AMC Setup */
 	/*
@@ -256,7 +251,6 @@ static int create_pf_dev_data(struct pci_dev *dev)
 	ret = setup_amc(dev,
 			&pf_dev->amc_ctrl_ctxt,
 			pf_dev->endpoints->gcq,
-			pf_dev->endpoints->gcq_payload,
 			amc_event_cb,
 			(void*)dev);
 	if (ret) {
@@ -847,7 +841,7 @@ static DRIVER_ATTR_RO(version);
  */
 static ssize_t ami_debug_enabled_store(struct device_driver *drv, const char *buf, size_t count)
 {
-	int set_output_status = 0;
+	uint8_t set_output_status = 0;
 
 	if (!drv || !buf)
 		return 0;
@@ -880,7 +874,7 @@ int __init vmc_entry(void)
 {
 	int ret = 0;
 
-	/* Init FAL for GCQ */
+	/* Init FAL for sGCQ */
 	ret = ulFW_IF_GCQ_Init(&fw_if_gcq_init_cfg);
 	if (ret != FW_IF_ERRORS_NONE)
 		goto fail;

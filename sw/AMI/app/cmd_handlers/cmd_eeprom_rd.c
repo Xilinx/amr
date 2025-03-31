@@ -1,9 +1,8 @@
-
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * cmd_eeprom_rd.c - This file contains the implementation for the command "eeprom_rd"
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /*****************************************************************************/
@@ -33,7 +32,7 @@
 
 /**
  * do_cmd_eeprom_rd() - "eeprom_rd" command callback.
- * 
+ *
  * For parameters and return value see the definition for `app_command`.
  */
 static int do_cmd_eeprom_rd(struct app_option *options, int num_args, char **args);

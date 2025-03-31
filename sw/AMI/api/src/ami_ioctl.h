@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * ami_ioctl.h - This file contains definitions for the AMI IOCTL interface
- * 
- * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+ *
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_IOCTL_H
@@ -70,12 +70,12 @@ struct ami_ioc_data_payload {
  * @bar_idx: Bar number.
  * @offset: Offset within BAR.
  * @cap_override: Bypass permission checks. This may not apply to all IOCTL's.
- * 
+ *
  * Note that this struct can be used for either read or write transactions.
  *
  * For reading a BAR, `addr` is the userspace address of a uint32 buffer to be
  * populated with data read from the BAR and `num` is the number of values to read.
- * 
+ *
  * To write to a BAR, `addr` is the userspace address of the uint32 buffer to
  * write and `num` is the number of values to write.
  */
@@ -94,7 +94,7 @@ struct ami_ioc_bar_data {
  * @IOC_SENSOR_TYPE_VOLTAGE: Voltage sensor ("in" in hwmon)
  * @IOC_SENSOR_TYPE_CURRENT: Current sensor ("curr" in hwmon)
  * @IOC_SENSOR_TYPE_POWER: Power sensor ("power" in hwmon)
- * 
+ *
  * This enum is to be used in conjunction with `struct ami_ioc_sensor_value`.
  */
 enum ami_ioc_sensor_type {
@@ -111,7 +111,7 @@ enum ami_ioc_sensor_type {
  * @fresh: Whether or not the value/status were read from the cache. Populated by the driver.
  * @hwmon_channel: The hwmon sensor channel number. This is passed in from userspace.
  * @sensor_type: Sensor type. This is passed in from userspace.
- * 
+ *
  * This API is provided as an alternative to hwmon due to a possible race condition
  * where the user would have to read two separate hwmon files to fetch both the
  * sensor value and its status. Currently, this is only supported for the
@@ -132,7 +132,7 @@ struct ami_ioc_sensor_value {
  * @hdr_size: The size of the header in bytes. Populated by the driver.
  * @entry_size: The entry size in bytes. Populated by the driver.
  * @num_entries: The number of partitions. Populated by the driver.
- * 
+ *
  * This struct is to be use in conjunction with `struct ami_ioc_fpt_hdr_value` to get the
  * individual partition information.
  */

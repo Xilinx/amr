@@ -6,7 +6,6 @@
  * proxy driver.
  *
  * @file axc_proxy_driver.c
- *
  */
 
 /******************************************************************************/
@@ -303,7 +302,6 @@ int iAXC_Initialise( uint8_t ucProxyId, uint32_t ulTaskPrio, uint32_t ulTaskStac
             }
         }
     }
-
     return iStatus;
 }
 
@@ -336,7 +334,6 @@ int iAXC_AddExternalDevice( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExDeviceC
             }
         }
     }
-
     return iStatus;
 }
 
@@ -355,7 +352,6 @@ int iAXC_BindCallback( EVL_CALLBACK *pxCallback )
     {
         iStatus = iEVL_BindCallback( pxThis->pxEvlRecord, pxCallback );
     }
-
     return iStatus;
 }
 
@@ -487,7 +483,6 @@ int iAXC_SetByte( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset, 
             }
         }
     }
-
     return iStatus;
 }
 
@@ -627,7 +622,6 @@ int iAXC_GetByte( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset, 
             }
         }
     }
-
     return iStatus;
 }
 
@@ -757,7 +751,6 @@ int iAXC_GetPage( uint8_t ucExDeviceId, uint32_t ulPage, AXC_PROXY_DRIVER_PAGE_D
             }
         }
     }
-
     return iStatus;
 }
 
@@ -777,7 +770,6 @@ int iAXC_GetSingleIoStatus( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO xIoCo
         ( MAX_AXC_PROXY_DRIVER_QSFP_IO > xIoControlLine ) &&
         ( NULL != pucIoStatus ) )
     {
-
         if( ( OK == iGetExDevFromList( &ppxCurrentExDev, ucExDeviceId ) ) &&
             ( NULL != ppxCurrentExDev ) )
         {
@@ -833,7 +825,6 @@ int iAXC_GetSingleIoStatus( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO xIoCo
             }
         }
     }
-
     return iStatus;
 }
 
@@ -912,7 +903,6 @@ int iAXC_GetAllIoStatuses( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO_STATUS
             }
         }
     }
-
     return iStatus;
 }
 
@@ -950,7 +940,6 @@ int iAXC_GetTemperature( uint8_t ucExDeviceId, float *pfTemperature )
             }
         }
     }
-
     return iStatus;
 }
 
@@ -992,7 +981,6 @@ int iAXC_GetState( MODULE_STATE *pxState )
     {
         INC_ERROR_COUNTER( AXC_PROXY_ERRORS_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1028,7 +1016,6 @@ int iAXC_PrintStatistics( void )
     {
         INC_ERROR_COUNTER( AXC_PROXY_ERRORS_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1051,7 +1038,6 @@ int iAXC_ClearStatistics( void )
     {
         INC_ERROR_COUNTER( AXC_PROXY_ERRORS_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1081,7 +1067,6 @@ int iAXC_ValidateRequest( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByte
     {
         INC_ERROR_COUNTER( AXC_PROXY_ERRORS_VALIDATION_FAILED )
     }
-
     return iStatus;
 }
 
@@ -1105,7 +1090,7 @@ static void vProxyDriverTask( void *pvArgs )
     /* Add a delay at the start of the process */
     iOSAL_Task_SleepMs( AXC_TASK_SLEEP_1S );
 
-    FOREVER
+    for( ;; )
     {
         /* Loop over each External Device held within linked list */
         ulStartMs = ulOSAL_GetUptimeMs();
@@ -1129,7 +1114,6 @@ static void vProxyDriverTask( void *pvArgs )
                     switch( pxCfg->xDevice )
                     {
                         case FW_IF_DEVICE_QSFP:
-                        {
                             if( FW_IF_ERRORS_NONE == ppxCurrentExDev->pxExDevLocalDeviceCfg->pxExDevIf->read( ppxCurrentExDev->pxExDevLocalDeviceCfg->pxExDevIf,
                                                                                                         QSFP_MSB_TEMPERATURE_REG,
                                                                                                         ( uint8_t* )&ucTemperatureReq,
@@ -1172,10 +1156,8 @@ static void vProxyDriverTask( void *pvArgs )
                                 xNewExDevStatus = AXC_STATUS_NOT_PRESENT;
                             }
                             break;
-                        }
 
                         case FW_IF_DEVICE_DIMM:
-                        {
                             /* DIMM */
                             if( FW_IF_ERRORS_NONE == ppxCurrentExDev->pxExDevLocalDeviceCfg->pxExDevIf->read( ppxCurrentExDev->pxExDevLocalDeviceCfg->pxExDevIf,
                                                                                                         DIMM_TEMPERATURE_REG,
@@ -1213,7 +1195,6 @@ static void vProxyDriverTask( void *pvArgs )
                                 xNewExDevStatus = AXC_STATUS_NOT_PRESENT;
                             }
                             break;
-                        }
 
                         default:
                             INC_ERROR_COUNTER_WITH_STATE( AXC_PROXY_ERRORS_UNKNOWN_DEVICE )
@@ -1242,7 +1223,6 @@ static void vProxyDriverTask( void *pvArgs )
             switch( pxCfg->xDevice )
             {
                 case FW_IF_DEVICE_QSFP:
-                {
                     if( ppxCurrentExDev->xExDevStatus != xNewExDevStatus )
                     {
                         ppxCurrentExDev->xExDevStatus = xNewExDevStatus;
@@ -1278,7 +1258,6 @@ static void vProxyDriverTask( void *pvArgs )
                         }
                     }
                     break;
-                }
 
                 case FW_IF_DEVICE_DIMM:
                     /* No events raised fro DIMM as it's not removable */
@@ -1327,7 +1306,6 @@ static int iInsertExDevListBegin( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExD
             INC_ERROR_COUNTER_WITH_STATE( AXC_PROXY_ERRORS_LIST_APPEND_FAILED )
         }
     }
-
     return iStatus;
 }
 
@@ -1354,6 +1332,5 @@ static int iGetExDevFromList( AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST **ppxCurre
             iStatus = OK;
         }
     }
-
     return iStatus;
 }

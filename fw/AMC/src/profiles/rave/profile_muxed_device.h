@@ -5,7 +5,6 @@
  * This file contains the muxed device profile for Rave
  *
  * @file profile_muxed_device.h
- *
  */
 
 #ifndef _PROFILE_MUXED_DEVICE_H_
@@ -13,5 +12,4 @@
 
 #define MAX_NUM_EXTERNAL_DEVICES_AVAILABLE ( 0 )
 
-
-#endif
+#endif /* _PROFILE_MUXED_DEVICE_H_ */

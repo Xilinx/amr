@@ -2,7 +2,7 @@
 /*
  * ami_pcie.c - This file contains PCI reading/writing logic.
  *
- * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/device.h>
@@ -961,7 +961,7 @@ int write_pcie_configuration(struct pci_dev *dev)
 	}
 
 	/*
-	 * Identity event over GCQ will enable the hot reload so we must make
+	 * Identity event over sGCQ will enable the hot reload so we must make
 	 * sure the PMC GPIO is cleared to prevent a reboot.
 	 */
 	if (PCI_FUNC(dev->devfn) == 0) {
@@ -1025,8 +1025,11 @@ static int do_bar_transaction(struct pci_dev	*dev,
 
 	bar = &(pf_dev->pcie_config->header->bar[bar_idx]);
 
-	if ((bar->len == 0) || ((offset + num) > bar->len))
+	if ((bar->len == 0) || ((offset + num) > bar->len)) {
+		DEV_VDBG(dev, "bar_idx = %d bar_len = %d offset = %d num = %d val = %d",
+			bar_idx, bar->len, offset, num, *val);
 		return -EFAULT;  /* Bad address */
+	}
 
 	/* Try to request region if it hasn't already been requested. */
 	if (!bar->requested) {

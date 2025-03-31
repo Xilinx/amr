@@ -5,7 +5,6 @@
  * This file contains the Printing and Logging Library (PLL) debug access
  *
  * @file pll_debug.h
- *
  */
 
 #ifndef _PLL_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the PLL debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vPLL_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _PLL_DEBUG_H_ */
 

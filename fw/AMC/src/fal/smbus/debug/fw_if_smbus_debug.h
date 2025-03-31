@@ -5,7 +5,6 @@
  * This file contains the FW IF SMBUS debug access
  *
  * @file fw_if_smbus_debug.h
- *
  */
 
 #ifndef _FW_IF_SMBUS_DEBUG_H_
@@ -20,12 +19,12 @@
 
 /**
  * @brief   Initialise the FW IF SMBUS debug access
- * 
+ *
  * @param   pxParentHandle optional handle to the parent directory
- * 
+ *
  * @return  N/A
  */
 void vFW_IF_SMBUS_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _FW_IF_SMBUS_DEBUG_H_ */
 

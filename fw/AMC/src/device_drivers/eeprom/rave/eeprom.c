@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This implenents the functions for accessing the
  * manufacturing eeprom.
  *
  * @file eeprom.c
- *
  */
 
 /******************************************************************************/
@@ -41,7 +40,7 @@
 #define UPPER_FIREWALL                    ( 0xBABECAFEU )
 #define LOWER_FIREWALL                    ( 0xDEADFACEU )
 /* Current EEPROM versions supported */
-#define EEPROM_V1_0 					 ( 0x01U )
+#define EEPROM_V1_0                      ( 0x01U )
 
 #define EEPROM_MAX_MAC                   (  40U )
 #define EEPROM_PAGE_SIZE_MAX             ( 255U )
@@ -50,12 +49,12 @@
 #define EEPROM_WRITE_BYTE_SIZE_MAX       ( 255U )
 
 /* Default register content in EEPROM if a particular register has not been programmed */
-#define EEPROM_DEFAULT_VAL 				 ( 0xFFU )
+#define EEPROM_DEFAULT_VAL               ( 0xFFU )
 
 #define EEPROM_VERSION_OFFSET            ( 0x00U )
 #define EEPROM_VERSION_SIZE              (    1U )
 #define EEPROM_BUF_SIZE                  (  128U )
-#define EEPROM_FIELD_NA_SIZE             (    0U )                             /* For non-existent fields */
+#define EEPROM_FIELD_NA_SIZE             (    0U )              /* For non-existent fields */
 #define EEPROM_DEVICE_ID_CHECK_TRY_COUNT (    3U )
 
 /* Verbose data log - disabled by default */
@@ -66,23 +65,23 @@
 #define EEPROM_V1_0_HEADER_CHECKSUM_OFFSET    ( 0x07U )
 #define EEPROM_V1_0_BOARD_CHECKSUM_SIZE       ( 0x60U )
 #define EEPROM_V1_0_BOARD_LENGTH_OFFSET       ( 0x09U )
-#define EEPROM_V1_0_PRODUCT_NAME_OFFSET 	  ( 0x16U )                         /* Board Product Name  */
-#define EEPROM_V1_0_PRODUCT_NAME_SIZE   	  (   16U )
-#define EEPROM_V1_0_PRODUCT_PART_NUM_OFFSET   ( 0x38U )                         /* Board Part Number  */
+#define EEPROM_V1_0_PRODUCT_NAME_OFFSET       ( 0x16U )         /* Board Product Name  */
+#define EEPROM_V1_0_PRODUCT_NAME_SIZE         (   16U )
+#define EEPROM_V1_0_PRODUCT_PART_NUM_OFFSET   ( 0x38U )         /* Board Part Number  */
 #define EEPROM_V1_0_PRODUCT_PART_NUM_SIZE     (    9U )
-#define EEPROM_V1_0_MFG_PART_NUM_OFFSET       ( 0x38U )                         /* Manufacturing Part Number */
+#define EEPROM_V1_0_MFG_PART_NUM_OFFSET       ( 0x38U )         /* Manufacturing Part Number */
 #define EEPROM_V1_0_MFG_PART_NUM_SIZE         (    9U )
-#define EEPROM_V1_0_MFG_PART_REV_OFFSET       ( 0x44U )                         /* Manufacturing Part Revision */
+#define EEPROM_V1_0_MFG_PART_REV_OFFSET       ( 0x44U )         /* Manufacturing Part Revision */
 #define EEPROM_V1_0_MFG_PART_REV_SIZE         (    8U )
-#define EEPROM_V1_0_PRODUCT_SERIAL_OFFSET     ( 0x27U )                         /* Product Serial Number */
+#define EEPROM_V1_0_PRODUCT_SERIAL_OFFSET     ( 0x27U )         /* Product Serial Number */
 #define EEPROM_V1_0_PRODUCT_SERIAL_SIZE       (   16U )
-#define EEPROM_V1_0_MFG_DATE_OFFSET           ( 0x0BU )                         /* Manufacturing Date  */
+#define EEPROM_V1_0_MFG_DATE_OFFSET           ( 0x0BU )         /* Manufacturing Date  */
 #define EEPROM_V1_0_MFG_DATE_SIZE             (    3U )
-#define EEPROM_V1_0_TOT_MAC_ID_OFFSET         ( 0x7CU )                         /* Number of MAC IDs Length */
+#define EEPROM_V1_0_TOT_MAC_ID_OFFSET         ( 0x7CU )         /* Number of MAC IDs Length */
 #define EEPROM_V1_0_TOT_MAC_ID_SIZE           (    1U )
-#define EEPROM_V1_0_MAC_OFFSET                ( 0x83U )                         /* MAC ID 1 */
+#define EEPROM_V1_0_MAC_OFFSET                ( 0x83U )         /* MAC ID 1 */
 #define EEPROM_V1_0_MAC_SIZE                  (    6U )
-#define EEPROM_V1_0_UUID_OFFSET               ( 0x56U )                         /* UUID */
+#define EEPROM_V1_0_UUID_OFFSET               ( 0x56U )         /* UUID */
 #define EEPROM_V1_0_UUID_SIZE                 (   16U )
 #define EEPROM_V1_0_CHECKSUM_START            (    6U )
 #define EEPROM_V1_0_CHECKSUM_END              (  127U )
@@ -272,172 +271,84 @@ typedef struct EEPROM_PRIVATE_DATA
 /******************************************************************************/
 static EEPROM_PRIVATE_DATA xLocalData =
 {
-	UPPER_FIREWALL,                                                        /* ulUpperFirewall       */
-	FALSE,                                                                 /* iEepromInitialised    */
+	UPPER_FIREWALL,         /* ulUpperFirewall       */
+	FALSE,                  /* iEepromInitialised    */
 	{
 		0
-	},                                                                     /* xEepromCfg            */
-	EEPROM_VERSION_MAX,                                                    /* xEepromExpectedVersion*/
-	EEPROM_VERSION_MAX,                                                    /* xEepromActualVersion  */
+	},                      /* xEepromCfg            */
+	EEPROM_VERSION_MAX,     /* xEepromExpectedVersion*/
+	EEPROM_VERSION_MAX,     /* xEepromActualVersion  */
 	{ { {
 		    0
-	    } } },                                                             /* xBoardInfo            */
-	NULL,                                                                  /* pucEepromVersion      */
-	NULL,                                                                  /* pucProductName        */
-	NULL,                                                                  /* pucBoardRev           */
-	NULL,                                                                  /* pucBoardSerial        */
-	0,                                                                     /* ucNumMacIds           */
-	NULL,                                                                  /* pucBoardMac           */
-	NULL,                                                                  /* pucBoardActivePassive */
-	NULL,                                                                  /* pucBoardConfigMode    */
-	NULL,                                                                  /* pucBoardMfgDate       */
-	NULL,                                                                  /* pucBoardPartNum       */
-	NULL,                                                                  /* pucBoardUuid          */
-	NULL,                                                                  /* pucBoardPcieInfo      */
-	NULL,                                                                  /* pucBoardMaxPowerMode  */
-	NULL,                                                                  /* pucMemorySize         */
-	NULL,                                                                  /* pucOemId              */
-	NULL,                                                                  /* pucCapability         */
-	NULL,                                                                  /* pucMfgPartNum         */
+	    } } },              /* xBoardInfo            */
+	NULL,                   /* pucEepromVersion      */
+	NULL,                   /* pucProductName        */
+	NULL,                   /* pucBoardRev           */
+	NULL,                   /* pucBoardSerial        */
+	0,                      /* ucNumMacIds           */
+	NULL,                   /* pucBoardMac           */
+	NULL,                   /* pucBoardActivePassive */
+	NULL,                   /* pucBoardConfigMode    */
+	NULL,                   /* pucBoardMfgDate       */
+	NULL,                   /* pucBoardPartNum       */
+	NULL,                   /* pucBoardUuid          */
+	NULL,                   /* pucBoardPcieInfo      */
+	NULL,                   /* pucBoardMaxPowerMode  */
+	NULL,                   /* pucMemorySize         */
+	NULL,                   /* pucOemId              */
+	NULL,                   /* pucCapability         */
+	NULL,                   /* pucMfgPartNum         */
 
-	0,                                                                     /* ucSizeEepromVersion       */
-	0,                                                                     /* ucSizeProductName         */
-	0,                                                                     /* ucSizeBoardRev            */
-	0,                                                                     /* ucSizeBoardSerial         */
-	0,                                                                     /* cNSizeumMacIds            */
-	0,                                                                     /* ucSizeBoardMac            */
-	0,                                                                     /* ucSizeBoardActivePassive  */
-	0,                                                                     /* ucSizeBoardConfigMode     */
-	0,                                                                     /* ucSizeBoardMfgDate        */
-	0,                                                                     /* ucSizeBoardPartNum        */
-	0,                                                                     /* ucSizeBoardUuid           */
-	0,                                                                     /* ucSizeBoardPcieInfo       */
-	0,                                                                     /* ucSizeBoardMaxPowerMode   */
-	0,                                                                     /* ucSizeMemorySize          */
-	0,                                                                     /* ucSizeOemId               */
-	0,                                                                     /* ucSizeCapability          */
-	0,                                                                     /* ucSizeMfgPartNum          */
+	0,                      /* ucSizeEepromVersion       */
+	0,                      /* ucSizeProductName         */
+	0,                      /* ucSizeBoardRev            */
+	0,                      /* ucSizeBoardSerial         */
+	0,                      /* cNSizeumMacIds            */
+	0,                      /* ucSizeBoardMac            */
+	0,                      /* ucSizeBoardActivePassive  */
+	0,                      /* ucSizeBoardConfigMode     */
+	0,                      /* ucSizeBoardMfgDate        */
+	0,                      /* ucSizeBoardPartNum        */
+	0,                      /* ucSizeBoardUuid           */
+	0,                      /* ucSizeBoardPcieInfo       */
+	0,                      /* ucSizeBoardMaxPowerMode   */
+	0,                      /* ucSizeMemorySize          */
+	0,                      /* ucSizeOemId               */
+	0,                      /* ucSizeCapability          */
+	0,                      /* ucSizeMfgPartNum          */
 
-	0,                                                                     /* ucOffsetEepromVersion       */
-	0,                                                                     /* ucOffsetProductName         */
-	0,                                                                     /* ucOffsetBoardRev            */
-	0,                                                                     /* ucOffsetBoardSerial         */
-	0,                                                                     /* cNOffsetumMacIds            */
-	0,                                                                     /* ucOffsetBoardMac            */
-	0,                                                                     /* ucOffsetBoardActivePassive  */
-	0,                                                                     /* ucOffsetBoardConfigMode     */
-	0,                                                                     /* ucOffsetBoardMfgDate        */
-	0,                                                                     /* ucOffsetBoardPartNum        */
-	0,                                                                     /* ucOffsetBoardUuid           */
-	0,                                                                     /* ucOffsetBoardPcieInfo       */
-	0,                                                                     /* ucOffsetBoardMaxPowerMode   */
-	0,                                                                     /* ucOffsetMemorySize          */
-	0,                                                                     /* ucOffsetOemId               */
-	0,                                                                     /* ucOffsetCapability          */
-	0,                                                                     /* ucOffsetMfgPartNum          */
+	0,                      /* ucOffsetEepromVersion       */
+	0,                      /* ucOffsetProductName         */
+	0,                      /* ucOffsetBoardRev            */
+	0,                      /* ucOffsetBoardSerial         */
+	0,                      /* cNOffsetumMacIds            */
+	0,                      /* ucOffsetBoardMac            */
+	0,                      /* ucOffsetBoardActivePassive  */
+	0,                      /* ucOffsetBoardConfigMode     */
+	0,                      /* ucOffsetBoardMfgDate        */
+	0,                      /* ucOffsetBoardPartNum        */
+	0,                      /* ucOffsetBoardUuid           */
+	0,                      /* ucOffsetBoardPcieInfo       */
+	0,                      /* ucOffsetBoardMaxPowerMode   */
+	0,                      /* ucOffsetMemorySize          */
+	0,                      /* ucOffsetOemId               */
+	0,                      /* ucOffsetCapability          */
+	0,                      /* ucOffsetMfgPartNum          */
 
-	0,                                                                     /* ucOffsetChecksumLsb         */
-	0,                                                                     /* ucOffsetChecksumMsb         */
-	0,                                                                     /* ucChecksumStart             */
-	0,                                                                     /* ucChecksumEnd               */
+	0,                      /* ucOffsetChecksumLsb         */
+	0,                      /* ucOffsetChecksumMsb         */
+	0,                      /* ucChecksumStart             */
+	0,                      /* ucChecksumEnd               */
 
 	{
 		0
-	},                                                                     /* pulStatCounters[ EEPROM_STATS_MAX ]      */
+	},                      /* pulStatCounters[ EEPROM_STATS_MAX ]      */
 	{
 		0
-	},                                                                     /* pulStatErrorCounters[ EEPROM_ERROR_MAX ] */
+	},                      /* pulStatErrorCounters[ EEPROM_ERROR_MAX ] */
 
-	LOWER_FIREWALL                                                         /* ulLowerFirewall             */
+	LOWER_FIREWALL          /* ulLowerFirewall             */
 };
-#if 0
-static EEPROM_PRIVATE_DATA xLocalData =
-{
-    UPPER_FIREWALL,                     /* ulUpperFirewall       */
-    FALSE,                              /* iEepromInitialised    */
-    { 0 },                              /* xEepromCfg            */
-    EEPROM_VERSION_1_0,                 /* xEepromExpectedVersion*/
-    EEPROM_VERSION_1_0,                 /* xEepromActualVersion  */
-    { {
-    { 0x01 },                           /* ucEepromVersion */
-    { 0x52, 0x41, 0x56, 0x45, 0x2d, 0x49, 0x56, 0x48, 0x2d,
-	  0x53, 0x41, 0x50, 0x50, 0x48, 0x00, 0x00 },             /* ucProductName */
-    { 0x35, 0x32, 0x31, 0x31, 0x33, 0x2d, 0x30, 0x31, 0x00 }, /* ucPartNumber */
-    { 0x35, 0x32, 0x31, 0x31, 0x33, 0x2d, 0x30, 0x31, 0x00 }, /* ucMfgPartNumber */
-    { 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },       /* ucMfgPartRevision */
-    { 0x35, 0x32, 0x48, 0x32, 0x34, 0x31, 0x37, 0x30, 0x30,
-	  0x30, 0x30, 0x37, 0x37, 0x00, 0x00, 0x00},              /* ucProductSerial */
-    { 0xa3, 0xe0, 0xdf, 0xff },                         /* ucMfgDate */
-      0x10,                                             /* ucNumMacIds */
-    { 0x00, 0x0a, 0x35, 0x16, 0x57, 0xc0 },             /* ucMac */
-    { 0x13, 0x77, 0xae, 0x10, 0x62, 0x29, 0xc4, 0x96,
-      0x54, 0x4f, 0x44, 0x2d, 0xd6, 0x5b, 0xa2, 0x7c }, /* ucUuid */
-    } },                                /* xBoardInfo            */
-    NULL,                               /* pucEepromVersion      */
-    NULL,                               /* pucProductName        */
-    NULL,                               /* pucBoardRev           */
-    NULL,                               /* pucBoardSerial        */
-    0,                                  /* ucNumMacIds           */
-    NULL,                               /* pucBoardMac           */
-    NULL,                               /* pucBoardActivePassive */
-    NULL,                               /* pucBoardConfigMode    */
-    NULL,                               /* pucBoardMfgDate       */
-    NULL,                               /* pucBoardPartNum       */
-    NULL,                               /* pucBoardUuid          */
-    NULL,                               /* pucBoardPcieInfo      */
-    NULL,                               /* pucBoardMaxPowerMode  */
-    NULL,                               /* pucMemorySize         */
-    NULL,                               /* pucOemId              */
-    NULL,                               /* pucCapability         */
-    NULL,                               /* pucMfgPartNum         */
-
-    0,                                  /* ucSizeEepromVersion       */
-    0,                                  /* ucSizeProductName         */
-    0,                                  /* ucSizeBoardRev            */
-    0,                                  /* ucSizeBoardSerial         */
-    0,                                  /* cNSizeumMacIds            */
-    0,                                  /* ucSizeBoardMac            */
-    0,                                  /* ucSizeBoardActivePassive  */
-    0,                                  /* ucSizeBoardConfigMode     */
-    0,                                  /* ucSizeBoardMfgDate        */
-    0,                                  /* ucSizeBoardPartNum        */
-    0,                                  /* ucSizeBoardUuid           */
-    0,                                  /* ucSizeBoardPcieInfo       */
-    0,                                  /* ucSizeBoardMaxPowerMode   */
-    0,                                  /* ucSizeMemorySize          */
-    0,                                  /* ucSizeOemId               */
-    0,                                  /* ucSizeCapability          */
-    0,                                  /* ucSizeMfgPartNum          */
-
-    0,                                  /* ucOffsetEepromVersion       */
-    0,                                  /* ucOffsetProductName         */
-    0,                                  /* ucOffsetBoardRev            */
-    0,                                  /* ucOffsetBoardSerial         */
-    0,                                  /* cNOffsetumMacIds            */
-    0,                                  /* ucOffsetBoardMac            */
-    0,                                  /* ucOffsetBoardActivePassive  */
-    0,                                  /* ucOffsetBoardConfigMode     */
-    0,                                  /* ucOffsetBoardMfgDate        */
-    0,                                  /* ucOffsetBoardPartNum        */
-    0,                                  /* ucOffsetBoardUuid           */
-    0,                                  /* ucOffsetBoardPcieInfo       */
-    0,                                  /* ucOffsetBoardMaxPowerMode   */
-    0,                                  /* ucOffsetMemorySize          */
-    0,                                  /* ucOffsetOemId               */
-    0,                                  /* ucOffsetCapability          */
-    0,                                  /* ucOffsetMfgPartNum          */
-
-    0,                                  /* ucOffsetChecksumLsb         */
-    0,                                  /* ucOffsetChecksumMsb         */
-    0,                                  /* ucChecksumStart             */
-    0,                                  /* ucChecksumEnd               */
-
-    { 0 },                              /* pulStatCounters[ EEPROM_STATS_MAX ]      */
-    { 0 },                              /* pulStatErrorCounters[ EEPROM_ERROR_MAX ] */
-
-    LOWER_FIREWALL     /* ulLowerFirewall             */
-};
-#endif
 static EEPROM_PRIVATE_DATA *pxThis = &xLocalData;
 
 
@@ -685,7 +596,7 @@ int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROM_CFG *pxEepromCfg )
 							uint32_t fru_ts = (uint32_t)(pxThis->pucBoardMfgDate[2] << 16) |  /* MSB */
 											    		(pxThis->pucBoardMfgDate[1] <<  8) |
 														(pxThis->pucBoardMfgDate[0]      ); /* LSB */
-							
+
 
 							/*if (FRU_BOARD_DATE_UNSPEC == fru_ts) {
 								ts = IPMI_TIME_UNSPECIFIED;
@@ -1463,7 +1374,7 @@ static int ucEepromWriteByte( uint8_t ucAddressOffset, uint8_t ucRegisterValue )
 				pxThis->xEepromCfg.ucEepromAddressSize,
 				ucAddressOffset,
 				ucRegisterValue);
-			
+
 			pucBuffer[ EEPROM_ADDRESS_BYTE_ONE ]     = ucAddressOffset;
 			pucBuffer[ EEPROM_ADDRESS_BYTE_ONE + 1 ] = ucRegisterValue;
 		}
@@ -1757,8 +1668,8 @@ static int iEepromVerifyChecksum( void )
 	{
 		0
 	};
-	int i                    	 = 0;
-	uint8_t ucAddressOffset      = 0;	
+	int i                        = 0;
+	uint8_t ucAddressOffset      = 0;
 	uint8_t usCalculatedChecksum = 0;
 
 	iStatus = ucEepromReadMultiBytes( ucAddressOffset, &pucData[ i ], EEPROM_V1_0_BOARD_CHECKSUM_SIZE
@@ -1772,7 +1683,6 @@ static int iEepromVerifyChecksum( void )
 
 		if( usCalculatedChecksum != 0U )
 		{
-           PLL_ERR( EEPROM_NAME, "iEepromVerifyHeaderChecksum checksum = %d \r\n", usCalculatedChecksum);
 			iStatus = ERROR;
 			INC_ERROR_COUNTER( EEPROM_ERROR_CHECKSUM );
 		}
@@ -1907,6 +1817,6 @@ static int iEepromDumpContents( void )
 		vPLL_Printf( "\r\n" );
 	}
 
-	return ( iStatus );
+	return iStatus;
 }
-#endif
+#endif /* EEPROM_VERBOSE_DEBUG_ENABLE */

@@ -5,7 +5,6 @@
  * This file contains the EMMC driver debug access
  *
  * @file emmc_debug.h
- *
  */
 
 #ifndef _EMMC_DEBUG_H_
@@ -27,4 +26,4 @@
  */
 void vEMMC_DebugInit( DAL_HDL pxParentHandle );
 
-#endif
+#endif /* _EMMC_DEBUG_H_ */
