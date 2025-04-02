@@ -16,7 +16,7 @@ XSA=${1:-"ve2302_pcie_qdma_base.xsa"}
 PRODUCT=${2:-"rave"}
 
 # Step FW
-#./scripts/build.sh -os freertos10_xilinx -profile ${PRODUCT} -xsa ../$XSA
+./scripts/build.sh -os freertos10_xilinx -xsa ../$XSA
 
 # Takes in fpt.json and produces fpt.bin
 ./scripts/gen_fpt.py \

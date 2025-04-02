@@ -29,6 +29,11 @@ else()
         set(OS "FreeRTOS")
     endif()
 
+    #if profile not specified, default to rave
+    if(NOT PROFILE)
+        set(PROFILE "rave")
+    endif()
+
     if(OS MATCHES "^(Linux)$")
         set(CMAKE_C_COMPILER gcc)
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

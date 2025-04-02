@@ -83,8 +83,8 @@ function print_help() {
 	echo "E.g.: To build the application only:"
 	echo " ./scripts/build.sh -os freertos10_xilinx -profile <v80|rave> -amc"
 	echo
-	echo "E.g.: To build application for Linux (profile will default to Linux):"
-	echo " ./scripts/build.sh -os Linux -amc"
+	echo "E.g.: To build default application (freertos and profile will default to rave):"
+	echo " ./scripts/build.sh -amc"
 	echo
 	echo "========================================================================================="
 }
@@ -141,34 +141,29 @@ while [ $# -gt 0 ]; do
 		echo "Building $OUTPUT_BIN only"
 		AMC_ONLY=1
 		;;
-		-xsa)
-			shift  ### shift to next passed variable (-xsa *) ###
-			XSA=$1 ### store option into xsa variable ###
+	-xsa)
+		shift  ### shift to next passed variable (-xsa *) ###
+		XSA=$1 ### store option into xsa variable ###
 
 		### handle empty string ###
-			if [ "$1" = "" ]; then
+		if [ "$1" = "" ]; then
 			echo "Error: Invalid xsa"
 			exit 1
 		fi
-			;;
+		;;
 	-profile)
 		shift
 		PROFILE=$1
-
-			if [ "$1" = "" ]; then
-			echo "Error: Invalid profile"
-			exit 1
-		fi
-			;;
+		;;
 		-os)
-			shift
-			OS=$1
+		shift
+		OS=$1
 
-			if [ "$1" = "" ]; then
+		if [ "$1" = "" ]; then
 			echo "Error: Invalid OS"
 			exit 1
 		fi
-			;;
+		;;
 	-freertos_debug)
 		FREERTOS_DEBUG=1
 		CMAKE_PARAMS+="-DFREERTOS_DEBUG=true "
@@ -214,11 +209,7 @@ if [ "$OS" == "Linux" ]; then
 fi
 
 ### handle profile ###
-if [ $PROFILE == 0 ]; then
-	### if profile not specified ###
-	echo "Error: Please specify profile"
-	exit 1
-else
+if [ -n $PROFILE ]; then
 	### print out profile name ###
 	echo "profile set ==> $PROFILE" |& tee -a $BUILD_LOG
 fi
@@ -264,9 +255,7 @@ else
 	fi
 fi
 
-if [ ! -d $BUILD_DIR ]; then
-	mkdir -p $BUILD_DIR;
-fi
+mkdir -p $BUILD_DIR;
 cd $BUILD_DIR
 
 # Running CMake
