@@ -27,10 +27,10 @@ PRODUCT=${2:-"rave"}
 bootgen \
     -arch versal \
     -image ./fpt/pdi_combine_${PRODUCT}.bif \
-    -w -o ./build/OSPI_${PRODUCT^^}.bin
+    -w -o ./build/ospi_${PRODUCT}.bin
 
 # final pdi generation
 ./scripts/fpt_pdi_gen.py \
     --fpt ./build/fpt.bin \
-    --pdi ./build/OSPI_${PRODUCT^^}.bin \
-    --output ./build/OSPI_${PRODUCT^^}_fpt.bin
+    --pdi ./build/ospi_${PRODUCT}.bin \
+    --output ./build/ospi_${PRODUCT}_fpt.bin

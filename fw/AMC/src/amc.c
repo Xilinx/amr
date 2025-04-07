@@ -19,7 +19,6 @@
 #include "xloader_bsp_config.h"
 #include "xil_util.h"
 #include "xil_cache.h"
-#include "xloader_defs.h"
 #include "xloader_client.h"
 
 /* osal */
