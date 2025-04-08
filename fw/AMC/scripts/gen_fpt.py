@@ -164,12 +164,12 @@ def main():
 
     # Step6: Write bytearray to binary file
     try:
-        fpt_bin_file = os.path.join(args.output_path, "fpt.bin")
+        fpt_bin_file = os.path.join(args.output_path, "amc_fpt.bin")
         print('FPT file: ' + fpt_bin_file)
 
         with open(fpt_bin_file, 'wb') as fp:
             fp.write(fpt_data)
-            print('Successfully generated binary fpt.bin...')
+            print('Successfully generated binary amc_fpt.bin...')
     except Exception as e:
         print(e)
 
