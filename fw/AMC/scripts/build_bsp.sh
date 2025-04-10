@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+##
+# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # E.g. Build amc bsp:
@@ -13,7 +14,8 @@
 xsa=0
 ### store os param ###
 os=0
-
+### SDT name
+SDT="emb_plus_sdt"
 
 ##
 # This function will display syntax diagram, with description of each option
@@ -28,6 +30,7 @@ function help() {
 	echo "Options:"
 	echo "-xsa       [file path]    Specify .xsa file path"
 	echo "-os        [name]         Specify target os (eg standalone)"
+	echo "-sdt       [name]         Specify SDT folder name (eg emb_plus_ve2302_sdt)"
 	echo "-clean                    Remove all vitis source directories"
 	echo "-help                     Print this help"
 	echo
@@ -46,7 +49,7 @@ function clean() {
 }
 
 
-###                           Script Starting Point                          ###
+### Script Starting Point ###
 
 ### handle options ###
 
@@ -89,6 +92,11 @@ while [ $# -gt 0 ]; do
 			echo "target os set ==> $os"
 		fi
 		;;
+	-sdt)
+		shift
+		SDT=$1
+		echo "SDT folder name set ==> $SDT"
+		;;
 	-freertos_debug)
 		FREERTOS_DEBUG=1
 		;;
@@ -123,12 +131,12 @@ echo "===    Creating BSP    ==="
 cd ..
 mkdir amc_bsp
 cd amc_bsp
-sdtgen -eval "sdtgen set_dt_param -xsa $xsa -dir emb_plus_ve2302_sdt; generate_sdt"
+sdtgen -eval "sdtgen set_dt_param -xsa $xsa -dir ${SDT}; generate_sdt"
 empyro repo -st ${XILINX_VITIS}/data/embeddedsw
-empyro create_bsp -t empty_application -w amc_bsp -s emb_plus_ve2302_sdt/system-top.dts -p psv_cortexr5_0 -o freertos
+empyro create_bsp -t empty_application -w amc_bsp -s ${SDT}/system-top.dts -p psv_cortexr5_0 -o freertos
 empyro config_bsp -d amc_bsp -al xilfpga
 empyro config_bsp -d amc_bsp -al xilloader
-empyro config_bsp -d amc_bsp -st freertos freertos_support_static_allocation:True
+empyro config_bsp -d amc_bsp -st freertos freertos_support_static_allocation:true
 empyro config_bsp -d amc_bsp -st freertos freertos_tick_rate:10000
 empyro config_bsp -d amc_bsp -st freertos freertos_total_heap_size:131072
 empyro build_bsp  -d amc_bsp

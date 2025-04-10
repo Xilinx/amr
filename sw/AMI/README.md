@@ -1,5 +1,5 @@
 SPDX-License-Identifier: GPL-2.0-only
-Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 
 # AVED Management Interface (AMI)
 

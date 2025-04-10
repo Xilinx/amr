@@ -15,6 +15,8 @@ XSA=0
 OS=0
 ### store profile param ###
 PROFILE=0
+### store sdt  param ###
+SDT="emb_plus_sdt"
 ### AMC build only
 AMC_ONLY=0
 ### stores additional params for CMake ###
@@ -71,7 +73,8 @@ function print_help() {
 	echo "-amc                    : only builds the AMC application (BSP untouched)"
 	echo "-profile <profile_name> : set the profile to build AMC for (v70/v80/Linux/rave, etc)"
 	echo "-os <os_name>           : set the OS (freertos10_xilinx, standalone, Linux, etc)"
-	echo "-xsa <path_to_xsa>      : XSA to generate BSP from"
+	echo "-xsa <abs_path_to_xsa>  : XSA to generate BSP from"
+	echo "-sdt                    : SDT folder name"
 	echo "-freertos_debug         : sets FreeRTOSConfig.h stat debug flags"
 	echo "-analysis               : triggers a static analysis check on AMC files"
 	echo
@@ -89,31 +92,7 @@ function print_help() {
 	echo "========================================================================================="
 }
 
-function check_workspace_setup() {
-	for file in "${GIT_FILES[@]}"
-	do
-		if [ -f ".git/hooks/$file" ]; then
-			echo "Checking ==> $file"
-		else
-			echo "Checking ==> $file"
-			echo "Error: file does not exist."
-			echo "Please run ./scripts/setupWorkspace.sh"
-			exit 1
-		fi
-	done
-
-	echo "Checking ==> uncrustify is installed"
-	check=$(command -v uncrustify)
-
-	if [ $? -ne 0 ]; then
-		echo "Error: uncrustify is not installed."
-		echo "Please run ./scripts/setupWorkspace.sh"
-		exit 1
-	fi
-}
-
-
-###                           Script Starting Point                          ###
+### Script Starting Point  ###
 
 ### handle options ###
 
@@ -155,19 +134,23 @@ while [ $# -gt 0 ]; do
 		shift
 		PROFILE=$1
 		;;
-		-os)
+	-os)
 		shift
 		OS=$1
 
 		if [ "$1" = "" ]; then
-			echo "Error: Invalid OS"
+			echo "Using default OS=freertos10_xilinx"
 			exit 1
 		fi
+		;;
+	-sdt)
+		shift
+		SDT=$1
 		;;
 	-freertos_debug)
 		FREERTOS_DEBUG=1
 		CMAKE_PARAMS+="-DFREERTOS_DEBUG=true "
-			;;
+		;;
 	-analysis)
 		STATIC_ANALYSIS_DEBUG=1
 		;;
@@ -179,14 +162,9 @@ while [ $# -gt 0 ]; do
 	shift ### shift to next passed option ###
 done
 
-# Check setupWorkspace.sh script has run, and that uncrustify is installed.
-# check_workspace_setup
-
 # Remake build direcory
-if [ -d "$BUILD_DIR" ]; then
-	rm -rf $BUILD_DIR/
-fi
-mkdir $BUILD_DIR
+rm -rf $BUILD_DIR/
+mkdir -p $BUILD_DIR
 
 ### start initial build ###
 echo "$(date)" |& tee $BUILD_LOG
@@ -194,12 +172,12 @@ echo "$(date)" |& tee $BUILD_LOG
 ### handle os ###
 if [ $OS == 0 ]; then
 	### if os not specified ###
-	echo "Error: Please specify target OS"
-	exit 1
-else
-	### print out os path ###
-	echo "OS path set ==> $OS" |& tee -a $BUILD_LOG
+	OS="freertos10_xilinx"
+	echo "Using default OS=${OS}"
 fi
+
+### print out os path ###
+echo "OS path set ==> $OS" |& tee -a $BUILD_LOG
 
 ### handle os set to Linux ###
 if [ "$OS" == "Linux" ]; then
@@ -233,16 +211,14 @@ else
 
 		### Removes and regenerates BSP ###
 		clean
-		if [ ! -d $BUILD_DIR ]; then
-			mkdir -p $BUILD_DIR;
-		fi
+		mkdir -p $BUILD_DIR;
 		echo "=== Building BSP ===" |& tee -a $BUILD_LOG
 		SECTION_START=$SECONDS
 		cd $SCRIPTS_DIR
 		if [ "$FREERTOS_DEBUG" == 1 ]; then
-			./build_bsp.sh -xsa "$XSA" -os "$OS" -freertos_debug |& tee -a $BUILD_LOG
+			./build_bsp.sh -xsa "$XSA" -os "$OS" -sdt "$SDT" -freertos_debug |& tee -a $BUILD_LOG
 		else
-			./build_bsp.sh -xsa "$XSA" -os "$OS" |& tee -a $BUILD_LOG
+			./build_bsp.sh -xsa "$XSA" -os "$OS" -sdt "$SDT" |& tee -a $BUILD_LOG
 
 		if [ "${PIPESTATUS[0]}" == 1 ]; then
 			echo "Error: Building BSP failed!"
