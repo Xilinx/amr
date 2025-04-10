@@ -9,11 +9,11 @@
     "fpt_entry(0, 0)": {
         "type"              : "PDI",
         "base_addr"         : "0x00008000",
-        "partition_size"    : "0x07E00000"
+        "partition_size"    : "0x03F00000" 
     },
     "fpt_entry(0, 1)": {
         "type"              : "PDI",
-        "base_addr"         : "0x07E08000",
-        "partition_size"    : "0x07E00000"
+        "base_addr"         : "0x03F08000",
+        "partition_size"    : "0x03F00000"
     }
 }
