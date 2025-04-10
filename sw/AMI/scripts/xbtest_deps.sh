@@ -1,10 +1,8 @@
 #!/bin/bash
-################################################################################
-#                                                                              #
-# Copyright (C) 2023, Advanced Micro Devices, Inc. All rights reserved.        #
-# SPDX-License-Identifier: GPL-2.0-only                                        #
-#                                                                              #
-################################################################################
+##
+# Copyright (C) 2023, Advanced Micro Devices, Inc. All rights reserved.
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 FLAVOR=`grep '^ID=' /etc/os-release | awk -F= '{print $2}' | tr -d '"'`
 VERSION=`grep '^VERSION_ID=' /etc/os-release | awk -F= '{print $2}' | tr -d '"'`
