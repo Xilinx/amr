@@ -74,7 +74,7 @@ done
 
 # Takes in fpt.json and produces fpt.bin
 ./scripts/gen_fpt.py \
-	-f ./fpt/fpt_${PROFILE}.json \
+	-f ./fpt/fpt.json \
 	-o build
 
 # Generate PDI w/ bootgen
@@ -85,11 +85,11 @@ sed -i "s|.pdi|$(find ./amc_bsp/${SDT} -name *.pdi)|" \
 bootgen \
 	-arch versal \
 	-image ./build/pdi_combine.bif \
-	-w -o  ./build/amc_ospi.bin
+	-w -o  ./build/amr_ospi.bin
 
 # final pdi generation
 ./scripts/fpt_pdi_gen.py \
-	--fpt    ./build/amc_fpt.bin \
-	--pdi    ./build/amc_ospi.bin \
-	--output ./build/amc_ospi_fpt.bin
+	--fpt    ./build/amr_fpt.bin \
+	--pdi    ./build/amr_ospi.bin \
+	--output ./build/amr_ospi_fpt.bin
 
