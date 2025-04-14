@@ -5,15 +5,10 @@
 
 set -e
 
-################################################################################
-###                                 Variables                                ###
-################################################################################
-
 # Command line options
 DRIVER_ONLY=0
 APP_ONLY=0
 NO_VER=0
-NO_WORKSPACE=0
 PROFILE=""
 
 # Output files
@@ -29,10 +24,7 @@ APP_DIR=$ROOT_DIR/app
 
 SCRIPT_START_TIME=$SECONDS
 
-################################################################################
-###                                 Functions                                ###
-################################################################################
-
+### Functions ###
 function clean_driver() {
     SECTION_START=$SECONDS
     echo "=== Removing driver artifacts ==="
@@ -57,7 +49,6 @@ function print_help() {
     echo "-driver       : only builds the AMI driver (app and API untouched)"
     echo "-app          : only builds the AMI API and ami_tool binary (driver untouched)"
     echo "-no_ver       : Don't execute the getVersion.sh script (useful for development)"
-    echo "-no_workspace : Skip the workspace setup (the workspace setup is only needed during active development)"
     echo "-profile      : Rave"
     echo
     echo "If no options are specified, the default behaviour is to clean and build everything"
@@ -121,11 +112,8 @@ function fetch_gcq_version() {
     echo "*** sGCQ version update took $((SECONDS - $SECTION_START)) S ***"
 }
 
-################################################################################
 
-################################################################################
-###                           Script Starting Point                          ###
-################################################################################
+### Script Starting Point ###
 
 # Check that the necessary directories exist
 if [[ (! -d "$DRIVER_DIR") || (! -d "$API_DIR") || (! -d "$APP_DIR") ]]; then
@@ -166,9 +154,6 @@ while [ $# -gt 0 ]; do
     -no_ver)
         NO_VER=1
         ;;
-    -no_workspace)
-        NO_WORKSPACE=1
-        ;;
     -profile)
         # Build profile
         PROFILE="$2"
@@ -180,11 +165,6 @@ done
 
 ### start initial build ###
 echo "$(date)"
-
-if [ $NO_WORKSPACE -eq 0 ]; then
-    echo "Setting up workspace"
-    #./scripts/setupWorkspace.sh
-fi
 
 if [ $DRIVER_ONLY -eq 1 ]; then
     echo "Building ami.ko only"

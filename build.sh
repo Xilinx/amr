@@ -91,5 +91,5 @@ popd
 pushd ${SW_DIR}
 	echo "${SW_DIR}"
 	./scripts/build.sh -profile ${PROFILE}
-	./scripts/gen_package_amr.py -g -n -f
+	./scripts/gen_package.py -g -n -f
 popd

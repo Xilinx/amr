@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
 import re
 import os
@@ -14,6 +14,7 @@ SCRIPT_VERSION = '1.0'
 SCRIPT_FILE    = os.path.basename(__file__)
 SCRIPT_DIR     = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR    = os.path.abspath(os.path.join(SCRIPT_DIR, os.pardir))
+ROOT_DIR       = os.path.abspath(os.path.join(SCRIPT_FILE ,"../../.."))
 
 BUILD_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, 'package_data'))
 sys.path.insert(0, BUILD_DIR)
@@ -312,7 +313,7 @@ def main(args):
                 api_headers.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
 
         config['package']                       = {}
-        config['package']['name']               = 'ami'
+        config['package']['name']               = 'amr'
         config['package']['release']            = opt.pkg_release
         config['package']['summary']            = config['package']['name'] + ' driver package'
         config['package']['description']        = [
@@ -416,6 +417,8 @@ def main(args):
 
         config['package']['usr_bin_dir']        = 'usr/local/bin/'
         config['package']['usr_lib_dir']        = 'usr/local/lib/'
+
+        config['package']['opt_dir']        = 'opt/amd/amr/amd_rave_gen3x4_25.1'
 
         config['package']['usr_bin'] = config['package']['usr_bin_dir'] + '/ami_tool'
         config['package']['usr_lib'] = config['package']['usr_lib_dir'] + '/libami.a'
@@ -647,6 +650,8 @@ def main(args):
             {'src': os.path.abspath(join(SCRIPT_DIR, 'package_data',  'dkms.conf')),'dst': config['package']['usr_src_dir']},
             {'src': os.path.abspath(join(PROJECT_DIR, 'api',  'build', 'libami.a')),'dst': config['package']['usr_lib_dir']},
             {'src': os.path.abspath(join(PROJECT_DIR, 'app',  'build', 'ami_tool')),'dst': config['package']['usr_bin_dir']},
+            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'amr_ospi.bin')),  'dst': config['package']['opt_dir']},
+            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'amr_ospi_fpt.bin')),'dst': config['package']['opt_dir']},
             *api_dest,
             *driver_dest
         ]
