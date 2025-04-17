@@ -1,7 +1,7 @@
 SPDX-License-Identifier: GPL-2.0-only
 Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 
-# AVED Management Interface (AMI)
+# AMR Management Interface (AMI)
 
 Refer to https://pages.gitenterprise.xilinx.com/XBB/AMI/ for the Architecture and API descriptions.
 

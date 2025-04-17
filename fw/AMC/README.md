@@ -1,19 +1,19 @@
 Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: MIT
 
-# AVED Management Control (AMC)
+# AMR Management Control (AMC)
 
 Refer to https://pages.gitenterprise.xilinx.com/XBB/AMC/ for the Architecture and API descriptions.
 
 ## Overview
 
-The AVED Management Controller (AMC) provides management and control of the AMR on RPU-0. Its basic features include, but are not limited to:
+The AMR Management Controller (AMC) provides management and control of the AMR on RPU-0. Its basic features include, but are not limited to:
 
 - In-Band Telemetry
-- Built in Monitoring 
+- Built in Monitoring
 - Host (AMI) communication
 - Sensor Control
-- QSFP Control
+- QSFP Control (v80 only)
 - Download and Programming to Flash
 
 In addition, the AMC is fully abstracted from:
@@ -32,16 +32,11 @@ Event driven architecture is provided by the Event Library (EVL).
 
 Copy source (ssh recommended):
 ```
-git clone --recurse-submodules git@gitenterprise.xilinx.com:XBB/AMC.git
+git clone git@gitenterprise.xilinx.com:Platform-Management/amr.git
 ```
-SSH key passphrase will be required to clone each submodule.
-
 cd into top-level of the cloned repo
 
 Enable Xilinx software command-line tools:
-```
-module switch xilinx/ta/<selected_version>
-```
 
 ### Build
 

@@ -480,7 +480,9 @@ void pcie_device_remove(struct pci_dev *dev)
 
 	pci_disable_device(dev);                        /* Disable bus mastering regardless of the refcount */
 	kill_pf_dev_apps(pf_dev, SIGBUS);               /* Kill any applications that may still be running */
-	down_interruptible(&pf_dev->remove_sema);       /* Wait until the refcount reaches 0 */
+	if (down_interruptible(&pf_dev->remove_sema)) { /* Wait until the refcount reaches 0 */
+		PR_DBG("PCIe device remove error");
+	}
 	delete_pf_dev_data(pf_dev, false);              /* Safe to delete data */
 	DEV_INFO(dev, "Successfully removed PCIe device");
 }
