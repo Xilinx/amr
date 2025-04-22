@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
 TARGET_MODULE:=ami
 
@@ -30,7 +30,7 @@ EXTRA_CFLAGS:=-I$(PWD) -I$(PWD)/fal -I$(PWD)/fal/gcq -I$(PWD)/gcq-driver/src
 KERNEL_DIR = /lib/modules/`uname -r`/build
 
 #CFLAGS_file_name will apply the macros to those files
-# CFLAGS_versal_vmc.o:=-DDEBUG
+# CFLAGS_versal_amc.o:=-DDEBUG
 
 #To apply the macro to all the source files compiled with this makefile
 # ccflags-y:=-DDEBUG

@@ -11,10 +11,6 @@
 #define _FW_IF_GCQ_H_
 
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 #include "fw_if.h"
 
 
@@ -48,9 +44,9 @@ typedef enum _FW_IF_GCQ_MODE_TYPE
  */
 typedef enum _FW_IF_GCQ_INTERRUPT_MODE_TYPE
 {
-    FW_IF_GCQ_INTERRUPT_MODE_NONE = 0,                      /* No interrupts enabled */
-    FW_IF_GCQ_INTERRUPT_MODE_TAIL_POINTER_TRIGGER,          /* Interrupt is triggered on a write operation to the tail pointer register */
-    FW_IF_GCQ_INTERRUPT_MODE_MANUAL_TRIGGER,                /* Interrupt is triggered by setting the interrupt field of the interrupt register */
+    FW_IF_GCQ_INTERRUPT_MODE_NONE = 0,          	/* No interrupts enabled */
+    FW_IF_GCQ_INTERRUPT_MODE_TAIL_POINTER_TRIGGER,	/* Interrupt is triggered on a write operation to the tail pointer register */
+    FW_IF_GCQ_INTERRUPT_MODE_MANUAL_TRIGGER,		/* Interrupt is triggered by setting the interrupt field of the interrupt register */
 
     MAX_FW_IF_GCQ_INTERRUPT_MODE
 
@@ -104,7 +100,7 @@ typedef enum _FW_IF_GCQ_IOCTL_TYPE
 
     MAX_FW_IF_GCQ_IOCTRL_OPTION
 
-} _FW_IF_GCQ_IOCTL_TYPE;
+} FW_IF_GCQ_IOCTL_TYPE;
 
 
 /*****************************************************************************/
@@ -117,7 +113,7 @@ typedef enum _FW_IF_GCQ_IOCTL_TYPE
  */
 typedef struct _FW_IF_GCQ_INIT_CFG
 {
-    void                                *pvIOAccess;
+    void                        	*pvIOAccess;
 
 } FW_IF_GCQ_INIT_CFG;
 
@@ -127,16 +123,16 @@ typedef struct _FW_IF_GCQ_INIT_CFG
  */
 typedef struct _FW_IF_GCQ_CFG
 {
-    uint64_t                            ullBaseAddress;
-    FW_IF_GCQ_MODE_TYPE                 xMode;
-    FW_IF_GCQ_INTERRUPT_MODE_TYPE       xInterruptMode;
-    uint64_t                            ullRingAddress;
-    uint32_t                            ulRingLength;
-    uint32_t                            ulCompletionQueueSlotSize;
-    uint32_t                            ulSubmissionQueueSlotSize;
-    uint8_t                             udid[ FW_IF_GCQ_UDID_LEN ];
+    uint64_t                  		ullBaseAddress;
+    FW_IF_GCQ_MODE_TYPE          	xMode;
+    FW_IF_GCQ_INTERRUPT_MODE_TYPE	xInterruptMode;
+    uint64_t                   		ullRingAddress;
+    uint32_t           				ulRingLength;
+    uint32_t                 		ulCompletionQueueSlotSize;
+    uint32_t                    	ulSubmissionQueueSlotSize;
+    uint8_t                 		udid[ FW_IF_GCQ_UDID_LEN ];
 
-    void                                *pvProfile;      /* opaque handle to store internal context */
+    void                      		*pvProfile;      /* opaque handle to store internal context */
 
 } FW_IF_GCQ_CFG;
 
@@ -152,7 +148,7 @@ typedef struct _FW_IF_GCQ_CFG
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxInitCfg );
+uint32_t ulFW_IF_GCQ_Init(FW_IF_GCQ_INIT_CFG *pxInitCfg);
 
 /**
  * @brief   creates an instance of the sGCQ interface
@@ -162,22 +158,6 @@ extern uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQ_INIT_CFG *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *pxFwIf, FW_IF_GCQ_CFG *pxGCQCfg );
-
-/**
- * @brief    Print all the stats gathered by the interface
- *
- * @return   OK                  Stats retrieved from gcq successfully
- *           ERROR               Stats not retrieved successfully
- */
-int iFW_IF_GCQ_PrintStatistics( void );
-
-/**
- * @brief    Clears all the stats gathered by the interface
- *
- * @return   OK                  Stats cleared successfully
- *           ERROR               Stats not cleared successfully
- */
-int iFW_IF_GCQ_ClearStatistics( void );
+uint32_t ulFW_IF_GCQ_Create(FW_IF_CFG *pxFwIf, FW_IF_GCQ_CFG *pxGCQCfg);
 
 #endif /* _FW_IF_GCQ_H_ */

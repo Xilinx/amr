@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdlib.h>
 #include <stddef.h>
@@ -136,8 +132,16 @@ static uint32_t calc_est_time(uint32_t part_size)
 	return est_dur_seconds;
 }
 
-/*
+/**
  * "cfgmem_copy" command callback.
+ * @options:  Ordered list of options passed in at the command line
+ * @num_args:  Number of non-option arguments (excluding command)
+ * @args:  List of non-option arguments (excluding command)
+ *
+ * `args` may be an invalid pointer. It is the function's responsibility
+ * to validate the `num_args` parameter.
+ *
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **args)
 {
@@ -217,10 +221,19 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 		APP_API_ERROR("could not get source fpt partition");
 	} else {
 		est_dur_seconds = calc_est_time(part.size);
-		printf("Estimated time to copy partition: %d (seconds) (NOTE: Changing logging levels may increase copy time)\r\n", est_dur_seconds);
+		printf("Estimated time to copy partition: %d (seconds) "
+			"(NOTE: Changing logging levels may increase copy time)\r\n",
+			est_dur_seconds);
 	}
 
-	ret = ami_prog_copy_partition(dev, source_device, source_partition, dest_device, dest_partition, progress_handler);
+	ret = ami_prog_copy_partition(
+			dev,
+			source_device,
+			source_partition,
+			dest_device,
+			dest_partition,
+			progress_handler
+		);
 	printf("\r\n");
 
 	if (ret == AMI_STATUS_ERROR)

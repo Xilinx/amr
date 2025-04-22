@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdlib.h>
 #include <stddef.h>
@@ -90,8 +86,16 @@ struct app_cmd cmd_bar_wr = {
 /* Function implementations                                                  */
 /*****************************************************************************/
 
-/*
+/**
  * "bar_wr" command callback.
+ * @options:  Ordered list of options passed in at the command line
+ * @num_args:  Number of non-option arguments (excluding command)
+ * @args:  List of non-option arguments (excluding command)
+ *
+ * `args` may be an invalid pointer. It is the function's responsibility
+ * to validate the `num_args` parameter.
+ *
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_bar_wr(struct app_option *options, int num_args, char **args)
 {
@@ -179,24 +183,20 @@ static int do_cmd_bar_wr(struct app_option *options, int num_args, char **args)
 	if ((NULL != find_app_option('F', options)) ||
 			confirm_action(APP_CONFIRM_PROMPT, 'Y', 3)) {
 		if (num == 1) {
-			ret = ami_mem_bar_write(
-				dev, bar, offset, buf[0]
-			);
+			ret = ami_mem_bar_write(dev, bar, offset, buf[0]);
 		} else {
-			ret = ami_mem_bar_write_range(
-				dev, bar, offset, num, buf
-			);
+			ret = ami_mem_bar_write_range(dev, bar, offset, num, buf);
 		}
 
 		if (ret == AMI_STATUS_OK) {
-			ret = EXIT_SUCCESS;
 			printf("Successfully wrote to %d register(s)\r\n", num);
+			ret = EXIT_SUCCESS;
 		} else {
 			APP_API_ERROR("could not write data");
 		}
 	} else {
-		ret = EXIT_SUCCESS;
 		printf("\r\nAborting...\r\n");
+		ret = EXIT_SUCCESS;
 	}
 
 done:

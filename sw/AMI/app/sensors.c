@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard Includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -148,53 +144,53 @@ static int make_unit_string(enum ami_sensor_unit_mod mod, int type, char *unit)
 		return EXIT_FAILURE;
 
 	switch (mod) {
-	case AMI_SENSOR_UNIT_MOD_MEGA:
-		unit[col++] = 'M';
-		break;
+		case AMI_SENSOR_UNIT_MOD_MEGA:
+			unit[col++] = 'M';
+			break;
 
-	case AMI_SENSOR_UNIT_MOD_KILO:
-		unit[col++] = 'k';
-		break;
+		case AMI_SENSOR_UNIT_MOD_KILO:
+			unit[col++] = 'k';
+			break;
 
-	case AMI_SENSOR_UNIT_MOD_MILLI:
-		unit[col++] = 'm';
-		break;
+		case AMI_SENSOR_UNIT_MOD_MILLI:
+			unit[col++] = 'm';
+			break;
 
-	case AMI_SENSOR_UNIT_MOD_MICRO:
-		unit[col++] = 'u';
-		break;
+		case AMI_SENSOR_UNIT_MOD_MICRO:
+			unit[col++] = 'u';
+			break;
 
-	case AMI_SENSOR_UNIT_MOD_NONE:
-		break;
+		case AMI_SENSOR_UNIT_MOD_NONE:
+			break;
 
-	default:
-		ret = EXIT_FAILURE;
-		break;
+		default:
+			ret = EXIT_FAILURE;
+			break;
 	}
 
 	if (ret == EXIT_FAILURE)
 		return ret;
 
 	switch (type) {
-	case AMI_SENSOR_TYPE_TEMP:
-		unit[col++] = 'C';
-		break;
+		case AMI_SENSOR_TYPE_TEMP:
+			unit[col++] = 'C';
+			break;
 
-	case AMI_SENSOR_TYPE_CURRENT:
-		unit[col++] = 'A';
-		break;
+		case AMI_SENSOR_TYPE_CURRENT:
+			unit[col++] = 'A';
+			break;
 
-	case AMI_SENSOR_TYPE_VOLTAGE:
-		unit[col++] = 'V';
-		break;
+		case AMI_SENSOR_TYPE_VOLTAGE:
+			unit[col++] = 'V';
+			break;
 
-	case AMI_SENSOR_TYPE_POWER:
-		unit[col++] = 'W';
-		break;
+		case AMI_SENSOR_TYPE_POWER:
+			unit[col++] = 'W';
+			break;
 
-	default:
-		ret = EXIT_FAILURE;
-		break;
+		default:
+			ret = EXIT_FAILURE;
+			break;
 	}
 
 	return ret;
@@ -234,33 +230,30 @@ static int populate_sensor_header(ami_device *dev, char **header,
 		}
 
 		switch (i) {
-		case TABLE_NAME:
-			sprintf(header[i], "%s", "Name");
-			break;
+			case TABLE_NAME:
+				sprintf(header[i], "%s", "Name");
+				break;
 
-		case TABLE_VALUE:
-			sprintf(header[i], "%s", "Value");
-			break;
+			case TABLE_VALUE:
+				sprintf(header[i], "%s", "Value");
+				break;
 
-		case TABLE_STATUS:
-			sprintf(header[i], "%s", "Status");
-			break;
+			case TABLE_STATUS:
+				sprintf(header[i], "%s", "Status");
+				break;
 
-		default:
-		{
-			if (extra & EXTRA_FIELDS_MAX) {
-				sprintf(header[i], "%s", "Max");
-				extra &= ~EXTRA_FIELDS_MAX;
-			} else if (extra & EXTRA_FIELDS_AVG) {
-				sprintf(header[i], "%s", "Average");
-				extra &= ~EXTRA_FIELDS_AVG;
-			} else if (extra & EXTRA_FIELDS_LIMITS) {
-				sprintf(header[i], "%s", "Limits (Warn, Crit, Fatal)");
-				extra &= ~EXTRA_FIELDS_LIMITS;
-			}
-
-			break;
-		}
+			default:
+				if (extra & EXTRA_FIELDS_MAX) {
+					sprintf(header[i], "%s", "Max");
+					extra &= ~EXTRA_FIELDS_MAX;
+				} else if (extra & EXTRA_FIELDS_AVG) {
+					sprintf(header[i], "%s", "Average");
+					extra &= ~EXTRA_FIELDS_AVG;
+				} else if (extra & EXTRA_FIELDS_LIMITS) {
+					sprintf(header[i], "%s", "Limits (Warn, Crit, Fatal)");
+					extra &= ~EXTRA_FIELDS_LIMITS;
+				}
+				break;
 		}
 	}
 
@@ -295,80 +288,76 @@ static void get_all_sensor_values(ami_device *dev, const char *sensor,
 	}
 
 	switch (sensor_type) {
-	case AMI_SENSOR_TYPE_TEMP:
-		ami_sensor_get_temp_value(dev, sensor, &v, &values->status);
-		ami_sensor_get_temp_unit_mod(dev, sensor, &modifier);
+		case AMI_SENSOR_TYPE_TEMP:
+			ami_sensor_get_temp_value(dev, sensor, &v, &values->status);
+			ami_sensor_get_temp_unit_mod(dev, sensor, &modifier);
 
-		if (extra_fields & EXTRA_FIELDS_MAX)
-			values->max_r = ami_sensor_get_temp_uptime_max(dev, sensor, &m);
+			if (extra_fields & EXTRA_FIELDS_MAX)
+				values->max_r = ami_sensor_get_temp_uptime_max(dev, sensor, &m);
 
-		if (extra_fields & EXTRA_FIELDS_AVG)
-			values->avg_r = ami_sensor_get_temp_uptime_average(dev, sensor, &a);
+			if (extra_fields & EXTRA_FIELDS_AVG)
+				values->avg_r = ami_sensor_get_temp_uptime_average(dev, sensor, &a);
 
-		if (extra_fields & EXTRA_FIELDS_LIMITS) {
-			values->limit_w_r = ami_sensor_get_temp_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
-			values->limit_c_r = ami_sensor_get_temp_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
-			values->limit_f_r = ami_sensor_get_temp_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
-		}
+			if (extra_fields & EXTRA_FIELDS_LIMITS) {
+				values->limit_w_r = ami_sensor_get_temp_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
+				values->limit_c_r = ami_sensor_get_temp_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
+				values->limit_f_r = ami_sensor_get_temp_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
+			}
+			break;
 
-		break;
+		case AMI_SENSOR_TYPE_POWER:
+			ami_sensor_get_power_value(dev, sensor, &v, &values->status);
+			ami_sensor_get_power_unit_mod(dev, sensor, &modifier);
 
-	case AMI_SENSOR_TYPE_POWER:
-		ami_sensor_get_power_value(dev, sensor, &v, &values->status);
-		ami_sensor_get_power_unit_mod(dev, sensor, &modifier);
+			if (extra_fields & EXTRA_FIELDS_MAX)
+				values->max_r = ami_sensor_get_power_uptime_max(dev, sensor, &m);
 
-		if (extra_fields & EXTRA_FIELDS_MAX)
-			values->max_r = ami_sensor_get_power_uptime_max(dev, sensor, &m);
+			if (extra_fields & EXTRA_FIELDS_AVG)
+				values->avg_r = ami_sensor_get_power_uptime_average(dev, sensor, &a);
 
-		if (extra_fields & EXTRA_FIELDS_AVG)
-			values->avg_r = ami_sensor_get_power_uptime_average(dev, sensor, &a);
+			if (extra_fields & EXTRA_FIELDS_LIMITS) {
+				values->limit_w_r = ami_sensor_get_power_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
+				values->limit_c_r = ami_sensor_get_power_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
+				values->limit_f_r = ami_sensor_get_power_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
+			}
+			break;
 
-		if (extra_fields & EXTRA_FIELDS_LIMITS) {
-			values->limit_w_r = ami_sensor_get_power_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
-			values->limit_c_r = ami_sensor_get_power_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
-			values->limit_f_r = ami_sensor_get_power_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
-		}
+		case AMI_SENSOR_TYPE_CURRENT:
+			ami_sensor_get_current_value(dev, sensor, &v, &values->status);
+			ami_sensor_get_current_unit_mod(dev, sensor, &modifier);
 
-		break;
+			if (extra_fields & EXTRA_FIELDS_MAX)
+				values->max_r = ami_sensor_get_current_uptime_max(dev, sensor, &m);
 
-	case AMI_SENSOR_TYPE_CURRENT:
-		ami_sensor_get_current_value(dev, sensor, &v, &values->status);
-		ami_sensor_get_current_unit_mod(dev, sensor, &modifier);
+			if (extra_fields & EXTRA_FIELDS_AVG)
+				values->avg_r = ami_sensor_get_current_uptime_average(dev, sensor, &a);
 
-		if (extra_fields & EXTRA_FIELDS_MAX)
-			values->max_r = ami_sensor_get_current_uptime_max(dev, sensor, &m);
+			if (extra_fields & EXTRA_FIELDS_LIMITS) {
+				values->limit_w_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
+				values->limit_c_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
+				values->limit_f_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
+			}
+			break;
 
-		if (extra_fields & EXTRA_FIELDS_AVG)
-			values->avg_r = ami_sensor_get_current_uptime_average(dev, sensor, &a);
+		case AMI_SENSOR_TYPE_VOLTAGE:
+			ami_sensor_get_voltage_value(dev, sensor, &v, &values->status);
+			ami_sensor_get_voltage_unit_mod(dev, sensor, &modifier);
 
-		if (extra_fields & EXTRA_FIELDS_LIMITS) {
-			values->limit_w_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
-			values->limit_c_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
-			values->limit_f_r = ami_sensor_get_current_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
-		}
+			if (extra_fields & EXTRA_FIELDS_MAX)
+				values->max_r = ami_sensor_get_voltage_uptime_max(dev, sensor, &m);
 
-		break;
+			if (extra_fields & EXTRA_FIELDS_AVG)
+				values->avg_r = ami_sensor_get_voltage_uptime_average(dev, sensor, &a);
 
-	case AMI_SENSOR_TYPE_VOLTAGE:
-		ami_sensor_get_voltage_value(dev, sensor, &v, &values->status);
-		ami_sensor_get_voltage_unit_mod(dev, sensor, &modifier);
+			if (extra_fields & EXTRA_FIELDS_LIMITS) {
+				values->limit_w_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
+				values->limit_c_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
+				values->limit_f_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
+			}
+			break;
 
-		if (extra_fields & EXTRA_FIELDS_MAX)
-			values->max_r = ami_sensor_get_voltage_uptime_max(dev, sensor, &m);
-
-		if (extra_fields & EXTRA_FIELDS_AVG)
-			values->avg_r = ami_sensor_get_voltage_uptime_average(dev, sensor, &a);
-
-		if (extra_fields & EXTRA_FIELDS_LIMITS) {
-			values->limit_w_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_WARN, &lw);
-			values->limit_c_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_CRIT, &lc);
-			values->limit_f_r = ami_sensor_get_voltage_limit(dev, sensor, AMI_SENSOR_LIMIT_FATAL, &lf);
-		}
-
-		break;
-
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (convert_units) {
@@ -428,30 +417,19 @@ static int mk_sensor_row(ami_device *dev, const char *sensor,
 	if (!dev || !sensor || !row)
 		return EXIT_FAILURE;
 
-	get_all_sensor_values(
-		dev, sensor, sensor_type, extra_fields, &values, true
-	);
+	get_all_sensor_values(dev, sensor, sensor_type, extra_fields, &values, true);
 
 	if (make_unit_string(AMI_SENSOR_UNIT_MOD_NONE, sensor_type, unit) == EXIT_FAILURE)
 		memset(unit, 0x00, UNIT_STR_SIZE);
 
 	/* Print name - always valid. */
 	if (n_row == 0)
-		sprintf(
-			row[col++],
-			"%s",
-			sensor
-		);
+		sprintf(row[col++], "%s", sensor);
 	else
 		col++;
 
 	/* Print value - always valid. */
-	sprintf(
-		row[col++],
-		"%.3f %s",
-		values.value,
-		unit
-	);
+	sprintf(row[col++], "%.3f %s", values.value, unit);
 
 	/* Print status - always valid. */
 	sprintf(
@@ -465,45 +443,23 @@ static int mk_sensor_row(ami_device *dev, const char *sensor,
 	/* Extra attributes. */
 	if (extra_fields & EXTRA_FIELDS_MAX) {
 		if (values.max_r == AMI_STATUS_OK)
-			sprintf(
-				row[col++],
-				"%.3f %s",
-				values.max,
-				unit
-			);
+			sprintf(row[col++], "%.3f %s", values.max, unit);
 		else
-			sprintf(
-				row[col++],
-				"%s",
-				"N/A"
-			);
+			sprintf(row[col++], "%s", "N/A");
 	}
 
 	if (extra_fields & EXTRA_FIELDS_AVG) {
 		if (values.avg_r == AMI_STATUS_OK)
-			sprintf(
-				row[col++],
-				"%.3f %s",
-				values.avg,
-				unit
-			);
+			sprintf(row[col++], "%.3f %s", values.avg, unit);
 		else
-			sprintf(
-				row[col++],
-				"%s",
-				"N/A"
-			);
+			sprintf(row[col++], "%s", "N/A");
 	}
 
 	if (extra_fields & EXTRA_FIELDS_LIMITS) {
 		/* If all limits are unavailable, print a single "N/A" */
 		if ((values.limit_w_r != AMI_STATUS_OK) && (values.limit_c_r != AMI_STATUS_OK) &&
 					(values.limit_f_r != AMI_STATUS_OK)) {
-			sprintf(
-				row[col++],
-				"%s",
-				"N/A"
-			);
+			sprintf(row[col++], "%s", "N/A");
 		} else {
 			char limit_w_str[LIMIT_STR_SIZE] = { 0 };
 			char limit_c_str[LIMIT_STR_SIZE] = { 0 };
@@ -511,45 +467,21 @@ static int mk_sensor_row(ami_device *dev, const char *sensor,
 
 			/* Warning limit */
 			if (values.limit_w_r == AMI_STATUS_OK)
-				sprintf(
-					limit_w_str,
-					"%.3f",
-					values.limit_w
-				);
+				sprintf(limit_w_str, "%.3f", values.limit_w);
 			else
-				sprintf(
-					limit_w_str,
-					"%s",
-					"N/A"
-				);
+				sprintf(limit_w_str, "%s", "N/A");
 
 			/* Critical limit */
 			if (values.limit_c_r == AMI_STATUS_OK)
-				sprintf(
-					limit_c_str,
-					"%.3f",
-					values.limit_c
-				);
+				sprintf(limit_c_str, "%.3f", values.limit_c);
 			else
-				sprintf(
-					limit_c_str,
-					"%s",
-					"N/A"
-				);
+				sprintf(limit_c_str, "%s", "N/A");
 
 			/* Fatal limit */
 			if (values.limit_f_r == AMI_STATUS_OK)
-				sprintf(
-					limit_f_str,
-					"%.3f",
-					values.limit_f
-				);
+				sprintf(limit_f_str, "%.3f", values.limit_f);
 			else
-				sprintf(
-					limit_f_str,
-					"%s",
-					"N/A"
-				);
+				sprintf(limit_f_str, "%s", "N/A");
 
 			sprintf(
 				row[col++],
@@ -639,9 +571,7 @@ static int mk_sensor_node(ami_device *dev, const char *sensor,
 	if (!dev || !sensor || !parent)
 		return EXIT_FAILURE;
 
-	get_all_sensor_values(
-		dev, sensor, sensor_type, extra_fields, &values, false
-	);
+	get_all_sensor_values(dev, sensor, sensor_type, extra_fields, &values, false);
 
 	row = json_mkobject();
 
@@ -704,25 +634,25 @@ static int mk_sensor_node(ami_device *dev, const char *sensor,
 	}
 
 	switch (sensor_type) {
-	case AMI_SENSOR_TYPE_TEMP:
-		json_append_member(parent, "temp", row);
-		break;
+		case AMI_SENSOR_TYPE_TEMP:
+			json_append_member(parent, "temp", row);
+			break;
 
-	case AMI_SENSOR_TYPE_CURRENT:
-		json_append_member(parent, "current", row);
-		break;
+		case AMI_SENSOR_TYPE_CURRENT:
+			json_append_member(parent, "current", row);
+			break;
 
-	case AMI_SENSOR_TYPE_VOLTAGE:
-		json_append_member(parent, "voltage", row);
-		break;
+		case AMI_SENSOR_TYPE_VOLTAGE:
+			json_append_member(parent, "voltage", row);
+			break;
 
-	case AMI_SENSOR_TYPE_POWER:
-		json_append_member(parent, "power", row);
-		break;
+		case AMI_SENSOR_TYPE_POWER:
+			json_append_member(parent, "power", row);
+			break;
 
-	default:
-		ret = EXIT_FAILURE;
-		break;
+		default:
+			ret = EXIT_FAILURE;
+			break;
 	}
 
 	return ret;
@@ -821,29 +751,29 @@ static int populate_sensor_values(ami_device *dev, void *values,
 
 	while (current_sensor && (j < *n_rows)) {
 		switch (fmt) {
-		case APP_OUT_FORMAT_JSON:
-			ret = construct_sensor_json(
-				dev,
-				(JsonNode*)values,
-				current_sensor->name,
-				sensor_data->extra_fields,
-				&j
-			);
-			break;
+			case APP_OUT_FORMAT_JSON:
+				ret = construct_sensor_json(
+					dev,
+					(JsonNode*)values,
+					current_sensor->name,
+					sensor_data->extra_fields,
+					&j
+				);
+				break;
 
-		case APP_OUT_FORMAT_TABLE:
-			ret = construct_sensor_table(
-				dev,
-				(char***)values,
-				current_sensor->name,
-				sensor_data->extra_fields,
-				&j
-			);
-			break;
+			case APP_OUT_FORMAT_TABLE:
+				ret = construct_sensor_table(
+					dev,
+					(char***)values,
+					current_sensor->name,
+					sensor_data->extra_fields,
+					&j
+				);
+				break;
 
-		default:
-			ret = EXIT_FAILURE;
-			break;
+			default:
+				ret = EXIT_FAILURE;
+				break;
 		}
 
 		if (ret == EXIT_FAILURE)
@@ -911,14 +841,14 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 	/* All values except name and status are right aligned */
 	for (i = 0; i < MAX_SENSOR_FIELDS; i++) {
 		switch (i) {
-		case TABLE_NAME:
-		case TABLE_STATUS:
-			col_align[i] = TABLE_ALIGN_LEFT;
-			break;
+			case TABLE_NAME:
+			case TABLE_STATUS:
+				col_align[i] = TABLE_ALIGN_LEFT;
+				break;
 
-		default:
-			col_align[i] = TABLE_ALIGN_RIGHT;
-			break;
+			default:
+				col_align[i] = TABLE_ALIGN_RIGHT;
+				break;
 		}
 	}
 
@@ -953,30 +883,29 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 	/* Write to file. */
 	if (stream && (ret != EXIT_FAILURE) && (fmt != APP_OUT_FORMAT_TABLE)) {
 		switch (fmt) {
-		case APP_OUT_FORMAT_JSON:
-			if (!json_out)
-				ret = print_json_data(
-					dev,
-					n_fields,
-					n_rows,
-					stream,
-					&populate_sensor_values,
-					&data
-				);
-			else
-				ret = gen_json_data(
-					dev,
-					n_fields,
-					n_rows,
-					&populate_sensor_values,
-					&data,
-					json_out
-				);
+			case APP_OUT_FORMAT_JSON:
+				if (!json_out)
+					ret = print_json_data(
+						dev,
+						n_fields,
+						n_rows,
+						stream,
+						&populate_sensor_values,
+						&data
+					);
+				else
+					ret = gen_json_data(
+						dev,
+						n_fields,
+						n_rows,
+						&populate_sensor_values,
+						&data,
+						json_out
+					);
+				break;
 
-			break;
-
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -1073,19 +1002,11 @@ int report_sensors(struct app_option *options)
 					AMI_PCI_FUNC(bdf)
 				);
 
-				printf(
-					"\r\n%s:\r\n\r\n",
-					bdf_str
-				);
+				printf("\r\n%s:\r\n\r\n", bdf_str);
 			} else {
 				APP_WARN("could not retrieve device BDF");
 
-				snprintf(
-					bdf_str,
-					AMI_BDF_STR_LEN,
-					"%02x:%02x.%01x",
-					0, 0, 0
-				);
+				snprintf(bdf_str, AMI_BDF_STR_LEN, "%02x:%02x.%01x", 0, 0, 0);
 			}
 
 			ret = ami_sensor_discover(dev);

@@ -6,6 +6,7 @@
 import re
 import os
 import sys
+import tarfile
 
 from os import walk
 from os.path import join
@@ -14,16 +15,14 @@ SCRIPT_VERSION = '1.0'
 SCRIPT_FILE    = os.path.basename(__file__)
 SCRIPT_DIR     = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR    = os.path.abspath(os.path.join(SCRIPT_DIR, os.pardir))
-ROOT_DIR       = os.path.abspath(os.path.join(SCRIPT_FILE ,"../../.."))
-
-BUILD_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, 'package_data'))
+BUILD_DIR      = os.path.abspath(os.path.join(SCRIPT_DIR, 'package_data'))
 sys.path.insert(0, BUILD_DIR)
 
 from pkg import *
 
 # Get date
-build_date=get_date_long()
-build_date_short=get_date_short()
+build_date = get_date_long()
+build_date_short = get_date_short()
 now = datetime.datetime.now()
 
 class Options(object):
@@ -159,9 +158,9 @@ def main(args):
             output_dir = os.path.abspath(os.path.join(CWD, 'output', output_dir))
 
         # Define steps output directories and others
-        tmp_dir         = os.path.abspath(os.path.join(output_dir, 'tmp'))
-        log_dir         = os.path.abspath(os.path.join(output_dir, 'log'))
-        bkp_design_dir  = os.path.abspath(os.path.join(output_dir, 'bkp_design'))
+        tmp_dir        = os.path.abspath(os.path.join(output_dir, 'tmp'))
+        log_dir        = os.path.abspath(os.path.join(output_dir, 'log'))
+        bkp_design_dir = os.path.abspath(os.path.join(output_dir, 'bkp_design'))
 
         # Create output directory
         if os.path.isdir(output_dir):
@@ -257,7 +256,7 @@ def main(args):
         config['vendor']['full']    = 'Xilinx Inc'
         config['vendor']['email']   = 'support@xilinx.com'
 
-        # for AMI build as part of aved_build flow - do not run genVersion for AMI or GCQ - these are run in advance
+        # for AMI build as part of amr_build flow - do not run genVersion for AMI or GCQ - these are run in advance
         if not opt.no_gen_version :
             # Get package version
             step = 'get AMI version'
@@ -312,15 +311,15 @@ def main(args):
             for name in files:
                 api_headers.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
 
-        config['package']                       = {}
-        config['package']['name']               = 'amr'
-        config['package']['release']            = opt.pkg_release
-        config['package']['summary']            = config['package']['name'] + ' driver package'
-        config['package']['description']        = [
+        config['package']                = {}
+        config['package']['name']        = 'amr'
+        config['package']['release']     = opt.pkg_release
+        config['package']['summary']     = config['package']['name'] + ' driver package'
+        config['package']['description'] = [
             config['package']['name'] + ' driver package',
-            'Built on ' + build_date_short + '.'
+                'Built on ' + build_date_short + '.'
         ]
-        config['package']['changelog']          = config['package']['name'] + ' driver package. Built on $build_date_short.'
+        config['package']['changelog']   = config['package']['name'] + ' driver package. Built on $build_date_short.'
 
         # Find version from generated header file
         with open(join(PROJECT_DIR, 'api', 'include', 'ami_version.h'), 'r') as fd:
@@ -392,13 +391,13 @@ def main(args):
 
             end_step('BUILD_DRIVER', start_time)
 
-        # Build libami.a and ami_tool
+        # Build libami.so and ami_tool
         step = 'build AMI API and tools'
         start_time = start_step('BUILD_AMI', step)
 
         build_api = 'cd api && make clean && make'
         exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
-        check_output_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.a'))
+        check_output_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
 
         build_ami_tool = 'cd app && make clean && make'
         exec_step_cmd('BUILD_AMI_TOOL', step, build_ami_tool, shell=True, cwd=PROJECT_DIR)
@@ -421,7 +420,7 @@ def main(args):
         config['package']['opt_dir']        = 'opt/amd/amr/amd_rave_gen3x4_25.1'
 
         config['package']['usr_bin'] = config['package']['usr_bin_dir'] + '/ami_tool'
-        config['package']['usr_lib'] = config['package']['usr_lib_dir'] + '/libami.a'
+        config['package']['usr_lib'] = config['package']['usr_lib_dir'] + '/libami.so'
 
         if config['system']['distribution_id'] in DIST_RPM:
             config['package']['pkg_config_dir'] = 'usr/lib64/pkgconfig'
@@ -648,10 +647,8 @@ def main(args):
         SRC_DEST_LIST = [
             {'src': os.path.abspath(join(PROJECT_DIR, 'driver', 'Makefile')), 'dst': join(config['package']['usr_src_dir'], 'driver')},
             {'src': os.path.abspath(join(SCRIPT_DIR, 'package_data',  'dkms.conf')),'dst': config['package']['usr_src_dir']},
-            {'src': os.path.abspath(join(PROJECT_DIR, 'api',  'build', 'libami.a')),'dst': config['package']['usr_lib_dir']},
+            {'src': os.path.abspath(join(PROJECT_DIR, 'api',  'build', 'libami.so')),'dst': config['package']['usr_lib_dir']},
             {'src': os.path.abspath(join(PROJECT_DIR, 'app',  'build', 'ami_tool')),'dst': config['package']['usr_bin_dir']},
-            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'amr_ospi.bin')),  'dst': config['package']['opt_dir']},
-            {'src': os.path.abspath(join(ROOT_DIR,    'fw',  'AMC', 'build', 'amr_ospi_fpt.bin')),'dst': config['package']['opt_dir']},
             *api_dest,
             *driver_dest
         ]

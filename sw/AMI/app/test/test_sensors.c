@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdarg.h>
 #include <stddef.h>
@@ -60,16 +56,16 @@ int __wrap_fclose(FILE *stream)
 	int ret = AMI_LINUX_STATUS_ERROR;
 
 	switch (w_fclose.current) {
-	case OK:
-		ret = AMI_LINUX_STATUS_OK;
-		break;
+		case OK:
+			ret = AMI_LINUX_STATUS_OK;
+			break;
 
-	case REAL:
-		ret = __real_fclose(stream);
-		break;
+		case REAL:
+			ret = __real_fclose(stream);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	WRAPPER_DONE(fclose);
@@ -83,14 +79,14 @@ void *__wrap_malloc(size_t size)
 	void *ret = NULL;
 
 	switch (w_malloc.current) {
-	/* case OK not implemented */
+		/* case OK not implemented */
 
-	case REAL:
-		ret = __real_malloc(size);
-		break;
+		case REAL:
+			ret = __real_malloc(size);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	WRAPPER_DONE(malloc);
@@ -104,14 +100,14 @@ void *__wrap_calloc(size_t nmemb, size_t size)
 	void *ret = NULL;
 
 	switch (w_calloc.current) {
-	/* case OK not implemented */
+		/* case OK not implemented */
 
-	case REAL:
-		ret = __real_calloc(nmemb, size);
-		break;
+		case REAL:
+			ret = __real_calloc(nmemb, size);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	WRAPPER_DONE(calloc);

@@ -8,10 +8,6 @@
 #ifndef AMI_SENSOR_INTERNAL_H
 #define AMI_SENSOR_INTERNAL_H
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdint.h>
 #include <stdbool.h>

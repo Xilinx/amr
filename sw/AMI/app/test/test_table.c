@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdarg.h>
 #include <stddef.h>
@@ -55,14 +51,14 @@ void *__wrap_calloc(size_t num, size_t size)
 	void *ret = NULL;
 
 	switch (w_calloc.current) {
-	/* case OK not implemented */
+		/* case OK not implemented */
 
-	case REAL:
-		ret = __real_calloc(num, size);
-		break;
+		case REAL:
+			ret = __real_calloc(num, size);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	WRAPPER_DONE(calloc);

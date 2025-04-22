@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdlib.h>
 #include <stdio.h>
@@ -97,20 +93,20 @@ void print_hexdump(uint64_t start_addr, void *values, uint32_t num_values,
 			);
 
 		switch (value_size) {
-		case sizeof(uint8_t):
-			printf(" %02x", ((uint8_t*)values)[i]);
-			break;
+			case sizeof(uint8_t):
+				printf(" %02x", ((uint8_t*)values)[i]);
+				break;
 
-		case sizeof(uint16_t):
-			printf(" %04x", ((uint16_t*)values)[i]);
-			break;
+			case sizeof(uint16_t):
+				printf(" %04x", ((uint16_t*)values)[i]);
+				break;
 
-		case sizeof(uint32_t):
-			printf(" %08x", ((uint32_t*)values)[i]);
-			break;
+			case sizeof(uint32_t):
+				printf(" %08x", ((uint32_t*)values)[i]);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		/* Check if last element */
@@ -353,20 +349,20 @@ char print_progress_bar(uint32_t cur, uint32_t max, uint32_t width,
 	printf(" %.0f%% ", ((double)cur / (double)max) * 100);
 
 	switch (state) {
-	case '|':
-		putchar('|');
-		new_state = '-';
-		break;
+		case '|':
+			putchar('|');
+			new_state = '-';
+			break;
 
-	case '-':
-		putchar('-');
-		new_state = '|';
-		break;
+		case '-':
+			putchar('-');
+			new_state = '|';
+			break;
 
-	default:
-		putchar('|');
-		new_state = '-';
-		break;
+		default:
+			putchar('|');
+			new_state = '-';
+			break;
 	}
 
 	/* Print space so cursor doesn't obstruct last character. */

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -11,14 +11,9 @@
 #ifndef _GCQ_H_
 #define _GCQ_H_
 
-#ifdef  __KERNEL__
 #include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/idr.h>
-#else
-#include <stdint.h>
-#include <stdio.h>
-#endif
 
 
 /******************************************************************************/
@@ -26,23 +21,14 @@
 /******************************************************************************/
 
 #ifndef GCQ_MAX_INSTANCES
-#define GCQ_MAX_INSTANCES	( 4 )   /**< Default value, but can be overridden by build environmental variable  */
+#define GCQ_MAX_INSTANCES	(4)   /**< Default value, but can be overridden by build environmental variable  */
 #endif
 
-#ifdef __KERNEL__
-#define gcq_assert( x )                                                         \
-do {    if ( x ) break;                                                         \
+#define gcq_assert(x)                                                           \
+do {    if (x) break;                                                           \
         printk(KERN_EMERG "### ASSERTION FAILED [sGCQ Driver] %s: %s: %d: %s\n",\
                __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();          \
 } while ( 0 )
-
-#else
-#include <assert.h>
-#define gcq_assert( x )	assert( x )
-
-#define likely( x )	__builtin_expect( !!( x ), 1 )
-#define unlikely( x )	__builtin_expect( !!( x ), 0 )
-#endif
 
 
 /******************************************************************************/
@@ -50,49 +36,42 @@ do {    if ( x ) break;                                                         
 /******************************************************************************/
 
 /**
- *
  * @brief   Bound in function ptr for reading from a register
  *
  * @param   ullRegAddr is the register address to be read
  *
  * @return  The 32-bit value read from the register
  *
-*******************************************************************************/
+ */
 typedef uint32_t ( *GCQ_READ_REG_32 )( uint64_t ullRegAddr );
 
 /**
- *
  * @brief   Bound in function ptr for writing to a register
  *
  * @param   ullRegAddr is the register address to write
  * @param   ulvalue is the 32-bit value to write
  *
  * @return  N/A
- *
-*******************************************************************************/
+ */
 typedef void ( *GCQ_WRITE_REG_32 )( uint64_t ullRegAddr, uint32_t ulValue );
 
 /**
- *
  * @brief   Bound in function ptr for reading from a memory address
  *
  * @param   ullMemAddr is the memory address to be read
  *
  * @return  The 32-bit value read from memory
- *
-*******************************************************************************/
+ */
 typedef uint32_t ( *GCQ_READ_MEM_32 )( uint64_t ullMemAddr );
 
 /**
- *
  * @brief   Bound in function for writing to a memory address
  *
  * @param   ullMemAddr is the memory address to be written
  * @param   ulValue is the 32-bit value to write
  *
  * @return  N/A
- *
-*******************************************************************************/
+ */
 typedef void ( *GCQ_WRITE_MEM_32 )( uint64_t ullMemAddr, uint32_t ulValue );
 
 

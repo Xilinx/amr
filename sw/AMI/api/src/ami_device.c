@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdint.h>
 #include <stdio.h>
@@ -43,19 +39,19 @@
 #define SYSFS_DEV_NAME			"dev_name"
 #define SYSFS_AMC_VERSION		"amc_version"
 
-#define AMC_VERSION_ATTR_FMT		"%hhd.%hhd.%hhd +%hd *%hhd"
-#define AMC_VERSION_ATTR_FIELDS		(5)
-#define AMC_VERSION_ATTR_SIZE		(16)
+#define AMC_VERSION_ATTR_FMT	"%hhd.%hhd.%hhd +%hd *%hhd"
+#define AMC_VERSION_ATTR_FIELDS	(5)
+#define AMC_VERSION_ATTR_SIZE	(16)
 
 /*
  * The AMI driver creates link speed/width attributes because
  * the pre-existing attributes created by the PCIe core return invalid
  * values on some systems.
  */
-#define SYSFS_PCI_LINK_SPEED_C		"link_speed_current"
-#define SYSFS_PCI_LINK_SPEED_M		"link_speed_max"
-#define SYSFS_PCI_LINK_WIDTH_C		"link_width_current"
-#define SYSFS_PCI_LINK_WIDTH_M		"link_width_max"
+#define SYSFS_PCI_LINK_SPEED_C	"link_speed_current"
+#define SYSFS_PCI_LINK_SPEED_M	"link_speed_max"
+#define SYSFS_PCI_LINK_WIDTH_C	"link_width_current"
+#define SYSFS_PCI_LINK_WIDTH_M	"link_width_max"
 
 /* For PCI reloading */
 #define HOT_RESET_GPIO_BAR		(1)
@@ -70,8 +66,8 @@
 #define HOT_RESET_RESCAN_DELAY_MS	(5000)
 #define HOT_RESET_GPIO_SET_DELAY_MS	(1)
 
-#define PCI_DEV_DIR			"/sys/bus/pci/devices/0000:%02x:%02x.%1x"
-#define PCI_BRIDGE_CONTROL		(0x3e)
+#define PCI_DEV_DIR					"/sys/bus/pci/devices/0000:%02x:%02x.%1x"
+#define PCI_BRIDGE_CONTROL			(0x3e)
 #define PCI_BRIDGE_CTL_BUS_RESET	(0x40)
 
 #define SYSFS_ENABLE			"1"
@@ -183,7 +179,7 @@ static int get_new_device_handle(ami_device **new_dev, uint16_t bdf, bool with_s
 	if (!new_dev || (*new_dev))
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
 
-	ret =  ami_dev_find_next(
+	ret = ami_dev_find_next(
 		&dev,
 		AMI_PCI_BUS(bdf),
 		AMI_PCI_DEV(bdf),
@@ -458,7 +454,6 @@ int ami_dev_find_next(ami_device **dev, int b, int d, int f, ami_device *prev)
 					} else {
 						ret = AMI_API_ERROR(AMI_ERROR_ENOMEM);
 					}
-
 					break;
 				}
 

@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -312,37 +308,35 @@ int main(int argc, char *argv[])
 	while (AMI_LINUX_STATUS_ERROR != (opt = getopt_long(argc, argv, \
 			cmd->short_options, cmd->long_options, &long_ind)))
 	{
-		switch (opt)
-		{
-		/* Error. */
-		case '?':
-		case ':':
-			APP_USER_ERROR("invalid arguments", cmd->help_msg);
-			exit(EXIT_FAILURE);
-			break;
+		switch (opt) {
+			/* Error. */
+			case '?':
+			case ':':
+				APP_USER_ERROR("invalid arguments", cmd->help_msg);
+				exit(EXIT_FAILURE);
+				break;
 
-		/* All other options. */
-		default:
-		{
-			struct app_option *option = \
-				(struct app_option*)calloc(1, sizeof *option);
+			/* All other options. */
+			default:
+			{
+				struct app_option *option = \
+					(struct app_option*)calloc(1, sizeof *option);
 
-			option->long_ind = long_ind;
-			option->val = opt;
-			option->arg = optarg;
-			option->next = NULL;
-			option->handled = false;
+				option->long_ind = long_ind;
+				option->val = opt;
+				option->arg = optarg;
+				option->next = NULL;
+				option->handled = false;
 
-			if (!options_head) {
-				options_head = option;
-				options_tail = option;
-			} else {
-				options_tail->next = option;
-				options_tail = option;
+				if (!options_head) {
+					options_head = option;
+					options_tail = option;
+				} else {
+					options_tail->next = option;
+					options_tail = option;
+				}
+				break;
 			}
-
-			break;
-		}
 		}
 	}
 

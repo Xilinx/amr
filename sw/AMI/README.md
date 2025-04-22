@@ -21,7 +21,7 @@ To compile AMI yourself, run the following commands from the top level project d
 When finished with the build process, you should be left with the following build artifacts:
 
 * Kernel module (ami.ko)
-* API static library (libami.a)
+* API shared library (libami.so)
 * Command line application (ami_tool)
 
 ### Build script
@@ -53,7 +53,7 @@ cd api
 make clean && make
 ```
 
-This creates a build directory and generates a **libami.a** file which you can link your applications against to use the
+This creates a build directory and generates a **libami.so** file which you can link your applications against to use the
 AMI API. The public header files are located in **api/include**. Note, if you already ran the 'getVersion.sh' script as
 part of the driver build steps, you do not need to run it again here.
 
@@ -98,7 +98,7 @@ The generated packages produce the following artifacts:
  * dkms config at /usr/src/ami-\<version\>
  * API header files at /usr/include/ami
  * ami_tool binary at /usr/local/bin
- * libami.a at /usr/local/lib
+ * libami.so at /usr/local/lib
 
 ## Testing
 

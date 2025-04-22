@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdlib.h>
 #include <stddef.h>
@@ -126,8 +122,16 @@ static void progress_handler(enum ami_event_status status, uint64_t ctr, void *d
 	);
 }
 
-/*
+/**
  * "cfgmem_fpt" command callback.
+ * @options:  Ordered list of options passed in at the command line
+ * @num_args:  Number of non-option arguments (excluding command)
+ * @args:  List of non-option arguments (excluding command)
+ *
+ * `args` may be an invalid pointer. It is the function's responsibility
+ * to validate the `num_args` parameter.
+ *
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_cfgmem_fpt(struct app_option *options, int num_args, char **args)
 {

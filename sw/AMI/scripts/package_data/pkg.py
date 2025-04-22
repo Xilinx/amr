@@ -1,41 +1,34 @@
 #!/usr/bin/env python3
 
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
 import json
 import os
 import sys
 import shutil
-import platform
-import types
-import glob
-import getopt
 import subprocess
-import signal
-import copy
 import datetime
-import re
-import inspect
 import getopt
-import pkg_resources
 import logging
-import zipfile
-import tarfile
 from io import StringIO
 
 # Get the root logger
 logger = logging.getLogger('')
 logger.setLevel(logging.INFO)
+
 # stream
 log_stream = StringIO()
 string_handler = logging.StreamHandler(stream=log_stream)
 string_handler.setLevel(logging.INFO)
+
 # stream
 console_handler = logging.StreamHandler(stream=sys.stdout)
 console_handler.setLevel(logging.INFO)
+
 # formatter
 formatter = logging.Formatter('%(levelname)s: %(message)s')
+
 # add
 string_handler.setFormatter(formatter)
 console_handler.setFormatter(formatter)
@@ -51,6 +44,7 @@ def setup_logfile(log_file):
     with open(log_file, 'w') as fd:
         log_stream.seek(0)
         shutil.copyfileobj(log_stream, fd)
+
     file_handler = logging.FileHandler(log_file, 'a')
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
@@ -72,6 +66,7 @@ def exit_error(id, msg):
 
 def format_time_str(time_in):
     return time_in.strftime('%Y-%m-%d, %H:%M:%S')
+
 def format_msg(id, msg):
     return '[' + id + '] ' + msg
 
@@ -174,11 +169,7 @@ def end_step(id, start_time):
     log_info(id, '************************** End of step. Elapsed time: ' + str(elapsed_time) + '\n\n')
 
 def exec_step_cmd(id, step, cmd, log_file_name = None, use_console = False, shell = False, ignore_error = False, env = None, expect_fail = False, cwd = None):
-    if not shell:
-        cmd_str = ' '.join(cmd)
-    else:
-        cmd_str = cmd
-
+    cmd_str = cmd if shell else ' '.join(cmd)
     log_info(id, 'Executing: $ ' + cmd_str)
 
     proc = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, env=env, cwd=cwd)
@@ -191,6 +182,7 @@ def exec_step_cmd(id, step, cmd, log_file_name = None, use_console = False, shel
         if use_console:
             sys.stdout.write(line)
             sys.stdout.flush()
+
         if log_file_name is not None:
             log_file.write(line)
             log_file.flush()
@@ -244,6 +236,7 @@ def get_date_long():
     # Thu Jul 15 09:35:39 BST 2021
     time_0 = datetime.datetime.now().replace(microsecond=0)
     return time_0.strftime('%a %b %d %H:%M:%S %Z %Y')
+
 def get_date_short():
     # Thu Jul 15 2021
     time_0 = datetime.datetime.now().replace(microsecond=0)

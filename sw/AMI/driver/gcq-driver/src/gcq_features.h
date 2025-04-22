@@ -15,9 +15,9 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define GCQ_FEATURES_IS_IN_MEM_PTR( flags )              ( ( flags & GCQ_FLAGS_TYPE_IN_MEM_PTR_ENABLE ) != 0 )
-#define GCQ_FEATURES_NEED_DOUBLE_MEM_READ( flags )       ( ( flags & GCQ_FLAGS_TYPE_DOUBLE_READ_ENABLE ) != 0 )
-#define GCQ_FEATURES_DOUBLE_MEM_READ_RETRY_COUNT         ( 1000 )
+#define GCQ_FEATURES_IS_IN_MEM_PTR(flags)			((flags & GCQ_FLAGS_TYPE_IN_MEM_PTR_ENABLE) != 0)
+#define GCQ_FEATURES_NEED_DOUBLE_MEM_READ(flags)	((flags & GCQ_FLAGS_TYPE_DOUBLE_READ_ENABLE) != 0)
+#define GCQ_FEATURES_DOUBLE_MEM_READ_RETRY_COUNT	(1000)
 
 
 /******************************************************************************/
@@ -29,14 +29,13 @@
  *           collision HW issue on MB ERT, which will cause ERT to read incorrect value
  *           from CQ. We only trust the value until we read twice and got the same value.
  *
- * @param    pxGCQIOAccess is the bound in memory/register access functions
- * @param    ullAddr is the address to read
+ * @pxGCQIOAccess is the bound in memory/register access functions
+ * @ullAddr is the address to read
  *
  * @return   The value read after its been validated by reading more than once
  *
  * @note     Only used for memory accesses, not register
  */
-uint32_t ulGCQFeaturesHandleDoubleRead32( const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess, uint64_t ullAddr );
-
+uint32_t ulGCQFeaturesHandleDoubleRead32(const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess, uint64_t ullAddr);
 
 #endif /* _GCQ_FEATURES_H_ */

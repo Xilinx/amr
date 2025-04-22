@@ -5,7 +5,7 @@
 
 AR := ar -rc
 
-TARGET := libami.a
+TARGET := libami.so
 BUILD_DIR := ./build
 SRC_DIRS := ./src  # Private source/headers
 
@@ -23,7 +23,8 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us.
 # These files will have .d instead of .o as the output.
-CFLAGS := $(INC_FLAGS) -MMD -MP -Wall -Werror
+CFLAGS  := $(INC_FLAGS) -MMD -MP -Wall -Werror -fpic
+LDFLAGS := -shared
 
 #
 # Default make
@@ -48,6 +49,7 @@ banner:
 	@echo "  - $(PWD)\n"
 	@echo "  - CC          : $(CC)"
 	@echo "  - CFLAGS      : $(CFLAGS)"
+	@echo "  - LDFLAGS     : $(LDFLAGS)"
 	@echo "  - INC_DIRS    : $(INC_DIRS)"
 	@echo "  - BUILD_DIR   : $(BUILD_DIR)\n"
 	@$(MAKE) -s newline
@@ -63,7 +65,7 @@ $(BUILD_DIR)/$(TARGET): $(OBJS)
 $(BUILD_DIR)/%.c.o: %.c
 	@echo "Building $@"
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
 .PHONY: clean
 clean:

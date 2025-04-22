@@ -5,10 +5,6 @@
  * Copyright (c) 2023-present Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdarg.h>
 #include <stddef.h>

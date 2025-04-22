@@ -12,6 +12,12 @@
 extern "C" {
 #endif
 
+/* Standard includes */
+#include <stdint.h>
+
+/* Public API includes */
+#include "ami_device.h"
+
 /*****************************************************************************/
 /* Defines                                                                   */
 /*****************************************************************************/
@@ -20,16 +26,6 @@ extern "C" {
 
 #define AMI_MFG_INFO_OEM_ID_XILINX	(0x10DA)
 #define AMI_MFG_INFO_OEM_ID_AMD		(0x3704)
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
-/* Standard includes */
-#include <stdint.h>
-
-/* Public API includes */
-#include "ami_device.h"
 
 /*****************************************************************************/
 /* Structs, Enums                                                            */

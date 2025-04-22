@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdlib.h>
 #include <stddef.h>
@@ -45,9 +41,9 @@
  */
 enum reload_type {
 	RELOAD_TYPE_INVALID = -1,
-	RELOAD_TYPE_DRIVER,
-	RELOAD_TYPE_PCI,
-	RELOAD_TYPE_SBR,
+	RELOAD_TYPE_DRIVER	= 0,
+	RELOAD_TYPE_PCI		= 1,
+	RELOAD_TYPE_SBR		= 2,
 };
 
 /*****************************************************************************/
@@ -133,8 +129,16 @@ static enum reload_type parse_reload_type(const char *reload_type)
 	return RELOAD_TYPE_INVALID;
 }
 
-/*
+/**
  * "reload" command callback.
+ * @options:  Ordered list of options passed in at the command line
+ * @num_args:  Number of non-option arguments (excluding command)
+ * @args:  List of non-option arguments (excluding command)
+ *
+ * `args` may be an invalid pointer. It is the function's responsibility
+ * to validate the `num_args` parameter.
+ *
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_reload(struct app_option *options, int num_args, char **args)
 {
@@ -161,88 +165,82 @@ static int do_cmd_reload(struct app_option *options, int num_args, char **args)
 
 	/* Find device */
 	switch (type) {
-	case RELOAD_TYPE_SBR:
-	case RELOAD_TYPE_PCI:
-		/* device option is required for these reload types */
-		opt = find_app_option('d', options);
+		case RELOAD_TYPE_SBR:
+		case RELOAD_TYPE_PCI:
+			/* device option is required for these reload types */
+			opt = find_app_option('d', options);
 
-		if (!opt) {
-			APP_USER_ERROR("device not specified", help_msg);
-			return EXIT_FAILURE;
-		}
-
-		bdf_string = opt->arg;
-
-		/*
-		 * The PCI reload works for *any* PCI device - even those
-		 * which are not attached to the AMI driver. We will use the
-		 * raw BDF string instead of a device handle.
-		 */
-		if (type != RELOAD_TYPE_PCI) {
-			/* Find device */
-			if (ami_dev_find(bdf_string, &dev) != AMI_STATUS_OK) {
-				APP_API_ERROR("could not find the requested device");
+			if (!opt) {
+				APP_USER_ERROR("device not specified", help_msg);
 				return EXIT_FAILURE;
 			}
 
-			ami_dev_get_pci_bdf(dev, &bdf);
-			ami_dev_get_state(dev, dev_state);
-		} else {
-			bdf = ami_parse_bdf(bdf_string);
-		}
+			bdf_string = opt->arg;
 
-		break;
+			/*
+			* The PCI reload works for *any* PCI device - even those
+			* which are not attached to the AMI driver. We will use the
+			* raw BDF string instead of a device handle.
+			*/
+			if (type != RELOAD_TYPE_PCI) {
+				/* Find device */
+				if (ami_dev_find(bdf_string, &dev) != AMI_STATUS_OK) {
+					APP_API_ERROR("could not find the requested device");
+					return EXIT_FAILURE;
+				}
 
-	default:
-		break;
+				ami_dev_get_pci_bdf(dev, &bdf);
+				ami_dev_get_state(dev, dev_state);
+			} else {
+				bdf = ami_parse_bdf(bdf_string);
+			}
+			break;
+
+		default:
+			break;
 	}
 
 	switch (type) {
-	case RELOAD_TYPE_DRIVER:
-		printf("Unloading AMI driver...\r\n");
-		ret = system(RMMOD);
+		case RELOAD_TYPE_DRIVER:
+			printf("Unloading AMI driver...\r\n");
+			ret = system(RMMOD);
 
-		if (ret == AMI_LINUX_STATUS_OK) {
-			printf("Done. Re-inserting driver module...\r\n");
-			ret = system(INSMOD);
+			if (ret == AMI_LINUX_STATUS_OK) {
+				printf("Done. Re-inserting driver module...\r\n");
+				ret = system(INSMOD);
 
-			if (ret == AMI_LINUX_STATUS_OK)
-				printf("OK. Driver has been reloaded.\r\n");
+				if (ret == AMI_LINUX_STATUS_OK)
+					printf("OK. Driver has been reloaded.\r\n");
+				else
+					APP_ERROR("could not insert module");
+			} else {
+				APP_ERROR("could not unload driver");
+			}
+			break;
+
+		case RELOAD_TYPE_PCI:
+			printf("Removing PCI device and rescanning bus...\r\n");
+
+			if ((ret = ami_dev_pci_reload(NULL, bdf_string)) == AMI_STATUS_OK)
+				printf("Done.\r\n");
 			else
-				APP_ERROR("could not insert module");
-		} else {
-			APP_ERROR("could not unload driver");
-		}
-		break;
+				APP_API_ERROR("could not perform PCI reset");
+			break;
 
-	case RELOAD_TYPE_PCI:
-	{
-		printf("Removing PCI device and rescanning bus...\r\n");
+		case RELOAD_TYPE_SBR:
+			printf("Will trigger a secondary bus reset. This may take a minute...\r\n");
 
-		if ((ret = ami_dev_pci_reload(NULL, bdf_string)) == AMI_STATUS_OK)
-			printf("Done.\r\n");
-		else
-			APP_API_ERROR("could not perform PCI reset");
+			if ((ret = ami_dev_hot_reset(&dev)) == AMI_STATUS_OK) {
+				printf("Done.\r\n");
+				ami_dev_delete(&dev);
+			} else {
+				APP_API_ERROR("could not perform reset");
+			}
+			break;
 
-		break;
-	}
-
-	case RELOAD_TYPE_SBR:
-	{
-		printf("Will trigger a secondary bus reset. This may take a minute...\r\n");
-
-		if ((ret = ami_dev_hot_reset(&dev)) == AMI_STATUS_OK) {
-			printf("Done.\r\n");
-			ami_dev_delete(&dev);
-		} else {
-			APP_API_ERROR("could not perform reset");
-		}
-		break;
-	}
-
-	default:
-		APP_ERROR("invalid reload type");
-		break;
+		default:
+			APP_ERROR("invalid reload type");
+			break;
 	}
 
 	return ret;

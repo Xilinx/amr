@@ -8,10 +8,6 @@
 #ifndef AMI_APP_PRINTER_H
 #define AMI_APP_PRINTER_H
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard Includes */
 #include <stdint.h>
 #include <stdbool.h>

@@ -750,65 +750,65 @@ static enum amc_cmd_id get_cmd_command_id(enum gcq_submit_cmd_req cmd_req)
 	enum amc_cmd_id id = AMC_CMD_ID_UNKNOWN;
 
 	switch (cmd_req) {
-	case GCQ_SUBMIT_CMD_DOWNLOAD_PDI:
-		id = AMC_CMD_ID_DOWNLOAD_PDI;
-		break;
+		case GCQ_SUBMIT_CMD_DOWNLOAD_PDI:
+			id = AMC_CMD_ID_DOWNLOAD_PDI;
+			break;
 
-	case GCQ_SUBMIT_CMD_GET_GCQ_VERSION:
-		id = AMC_CMD_ID_IDENTIFY;
-		break;
+		case GCQ_SUBMIT_CMD_GET_GCQ_VERSION:
+			id = AMC_CMD_ID_IDENTIFY;
+			break;
 
-	case GCQ_SUBMIT_CMD_GET_SDR:
-	case GCQ_SUBMIT_CMD_GET_SDR_SIZE:
-		id = AMC_CMD_ID_SENSOR;
-		break;
+		case GCQ_SUBMIT_CMD_GET_SDR:
+		case GCQ_SUBMIT_CMD_GET_SDR_SIZE:
+			id = AMC_CMD_ID_SENSOR;
+			break;
 
-	case GCQ_SUBMIT_CMD_DEVICE_BOOT:
-		id = AMC_CMD_ID_DEVICE_BOOT;
-		break;
+		case GCQ_SUBMIT_CMD_DEVICE_BOOT:
+			id = AMC_CMD_ID_DEVICE_BOOT;
+			break;
 
-	case GCQ_SUBMIT_CMD_COPY_PARTITION:
-		id = AMC_CMD_ID_COPY_PARTITION;
-		break;
+		case GCQ_SUBMIT_CMD_COPY_PARTITION:
+			id = AMC_CMD_ID_COPY_PARTITION;
+			break;
 
-	case GCQ_SUBMIT_CMD_GET_INLET_TEMP_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_OUTLET_TEMP_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_BOARD_TEMP_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_FPGA_TEMP_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_VCCINT_VOLTAGE:
-	case GCQ_SUBMIT_CMD_GET_VCC1V2_VOLTAGE:
-	case GCQ_SUBMIT_CMD_GET_12V_PEX_VOLTAGE:
-	case GCQ_SUBMIT_CMD_GET_12V_AUX0_VOLTAGE:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_VCCINT_CURRENT:
-	case GCQ_SUBMIT_CMD_GET_VCC1V2_CURRENT:
-	case GCQ_SUBMIT_CMD_GET_12V_PEX_CURRENT:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_TOTAL_POWER:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR:
-		id = AMC_CMD_ID_SENSOR;
-		break;
+		case GCQ_SUBMIT_CMD_GET_INLET_TEMP_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_OUTLET_TEMP_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_BOARD_TEMP_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_FPGA_TEMP_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_VCCINT_VOLTAGE:
+		case GCQ_SUBMIT_CMD_GET_VCC1V2_VOLTAGE:
+		case GCQ_SUBMIT_CMD_GET_12V_PEX_VOLTAGE:
+		case GCQ_SUBMIT_CMD_GET_12V_AUX0_VOLTAGE:
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_VCCINT_CURRENT:
+		case GCQ_SUBMIT_CMD_GET_VCC1V2_CURRENT:
+		case GCQ_SUBMIT_CMD_GET_12V_PEX_CURRENT:
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_TOTAL_POWER:
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR:
+			id = AMC_CMD_ID_SENSOR;
+			break;
 
-	case GCQ_SUBMIT_CMD_GET_HEARTBEAT:
-		id = AMC_CMD_ID_HEARTBEAT;
-		break;
+		case GCQ_SUBMIT_CMD_GET_HEARTBEAT:
+			id = AMC_CMD_ID_HEARTBEAT;
+			break;
 
-	case GCQ_SUBMIT_CMD_EEPROM_READ_WRITE:
-		id = AMC_CMD_ID_EEPROM_READ_WRITE;
-		break;
+		case GCQ_SUBMIT_CMD_EEPROM_READ_WRITE:
+			id = AMC_CMD_ID_EEPROM_READ_WRITE;
+			break;
 
-	case GCQ_SUBMIT_CMD_MODULE_READ_WRITE:
-		id = AMC_CMD_ID_MODULE_READ_WRITE;
-		break;
+		case GCQ_SUBMIT_CMD_MODULE_READ_WRITE:
+			id = AMC_CMD_ID_MODULE_READ_WRITE;
+			break;
 
-	case GCQ_SUBMIT_CMD_DEBUG_VERBOSITY:
-		id = AMC_CMD_ID_DEBUG_VERBOSITY;
-		break;
+		case GCQ_SUBMIT_CMD_DEBUG_VERBOSITY:
+			id = AMC_CMD_ID_DEBUG_VERBOSITY;
+			break;
 
-	default:
-		id = AMC_CMD_ID_UNKNOWN;
-		break;
+		default:
+			id = AMC_CMD_ID_UNKNOWN;
+			break;
 	}
 
 	return id;
@@ -1211,36 +1211,36 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 		AMI_DBG(amc_ctrl_ctxt, "Submitting command [%d] with resp len %d", cmd_id, data_size);
 
 	switch (cmd_id) {
-	/* data_buf required */
-	case AMC_CMD_ID_DOWNLOAD_PDI:
-	case AMC_CMD_ID_IDENTIFY:
-	case AMC_CMD_ID_SENSOR:
-	case AMC_CMD_ID_HEARTBEAT:
-	case AMC_CMD_ID_EEPROM_READ_WRITE:
-	case AMC_CMD_ID_MODULE_READ_WRITE:
-		if (!data_buf) {
-			ret = -EINVAL;
+		/* data_buf required */
+		case AMC_CMD_ID_DOWNLOAD_PDI:
+		case AMC_CMD_ID_IDENTIFY:
+		case AMC_CMD_ID_SENSOR:
+		case AMC_CMD_ID_HEARTBEAT:
+		case AMC_CMD_ID_EEPROM_READ_WRITE:
+		case AMC_CMD_ID_MODULE_READ_WRITE:
+			if (!data_buf) {
+				ret = -EINVAL;
+				goto done;
+			}
+			break;
+
+		/* data_buf not required, data_size required */
+		case AMC_CMD_ID_COPY_PARTITION:
+			if (!data_size) {
+				ret = -EINVAL;
+				goto done;
+			}
+			break;
+
+		/* data_buf not required */
+		case AMC_CMD_ID_DEBUG_VERBOSITY:
+		case AMC_CMD_ID_DEVICE_BOOT:
+			break;
+
+		default:
+			AMI_ERR(amc_ctrl_ctxt, ",command id %d not supported", cmd_id);
+			ret = -EIO;
 			goto done;
-		}
-		break;
-
-	/* data_buf not required, data_size required */
-	case AMC_CMD_ID_COPY_PARTITION:
-		if (!data_size) {
-			ret = -EINVAL;
-			goto done;
-		}
-		break;
-
-	/* data_buf not required */
-	case AMC_CMD_ID_DEBUG_VERBOSITY:
-	case AMC_CMD_ID_DEVICE_BOOT:
-		break;
-
-	default:
-		AMI_ERR(amc_ctrl_ctxt, ",command id %d not supported", cmd_id);
-		ret = -EIO;
-		goto done;
 	}
 
 	amc_proxy_cmd = kzalloc(sizeof(struct amc_proxy_cmd_struct), GFP_KERNEL);
@@ -1252,169 +1252,169 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 	/* Payload formation */
 	switch (cmd_id) {
-	case AMC_CMD_ID_IDENTIFY:
-		break; /* No Payload */
+		case AMC_CMD_ID_IDENTIFY:
+			break; /* No Payload */
 
-	case AMC_CMD_ID_DEVICE_BOOT:
-		break; /* No Payload */
+		case AMC_CMD_ID_DEVICE_BOOT:
+			break; /* No Payload */
 
-	case AMC_CMD_ID_HEARTBEAT:
-		break; /* No Payload */
+		case AMC_CMD_ID_HEARTBEAT:
+			break; /* No Payload */
 
-	case AMC_CMD_ID_DEBUG_VERBOSITY:
-		break; /* No Payload */
+		case AMC_CMD_ID_DEBUG_VERBOSITY:
+			break; /* No Payload */
 
-	case AMC_CMD_ID_COPY_PARTITION:
-	{
-		/*
-		 * For COPY_PARTITION we allocate max memory - it will be populated
-		 * by AMC and used by AMC only. This gets released again by AMI
-		 * when the command is complete/aborted. As part of the payload,
-		 * however, we pass in the value of `data_size` - this must be set
-		 * to the size of the source partition by the caller.
-		 */
-		if (acquire_gcq_data(amc_ctrl_ctxt, (uint32_t *)&(payload_address), &length)) {
-			ret = -EIO;
-			goto done;
-		}
+		case AMC_CMD_ID_COPY_PARTITION:
+			/*
+			* For COPY_PARTITION we allocate max memory - it will be populated
+			* by AMC and used by AMC only. This gets released again by AMI
+			* when the command is complete/aborted. As part of the payload,
+			* however, we pass in the value of `data_size` - this must be set
+			* to the size of the source partition by the caller.
+			*/
+			if (acquire_gcq_data(amc_ctrl_ctxt, (uint32_t *)&(payload_address), &length)) {
+				ret = -EIO;
+				goto done;
+			}
 
-		data_page_acquired = true;
-		payload_size = data_size;
+			data_page_acquired = true;
+			payload_size = data_size;
 
-		AMI_VDBG(amc_ctrl_ctxt,
-			 "Copy partition max data size = %d, actual size = %d",
-			 length,
-			 payload_size);
-		if (length < payload_size) {
-			AMI_ERR(amc_ctrl_ctxt,
-				"Data request length is %d but allocated length is %d",
+			AMI_VDBG(amc_ctrl_ctxt,
+				"Copy partition max data size = %d, actual size = %d",
+				length,
+				payload_size);
+
+			if (length < payload_size) {
+				AMI_ERR(amc_ctrl_ctxt,
+					"Data request length is %d but allocated length is %d",
+					payload_size,
+					length);
+				ret = -ENOMEM;
+				goto done;
+			}
+			break;
+
+		case AMC_CMD_ID_DOWNLOAD_PDI:
+			if (acquire_gcq_data(amc_ctrl_ctxt,
+				(uint32_t *)&(payload_address),
+				&length)) {
+				ret = -EIO;
+				goto done;
+			}
+
+			data_page_acquired = true;
+			payload_size = data_size;
+
+			AMI_VDBG(amc_ctrl_ctxt,
+				"Payload size = %d, page length = %d",
 				payload_size,
 				length);
-			ret = -ENOMEM;
-			goto done;
-		}
-	}
-	break;
+			if (length < payload_size) {
+				AMI_WARN(amc_ctrl_ctxt,
+					"Data request length is %d but allocated length is %d",
+					payload_size,
+					length);
+				payload_size = length;
+			}
 
-	case AMC_CMD_ID_DOWNLOAD_PDI:
-	{
-		if (acquire_gcq_data(amc_ctrl_ctxt, (uint32_t *)&(payload_address), &length)) {
-			ret = -EIO;
-			goto done;
-		}
+			/* Copy payload data to address */
+			memcpy_gcq_payload_to_device(amc_ctrl_ctxt,
+										payload_address,
+										data_buf,
+										data_size);
+			break;
 
-		data_page_acquired = true;
-		payload_size = data_size;
+		case AMC_CMD_ID_SENSOR:
+			if (acquire_gcq_log_page_sema(amc_ctrl_ctxt,
+							(uint32_t *)&(payload_address),
+							&length)) {
+				ret = -EIO;
+				goto done;
+			}
+			log_page_acquired = true;
 
-		AMI_VDBG(amc_ctrl_ctxt,
-			 "Payload size = %d, page length = %d",
-			 payload_size,
-			 length);
-		if (length < payload_size) {
-			AMI_WARN(amc_ctrl_ctxt,
-				 "Data request length is %d but allocated length is %d",
-				 payload_size,
-				 length);
-			payload_size = length;
-		}
+			payload_size = data_size;
+			if (length < payload_size) {
+				AMI_WARN(amc_ctrl_ctxt,
+					"Sensor request length is %d but allocated length is %d",
+					payload_size,
+					length);
+				payload_size = length;
+			}
 
-		/* Copy payload data to address */
-		memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
-	}
-	break;
+			/* Sensor request ID */
+			sid = get_sid(cmd_req, flags);
+			if (sid == AMC_PROXY_CMD_SENSOR_REPO_UNKNOWN) {
+				AMI_ERR(amc_ctrl_ctxt, "Sensor request ID not defined for command 0x%X", cmd_req);
+				ret = -EIO;
+				goto done;
+			}
 
-	case AMC_CMD_ID_SENSOR:
-	{
-		if (acquire_gcq_log_page_sema(amc_ctrl_ctxt,
-					      (uint32_t *)&(payload_address),
-					      &length)) {
-			ret = -EIO;
-			goto done;
-		}
-		log_page_acquired = true;
+			/* Sensor API ID */
+			aid = get_aid(cmd_req, flags);
+			if (aid == AMC_PROXY_CMD_SENSOR_REQUEST_UNKNOWN) {
+				AMI_ERR(amc_ctrl_ctxt, "Sensor API ID not defined for command 0x%X", cmd_req);
+				ret = -EIO;
+				goto done;
+			}
 
-		payload_size = data_size;
-		if (length < payload_size) {
-			AMI_WARN(amc_ctrl_ctxt,
-				 "Sensor request length is %d but allocated length is %d",
-				 payload_size,
-				 length);
-			payload_size = length;
-		}
+			/* Sensor ID */
+			sensor_id = get_sensor_id(cmd_req, flags);
+			if (sensor_id == UNKNOWN_SENSOR_ID) {
+				AMI_ERR(amc_ctrl_ctxt, "Sensor ID not defined for command 0x%X", cmd_req);
+				ret = -EIO;
+				goto done;
+			}
+			break;
 
-		/* Sensor request ID */
-		sid = get_sid(cmd_req, flags);
-		if (sid == AMC_PROXY_CMD_SENSOR_REPO_UNKNOWN) {
-			AMI_ERR(amc_ctrl_ctxt, "Sensor request ID not defined for command 0x%X", cmd_req);
-			ret = -EIO;
-			goto done;
-		}
-
-		/* Sensor API ID */
-		aid = get_aid(cmd_req, flags);
-		if (aid == AMC_PROXY_CMD_SENSOR_REQUEST_UNKNOWN) {
-			AMI_ERR(amc_ctrl_ctxt, "Sensor API ID not defined for command 0x%X", cmd_req);
-			ret = -EIO;
-			goto done;
-		}
-
-		/* Sensor ID */
-		sensor_id = get_sensor_id(cmd_req, flags);
-		if (sensor_id == UNKNOWN_SENSOR_ID) {
-			AMI_ERR(amc_ctrl_ctxt, "Sensor ID not defined for command 0x%X", cmd_req);
-			ret = -EIO;
-			goto done;
-		}
-	}
-	break;
-
-	case AMC_CMD_ID_EEPROM_READ_WRITE:
-	case AMC_CMD_ID_MODULE_READ_WRITE:
-	{
-		int req_type = MAX_AMC_PROXY_CMD_RW_REQUEST;
-
-		if (acquire_gcq_data(amc_ctrl_ctxt, (uint32_t *)&(payload_address), &length)) {
-			ret = -EIO;
-			goto done;
-		}
-
-		data_page_acquired = true;
-		payload_size = data_size;
-
-		AMI_VDBG(amc_ctrl_ctxt,
-			 "Payload size = %d, page length = %d",
-			 payload_size,
-			 length);
-		if (length < payload_size) {
-			AMI_WARN(amc_ctrl_ctxt,
-				 "Data request length is %d but allocated length is %d",
-				 payload_size,
-				 length);
-			payload_size = length;
-		}
-
-		/* Check if we need to copy the payload data */
-		switch (cmd_id) {
 		case AMC_CMD_ID_EEPROM_READ_WRITE:
-			req_type = EEPROM_GET_TYPE(flags);
-			break;
-
 		case AMC_CMD_ID_MODULE_READ_WRITE:
-			req_type = MODULE_RW_TYPE(flags);
-			break;
+		{
+			int req_type = MAX_AMC_PROXY_CMD_RW_REQUEST;
+
+			if (acquire_gcq_data(amc_ctrl_ctxt, (uint32_t *)&(payload_address), &length)) {
+				ret = -EIO;
+				goto done;
+			}
+
+			data_page_acquired = true;
+			payload_size = data_size;
+
+			AMI_VDBG(amc_ctrl_ctxt,
+				"Payload size = %d, page length = %d",
+				payload_size,
+				length);
+			if (length < payload_size) {
+				AMI_WARN(amc_ctrl_ctxt,
+					"Data request length is %d but allocated length is %d",
+					payload_size,
+					length);
+				payload_size = length;
+			}
+
+			/* Check if we need to copy the payload data */
+			switch (cmd_id) {
+			case AMC_CMD_ID_EEPROM_READ_WRITE:
+				req_type = EEPROM_GET_TYPE(flags);
+				break;
+
+			case AMC_CMD_ID_MODULE_READ_WRITE:
+				req_type = MODULE_RW_TYPE(flags);
+				break;
+
+			default:
+				break;
+			}
+
+			if (req_type == AMC_PROXY_CMD_RW_REQUEST_WRITE)
+				/* Copy payload data to address */
+				memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+		}
+		break;
 
 		default:
 			break;
-		}
-
-		if (req_type == AMC_PROXY_CMD_RW_REQUEST_WRITE)
-			/* Copy payload data to address */
-			memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
-	}
-	break;
-
-	default:
-		break;
 	}
 
 	/* Allocate unique id to the command */
@@ -1544,11 +1544,9 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	}
 
 	case AMC_CMD_ID_DEBUG_VERBOSITY:
-	{
 		/* flags are the verbosity */
 		ret = amc_proxy_request_debug_verbosity(amc_proxy_cmd, (uint8_t)flags);
 		break;
-	}
 
 	default:
 		ret = -EINVAL;
@@ -1599,75 +1597,69 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	}
 
 	switch (cmd_id) {
-	case AMC_CMD_ID_IDENTIFY:
-	{
-		struct amc_proxy_identify_response identity = { 0 };
-		ret = amc_proxy_get_response_identity(amc_proxy_cmd, &identity);
-		if (!ret) {
-			memcpy(&data_buf[0], &(identity.ver_major), sizeof(uint8_t));
-			memcpy(&data_buf[1], &(identity.ver_minor), sizeof(uint8_t));
-			memcpy(&data_buf[2], &(identity.ver_patch), sizeof(uint8_t));
-			memcpy(&data_buf[3], &(identity.local_changes), sizeof(uint8_t));
-			memcpy(&data_buf[4], &(identity.dev_commits), sizeof(uint16_t));
-			memcpy(&data_buf[6], &(identity.link_ver_major), sizeof(uint8_t));
-			memcpy(&data_buf[7], &(identity.link_ver_minor), sizeof(uint8_t));
+		case AMC_CMD_ID_IDENTIFY:
+		{
+			struct amc_proxy_identify_response identity = { 0 };
+			ret = amc_proxy_get_response_identity(amc_proxy_cmd, &identity);
+			if (!ret) {
+				memcpy(&data_buf[0], &(identity.ver_major), sizeof(uint8_t));
+				memcpy(&data_buf[1], &(identity.ver_minor), sizeof(uint8_t));
+				memcpy(&data_buf[2], &(identity.ver_patch), sizeof(uint8_t));
+				memcpy(&data_buf[3], &(identity.local_changes), sizeof(uint8_t));
+				memcpy(&data_buf[4], &(identity.dev_commits), sizeof(uint16_t));
+				memcpy(&data_buf[6], &(identity.link_ver_major), sizeof(uint8_t));
+				memcpy(&data_buf[7], &(identity.link_ver_minor), sizeof(uint8_t));
+			}
 		}
-	}
-	break;
-
-	case AMC_CMD_ID_SENSOR:
-	{
-		ret = amc_proxy_get_response_sensor(amc_proxy_cmd);
-		if (!ret)
-			memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
-	}
-	break;
-
-	case AMC_CMD_ID_DOWNLOAD_PDI:
-		ret = amc_proxy_get_response_pdi_download(amc_proxy_cmd);
 		break;
 
-	case AMC_CMD_ID_DEVICE_BOOT:
-		ret = amc_proxy_get_response_device_boot(amc_proxy_cmd);
-		break;
-
-	case AMC_CMD_ID_COPY_PARTITION:
-		ret = amc_proxy_get_response_partition_copy(amc_proxy_cmd);
-		break;
-
-	case AMC_CMD_ID_HEARTBEAT:
-	{
-		struct amc_proxy_heartbeat_response heartbeat = { 0 };
-		ret = amc_proxy_get_response_heartbeat(amc_proxy_cmd, &heartbeat);
-		memcpy(&data_buf[0], &(heartbeat.request_id), sizeof(uint8_t));
-		break;
-	}
-
-	case AMC_CMD_ID_EEPROM_READ_WRITE:
-	{
-		ret = amc_proxy_get_response_eeprom_read_write(amc_proxy_cmd);
-		if (!ret)
-			if (EEPROM_GET_TYPE(flags) == AMC_PROXY_CMD_RW_REQUEST_READ)
+		case AMC_CMD_ID_SENSOR:
+			ret = amc_proxy_get_response_sensor(amc_proxy_cmd);
+			if (!ret)
 				memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
-		break;
-	}
+			break;
 
-	case AMC_CMD_ID_MODULE_READ_WRITE:
-	{
-		ret = amc_proxy_get_response_module_read_write(amc_proxy_cmd);
-		if (!ret)
-			if (MODULE_RW_TYPE(flags) == AMC_PROXY_CMD_RW_REQUEST_READ)
-				memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
-		break;
-	}
+		case AMC_CMD_ID_DOWNLOAD_PDI:
+			ret = amc_proxy_get_response_pdi_download(amc_proxy_cmd);
+			break;
 
-	case AMC_CMD_ID_DEBUG_VERBOSITY:
-		ret = amc_proxy_get_response_debug_verbosity(amc_proxy_cmd);
-		break;
+		case AMC_CMD_ID_DEVICE_BOOT:
+			ret = amc_proxy_get_response_device_boot(amc_proxy_cmd);
+			break;
 
-	default:
-		AMI_ERR(amc_ctrl_ctxt, "Unsupported response %d", cmd_id);
-		break;
+		case AMC_CMD_ID_COPY_PARTITION:
+			ret = amc_proxy_get_response_partition_copy(amc_proxy_cmd);
+			break;
+
+		case AMC_CMD_ID_HEARTBEAT:
+		{
+			struct amc_proxy_heartbeat_response heartbeat = { 0 };
+			ret = amc_proxy_get_response_heartbeat(amc_proxy_cmd, &heartbeat);
+			memcpy(&data_buf[0], &(heartbeat.request_id), sizeof(uint8_t));
+			break;
+		}
+
+		case AMC_CMD_ID_EEPROM_READ_WRITE:
+			ret = amc_proxy_get_response_eeprom_read_write(amc_proxy_cmd);
+			if (!ret)
+				if (EEPROM_GET_TYPE(flags) == AMC_PROXY_CMD_RW_REQUEST_READ)
+					memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+			break;
+
+		case AMC_CMD_ID_MODULE_READ_WRITE:
+			ret = amc_proxy_get_response_module_read_write(amc_proxy_cmd);
+			if (!ret)
+				if (MODULE_RW_TYPE(flags) == AMC_PROXY_CMD_RW_REQUEST_READ)
+					memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+			break;
+
+		case AMC_CMD_ID_DEBUG_VERBOSITY:
+			ret = amc_proxy_get_response_debug_verbosity(amc_proxy_cmd);
+			break;
+
+		default:
+			AMI_ERR(amc_ctrl_ctxt, "Unsupported response %d", cmd_id);
+			break;
 	}
 
 done:

@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdlib.h>
 #include <stddef.h>
@@ -81,8 +77,16 @@ struct app_cmd cmd_mfg_info = {
 /* Function implementations                                                  */
 /*****************************************************************************/
 
-/*
+/**
  * "mfg_info" command callback.
+ * @options:  Ordered list of options passed in at the command line
+ * @num_args:  Number of non-option arguments (excluding command)
+ * @args:  List of non-option arguments (excluding command)
+ *
+ * `args` may be an invalid pointer. It is the function's responsibility
+ * to validate the `num_args` parameter.
+ *
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 static int do_cmd_mfg_info(struct app_option *options, int num_args, char **args)
 {

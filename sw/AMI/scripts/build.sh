@@ -14,7 +14,7 @@ PROFILE=""
 # Output files
 DRIVER_BIN="ami.ko"
 APP_BIN="ami_tool"
-API_BIN="libami.a"
+API_BIN="libami.so"
 
 # This script assumes that it is run from the top level project directory
 ROOT_DIR=$(realpath .)

@@ -8,10 +8,6 @@
 #ifndef AMI_APP_UTILS_H
 #define AMI_APP_UTILS_H
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdint.h>
 #include <stdbool.h>

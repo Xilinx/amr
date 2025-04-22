@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,34 +57,34 @@
 /* PCI info */
 #define NUM_PCIEINFO_ROWS		(6)
 #define NUM_PCIEINFO_COLS		(2)
-#define PCIEINFO_HEADER_INFO		(0)
+#define PCIEINFO_HEADER_INFO	(0)
 #define PCIEINFO_ROW_VENDOR		(0)
 #define PCIEINFO_ROW_DEVICE		(1)
-#define PCIEINFO_ROW_LINK_SPEED		(2)
-#define PCIEINFO_ROW_LINK_WIDTH		(3)
-#define PCIEINFO_ROW_NUMA_NODE		(4)
-#define PCIEINFO_ROW_CPULIST		(5)
+#define PCIEINFO_ROW_LINK_SPEED	(2)
+#define PCIEINFO_ROW_LINK_WIDTH	(3)
+#define PCIEINFO_ROW_NUMA_NODE	(4)
+#define PCIEINFO_ROW_CPULIST	(5)
 
 /* FPT header information */
 #define PARTITION_ID_STR_LEN		(20)
-#define NUM_FPT_HEADER_ROWS		(4)
-#define NUM_FPT_HEADER_COLS		(2)
-#define FPT_HEADER_INFO			(0)
+#define NUM_FPT_HEADER_ROWS			(4)
+#define NUM_FPT_HEADER_COLS			(2)
+#define FPT_HEADER_INFO				(0)
 #define FPT_HEADER_ROW_VERSION		(0)
-#define FPT_HEADER_ROW_SIZE		(1)
+#define FPT_HEADER_ROW_SIZE			(1)
 #define FPT_HEADER_ROW_ENTRY_SIZE	(2)
 #define FPT_HEADER_ROW_NUM_ENTRIES	(3)
 
 /* FPT partition information */
-#define NUM_PARTITION_COLS		(4)
-#define PARTITION_COL_ID		(0)
-#define PARTITION_COL_TYPE		(1)
-#define PARTITION_COL_ADDR		(2)
-#define PARTITION_COL_SIZE		(3)
+#define NUM_PARTITION_COLS			(4)
+#define PARTITION_COL_ID			(0)
+#define PARTITION_COL_TYPE			(1)
+#define PARTITION_COL_ADDR			(2)
+#define PARTITION_COL_SIZE			(3)
 
 /* Manufacturing info */
-#define NUM_MFG_INFO_ROWS		(17)
-#define NUM_MFG_INFO_COLS		(2)
+#define NUM_MFG_INFO_ROWS			(17)
+#define NUM_MFG_INFO_COLS			(2)
 #define MFG_INFO_HEADER_INFO		(0)
 #define MFG_INFO_EEPROM_VERSION		(0)
 #define MFG_INFO_PRODUCT_NAME		(1)
@@ -100,23 +96,23 @@
 #define MFG_INFO_CONFIG_MODE		(7)
 #define MFG_INFO_MAX_POWER_MODE		(8)
 #define MFG_INFO_ACTIVE_STATE		(9)
-#define MFG_INFO_MANUFACTURING_DATE     (10)
-#define MFG_INFO_UUID		        (11)
-#define MFG_INFO_PCIE_ID		(12)
-#define MFG_INFO_OEM_ID		        (13)
-#define MFG_INFO_CAPABILITY		(14)
-#define MFG_INFO_PART_NUM               (15)
+#define MFG_INFO_MANUFACTURING_DATE (10)
+#define MFG_INFO_UUID				(11)
+#define MFG_INFO_PCIE_ID			(12)
+#define MFG_INFO_OEM_ID				(13)
+#define MFG_INFO_CAPABILITY			(14)
+#define MFG_INFO_PART_NUM			(15)
 #define MFG_INFO_MFG_PART_NUM		(16)
 
-#define MFG_OEM_ID_BASE			(16)
-#define MFG_TIMESTAMP_BASE		(10)
-#define MFG_DATE_TM_YEAR		(1996 - 1900)
-#define FPGA_CONFIG_MODE_QSPIX4         (7)
-#define FPGA_CONFIG_MODE_OSPI           (8)
-#define MAX_POWER_MODE_75W              (0)
-#define MAX_POWER_MODE_150W             (1)
-#define MAX_POWER_MODE_225W             (2)
-#define MAX_POWER_MODE_350W             (3)
+#define MFG_OEM_ID_BASE				(16)
+#define MFG_TIMESTAMP_BASE			(10)
+#define MFG_DATE_TM_YEAR			(1996 - 1900)
+#define FPGA_CONFIG_MODE_QSPIX4		(7)
+#define FPGA_CONFIG_MODE_OSPI		(8)
+#define MAX_POWER_MODE_75W			(0)
+#define MAX_POWER_MODE_150W			(1)
+#define MAX_POWER_MODE_225W			(2)
+#define MAX_POWER_MODE_350W			(3)
 
 #define NOT_APPLICABLE_FIELD		"N/A"
 
@@ -134,41 +130,41 @@
 static char* fpt_partition_type_to_str(enum ami_fpt_type type)
 {
 	switch (type) {
-	case AMI_FPT_TYPE_FPT:
-		return "FPT";
+		case AMI_FPT_TYPE_FPT:
+			return "FPT";
 
-	case AMI_FPT_TYPE_RECOVERY_FPT:
-		return "RECOVERY_FPT";
+		case AMI_FPT_TYPE_RECOVERY_FPT:
+			return "RECOVERY_FPT";
 
-	case AMI_FPT_TYPE_EXTENSION_FPT:
-		return "EXTENSION_FPT";
+		case AMI_FPT_TYPE_EXTENSION_FPT:
+			return "EXTENSION_FPT";
 
-	case AMI_FPT_TYPE_PDI_BOOT:
-		return "PDI_BOOT";
+		case AMI_FPT_TYPE_PDI_BOOT:
+			return "PDI_BOOT";
 
-	case AMI_FPT_TYPE_PDI_BOOT_BACKUP:
-		return "PDI_BOOT_BACKUP";
+		case AMI_FPT_TYPE_PDI_BOOT_BACKUP:
+			return "PDI_BOOT_BACKUP";
 
-	case AMI_FPT_TYPE_PDI_XSABIN_META:
-		return "PDI_XSABIN_META";
+		case AMI_FPT_TYPE_PDI_XSABIN_META:
+			return "PDI_XSABIN_META";
 
-	case AMI_FPT_TYPE_PDI_GOLDEN:
-		return "PDI_GOLDEN";
+		case AMI_FPT_TYPE_PDI_GOLDEN:
+			return "PDI_GOLDEN";
 
-	case AMI_FPT_TYPE_PDI_SYS_DTB:
-		return "PDI_SYS_DTB";
+		case AMI_FPT_TYPE_PDI_SYS_DTB:
+			return "PDI_SYS_DTB";
 
-	case AMI_FPT_TYPE_PDI_META:
-		return "PDI_META";
+		case AMI_FPT_TYPE_PDI_META:
+			return "PDI_META";
 
-	case AMI_FPT_TYPE_PDI_META_BACKUP:
-		return "PDI_META_BACKUP";
+		case AMI_FPT_TYPE_PDI_META_BACKUP:
+			return "PDI_META_BACKUP";
 
-	case AMI_FPT_TYPE_SC_FW:
-		return "SC_FW";
+		case AMI_FPT_TYPE_SC_FW:
+			return "SC_FW";
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return "Unknown";
@@ -193,7 +189,6 @@ static int populate_fpt_header(ami_device *dev, char **header,
 		return EXIT_FAILURE;
 
 	/* dev and data may be NULL */
-
 	for (i = 0; (i < num_fields) && (i < NUM_FPT_HEADER_COLS); i++) {
 		if (!header[i]) {
 			ret = EXIT_FAILURE;
@@ -201,12 +196,12 @@ static int populate_fpt_header(ami_device *dev, char **header,
 		}
 
 		switch (i) {
-		case FPT_HEADER_INFO:
-			sprintf(header[i], "%s", "FPT");
-			break;
+			case FPT_HEADER_INFO:
+				sprintf(header[i], "%s", "FPT");
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -240,100 +235,96 @@ static int populate_fpt_values(ami_device *dev, void *values,
 		int col = 0;
 
 		switch (i) {
-		case FPT_HEADER_ROW_VERSION:
-		{
-			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Version");
-				sprintf(((char***)values)[i][col++], "%d", hdr->version);
-				break;
+			case FPT_HEADER_ROW_VERSION:
+			{
+				switch (fmt) {
+					case APP_OUT_FORMAT_TABLE:
+						sprintf(((char***)values)[i][col++], "%s", "Version");
+						sprintf(((char***)values)[i][col++], "%d", hdr->version);
+						break;
 
-			case APP_OUT_FORMAT_JSON:
-				json_append_member(
-					(JsonNode*)values,
-					"version",
-					json_mknumber(hdr->version)
-				);
-				break;
+					case APP_OUT_FORMAT_JSON:
+						json_append_member(
+							(JsonNode*)values,
+							"version",
+							json_mknumber(hdr->version)
+						);
+						break;
 
-			default:
-				break;
-			}
-
-			break;
-		}
-
-		case FPT_HEADER_ROW_SIZE:
-		{
-			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Header Size");
-				sprintf(((char***)values)[i][col++], "%d", hdr->hdr_size);
-				break;
-
-			case APP_OUT_FORMAT_JSON:
-				json_append_member(
-					(JsonNode*)values,
-					"header_size",
-					json_mknumber(hdr->hdr_size)
-				);
-				break;
-
-			default:
+					default:
+						break;
+				}
 				break;
 			}
 
-			break;
-		}
+			case FPT_HEADER_ROW_SIZE:
+			{
+				switch (fmt) {
+					case APP_OUT_FORMAT_TABLE:
+						sprintf(((char***)values)[i][col++], "%s", "Header Size");
+						sprintf(((char***)values)[i][col++], "%d", hdr->hdr_size);
+						break;
 
-		case FPT_HEADER_ROW_ENTRY_SIZE:
-		{
-			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Entry Size");
-				sprintf(((char***)values)[i][col++], "%d", hdr->entry_size);
-				break;
+					case APP_OUT_FORMAT_JSON:
+						json_append_member(
+							(JsonNode*)values,
+							"header_size",
+							json_mknumber(hdr->hdr_size)
+						);
+						break;
 
-			case APP_OUT_FORMAT_JSON:
-				json_append_member(
-					(JsonNode*)values,
-					"entry_size",
-					json_mknumber(hdr->entry_size)
-				);
-				break;
-
-			default:
-				break;
-			}
-
-			break;
-		}
-
-		case FPT_HEADER_ROW_NUM_ENTRIES:
-		{
-			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Entries");
-				sprintf(((char***)values)[i][col++], "%d", hdr->num_entries);
-				break;
-
-			case APP_OUT_FORMAT_JSON:
-				json_append_member(
-					(JsonNode*)values,
-					"entries",
-					json_mknumber(hdr->num_entries)
-				);
-				break;
-
-			default:
+					default:
+						break;
+				}
 				break;
 			}
 
-			break;
-		}
+			case FPT_HEADER_ROW_ENTRY_SIZE:
+			{
+				switch (fmt) {
+					case APP_OUT_FORMAT_TABLE:
+						sprintf(((char***)values)[i][col++], "%s", "Entry Size");
+						sprintf(((char***)values)[i][col++], "%d", hdr->entry_size);
+						break;
 
-		default:
-			break;
+					case APP_OUT_FORMAT_JSON:
+						json_append_member(
+							(JsonNode*)values,
+							"entry_size",
+							json_mknumber(hdr->entry_size)
+						);
+						break;
+
+					default:
+						break;
+					}
+				break;
+			}
+
+			case FPT_HEADER_ROW_NUM_ENTRIES:
+			{
+				switch (fmt) {
+					case APP_OUT_FORMAT_TABLE:
+						sprintf(((char***)values)[i][col++], "%s", "Entries");
+						sprintf(((char***)values)[i][col++], "%d", hdr->num_entries);
+						break;
+
+					case APP_OUT_FORMAT_JSON:
+						json_append_member(
+							(JsonNode*)values,
+							"entries",
+							json_mknumber(hdr->num_entries)
+						);
+						break;
+
+					default:
+						break;
+				}
+				break;
+			}
+
+			default:
+				break;
 		}
 	}
 
@@ -359,7 +350,6 @@ static int populate_version_header(ami_device *dev, char **header,
 		return EXIT_FAILURE;
 
 	/* dev and data may be NULL */
-
 	for (i = 0; i < num_fields; i++) {
 		if (!header[i]) {
 			ret = EXIT_FAILURE;
@@ -367,12 +357,12 @@ static int populate_version_header(ami_device *dev, char **header,
 		}
 
 		switch (i) {
-		case VERSION_HEADER_AMI:
-			sprintf(header[i], "%s", "AMI");
-			break;
+			case VERSION_HEADER_AMI:
+				sprintf(header[i], "%s", "AMI");
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -406,95 +396,94 @@ static int populate_version_values(ami_device *dev, void *values,
 		return EXIT_FAILURE;
 
 	switch (fmt) {
-	case APP_OUT_FORMAT_TABLE:
-	{
-		int i = 0;
-		char ***rows = (char***)values;
+		case APP_OUT_FORMAT_TABLE:
+		{
+			int i = 0;
+			char ***rows = (char***)values;
 
-		for (i = 0; i < NUM_VERSION_ROWS; i++) {
-			int col = 0;
+			for (i = 0; i < NUM_VERSION_ROWS; i++) {
+				int col = 0;
 
-			switch (i) {
-			case VERSION_ROW_VER:
-				sprintf(rows[i][col++], "%s", "Version");
-				sprintf(
-					rows[i][col++],
-					"%d.%d.%d%c (%d)",
-					GIT_TAG_VER_MAJOR,
-					GIT_TAG_VER_MINOR,
-					GIT_TAG_VER_PATCH,
-					(GIT_STATUS == 0) ? (' ') : ('*'),
-					GIT_TAG_VER_DEV_COMMITS
-				);
-				break;
+				switch (i) {
+					case VERSION_ROW_VER:
+						sprintf(rows[i][col++], "%s", "Version");
+						sprintf(
+							rows[i][col++],
+							"%d.%d.%d%c (%d)",
+							GIT_TAG_VER_MAJOR,
+							GIT_TAG_VER_MINOR,
+							GIT_TAG_VER_PATCH,
+							(GIT_STATUS == 0) ? (' ') : ('*'),
+							GIT_TAG_VER_DEV_COMMITS
+						);
+						break;
 
-			case VERSION_ROW_BRANCH:
-				sprintf(rows[i][col++], "%s", "Branch");
-				sprintf(rows[i][col++], "%s", GIT_BRANCH);
-				break;
+					case VERSION_ROW_BRANCH:
+						sprintf(rows[i][col++], "%s", "Branch");
+						sprintf(rows[i][col++], "%s", GIT_BRANCH);
+						break;
 
-			case VERSION_ROW_HASH:
-				sprintf(rows[i][col++], "%s", "Hash");
-				sprintf(rows[i][col++], "%s", GIT_HASH);
-				break;
+					case VERSION_ROW_HASH:
+						sprintf(rows[i][col++], "%s", "Hash");
+						sprintf(rows[i][col++], "%s", GIT_HASH);
+						break;
 
-			case VERSION_ROW_DATE:
-				sprintf(rows[i][col++], "%s", "Hash Date");
-				sprintf(rows[i][col++], "%s", GIT_DATE);
-				break;
+					case VERSION_ROW_DATE:
+						sprintf(rows[i][col++], "%s", "Hash Date");
+						sprintf(rows[i][col++], "%s", GIT_DATE);
+						break;
 
-			case VERSION_ROW_DRV:
-				sprintf(rows[i][col++], "%s", "Driver Version");
-				sprintf(
-					rows[i][col++],
-					"%d.%d.%d%c (%d)",
-					driver_ver.major,
-					driver_ver.minor,
-					driver_ver.patch,
-					(driver_ver.status == 0) ? (' ') : ('*'),
-					driver_ver.dev_commits
-				);
-				break;
+					case VERSION_ROW_DRV:
+						sprintf(rows[i][col++], "%s", "Driver Version");
+						sprintf(
+							rows[i][col++],
+							"%d.%d.%d%c (%d)",
+							driver_ver.major,
+							driver_ver.minor,
+							driver_ver.patch,
+							(driver_ver.status == 0) ? (' ') : ('*'),
+							driver_ver.dev_commits
+						);
+						break;
 
-			default:
-				break;
+					default:
+						break;
+				}
 			}
+			break;
 		}
-		break;
-	}
 
-	case APP_OUT_FORMAT_JSON:
-	{
-		JsonNode *parent = (JsonNode*)values;
-		JsonNode *api_ver = json_mkobject();
-		JsonNode *drv_ver = json_mkobject();
+		case APP_OUT_FORMAT_JSON:
+		{
+			JsonNode *parent = (JsonNode*)values;
+			JsonNode *api_ver = json_mkobject();
+			JsonNode *drv_ver = json_mkobject();
 
-		/* Construct API version */
-		json_append_member(api_ver, "major", json_mknumber(GIT_TAG_VER_MAJOR));
-		json_append_member(api_ver, "minor", json_mknumber(GIT_TAG_VER_MINOR));
-		json_append_member(api_ver, "patch", json_mknumber(GIT_TAG_VER_PATCH));
-		json_append_member(api_ver, "commits", json_mknumber(GIT_TAG_VER_DEV_COMMITS));
-		json_append_member(api_ver, "status", json_mknumber(GIT_STATUS));
-		json_append_member(api_ver, "branch", json_mkstring(GIT_BRANCH));
-		json_append_member(api_ver, "hash", json_mkstring(GIT_HASH));
-		json_append_member(api_ver, "date", json_mkstring(GIT_DATE));
+			/* Construct API version */
+			json_append_member(api_ver, "major", json_mknumber(GIT_TAG_VER_MAJOR));
+			json_append_member(api_ver, "minor", json_mknumber(GIT_TAG_VER_MINOR));
+			json_append_member(api_ver, "patch", json_mknumber(GIT_TAG_VER_PATCH));
+			json_append_member(api_ver, "commits", json_mknumber(GIT_TAG_VER_DEV_COMMITS));
+			json_append_member(api_ver, "status", json_mknumber(GIT_STATUS));
+			json_append_member(api_ver, "branch", json_mkstring(GIT_BRANCH));
+			json_append_member(api_ver, "hash", json_mkstring(GIT_HASH));
+			json_append_member(api_ver, "date", json_mkstring(GIT_DATE));
 
-		/* Construct driver version*/
-		json_append_member(drv_ver, "major", json_mknumber(driver_ver.major));
-		json_append_member(drv_ver, "minor", json_mknumber(driver_ver.minor));
-		json_append_member(drv_ver, "patch", json_mknumber(driver_ver.patch));
-		json_append_member(drv_ver, "commits", json_mknumber(driver_ver.dev_commits));
-		json_append_member(drv_ver, "status", json_mknumber(driver_ver.status));
+			/* Construct driver version*/
+			json_append_member(drv_ver, "major", json_mknumber(driver_ver.major));
+			json_append_member(drv_ver, "minor", json_mknumber(driver_ver.minor));
+			json_append_member(drv_ver, "patch", json_mknumber(driver_ver.patch));
+			json_append_member(drv_ver, "commits", json_mknumber(driver_ver.dev_commits));
+			json_append_member(drv_ver, "status", json_mknumber(driver_ver.status));
 
-		/* Add to parent */
-		json_append_member(parent, "api", api_ver);
-		json_append_member(parent, "driver", drv_ver);
+			/* Add to parent */
+			json_append_member(parent, "api", api_ver);
+			json_append_member(parent, "driver", drv_ver);
+			break;
+		}
 
-		break;
-	}
-
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return EXIT_SUCCESS;
@@ -528,24 +517,24 @@ static int populate_partition_header(ami_device *dev, char **header,
 		}
 
 		switch (i) {
-		case PARTITION_COL_ID:
-			sprintf(header[i], "%s", "Partition");
-			break;
+			case PARTITION_COL_ID:
+				sprintf(header[i], "%s", "Partition");
+				break;
 
-		case PARTITION_COL_TYPE:
-			sprintf(header[i], "%s", "Type");
-			break;
+			case PARTITION_COL_TYPE:
+				sprintf(header[i], "%s", "Type");
+				break;
 
-		case PARTITION_COL_ADDR:
-			sprintf(header[i], "%s", "Address");
-			break;
+			case PARTITION_COL_ADDR:
+				sprintf(header[i], "%s", "Address");
+				break;
 
-		case PARTITION_COL_SIZE:
-			sprintf(header[i], "%s", "Size");
-			break;
+			case PARTITION_COL_SIZE:
+				sprintf(header[i], "%s", "Size");
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -572,24 +561,24 @@ static int construct_partition_row(struct ami_fpt_partition *part, int part_num,
 
 	for (col = 0; (col < n_fields) && (col < NUM_PARTITION_COLS); col++) {
 		switch (col) {
-		case PARTITION_COL_ID:
-			sprintf(row[col], "%d", part_num);
-			break;
+			case PARTITION_COL_ID:
+				sprintf(row[col], "%d", part_num);
+				break;
 
-		case PARTITION_COL_TYPE:
-			sprintf(row[col], "%s", fpt_partition_type_to_str(part->type));
-			break;
+			case PARTITION_COL_TYPE:
+				sprintf(row[col], "%s", fpt_partition_type_to_str(part->type));
+				break;
 
-		case PARTITION_COL_ADDR:
-			sprintf(row[col], "0x%08x", part->base_addr);
-			break;
+			case PARTITION_COL_ADDR:
+				sprintf(row[col], "0x%08x", part->base_addr);
+				break;
 
-		case PARTITION_COL_SIZE:
-			sprintf(row[col], "0x%08x", part->size);
-			break;
+			case PARTITION_COL_SIZE:
+				sprintf(row[col], "0x%08x", part->size);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -619,32 +608,32 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 
 	for (col = 0; (col < n_fields) && (col < NUM_PARTITION_COLS); col++) {
 		switch (col) {
-		case PARTITION_COL_TYPE:
-			json_append_member(
-				row,
-				"type",
-				json_mkstring(fpt_partition_type_to_str(part->type))
-			);
-			break;
+			case PARTITION_COL_TYPE:
+				json_append_member(
+					row,
+					"type",
+					json_mkstring(fpt_partition_type_to_str(part->type))
+				);
+				break;
 
-		case PARTITION_COL_ADDR:
-			json_append_member(
-				row,
-				"address",
-				json_mknumber(part->base_addr)
-			);
-			break;
+			case PARTITION_COL_ADDR:
+				json_append_member(
+					row,
+					"address",
+					json_mknumber(part->base_addr)
+				);
+				break;
 
-		case PARTITION_COL_SIZE:
-			json_append_member(
-				row,
-				"size",
-				json_mknumber(part->size)
-			);
-			break;
+			case PARTITION_COL_SIZE:
+				json_append_member(
+					row,
+					"size",
+					json_mknumber(part->size)
+				);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -684,26 +673,26 @@ static int populate_partition_values(ami_device *dev, void *values,
 		}
 
 		switch (fmt) {
-		case APP_OUT_FORMAT_TABLE:
-			construct_partition_row(
-				&part,
-				i,
-				((char***)values)[i],
-				*n_fields
-			);
-			break;
+			case APP_OUT_FORMAT_TABLE:
+				construct_partition_row(
+					&part,
+					i,
+					((char***)values)[i],
+					*n_fields
+				);
+				break;
 
-		case APP_OUT_FORMAT_JSON:
-			construct_partition_node(
-				&part,
-				i,
-				(JsonNode*)values,
-				*n_fields
-			);
-			break;
+			case APP_OUT_FORMAT_JSON:
+				construct_partition_node(
+					&part,
+					i,
+					(JsonNode*)values,
+					*n_fields
+				);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		i++;
@@ -731,7 +720,6 @@ static int populate_overview_header(ami_device *dev, char **header,
 		return EXIT_FAILURE;
 
 	/* dev and data may be NULL */
-
 	for (i = 0; (i < num_fields) && (i < NUM_OVERVIEW_COLS_V); i++) {
 		if (!header[i]) {
 			ret = EXIT_FAILURE;
@@ -739,36 +727,36 @@ static int populate_overview_header(ami_device *dev, char **header,
 		}
 
 		switch (i) {
-		case OVERVIEW_COL_BDF:
-			sprintf(header[i], "%s", "BDF");
-			break;
+			case OVERVIEW_COL_BDF:
+				sprintf(header[i], "%s", "BDF");
+				break;
 
-		case OVERVIEW_COL_UUID:
-			sprintf(header[i], "%s", "UUID");
-			break;
+			case OVERVIEW_COL_UUID:
+				sprintf(header[i], "%s", "UUID");
+				break;
 
-		case OVERVIEW_COL_HWMON:
-			sprintf(header[i], "%s", "HWMON");
-			break;
+			case OVERVIEW_COL_HWMON:
+				sprintf(header[i], "%s", "HWMON");
+				break;
 
-		case OVERVIEW_COL_CDEV:
-			sprintf(header[i], "%s", "CDEV");
-			break;
+			case OVERVIEW_COL_CDEV:
+				sprintf(header[i], "%s", "CDEV");
+				break;
 
-		case OVERVIEW_COL_STATE:
-			sprintf(header[i], "%s", "State");
-			break;
+			case OVERVIEW_COL_STATE:
+				sprintf(header[i], "%s", "State");
+				break;
 
-		case OVERVIEW_COL_NAME:
-			sprintf(header[i], "%s", "Device");
-			break;
+			case OVERVIEW_COL_NAME:
+				sprintf(header[i], "%s", "Device");
+				break;
 
-		case OVERVIEW_COL_AMC:
-			sprintf(header[i], "%s", "AMC");
-			break;
+			case OVERVIEW_COL_AMC:
+				sprintf(header[i], "%s", "AMC");
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -803,92 +791,92 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 
 	for (col = 0; (col < n_fields) && (col < NUM_OVERVIEW_COLS_V); col++) {
 		switch (col) {
-		case OVERVIEW_COL_UUID:
-		{
-			char uuid[AMI_LOGIC_UUID_SIZE] = { 0 };
+			case OVERVIEW_COL_UUID:
+			{
+				char uuid[AMI_LOGIC_UUID_SIZE] = { 0 };
 
-			if (ami_dev_read_uuid(dev, uuid) == AMI_STATUS_OK)
-				uuid_node = json_mkstring(uuid);
-			else
-				uuid_node = json_mknull();
+				if (ami_dev_read_uuid(dev, uuid) == AMI_STATUS_OK)
+					uuid_node = json_mkstring(uuid);
+				else
+					uuid_node = json_mknull();
 
-			json_append_member(row, "uuid", uuid_node);
-			break;
-		}
-
-		case OVERVIEW_COL_HWMON:
-		{
-			int hwmon = 0;
-
-			if (ami_dev_get_hwmon_num(dev, &hwmon) == AMI_STATUS_OK)
-				hwmon_node = json_mknumber(hwmon);
-			else
-				hwmon_node = json_mknull();
-
-			json_append_member(row, "hwmon", hwmon_node);
-			break;
-		}
-
-		case OVERVIEW_COL_CDEV:
-		{
-			int cdev = 0;
-
-			if (ami_dev_get_cdev_num(dev, &cdev) == AMI_STATUS_OK)
-				cdev_node = json_mknumber(cdev);
-			else
-				cdev_node = json_mknull();
-
-			json_append_member(row, "cdev", cdev_node);
-			break;
-		}
-
-		case OVERVIEW_COL_STATE:
-		{
-			char state[AMI_DEV_STATE_SIZE] = { 0 };
-
-			if (ami_dev_get_state(dev, state) == AMI_STATUS_OK)
-				state_node = json_mkstring(state);
-			else
-				state_node = json_mknull();
-
-			json_append_member(row, "state", state_node);
-			break;
-		}
-
-		case OVERVIEW_COL_NAME:
-		{
-			char name[AMI_DEV_NAME_SIZE] = { 0 };
-
-			if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
-				name_node = json_mkstring(name);
-			else
-				name_node = json_mknull();
-
-			json_append_member(row, "name", name_node);
-			break;
-		}
-
-		case OVERVIEW_COL_AMC:
-		{
-			struct amc_version ver = { 0 };
-
-			if (ami_dev_get_amc_version(dev, &ver) == AMI_STATUS_OK) {
-				amc_node = json_mkobject();
-				json_append_member(amc_node, "major", json_mknumber(ver.major));
-				json_append_member(amc_node, "minor", json_mknumber(ver.minor));
-				json_append_member(amc_node, "patch", json_mknumber(ver.patch));
-				json_append_member(amc_node, "commits", json_mknumber(ver.dev_commits));
-				json_append_member(amc_node, "local_changes", json_mknumber(ver.local_changes));
-			} else {
-				amc_node = json_mknull();
+				json_append_member(row, "uuid", uuid_node);
+				break;
 			}
 
-			json_append_member(row, "amc", amc_node);
-			break;
-		}
+			case OVERVIEW_COL_HWMON:
+			{
+				int hwmon = 0;
 
-		default:
-			break;
+				if (ami_dev_get_hwmon_num(dev, &hwmon) == AMI_STATUS_OK)
+					hwmon_node = json_mknumber(hwmon);
+				else
+					hwmon_node = json_mknull();
+
+				json_append_member(row, "hwmon", hwmon_node);
+				break;
+			}
+
+			case OVERVIEW_COL_CDEV:
+			{
+				int cdev = 0;
+
+				if (ami_dev_get_cdev_num(dev, &cdev) == AMI_STATUS_OK)
+					cdev_node = json_mknumber(cdev);
+				else
+					cdev_node = json_mknull();
+
+				json_append_member(row, "cdev", cdev_node);
+				break;
+			}
+
+			case OVERVIEW_COL_STATE:
+			{
+				char state[AMI_DEV_STATE_SIZE] = { 0 };
+
+				if (ami_dev_get_state(dev, state) == AMI_STATUS_OK)
+					state_node = json_mkstring(state);
+				else
+					state_node = json_mknull();
+
+				json_append_member(row, "state", state_node);
+				break;
+			}
+
+			case OVERVIEW_COL_NAME:
+			{
+				char name[AMI_DEV_NAME_SIZE] = { 0 };
+
+				if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
+					name_node = json_mkstring(name);
+				else
+					name_node = json_mknull();
+
+				json_append_member(row, "name", name_node);
+				break;
+			}
+
+			case OVERVIEW_COL_AMC:
+			{
+				struct amc_version ver = { 0 };
+
+				if (ami_dev_get_amc_version(dev, &ver) == AMI_STATUS_OK) {
+					amc_node = json_mkobject();
+					json_append_member(amc_node, "major", json_mknumber(ver.major));
+					json_append_member(amc_node, "minor", json_mknumber(ver.minor));
+					json_append_member(amc_node, "patch", json_mknumber(ver.patch));
+					json_append_member(amc_node, "commits", json_mknumber(ver.dev_commits));
+					json_append_member(amc_node, "local_changes", json_mknumber(ver.local_changes));
+				} else {
+					amc_node = json_mknull();
+				}
+
+				json_append_member(row, "amc", amc_node);
+				break;
+			}
+
+			default:
+				break;
 		}
 	}
 
@@ -920,91 +908,77 @@ static int construct_overview_row(ami_device *dev, char **row, int n_fields)
 
 	for (col = 0; (col < n_fields) && (col < NUM_OVERVIEW_COLS_V); col++) {
 		switch (col) {
-		case OVERVIEW_COL_BDF:
-		{
-			uint16_t bdf = 0;
+			case OVERVIEW_COL_BDF:
+			{
+				uint16_t bdf = 0;
 
-			if (ami_dev_get_pci_bdf(dev, &bdf) == AMI_STATUS_OK)
-				sprintf(
-					row[col],
-					"%02x:%02x.%01x",
-					AMI_PCI_BUS(bdf), AMI_PCI_DEV(bdf), AMI_PCI_FUNC(bdf)
-				);
+				if (ami_dev_get_pci_bdf(dev, &bdf) == AMI_STATUS_OK)
+					sprintf(
+						row[col],
+						"%02x:%02x.%01x",
+						AMI_PCI_BUS(bdf), AMI_PCI_DEV(bdf), AMI_PCI_FUNC(bdf)
+					);
 
-			break;
-		}
+				break;
+			}
 
-		case OVERVIEW_COL_UUID:
-		{
-			char uuid[AMI_LOGIC_UUID_SIZE] = { 0 };
+			case OVERVIEW_COL_UUID:
+			{
+				char uuid[AMI_LOGIC_UUID_SIZE] = { 0 };
 
-			if (ami_dev_read_uuid(dev, uuid) == AMI_STATUS_OK)
-				sprintf(
-					row[col],
-					"%s",
-					uuid
-				);
-			else
-				sprintf(row[col], "%s", "N/A");
+				if (ami_dev_read_uuid(dev, uuid) == AMI_STATUS_OK)
+					sprintf(row[col], "%s", uuid);
+				else
+					sprintf(row[col], "%s", "N/A");
 
-			break;
-		}
+				break;
+			}
 
-		case OVERVIEW_COL_HWMON:
-		{
-			int hwmon = 0;
+			case OVERVIEW_COL_HWMON:
+			{
+				int hwmon = 0;
 
-			if (ami_dev_get_hwmon_num(dev, &hwmon) == AMI_STATUS_OK)
-				sprintf(row[col], "%d", hwmon);
+				if (ami_dev_get_hwmon_num(dev, &hwmon) == AMI_STATUS_OK)
+					sprintf(row[col], "%d", hwmon);
 
-			break;
-		}
+				break;
+			}
 
-		case OVERVIEW_COL_CDEV:
-		{
-			int cdev = 0;
+			case OVERVIEW_COL_CDEV:
+			{
+				int cdev = 0;
 
-			if (ami_dev_get_cdev_num(dev, &cdev) == AMI_STATUS_OK)
-				sprintf(row[col], "%d", cdev);
+				if (ami_dev_get_cdev_num(dev, &cdev) == AMI_STATUS_OK)
+					sprintf(row[col], "%d", cdev);
 
-			break;
-		}
+				break;
+			}
 
-		case OVERVIEW_COL_STATE:
-		{
-			char state[AMI_DEV_STATE_SIZE] = { 0 };
+			case OVERVIEW_COL_STATE:
+			{
+				char state[AMI_DEV_STATE_SIZE] = { 0 };
 
-			if (ami_dev_get_state(dev, state) == AMI_STATUS_OK)
-				sprintf(
-					row[col],
-					"%s",
-					state
-				);
-			else
-				sprintf(row[col], "%s", "Unknown");
+				if (ami_dev_get_state(dev, state) == AMI_STATUS_OK)
+					sprintf(row[col], "%s", state);
+				else
+					sprintf(row[col], "%s", "Unknown");
+				break;
+			}
 
-			break;
-		}
+			case OVERVIEW_COL_NAME:
+			{
+				char name[AMI_DEV_NAME_SIZE] = { 0 };
 
-		case OVERVIEW_COL_NAME:
-		{
-			char name[AMI_DEV_NAME_SIZE] = { 0 };
+				if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
+					sprintf(row[col], "%s", name);
+				else
+					sprintf(row[col], "%s", "Unknown");
+				break;
+			}
 
-			if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
-				sprintf(
-					row[col],
-					"%s",
-					name
-				);
-			else
-				sprintf(row[col], "%s", "Unknown");
-
-			break;
-		}
-
-		case OVERVIEW_COL_AMC:
-		{
-			struct amc_version ver = { 0 };
+			case OVERVIEW_COL_AMC:
+			{
+				struct amc_version ver = { 0 };
 
 			if (ami_dev_get_amc_version(dev, &ver) == AMI_STATUS_OK)
 				sprintf(
@@ -1017,13 +991,12 @@ static int construct_overview_row(ami_device *dev, char **row, int n_fields)
 					ver.dev_commits
 				);
 			else
-				sprintf(row[col], "%s", "Unknown");
+					sprintf(row[col], "%s", "Unknown");
+				break;
+			}
 
-			break;
-		}
-
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -1053,28 +1026,21 @@ static int populate_overview_values(ami_device *dev, void *values,
 		return EXIT_FAILURE;
 
 	/* dev and data may be NULL */
-
 	while ((i < *n_rows) &&
-		(ami_dev_find_next(&device, AMI_ANY_DEV, AMI_ANY_DEV, AMI_ANY_DEV, prev) == AMI_STATUS_OK)) {
+		(ami_dev_find_next(&device, AMI_ANY_DEV, AMI_ANY_DEV, AMI_ANY_DEV, prev)
+			== AMI_STATUS_OK)) {
 
 		switch (fmt) {
-		case APP_OUT_FORMAT_TABLE:
-			construct_overview_row(
-				device,
-				((char***)values)[i],
-				*n_fields
-			);
-			break;
+			case APP_OUT_FORMAT_TABLE:
+				construct_overview_row(device, ((char***)values)[i], *n_fields);
+				break;
 
-		case APP_OUT_FORMAT_JSON:
-			construct_overview_node(
-				device,
-				(JsonNode*)values,
-				*n_fields
-			);
+			case APP_OUT_FORMAT_JSON:
+				construct_overview_node(device, (JsonNode*)values, *n_fields);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		/* Move to next device. */
@@ -1112,7 +1078,6 @@ static int populate_pcieinfo_header(ami_device *dev, char **header,
 		return EXIT_FAILURE;
 
 	/* data may be NULL */
-
 	for (i = 0; (i < num_fields) && (i < NUM_PCIEINFO_COLS); i++) {
 		if (!header[i]) {
 			ret = EXIT_FAILURE;
@@ -1120,12 +1085,12 @@ static int populate_pcieinfo_header(ami_device *dev, char **header,
 		}
 
 		switch (i) {
-		case PCIEINFO_HEADER_INFO:
-			sprintf(header[i], "%s", "PCIe Info");
-			break;
+			case PCIEINFO_HEADER_INFO:
+				sprintf(header[i], "%s", "PCIe Info");
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -1153,7 +1118,6 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 		return EXIT_FAILURE;
 
 	/* data may be NULL */
-
 	for (i = 0; i < NUM_PCIEINFO_ROWS; i++) {
 		int col = 0;
 
@@ -1164,28 +1128,27 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 			int r = ami_dev_get_pci_vendor(dev, &vendor);
 
 			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Vendor");
-				sprintf(((char***)values)[i][col++], "0x%04x", vendor);
-				break;
+				case APP_OUT_FORMAT_TABLE:
+					sprintf(((char***)values)[i][col++], "%s", "Vendor");
+					sprintf(((char***)values)[i][col++], "0x%04x", vendor);
+					break;
 
-			case APP_OUT_FORMAT_JSON:
-			{
-				JsonNode *vendor_node = NULL;
+				case APP_OUT_FORMAT_JSON:
+				{
+					JsonNode *vendor_node = NULL;
 
-				if (r == AMI_STATUS_OK)
-					vendor_node = json_mknumber(vendor);
-				else
-					vendor_node = json_mknull();
+					if (r == AMI_STATUS_OK)
+						vendor_node = json_mknumber(vendor);
+					else
+						vendor_node = json_mknull();
 
-				json_append_member((JsonNode*)values, "vendor", vendor_node);
-				break;
+					json_append_member((JsonNode*)values, "vendor", vendor_node);
+					break;
+				}
+
+				default:
+					break;
 			}
-
-			default:
-				break;
-			}
-
 			break;
 		}
 
@@ -1195,28 +1158,27 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 			int r = ami_dev_get_pci_device(dev, &device);
 
 			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Device");
-				sprintf(((char***)values)[i][col++], "0x%04x", device);
-				break;
+				case APP_OUT_FORMAT_TABLE:
+					sprintf(((char***)values)[i][col++], "%s", "Device");
+					sprintf(((char***)values)[i][col++], "0x%04x", device);
+					break;
 
-			case APP_OUT_FORMAT_JSON:
-			{
-				JsonNode *device_node = NULL;
+				case APP_OUT_FORMAT_JSON:
+				{
+					JsonNode *device_node = NULL;
 
-				if (r == AMI_STATUS_OK)
-					device_node = json_mknumber(device);
-				else
-					device_node = json_mknull();
+					if (r == AMI_STATUS_OK)
+						device_node = json_mknumber(device);
+					else
+						device_node = json_mknull();
 
-				json_append_member((JsonNode*)values, "device", device_node);
-				break;
+					json_append_member((JsonNode*)values, "device", device_node);
+					break;
+				}
+
+				default:
+					break;
 			}
-
-			default:
-				break;
-			}
-
 			break;
 		}
 
@@ -1226,35 +1188,33 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 			int r = ami_dev_get_pci_link_speed(dev, &current, &max);
 
 			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Link Speed");
-				sprintf(((char***)values)[i][col++], "Gen%d (max Gen%d)", current, max);
-				break;
+				case APP_OUT_FORMAT_TABLE:
+					sprintf(((char***)values)[i][col++], "%s", "Link Speed");
+					sprintf(((char***)values)[i][col++], "Gen%d (max Gen%d)", current, max);
+					break;
 
-			case APP_OUT_FORMAT_JSON:
-			{
-				JsonNode *link_node = NULL;
+				case APP_OUT_FORMAT_JSON:
+				{
+					JsonNode *link_node = NULL;
 
-				if (r == AMI_STATUS_OK) {
-					JsonNode *max_node = json_mknumber(max);
-					JsonNode *current_node = json_mknumber(current);
+					if (r == AMI_STATUS_OK) {
+						JsonNode *max_node = json_mknumber(max);
+						JsonNode *current_node = json_mknumber(current);
 
-					link_node = json_mkobject();
-					json_append_member(link_node, "max", max_node);
-					json_append_member(link_node, "current", current_node);
-				} else {
-					link_node = json_mknull();
+						link_node = json_mkobject();
+						json_append_member(link_node, "max", max_node);
+						json_append_member(link_node, "current", current_node);
+					} else {
+						link_node = json_mknull();
+					}
+
+					json_append_member((JsonNode*)values, "link_speed", link_node);
+					break;
 				}
 
-				json_append_member((JsonNode*)values, "link_speed", link_node);
-				break;
+				default:
+					break;
 			}
-
-			default:
-				break;
-			}
-
-
 			break;
 		}
 
@@ -1264,35 +1224,33 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 			int r = ami_dev_get_pci_link_width(dev, &current, &max);
 
 			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "Link Width");
-				sprintf(((char***)values)[i][col++], "x%d (max x%d)", current, max);
-				break;
+				case APP_OUT_FORMAT_TABLE:
+					sprintf(((char***)values)[i][col++], "%s", "Link Width");
+					sprintf(((char***)values)[i][col++], "x%d (max x%d)", current, max);
+					break;
 
-			case APP_OUT_FORMAT_JSON:
-			{
-				JsonNode *width_node = NULL;
+				case APP_OUT_FORMAT_JSON:
+				{
+					JsonNode *width_node = NULL;
 
-				if (r == AMI_STATUS_OK) {
-					JsonNode *max_node = json_mknumber(max);
-					JsonNode *current_node = json_mknumber(current);
+					if (r == AMI_STATUS_OK) {
+						JsonNode *max_node = json_mknumber(max);
+						JsonNode *current_node = json_mknumber(current);
 
-					width_node = json_mkobject();
-					json_append_member(width_node, "max", max_node);
-					json_append_member(width_node, "current", current_node);
-				} else {
-					width_node = json_mknull();
+						width_node = json_mkobject();
+						json_append_member(width_node, "max", max_node);
+						json_append_member(width_node, "current", current_node);
+					} else {
+						width_node = json_mknull();
+					}
+
+					json_append_member((JsonNode*)values, "link_width", width_node);
+					break;
 				}
 
-				json_append_member((JsonNode*)values, "link_width", width_node);
-				break;
+				default:
+					break;
 			}
-
-			default:
-				break;
-			}
-
-
 			break;
 		}
 
@@ -1302,28 +1260,27 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 			int r = ami_dev_get_pci_numa_node(dev, &numa);
 
 			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "NUMA Node");
-				sprintf(((char***)values)[i][col++], "%d", numa);
-				break;
+				case APP_OUT_FORMAT_TABLE:
+					sprintf(((char***)values)[i][col++], "%s", "NUMA Node");
+					sprintf(((char***)values)[i][col++], "%d", numa);
+					break;
 
-			case APP_OUT_FORMAT_JSON:
-			{
-				JsonNode *numa_node = NULL;
+				case APP_OUT_FORMAT_JSON:
+				{
+					JsonNode *numa_node = NULL;
 
-				if (r == AMI_STATUS_OK)
-					numa_node = json_mknumber(numa);
-				else
-					numa_node = json_mknull();
+					if (r == AMI_STATUS_OK)
+						numa_node = json_mknumber(numa);
+					else
+						numa_node = json_mknull();
 
-				json_append_member((JsonNode*)values, "numa_node", numa_node);
-				break;
+					json_append_member((JsonNode*)values, "numa_node", numa_node);
+					break;
+				}
+
+				default:
+					break;
 			}
-
-			default:
-				break;
-			}
-
 			break;
 		}
 
@@ -1333,32 +1290,31 @@ static int populate_pcieinfo_values(ami_device *dev, void *values,
 			int r = ami_dev_get_pci_cpulist(dev, buf);
 
 			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[i][col++], "%s", "CPU Affinity");
-				sprintf(
-					((char***)values)[i][col++],
-					"%s",
-					(buf[0] == '\0') ? ("N/A") : (buf)
-				);
-				break;
+				case APP_OUT_FORMAT_TABLE:
+					sprintf(((char***)values)[i][col++], "%s", "CPU Affinity");
+					sprintf(
+						((char***)values)[i][col++],
+						"%s",
+						(buf[0] == '\0') ? ("N/A") : (buf)
+					);
+					break;
 
-			case APP_OUT_FORMAT_JSON:
-			{
-				JsonNode *cpu_node = NULL;
+				case APP_OUT_FORMAT_JSON:
+				{
+					JsonNode *cpu_node = NULL;
 
-				if (r == AMI_STATUS_OK)
-					cpu_node = json_mkstring(buf);
-				else
-					cpu_node = json_mknull();
+					if (r == AMI_STATUS_OK)
+						cpu_node = json_mkstring(buf);
+					else
+						cpu_node = json_mknull();
 
-				json_append_member((JsonNode*)values, "cpu_affinity", cpu_node);
-				break;
+					json_append_member((JsonNode*)values, "cpu_affinity", cpu_node);
+					break;
+				}
+
+				default:
+					break;
 			}
-
-			default:
-				break;
-			}
-
 			break;
 		}
 
@@ -1389,7 +1345,6 @@ static int populate_mfg_info_header(ami_device *dev, char **header,
 		return EXIT_FAILURE;
 
 	/* data may be NULL */
-
 	for (i = 0; (i < num_fields) && (i < NUM_MFG_INFO_COLS); i++) {
 		if (!header[i]) {
 			ret = EXIT_FAILURE;
@@ -1397,12 +1352,12 @@ static int populate_mfg_info_header(ami_device *dev, char **header,
 		}
 
 		switch (i) {
-		case MFG_INFO_HEADER_INFO:
-			sprintf(header[i], "%s", "Manufacturing Information");
-			break;
+			case MFG_INFO_HEADER_INFO:
+				sprintf(header[i], "%s", "Manufacturing Information");
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -1418,24 +1373,24 @@ static int populate_mfg_info_header(ami_device *dev, char **header,
 static enum ami_mfg_field mfg_row_to_field_type(int row_num)
 {
 	switch (row_num) {
-	case MFG_INFO_EEPROM_VERSION:     return AMI_MFG_EEPROM_VERSION;
-	case MFG_INFO_PRODUCT_NAME:       return AMI_MFG_PRODUCT_NAME;
-	case MFG_INFO_BOARD_REVISION:     return AMI_MFG_BOARD_REV;
-	case MFG_INFO_BOARD_SERIAL:       return AMI_MFG_BOARD_SERIAL;
-	case MFG_INFO_MAC_ADDRESS_1:      return AMI_MFG_MAC_ADDR;
-	case MFG_INFO_MAC_ADDRESS_N:      return AMI_MFG_MAC_ADDR_N;
-	case MFG_INFO_MEMORY_SIZE:        return AMI_MFG_MEMORY_SIZE;
-	case MFG_INFO_CONFIG_MODE:        return AMI_MFG_CONFIG_MODE;
-	case MFG_INFO_MAX_POWER_MODE:     return AMI_MFG_POWER_MODE;
-	case MFG_INFO_ACTIVE_STATE:       return AMI_MFG_ACTIVE_STATE;
-	case MFG_INFO_MANUFACTURING_DATE: return AMI_MFG_M_DATE;
-	case MFG_INFO_UUID:               return AMI_MFG_UUID;
-	case MFG_INFO_PCIE_ID:            return AMI_MFG_PCIE_ID;
-	case MFG_INFO_OEM_ID:             return AMI_MFG_OEM_ID;
-	case MFG_INFO_CAPABILITY:         return AMI_MFG_CAPABILITY;
-	case MFG_INFO_PART_NUM:           return AMI_MFG_PART_NUM;
-	case MFG_INFO_MFG_PART_NUM:       return AMI_MFG_M_PART_NUM;
-	default:                          break;
+		case MFG_INFO_EEPROM_VERSION:     return AMI_MFG_EEPROM_VERSION;
+		case MFG_INFO_PRODUCT_NAME:       return AMI_MFG_PRODUCT_NAME;
+		case MFG_INFO_BOARD_REVISION:     return AMI_MFG_BOARD_REV;
+		case MFG_INFO_BOARD_SERIAL:       return AMI_MFG_BOARD_SERIAL;
+		case MFG_INFO_MAC_ADDRESS_1:      return AMI_MFG_MAC_ADDR;
+		case MFG_INFO_MAC_ADDRESS_N:      return AMI_MFG_MAC_ADDR_N;
+		case MFG_INFO_MEMORY_SIZE:        return AMI_MFG_MEMORY_SIZE;
+		case MFG_INFO_CONFIG_MODE:        return AMI_MFG_CONFIG_MODE;
+		case MFG_INFO_MAX_POWER_MODE:     return AMI_MFG_POWER_MODE;
+		case MFG_INFO_ACTIVE_STATE:       return AMI_MFG_ACTIVE_STATE;
+		case MFG_INFO_MANUFACTURING_DATE: return AMI_MFG_M_DATE;
+		case MFG_INFO_UUID:               return AMI_MFG_UUID;
+		case MFG_INFO_PCIE_ID:            return AMI_MFG_PCIE_ID;
+		case MFG_INFO_OEM_ID:             return AMI_MFG_OEM_ID;
+		case MFG_INFO_CAPABILITY:         return AMI_MFG_CAPABILITY;
+		case MFG_INFO_PART_NUM:           return AMI_MFG_PART_NUM;
+		case MFG_INFO_MFG_PART_NUM:       return AMI_MFG_M_PART_NUM;
+		default:                          break;
 	}
 
 	return AMI_MFG_FIELD_MAX;
@@ -1451,54 +1406,54 @@ static enum ami_mfg_field mfg_row_to_field_type(int row_num)
 static char *header_name_for_mfg_row(int row_num, enum app_out_format fmt)
 {
 	switch (fmt) {
-	case APP_OUT_FORMAT_TABLE:
-		switch (row_num) {
-		case MFG_INFO_EEPROM_VERSION:     return "Eeprom Version";
-		case MFG_INFO_PRODUCT_NAME:       return "Product Name";
-		case MFG_INFO_BOARD_REVISION:     return "Board Revision";
-		case MFG_INFO_BOARD_SERIAL:       return "Serial Number";
-		case MFG_INFO_MAC_ADDRESS_1:      return "Mac Address 1";
-		case MFG_INFO_MAC_ADDRESS_N:      return "Mac Address N";
-		case MFG_INFO_MEMORY_SIZE:        return "Memory Size";
-		case MFG_INFO_CONFIG_MODE:        return "FPGA Config Mode";
-		case MFG_INFO_MAX_POWER_MODE:     return "Max Power Mode";
-		case MFG_INFO_ACTIVE_STATE:       return "Active State";
-		case MFG_INFO_MANUFACTURING_DATE: return "Manufacturing Date";
-		case MFG_INFO_UUID:               return "UUID";
-		case MFG_INFO_PCIE_ID:            return "PCIe Ids(Vendor, Device, SS Vendor, SS Device)";
-		case MFG_INFO_OEM_ID:             return "OEM ID";
-		case MFG_INFO_CAPABILITY:         return "Capability Word";
-		case MFG_INFO_PART_NUM:           return "Board Part Num";
-		case MFG_INFO_MFG_PART_NUM:       return "Mfg Part Num";
-		default:                          break;
-		}
-		break;
+		case APP_OUT_FORMAT_TABLE:
+			switch (row_num) {
+				case MFG_INFO_EEPROM_VERSION:     return "Eeprom Version";
+				case MFG_INFO_PRODUCT_NAME:       return "Product Name";
+				case MFG_INFO_BOARD_REVISION:     return "Board Revision";
+				case MFG_INFO_BOARD_SERIAL:       return "Serial Number";
+				case MFG_INFO_MAC_ADDRESS_1:      return "Mac Address 1";
+				case MFG_INFO_MAC_ADDRESS_N:      return "Mac Address N";
+				case MFG_INFO_MEMORY_SIZE:        return "Memory Size";
+				case MFG_INFO_CONFIG_MODE:        return "FPGA Config Mode";
+				case MFG_INFO_MAX_POWER_MODE:     return "Max Power Mode";
+				case MFG_INFO_ACTIVE_STATE:       return "Active State";
+				case MFG_INFO_MANUFACTURING_DATE: return "Manufacturing Date";
+				case MFG_INFO_UUID:               return "UUID";
+				case MFG_INFO_PCIE_ID:            return "PCIe Ids(Vendor, Device, SS Vendor, SS Device)";
+				case MFG_INFO_OEM_ID:             return "OEM ID";
+				case MFG_INFO_CAPABILITY:         return "Capability Word";
+				case MFG_INFO_PART_NUM:           return "Board Part Num";
+				case MFG_INFO_MFG_PART_NUM:       return "Mfg Part Num";
+				default:                          break;
+			}
+			break;
 
-	case APP_OUT_FORMAT_JSON:
-		switch (row_num) {
-		case MFG_INFO_EEPROM_VERSION:     return "eeprom_version";
-		case MFG_INFO_PRODUCT_NAME:       return "product_name";
-		case MFG_INFO_BOARD_REVISION:     return "board_rev";
-		case MFG_INFO_BOARD_SERIAL:       return "serial_number";
-		case MFG_INFO_MAC_ADDRESS_1:      return "mac_address_1";
-		case MFG_INFO_MAC_ADDRESS_N:      return "mac_address_n";
-		case MFG_INFO_MEMORY_SIZE:        return "memory_size";
-		case MFG_INFO_CONFIG_MODE:        return "fpga_config_mode";
-		case MFG_INFO_MAX_POWER_MODE:     return "max_power_mode";
-		case MFG_INFO_ACTIVE_STATE:       return "active_state";
-		case MFG_INFO_MANUFACTURING_DATE: return "manufacturing_date";
-		case MFG_INFO_UUID:               return "uuid";
-		case MFG_INFO_PCIE_ID:            return "pcie_ids";
-		case MFG_INFO_OEM_ID:             return "oem_id";
-		case MFG_INFO_CAPABILITY:         return "capability_word";
-		case MFG_INFO_PART_NUM:           return "board_part_number";
-		case MFG_INFO_MFG_PART_NUM:       return "mfg_part_number";
-		default:                          break;
-		}
-		break;
+		case APP_OUT_FORMAT_JSON:
+			switch (row_num) {
+				case MFG_INFO_EEPROM_VERSION:     return "eeprom_version";
+				case MFG_INFO_PRODUCT_NAME:       return "product_name";
+				case MFG_INFO_BOARD_REVISION:     return "board_rev";
+				case MFG_INFO_BOARD_SERIAL:       return "serial_number";
+				case MFG_INFO_MAC_ADDRESS_1:      return "mac_address_1";
+				case MFG_INFO_MAC_ADDRESS_N:      return "mac_address_n";
+				case MFG_INFO_MEMORY_SIZE:        return "memory_size";
+				case MFG_INFO_CONFIG_MODE:        return "fpga_config_mode";
+				case MFG_INFO_MAX_POWER_MODE:     return "max_power_mode";
+				case MFG_INFO_ACTIVE_STATE:       return "active_state";
+				case MFG_INFO_MANUFACTURING_DATE: return "manufacturing_date";
+				case MFG_INFO_UUID:               return "uuid";
+				case MFG_INFO_PCIE_ID:            return "pcie_ids";
+				case MFG_INFO_OEM_ID:             return "oem_id";
+				case MFG_INFO_CAPABILITY:         return "capability_word";
+				case MFG_INFO_PART_NUM:           return "board_part_number";
+				case MFG_INFO_MFG_PART_NUM:       return "mfg_part_number";
+				default:                          break;
+			}
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return "Unknown";
@@ -1537,6 +1492,7 @@ static int populate_mfg_info_values(ami_device *dev, void *values,
 
 		if (mfg_field != AMI_MFG_FIELD_MAX) {
 			memset(eeprom_buf, 0x00, AMI_MFG_INFO_MAX_STR);
+
 			if (ami_mfg_get_info(dev, mfg_field, eeprom_buf) != AMI_STATUS_OK) {
 				strncpy(eeprom_buf, "Unknown", AMI_MFG_INFO_MAX_STR - 1);
 			} else if (!strcmp(eeprom_buf, NOT_APPLICABLE_FIELD)) {
@@ -1550,60 +1506,60 @@ static int populate_mfg_info_values(ami_device *dev, void *values,
 		}
 
 		switch (i) {
-		case MFG_INFO_EEPROM_VERSION:
-		case MFG_INFO_PRODUCT_NAME:
-		case MFG_INFO_BOARD_REVISION:
-		case MFG_INFO_BOARD_SERIAL:
-		case MFG_INFO_MAC_ADDRESS_1:
-		case MFG_INFO_MAC_ADDRESS_N:
-		case MFG_INFO_MEMORY_SIZE:
-		case MFG_INFO_CONFIG_MODE:
-		case MFG_INFO_MAX_POWER_MODE:
-		case MFG_INFO_ACTIVE_STATE:
-		case MFG_INFO_UUID:
-		case MFG_INFO_PCIE_ID:
-		case MFG_INFO_CAPABILITY:
-		case MFG_INFO_PART_NUM:
-		case MFG_INFO_MFG_PART_NUM:
-		{
-			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[j][col++], "%s", header);
-				sprintf(((char***)values)[j][col++], "%s", eeprom_buf);
-				break;
+			case MFG_INFO_EEPROM_VERSION:
+			case MFG_INFO_PRODUCT_NAME:
+			case MFG_INFO_BOARD_REVISION:
+			case MFG_INFO_BOARD_SERIAL:
+			case MFG_INFO_MAC_ADDRESS_1:
+			case MFG_INFO_MAC_ADDRESS_N:
+			case MFG_INFO_MEMORY_SIZE:
+			case MFG_INFO_CONFIG_MODE:
+			case MFG_INFO_MAX_POWER_MODE:
+			case MFG_INFO_ACTIVE_STATE:
+			case MFG_INFO_UUID:
+			case MFG_INFO_PCIE_ID:
+			case MFG_INFO_CAPABILITY:
+			case MFG_INFO_PART_NUM:
+			case MFG_INFO_MFG_PART_NUM:
+			{
+				switch (fmt) {
+					case APP_OUT_FORMAT_TABLE:
+						sprintf(((char***)values)[j][col++], "%s", header);
+						sprintf(((char***)values)[j][col++], "%s", eeprom_buf);
+						break;
 
-			case APP_OUT_FORMAT_JSON:
-				json_append_member(
-					(JsonNode*)values,
-					header,
-					json_mkstring(eeprom_buf)
-				);
-				break;
+					case APP_OUT_FORMAT_JSON:
+						json_append_member(
+							(JsonNode*)values,
+							header,
+							json_mkstring(eeprom_buf)
+						);
+						break;
 
-			default:
+					default:
+						break;
+				}
 				break;
 			}
-			break;
-		}
 
-		case MFG_INFO_MANUFACTURING_DATE:
-		{
-			/* Number of minutes from 0:00 hrs 1/1/96 in GMT LSbyte first*/
-			char manufacturing_date_str[META_MAX_STR_LEN] = { 0 };
-			struct tm info = { 0 };
-			long manufacturing_date_mins = 0;
+			case MFG_INFO_MANUFACTURING_DATE:
+			{
+				/* Number of minutes from 0:00 hrs 1/1/96 in GMT LSbyte first*/
+				char manufacturing_date_str[META_MAX_STR_LEN] = { 0 };
+				struct tm info = { 0 };
+				long manufacturing_date_mins = 0;
 
-			/* convert to long from hex */
-			manufacturing_date_mins = strtol(eeprom_buf, NULL, MFG_TIMESTAMP_BASE);
+				/* convert to long from hex */
+				manufacturing_date_mins = strtol(eeprom_buf, NULL, MFG_TIMESTAMP_BASE);
 
-			if (manufacturing_date_mins) {
-				info.tm_year = MFG_DATE_TM_YEAR;
-				info.tm_mon = 1;
-				info.tm_mday = 1;
-				info.tm_hour = 0;
-				info.tm_min = manufacturing_date_mins;
-				info.tm_sec = 0;
-				info.tm_isdst = -1;
+				if (manufacturing_date_mins) {
+					info.tm_year = MFG_DATE_TM_YEAR;
+					info.tm_mon = 1;
+					info.tm_mday = 1;
+					info.tm_hour = 0;
+					info.tm_min = manufacturing_date_mins;
+					info.tm_sec = 0;
+					info.tm_isdst = -1;
 
 				if(mktime(&info) == AMI_LINUX_STATUS_ERROR)
 					return EXIT_FAILURE;
@@ -1613,71 +1569,70 @@ static int populate_mfg_info_values(ami_device *dev, void *values,
 						"%c",
 						&info ))
 					return EXIT_FAILURE;
-			} else {
-				strncpy(manufacturing_date_str, eeprom_buf, META_MAX_STR_LEN - 1);
+				} else {
+					strncpy(manufacturing_date_str, eeprom_buf, META_MAX_STR_LEN - 1);
+				}
+
+				switch (fmt) {
+					case APP_OUT_FORMAT_TABLE:
+						sprintf(((char***)values)[j][col++], "%s", header);
+						sprintf(((char***)values)[j][col++], "%s", manufacturing_date_str);
+						break;
+
+					case APP_OUT_FORMAT_JSON:
+						json_append_member(
+							(JsonNode*)values,
+							header,
+							json_mkstring(manufacturing_date_str)
+						);
+						break;
+
+					default:
+						break;
+				}
+				break;
 			}
 
-			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[j][col++], "%s", header);
-				sprintf(((char***)values)[j][col++], "%s", manufacturing_date_str);
-				break;
-
-			case APP_OUT_FORMAT_JSON:
-				json_append_member(
-					(JsonNode*)values,
-					header,
-					json_mkstring(manufacturing_date_str)
-				);
-				break;
-
-			default:
-				break;
-			}
-			break;
-		}
-
-		case MFG_INFO_OEM_ID:
-		{
-			/* LSB First Format */
-			char oem_str[META_MAX_STR_LEN] = { 0 };
-
-			/* Convert from hex string to int */
-			switch((int)strtol(eeprom_buf, NULL, MFG_OEM_ID_BASE))
+			case MFG_INFO_OEM_ID:
 			{
-			case AMI_MFG_INFO_OEM_ID_XILINX:
-			case AMI_MFG_INFO_OEM_ID_AMD:
-				sprintf(oem_str, "%s", "AMD");
-				break;
-			default:
-				sprintf(oem_str, "%s", eeprom_buf);
+				/* LSB First Format */
+				char oem_str[META_MAX_STR_LEN] = { 0 };
+
+				/* Convert from hex string to int */
+				switch((int)strtol(eeprom_buf, NULL, MFG_OEM_ID_BASE)) {
+					case AMI_MFG_INFO_OEM_ID_XILINX:
+					case AMI_MFG_INFO_OEM_ID_AMD:
+						sprintf(oem_str, "%s", "AMD");
+						break;
+					default:
+						sprintf(oem_str, "%s", eeprom_buf);
+						break;
+				}
+
+				switch (fmt) {
+					case APP_OUT_FORMAT_TABLE:
+						sprintf(((char***)values)[j][col++], "%s", header);
+						sprintf(((char***)values)[j][col++], "%s", oem_str);
+						break;
+
+					case APP_OUT_FORMAT_JSON:
+						json_append_member(
+							(JsonNode*)values,
+							header,
+							json_mkstring(oem_str)
+						);
+						break;
+
+					default:
+						break;
+				}
 				break;
 			}
 
-			switch (fmt) {
-			case APP_OUT_FORMAT_TABLE:
-				sprintf(((char***)values)[j][col++], "%s", header);
-				sprintf(((char***)values)[j][col++], "%s", oem_str);
-				break;
-
-			case APP_OUT_FORMAT_JSON:
-				json_append_member(
-					(JsonNode*)values,
-					header,
-					json_mkstring(oem_str)
-				);
-				break;
-
 			default:
+				sprintf(((char***)values)[j][col++], "%s", "Unknown");
+				sprintf(((char***)values)[j][col++], "%s", "Unknown");
 				break;
-			}
-			break;
-		}
-
-		default:
-			sprintf(((char***)values)[j][col++], "%s", "Unknown");
-			sprintf(((char***)values)[j][col++], "%s", "Unknown");
-			break;
 		}
 
 		i++; /* increment loop */
@@ -1789,7 +1744,6 @@ int print_overview(struct app_option *options)
 			} else {
 				APP_ERROR("could not create version json");
 			}
-
 			break;
 		}
 
@@ -1841,23 +1795,23 @@ int print_pcieinfo(ami_device *dev, struct app_option *options)
 	/* Write to file. */
 	if (stream && (ret != EXIT_FAILURE) && (format != APP_OUT_FORMAT_TABLE)) {
 		switch (format) {
-		case APP_OUT_FORMAT_JSON:
-			ret = print_json_data(
-				dev,
-				NUM_PCIEINFO_COLS,
-				NUM_PCIEINFO_ROWS,
-				stream,
-				&populate_pcieinfo_values,
-				NULL
-			);
+			case APP_OUT_FORMAT_JSON:
+				ret = print_json_data(
+					dev,
+					NUM_PCIEINFO_COLS,
+					NUM_PCIEINFO_ROWS,
+					stream,
+					&populate_pcieinfo_values,
+					NULL
+				);
 
-			if (ret)
-				APP_ERROR("could not create pcieinfo json");
+				if (ret)
+					APP_ERROR("could not create pcieinfo json");
 
-			break;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -1970,7 +1924,6 @@ int print_fpt_info(ami_device *dev, uint8_t boot_device, struct app_option *opti
 			} else {
 				APP_ERROR("could not create FPT header json");
 			}
-
 			break;
 		}
 
@@ -2022,23 +1975,22 @@ int print_mfg_info(ami_device *dev, struct app_option *options)
 	/* Write to file. */
 	if (stream && (ret != EXIT_FAILURE) && (format != APP_OUT_FORMAT_TABLE)) {
 		switch (format) {
-		case APP_OUT_FORMAT_JSON:
-			ret = print_json_data(
-				dev,
-				NUM_MFG_INFO_COLS,
-				NUM_MFG_INFO_ROWS,
-				stream,
-				&populate_mfg_info_values,
-				NULL
-			);
+			case APP_OUT_FORMAT_JSON:
+				ret = print_json_data(
+					dev,
+					NUM_MFG_INFO_COLS,
+					NUM_MFG_INFO_ROWS,
+					stream,
+					&populate_mfg_info_values,
+					NULL
+				);
 
-			if (ret)
-				APP_ERROR("could not create mfg_info json");
-
+				if (ret)
+					APP_ERROR("could not create mfg_info json");
 			break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 

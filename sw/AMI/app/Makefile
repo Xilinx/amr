@@ -50,12 +50,13 @@ banner:
 	@echo "  - $(PWD)\n"
 	@echo "  - CC          : $(CC)"
 	@echo "  - CFLAGS      : $(CFLAGS)"
+	@echo "  - LDFLAGS     : $(LDFLAGS)"
 	@echo "  - INC_DIRS    : $(INC_DIRS)"
 	@echo "  - BUILD_DIR   : $(BUILD_DIR)\n"
 	@$(MAKE) -s newline
 
 #
-# amiapp target
+# amiapp ami_tool target
 #
 $(BUILD_DIR)/$(TARGET): $(OBJS)
 	mkdir -p $(dir $@)

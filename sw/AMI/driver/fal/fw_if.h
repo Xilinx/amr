@@ -10,26 +10,15 @@
 #ifndef _FW_IF_H_
 #define _FW_IF_H_
 
-/*****************************************************************************/
-/* includes                                                                  */
-/*****************************************************************************/
-
-#if defined __KERNEL__
 #include <linux/types.h>
-#else
-#include "stdint.h"
-#endif
 
 
 /*****************************************************************************/
 /* defines                                                                   */
 /*****************************************************************************/
 
-#define FW_IF_TRUE                  ( 1 )
-#define FW_IF_FALSE                 ( 0 )
-
-#define FW_IF_TIMEOUT_NO_WAIT       ( 0 )
-#define FW_IF_TIMEOUT_WAIT_FOREVER  ( -1 )
+#define FW_IF_TIMEOUT_NO_WAIT       (0)
+#define FW_IF_TIMEOUT_WAIT_FOREVER  (-1)
 
 
 /*****************************************************************************/
@@ -39,79 +28,81 @@
 /**
  * @brief   Callback to raise to calling layer
  *
- * @param   usEventId   Unique ID to identify the event
- * @param   pucData     Pointer to data buffer
- * @param   ulSize      Number of bytes in data
+ * @usEventId: Unique ID to identify the event
+ * @pucData: Pointer to data buffer
+ * @ulSize: Number of bytes in data
  *
  * @return  See FW_IF_ERRORS
  */
-typedef uint32_t ( FW_IF_callback )( uint16_t usEventId, uint8_t *pucData, uint32_t ulSize );
+typedef uint32_t (FW_IF_callback)(uint16_t usEventId, uint8_t *pucData, uint32_t ulSize);
 
 /**
  * @brief   Open the specific fw_if
  *
- * @param   pvFwIf        Pointer to this fw_if
+ * @pvFwIf: Pointer to this fw_if
  *
  * @return  See FW_IF_ERRORS
  */
-typedef uint32_t ( FW_IF_open )( void *pvFwIf );
+typedef uint32_t (FW_IF_open)(void *pvFwIf);
 
 /**
  * @brief   Close the specific fw_if
  *
- * @param   pvFwIf        Pointer to this fw_if
+ * @pvFwIf: Pointer to this fw_if
  *
  * @return  See FW_IF_ERRORS
  */
-typedef uint32_t ( FW_IF_close )( void *pvFwIf );
+typedef uint32_t (FW_IF_close)(void *pvFwIf);
 
 /**
  * @brief   Writes data from an instance of the specific fw_if
  *
- * @param   pvFwIf      Pointer to this fw_if
- * @param   ullDstPort  Remote port to write to
- * @param   pucData     Data buffer to write
- * @param   ulSize      Number of bytes in data buffer
- * @param   ulTimeoutMs Time (in ms) to wait for write to complete
+ * @pvFwIf: Pointer to this fw_if
+ * @ullDstPort: Remote port to write to
+ * @pucData: Data buffer to write
+ * @ulSize: Number of bytes in data buffer
+ * @ulTimeoutMs: Time (in ms) to wait for write to complete
  *
  * @return  See FW_IF_ERRORS
  */
-typedef uint32_t ( FW_IF_write )( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs );
+typedef uint32_t (FW_IF_write)(void *pvFwIf,
+		uint64_t ullDstPort, uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs);
 
 /**
  * @brief   Reads data from an instance of the specific fw_if
  *
- * @param   pvFwIf      Pointer to this fw_if
- * @param   ullSrcPort  Remote port to read from
- * @param   pucData     Data buffer to read
- * @param   pulSize     Pointer to maximum number of bytes allowed in data buffer
- *                      This value is updated to the actual number of bytes read
- * @param   ulTimeoutMs Time (in ms) to wait for read to complete
+ * @pvFwIf: Pointer to this fw_if
+ * @ullSrcPort: Remote port to read from
+ * @pucData: Data buffer to read
+ * @pulSize: Pointer to maximum number of bytes allowed in data buffer
+ *           This value is updated to the actual number of bytes read
+ * @ulTimeoutMs    Time (in ms) to wait for read to complete
  *
  * @return  See FW_IF_ERRORS
  */
-typedef uint32_t ( FW_IF_read )( void *pvFwIf, uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulSize, uint32_t ulTimeoutMs );
+typedef uint32_t (FW_IF_read)(void *pvFwIf,
+		uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulSize, uint32_t ulTimeoutMs);
 
 /**
  * @brief   Set/get specific IO options to/from the specific fw_if
  *
- * @param   pvFwIf      Pointer to this fw_if
- * @param   ulOption    Unique IO Ctrl option to set/get
- * @param   pvValue     Pointer to value to set/get
+ * @pvFwIf: Pointer to this fw_if
+ * @ulOption: Unique IO Ctrl option to set/get
+ * @pvValue: Pointer to value to set/get
  *
  * @return  See FW_IF_ERRORS
  */
-typedef uint32_t ( FW_IF_ioctrl )( void *pvFwIf, uint32_t ulOption, void *pvValue );
+typedef uint32_t (FW_IF_ioctrl)(void *pvFwIf, uint32_t ulOption, void *pvValue);
 
 /**
  * @brief   Binds a user-defined callback into the fw_if
  *
- * @param   pvFwIf      Pointer too this fw_if
- * @param   pxNewFunc   Function pointer to call
+ * @pvFwIf: Pointer too this fw_if
+ * @pxNewFunc: Function pointer to call
  *
  * @return  See FW_IF_ERRORS
  */
-typedef uint32_t ( FW_IF_bindCallback )( void *pvFwIf, FW_IF_callback *pxNewFunc );
+typedef uint32_t (FW_IF_bindCallback)(void *pvFwIf, FW_IF_callback *pxNewFunc);
 
 
 /*****************************************************************************/

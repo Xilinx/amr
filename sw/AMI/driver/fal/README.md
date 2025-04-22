@@ -70,12 +70,6 @@ _**Note - the examples shown are from the SMBus implementation of the FW_IF.**_
 ## Standard definitions
 
 ```
-#define FW_IF_TRUE                  ( 1 )
-#define FW_IF_FALSE                 ( 0 )
-```
-Use in place of standard boolean definitions.
-
-```
 #define FW_IF_TIMEOUT_NO_WAIT       ( 0 )
 #define FW_IF_TIMEOUT_WAIT_FOREVER  ( -1 )
 ```
@@ -744,7 +738,7 @@ static uint32_t smbusIoctrl( void *fwIf, uint32_t option, void * value )
     switch( option )
     {
     case FW_IF_SMBUS_IOCTRL_SET_CONTROLLER:
-        iIsController = FW_IF_TRUE;
+        iIsController = true;
         break;
 
     case FW_IF_SMBUS_IOCTRL_SET_TARGET:
@@ -881,7 +875,7 @@ Now, at specific places in the implementation, the **raiseEvent()** can be call
 
     ...
 
-    if( FW_IF_TRUE == thereIsAnError )
+    if( true == thereIsAnError )
     {
         thisIf->raiseEvent( FW_IF_SMBUS_EVENT_ERROR, NULL, 0 );
     }

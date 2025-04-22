@@ -8,15 +8,15 @@
 #ifndef AMI_PROFILE_FAL_H
 #define AMI_PROFILE_FAL_H
 
-#define PLL_INF( t, m, ... ) printk( "[" t "] " m, ##__VA_ARGS__ )
-#define PLL_ERR( t, m, ... ) printk( "[" t "] " m, ##__VA_ARGS__ )
-#define PLL_WRN( t, m, ... ) printk( "[" t "] " m, ##__VA_ARGS__ )
-#define PLL_LOG( t, m, ... ) printk( "[" t "] " m, ##__VA_ARGS__ )
+#define PLL_INF(t, m, ...)	printk("[" t "] " m, ##__VA_ARGS__)
+#define PLL_ERR(t, m, ...)	printk("[" t "] " m, ##__VA_ARGS__)
+#define PLL_WRN(t, m, ...)	printk("[" t "] " m, ##__VA_ARGS__)
+#define PLL_LOG(t, m, ...)	printk("[" t "] " m, ##__VA_ARGS__)
 
 #ifdef FAL_DBG_PRINT
-#define PLL_DBG( t, m, ... ) printk( "[" t "] " m, ##__VA_ARGS__ )
+#define PLL_DBG(t, m, ...)	printk("[" t "] " m, ##__VA_ARGS__)
 #else
-#define PLL_DBG( t, m, ... ) ( ( void )( 0 ) )
+#define PLL_DBG(t, m, ...)	((void)(0))
 #endif
 
 #endif /* AMI_PROFILE_FAL_H */

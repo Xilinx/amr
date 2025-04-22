@@ -8,10 +8,6 @@
 #ifndef AMI_DEVICE_INTERNAL_H
 #define AMI_DEVICE_INTERNAL_H
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdint.h>
 

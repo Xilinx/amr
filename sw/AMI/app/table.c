@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -134,14 +130,14 @@ int print_table(char* header[], char** values[], int num_cols, int num_rows,
 	my_fprintf(stream, "\r\n");  /* whitespace padding */
 
 	switch (divider_fmt) {
-	case TABLE_DIVIDER_HEADER_ONLY:
-	case TABLE_DIVIDER_ALL:
-	case TABLE_DIVIDER_GROUPS:
-		print_divider = true;
-		break;
+		case TABLE_DIVIDER_HEADER_ONLY:
+		case TABLE_DIVIDER_ALL:
+		case TABLE_DIVIDER_GROUPS:
+			print_divider = true;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	/* Print header */
@@ -159,27 +155,27 @@ int print_table(char* header[], char** values[], int num_cols, int num_rows,
 	/* Print rows */
 	for (j = 0; j < num_rows; j++) {
 		switch (divider_fmt) {
-		case TABLE_DIVIDER_HEADER_ONLY:
-			if (j == 0)
+			case TABLE_DIVIDER_HEADER_ONLY:
+				if (j == 0)
+					print_divider = true;
+				else
+					print_divider = false;
+				break;
+
+			case TABLE_DIVIDER_ALL:
 				print_divider = true;
-			else
+				break;
+
+			case TABLE_DIVIDER_GROUPS:
+				if ((j != 0) && (strlen(values[j][0]) == 0))
+					print_divider = false;
+				else
+					print_divider = true;
+				break;
+
+			default:
 				print_divider = false;
-			break;
-
-		case TABLE_DIVIDER_ALL:
-			print_divider = true;
-			break;
-
-		case TABLE_DIVIDER_GROUPS:
-			if ((j != 0) && (strlen(values[j][0]) == 0))
-				print_divider = false;
-			else
-				print_divider = true;
-			break;
-
-		default:
-			print_divider = false;
-			break;
+				break;
 		}
 
 		print_table_row(

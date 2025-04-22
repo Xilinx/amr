@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
 MODULE_NAME=$1
 MODULE_VERSION_STRING=$2
@@ -21,7 +21,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-find /lib/modules -type f -name ${MODULE_NAME}.ko -delete
+find /lib/modules -type f -name ${MODULE_NAME}.ko    -delete
 find /lib/modules -type f -name ${MODULE_NAME}.ko.kz -delete
 find /lib/modules -type f -name ${MODULE_NAME}.ko.xz -delete
 depmod -A

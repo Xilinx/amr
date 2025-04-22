@@ -5,9 +5,6 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 #include <linux/types.h>
 #include <linux/kthread.h>
 #include <linux/delay.h>
@@ -569,7 +566,8 @@ static void amc_proxy_cmd_complete(struct amc_proxy_instance *inst, struct com_q
 	                        ccmd->hdr.specific,
 	                        ccmd->hdr.state,
 	                        ccmd->result,
-	                        ccmd->rcode);
+                            ccmd->rcode
+                    );
 	        }
 
 			list_del(pos);
@@ -1308,6 +1306,7 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
                 ret = -EIO;
         }
     }
+
     return ret;
 }
 
@@ -1349,6 +1348,7 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
             ret = -EIO;
         }
     }
+
     return ret;
 }
 

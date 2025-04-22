@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdio.h>
 #include <stdint.h>
@@ -169,95 +165,91 @@ int ami_set_last_error(enum ami_error err, const char *ctxt, ...)
 		va_end(args);
 	} else {
 		/* Default to just the numeric error code. */
-		sprintf(
-			error_ctxt,
-			"%d",
-			(int)err
-		);
+		sprintf(error_ctxt, "%d", (int)err);
 	}
 
 	memset(last_error_str, 0x00, MAX_ERROR_STR);
 
 	switch (err) {
-	case AMI_ERROR_EINVAL:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"EINVAL: Invalid arguments [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_EINVAL:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"EINVAL: Invalid arguments [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	case AMI_ERROR_EBADF:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"EBADF: File could not be opened and/or closed [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_EBADF:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"EBADF: File could not be opened and/or closed [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	case AMI_ERROR_EIO:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"EIO: File could not be read or written [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_EIO:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"EIO: File could not be read or written [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	case AMI_ERROR_EFMT:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"EFMT: Bad format; data could not be parsed [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_EFMT:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"EFMT: Bad format; data could not be parsed [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	case AMI_ERROR_ENOMEM:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"ENOMEM: Could not allocate memory [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_ENOMEM:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"ENOMEM: Could not allocate memory [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	case AMI_ERROR_ERET:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"ERET: Invalid return code from function call [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_ERET:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"ERET: Invalid return code from function call [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	case AMI_ERROR_ENODEV:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"ENODEV: No such device [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_ENODEV:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"ENODEV: No such device [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	case AMI_ERROR_EVER:
-		snprintf(
-			last_error_str,
-			MAX_ERROR_STR,
-			"EVER: Version does not match expected value [%s].\r\n",
-			error_ctxt
-		);
-		break;
+		case AMI_ERROR_EVER:
+			snprintf(
+				last_error_str,
+				MAX_ERROR_STR,
+				"EVER: Version does not match expected value [%s].\r\n",
+				error_ctxt
+			);
+			break;
 
-	default:
-		sprintf(
-			last_error_str,
-			"Unknown error (%d).\r\n",
-			(int)err
-		);
-		break;
+		default:
+			sprintf(
+				last_error_str,
+				"Unknown error (%d).\r\n",
+				(int)err
+			);
+			break;
 	}
 
 	return AMI_STATUS_OK;

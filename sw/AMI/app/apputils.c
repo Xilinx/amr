@@ -5,10 +5,6 @@
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* Standard includes */
 #include <stdio.h>
 #include <string.h>
@@ -72,12 +68,8 @@ static int parse_logic_uuid(const char *json, char *uuid)
 			uuid_meta = json_find_member(partition_meta, "logic_uuid");
 
 			if (uuid_meta && uuid_meta->string_) {
+				strncpy(uuid, uuid_meta->string_, AMI_LOGIC_UUID_SIZE);
 				ret = EXIT_SUCCESS;
-				strncpy(
-					uuid,
-					uuid_meta->string_,
-					AMI_LOGIC_UUID_SIZE
-				);
 			}
 		}
 
@@ -130,9 +122,7 @@ int read_hex_data(const char *fname, void **values, uint32_t *num_values,
 				n_lines_allocated += HEX_DATA_REALLOC_BUFFER;
 			}
 
-			buf[n_lines_done++] = (uint32_t)strtoul(
-				line, NULL, 0
-			);
+			buf[n_lines_done++] = (uint32_t)strtoul(line, NULL, 0);
 		}
 
 		if (line)
@@ -140,47 +130,50 @@ int read_hex_data(const char *fname, void **values, uint32_t *num_values,
 
 		/* Allocate output buffer and populate values */
 		switch (value_size) {
-		case sizeof(uint8_t):
-		{
-			int i = 0;
-			uint8_t *v = (uint8_t*)malloc(n_lines_done * value_size);
-			if (!v)
-				goto exit;
-			for (i = 0; i < n_lines_done; i++) {
-				v[i] = (uint8_t)buf[i];
-			}
-			*((uint8_t**)values) = v;
-		}
-		break;
+			case sizeof(uint8_t):
+			{
+				int i = 0;
+				uint8_t *v = (uint8_t*)malloc(n_lines_done * value_size);
+				if (!v)
+					goto exit;
 
-		case sizeof(uint16_t):
-		{
-			int i = 0;
-			uint16_t *v = (uint16_t*)malloc(n_lines_done * value_size);
-			if (!v)
-				goto exit;
-			for (i = 0; i < n_lines_done; i++) {
-				v[i] = (uint16_t)buf[i];
+				for (i = 0; i < n_lines_done; i++) {
+					v[i] = (uint8_t)buf[i];
+				}
+				*((uint8_t**)values) = v;
 			}
-			*((uint16_t**)values) = v;
-		}
-		break;
+			break;
 
-		case sizeof(uint32_t):
-		{
-			int i = 0;
-			uint32_t *v = (uint32_t*)malloc(n_lines_done * value_size);
-			if (!v)
-				goto exit;
-			for (i = 0; i < n_lines_done; i++) {
-				v[i] = (uint32_t)buf[i];
+			case sizeof(uint16_t):
+			{
+				int i = 0;
+				uint16_t *v = (uint16_t*)malloc(n_lines_done * value_size);
+				if (!v)
+					goto exit;
+
+				for (i = 0; i < n_lines_done; i++) {
+					v[i] = (uint16_t)buf[i];
+				}
+				*((uint16_t**)values) = v;
 			}
-			*((uint32_t**)values) = v;
-		}
-		break;
+			break;
 
-		default:
-			goto exit;
+			case sizeof(uint32_t):
+			{
+				int i = 0;
+				uint32_t *v = (uint32_t*)malloc(n_lines_done * value_size);
+				if (!v)
+					goto exit;
+
+				for (i = 0; i < n_lines_done; i++) {
+					v[i] = (uint32_t)buf[i];
+				}
+				*((uint32_t**)values) = v;
+			}
+			break;
+
+			default:
+				goto exit;
 		}
 
 		*num_values = n_lines_done;
@@ -215,20 +208,20 @@ int write_hex_data(const char *fname, void *values, uint32_t num_values,
 		int i = 0;
 		for (i = 0; i < num_values; i++) {
 			switch (value_size) {
-			case sizeof(uint8_t):
-				fprintf(file, "0x%02x\r\n", ((uint8_t*)values)[i]);
-				break;
+				case sizeof(uint8_t):
+					fprintf(file, "0x%02x\r\n", ((uint8_t*)values)[i]);
+					break;
 
-			case sizeof(uint16_t):
-				fprintf(file, "0x%04x\r\n", ((uint16_t*)values)[i]);
-				break;
+				case sizeof(uint16_t):
+					fprintf(file, "0x%04x\r\n", ((uint16_t*)values)[i]);
+					break;
 
-			case sizeof(uint32_t):
-				fprintf(file, "0x%08x\r\n", ((uint32_t*)values)[i]);
-				break;
+				case sizeof(uint32_t):
+					fprintf(file, "0x%08x\r\n", ((uint32_t*)values)[i]);
+					break;
 
-			default:
-				goto exit;
+				default:
+					goto exit;
 			}
 		}
 
@@ -343,13 +336,7 @@ int find_logic_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE])
 	strncpy(pdi_path, pdi, PATH_MAX);
 	dir = dirname(pdi_path);
 
-	snprintf(
-		path,
-		PATH_MAX,
-		"%s/%s",
-		dir,
-		PDI_VERSION_FILE
-	);
+	snprintf(path, PATH_MAX, "%s/%s", dir, PDI_VERSION_FILE);
 
 	if (access(path, F_OK) == 0) {
 		if (read_file(path, &data, &data_size) == AMI_STATUS_OK) {
@@ -433,15 +420,9 @@ void warn_compat_mode(ami_device *dev)
 	if (!dev)
 		return;
 
-	 if (ami_dev_get_state(dev, buf) == AMI_STATUS_ERROR) {
-		APP_WARN(
-			"could not check device state - you may experience issues!\r\n"
-		);
-		return;
+	if (ami_dev_get_state(dev, buf) == AMI_STATUS_ERROR) {
+		APP_WARN("could not check device state - you may experience issues!\r\n");
+	} else if (strcmp(buf, APP_DEV_COMPAT_STR) == 0) {
+		APP_WARN("device is running in compatibility mode - you may experience issues!\r\n");
 	}
-
-	if (strcmp(buf, APP_DEV_COMPAT_STR) == 0)
-		APP_WARN(
-			"device is running in compatibility mode - you may experience issues!\r\n"
-		);
 }
