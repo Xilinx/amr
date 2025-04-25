@@ -2,7 +2,7 @@
 /*
  * ami_vsec.h - This file contains definitions to parse PCI XILINX VSEC.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_VSEC_H
@@ -23,7 +23,7 @@
 #define XILINX_ENDPOINT_NAME_PL_PF0			"ep_pl_mgmt_00"
 
 #define XILINX_LOGIC_UUID_SIZE_BYTES		16
-#define XILINX_SGCQ_SIZE_BYTES				0x1000
+#define XILINX_SGCQ_SIZE_BYTES				0x1000		/* sGCQ size */
 
 typedef struct {
 	endpoint_info_struct gcq;
@@ -34,8 +34,7 @@ typedef struct {
 } endpoints_struct;
 
 int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints);
-int read_vsec(struct pci_dev *dev, uint32_t vsec_base_addr,
-	endpoints_struct **endpoints);
+int read_vsec(struct pci_dev *dev, endpoints_struct **endpoints);
 
 void release_endpoints(endpoints_struct **endpoints);
 void release_vsec_mem(endpoints_struct **endpoints);

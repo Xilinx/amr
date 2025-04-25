@@ -2,7 +2,7 @@
 
 ##
 # Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
-# SPDX-License-Identifier: X11
+# SPDX-License-Identifier: MIT
 #
 # E.g. To get the version info of a module named "ami":
 #           ./getVersion ami

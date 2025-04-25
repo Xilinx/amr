@@ -2,7 +2,7 @@
 /*
  * ami_hwmon.c - This file contains logic related to hwmon.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/hwmon.h>
@@ -21,7 +21,7 @@
 
 /*
  * NOTE: Where possible, we implement functionality for ALL sensors that may be
- * present - this is then checked against each device in the `alveo_is_visible`
+ * present - this is then checked against each device in the `amc_is_visible`
  * function so that a device's hwmon tree is populated only with the sensors
  * that the particular device supports. Suported sensors are discovered
  * through the ASDM API (see `ami_amc_control.c` and `ami_sensor.c`). The ASDM API
@@ -35,18 +35,18 @@
 #define ALVEO_NUM_CURRENT_SENSORS	(20)
 #define ALVEO_NUM_POWER_SENSORS		(5)
 
-#define NONE_TO_MILLI_UNIT(x)	        (x * 1000)
-#define KILO_TO_MILLI_UNIT(x)           (NONE_TO_MILLI_UNIT(x * 1000))
-#define MEGA_TO_MILLI_UNIT(x)           (KILO_TO_MILLI_UNIT(x * 1000))
-#define MICRO_TO_MILLI_UNIT(x)	        (x / 1000)
+#define NONE_TO_MILLI_UNIT(x)		(x * 1000)
+#define KILO_TO_MILLI_UNIT(x)		(NONE_TO_MILLI_UNIT(x * 1000))
+#define MEGA_TO_MILLI_UNIT(x)		(KILO_TO_MILLI_UNIT(x * 1000))
+#define MICRO_TO_MILLI_UNIT(x)		(x / 1000)
 
-#define MILLI_TO_MICRO_UNIT(x)	        (x * 1000)
-#define NONE_TO_MICRO_UNIT(x)	        (MILLI_TO_MICRO_UNIT(x * 1000))
-#define KILO_TO_MICRO_UNIT(x)	        (NONE_TO_MICRO_UNIT(x * 1000))
-#define MEGA_TO_MICRO_UNIT(x)	        (KILO_TO_MICRO_UNIT(x * 1000))
+#define MILLI_TO_MICRO_UNIT(x)		(x * 1000)
+#define NONE_TO_MICRO_UNIT(x)		(MILLI_TO_MICRO_UNIT(x * 1000))
+#define KILO_TO_MICRO_UNIT(x)		(NONE_TO_MICRO_UNIT(x * 1000))
+#define MEGA_TO_MICRO_UNIT(x)		(KILO_TO_MICRO_UNIT(x * 1000))
 
-#define READ_ONLY			(0444)
-#define READ_WRITE			(0644)
+#define READ_ONLY					(0444)
+#define READ_WRITE					(0644)
 
 /* Utility macros for hwmon attributes */
 #define HWMON_LIMITS(x) ( \
@@ -130,7 +130,7 @@ enum ami_sensor_type {
 };
 
 /**
- * _alveo_is_visible() - Check if a sensor attribute exists for a given PCI device.
+ * _amc_is_visible() - Check if a sensor attribute exists for a given PCI device.
  * @pf_dev: Pointer to PCI device data.
  * @sid: Sensor ID (index/channel).
  * @type: Sensor type.
@@ -138,35 +138,35 @@ enum ami_sensor_type {
  *
  * Return: The mode of the hwmon file if the attribute exists or 0.
  */
-umode_t _alveo_is_visible(struct pf_dev_struct *pf_dev, int sid,
+static umode_t _amc_is_visible(struct pf_dev_struct *pf_dev, int sid,
 		enum ami_sensor_type type, enum ami_sensor_attribute attr);
 
 /* hwmon callbacks */
-umode_t alveo_is_visible(const void *data, enum hwmon_sensor_types type,
+static umode_t amc_is_visible(const void *data, enum hwmon_sensor_types type,
 		u32 attr, int channel);
-int alveo_read(struct device *dev, enum hwmon_sensor_types type,
+static int amc_read(struct device *dev, enum hwmon_sensor_types type,
 		u32 attr, int channel, long *val);
-int alveo_write(struct device *dev, enum hwmon_sensor_types type,
+static int amc_write(struct device *dev, enum hwmon_sensor_types type,
 			u32 attr, int channel, long val);
 
 
-static const struct hwmon_ops alveo_ops = {
-	.is_visible = alveo_is_visible,
-	.read = alveo_read,
-	.write = alveo_write,
+static const struct hwmon_ops amc_ops = {
+	.is_visible = amc_is_visible,
+	.read = amc_read,
+	.write = amc_write,
 };
 
-static const u32 alveo_chip_config[] = {
+static const u32 amc_chip_config[] = {
 	HWMON_C_UPDATE_INTERVAL,
 	0
 };
 
-static const struct hwmon_channel_info alveo_chip = {
+static const struct hwmon_channel_info amc_chip = {
 	.type = hwmon_chip,
-	.config = alveo_chip_config,
+	.config = amc_chip_config,
 };
 
-static const u32 alveo_temp_config[ALVEO_NUM_TEMP_SENSORS + 1] = {
+static const u32 amc_temp_config[ALVEO_NUM_TEMP_SENSORS + 1] = {
 	HWMON_T_INPUT | HWMON_T_HIGHEST | HWMON_LIMITS(T),
 	HWMON_T_INPUT | HWMON_T_HIGHEST | HWMON_LIMITS(T),
 	HWMON_T_INPUT | HWMON_T_HIGHEST | HWMON_LIMITS(T),
@@ -193,12 +193,12 @@ static const u32 alveo_temp_config[ALVEO_NUM_TEMP_SENSORS + 1] = {
 	0
 };
 
-static const struct hwmon_channel_info alveo_temp = {
+static const struct hwmon_channel_info amc_temp = {
 	.type = hwmon_temp,
-	.config = alveo_temp_config,
+	.config = amc_temp_config,
 };
 
-static const u32 alveo_voltage_config[ALVEO_NUM_VOLTAGE_SENSORS + 1] = {
+static const u32 amc_voltage_config[ALVEO_NUM_VOLTAGE_SENSORS + 1] = {
 	HWMON_I_INPUT | HWMON_I_HIGHEST | HWMON_I_AVERAGE | HWMON_LIMITS(I),
 	HWMON_I_INPUT | HWMON_I_HIGHEST | HWMON_I_AVERAGE | HWMON_LIMITS(I),
 	HWMON_I_INPUT | HWMON_I_HIGHEST | HWMON_I_AVERAGE | HWMON_LIMITS(I),
@@ -225,12 +225,12 @@ static const u32 alveo_voltage_config[ALVEO_NUM_VOLTAGE_SENSORS + 1] = {
 	0
 };
 
-static const struct hwmon_channel_info alveo_voltage = {
+static const struct hwmon_channel_info amc_voltage = {
 	.type = hwmon_in,
-	.config = alveo_voltage_config,
+	.config = amc_voltage_config,
 };
 
-static const u32 alveo_current_config[ALVEO_NUM_CURRENT_SENSORS + 1] = {
+static const u32 amc_current_config[ALVEO_NUM_CURRENT_SENSORS + 1] = {
 	HWMON_C_INPUT | HWMON_C_HIGHEST | HWMON_C_AVERAGE | HWMON_LIMITS(C),
 	HWMON_C_INPUT | HWMON_C_HIGHEST | HWMON_C_AVERAGE | HWMON_LIMITS(C),
 	HWMON_C_INPUT | HWMON_C_HIGHEST | HWMON_C_AVERAGE | HWMON_LIMITS(C),
@@ -257,12 +257,12 @@ static const u32 alveo_current_config[ALVEO_NUM_CURRENT_SENSORS + 1] = {
 	0
 };
 
-static const struct hwmon_channel_info alveo_current = {
+static const struct hwmon_channel_info amc_current = {
 	.type = hwmon_curr,
-	.config = alveo_current_config,
+	.config = amc_current_config,
 };
 
-static const u32 alveo_power_config[ALVEO_NUM_POWER_SENSORS + 1] = {
+static const u32 amc_power_config[ALVEO_NUM_POWER_SENSORS + 1] = {
 	HWMON_P_INPUT | HWMON_P_INPUT_HIGHEST | HWMON_P_AVERAGE | HWMON_LIMITS(P),
 
 	/* Extra attributes in case a device needs them. */
@@ -274,23 +274,23 @@ static const u32 alveo_power_config[ALVEO_NUM_POWER_SENSORS + 1] = {
 	0
 };
 
-static const struct hwmon_channel_info alveo_power = {
+static const struct hwmon_channel_info amc_power = {
 	.type = hwmon_power,
-	.config = alveo_power_config,
+	.config = amc_power_config,
 };
 
-static const struct hwmon_channel_info * alveo_info[] = {
-	&alveo_chip,
-	&alveo_temp,
-	&alveo_voltage,
-	&alveo_current,
-	&alveo_power,
+static const struct hwmon_channel_info * amc_info[] = {
+	&amc_chip,
+	&amc_temp,
+	&amc_voltage,
+	&amc_current,
+	&amc_power,
 	NULL
 };
 
-static const struct hwmon_chip_info alveo_hwmon_info = {
-	.ops = &alveo_ops,
-	.info = alveo_info
+static const struct hwmon_chip_info amc_hwmon_info = {
+	.ops = &amc_ops,
+	.info = amc_info
 };
 
 /**
@@ -399,7 +399,7 @@ enum ami_sensor_attribute to_ami_attribute(enum hwmon_sensor_types hwmon_type,
 	return ret;
 }
 
-umode_t _alveo_is_visible(struct pf_dev_struct *pf_dev, int sid,
+static umode_t _amc_is_visible(struct pf_dev_struct *pf_dev, int sid,
 		enum ami_sensor_type type, enum ami_sensor_attribute attr)
 {
 	struct sdr_record *rec = NULL;
@@ -441,7 +441,7 @@ umode_t _alveo_is_visible(struct pf_dev_struct *pf_dev, int sid,
 	return 0;
 }
 
-umode_t alveo_is_visible(const void *data, enum hwmon_sensor_types type,
+static umode_t amc_is_visible(const void *data, enum hwmon_sensor_types type,
 		u32 attr, int channel)
 {
 	if (!data)
@@ -458,7 +458,7 @@ umode_t alveo_is_visible(const void *data, enum hwmon_sensor_types type,
 		}
 	}
 
-	return _alveo_is_visible((struct pf_dev_struct*)data,
+	return _amc_is_visible((struct pf_dev_struct*)data,
 		channel, to_ami_sensor_type(type), to_ami_attribute(type, attr));
 }
 
@@ -579,7 +579,7 @@ int get_sensor_value(struct pf_dev_struct *pf_dev, enum ami_sensor_type type,
 	return ret;
 }
 
-int alveo_write(struct device *dev, enum hwmon_sensor_types type,
+static int amc_write(struct device *dev, enum hwmon_sensor_types type,
 			u32 attr, int channel, long val)
 {
 	int ret = 0;
@@ -610,6 +610,7 @@ int alveo_write(struct device *dev, enum hwmon_sensor_types type,
 	}
 
 	put_pf_dev_entry(pf_dev);
+
 	return ret;
 }
 
@@ -630,20 +631,25 @@ static int convert_milli_units(enum ami_sensor_unit_mod unit_mod, long val, long
 	switch(unit_mod)
 	{
 	case SENSOR_UNIT_MOD_MEGA:
-                *mapped_val = MEGA_TO_MILLI_UNIT(val);
-                break;
+		*mapped_val = MEGA_TO_MILLI_UNIT(val);
+		break;
+
 	case SENSOR_UNIT_MOD_KILO:
-                *mapped_val = KILO_TO_MILLI_UNIT(val);
-                break;
+		*mapped_val = KILO_TO_MILLI_UNIT(val);
+		break;
+
 	case SENSOR_UNIT_MOD_NONE:
 		*mapped_val = NONE_TO_MILLI_UNIT(val);
 		break;
+
 	case SENSOR_UNIT_MOD_MILLI:
 		*mapped_val = val;
 		break;
+
 	case SENSOR_UNIT_MOD_MICRO:
-                *mapped_val = MICRO_TO_MILLI_UNIT(val);
-                break;
+		*mapped_val = MICRO_TO_MILLI_UNIT(val);
+		break;
+
 	default:
 		ret = -EINVAL;
 		break;
@@ -669,20 +675,20 @@ static int convert_micro_units(enum ami_sensor_unit_mod unit_mod, long val, long
 	switch(unit_mod)
 	{
 	case SENSOR_UNIT_MOD_MEGA:
-                *mapped_val = MEGA_TO_MICRO_UNIT(val);
-                break;
+		*mapped_val = MEGA_TO_MICRO_UNIT(val);
+		break;
 	case SENSOR_UNIT_MOD_KILO:
-                *mapped_val = KILO_TO_MICRO_UNIT(val);
-                break;
+		*mapped_val = KILO_TO_MICRO_UNIT(val);
+		break;
 	case SENSOR_UNIT_MOD_NONE:
-                *mapped_val = NONE_TO_MICRO_UNIT(val);
-                break;
+		*mapped_val = NONE_TO_MICRO_UNIT(val);
+		break;
 	case SENSOR_UNIT_MOD_MILLI:
-	        *mapped_val = MILLI_TO_MICRO_UNIT(val);
+		*mapped_val = MILLI_TO_MICRO_UNIT(val);
 		break;
 	case SENSOR_UNIT_MOD_MICRO:
 		*mapped_val = val;
-                break;
+		break;
 	default:
 		ret = -EINVAL;
 		break;
@@ -692,7 +698,7 @@ static int convert_micro_units(enum ami_sensor_unit_mod unit_mod, long val, long
 }
 
 /**
- * alveo_read() - Hwmon read callback.
+ * amc_read() - Hwmon read callback.
  * @dev: The character device data.
  * @type: The requested sensor type.
  * @attr: The requested sensor attribute.
@@ -701,7 +707,7 @@ static int convert_micro_units(enum ami_sensor_unit_mod unit_mod, long val, long
  *
  * Return: 0 on success or negative error code.
  */
-int alveo_read(struct device *dev, enum hwmon_sensor_types type,
+static int amc_read(struct device *dev, enum hwmon_sensor_types type,
 	u32 attr, int channel, long *val)
 {
 	int ret = 0;
@@ -712,7 +718,7 @@ int alveo_read(struct device *dev, enum hwmon_sensor_types type,
 
 	/*
 	 * If this callback is triggered, we know that the device supports
-	 * the sensor as this is already verified by the `alveo_is_visible`
+	 * the sensor as this is already verified by the `amc_is_visible`
 	 * function.
 	 */
 	pf_dev = get_pf_dev_entry(dev, PF_DEV_CACHE_DEV);
@@ -737,7 +743,7 @@ int alveo_read(struct device *dev, enum hwmon_sensor_types type,
 
 /* Non-standard attributes - every sensor has an additional label and status */
 
-/* sysfs callback - same as `alveo_is_visible` but for nonstandard attributes. */
+/* sysfs callback - same as `amc_is_visible` but for nonstandard attributes. */
 static umode_t is_visible_extra(struct kobject *kobj, struct attribute *attr, int n)
 {
 	struct device *dev = NULL; /* This is the hwmon device */
@@ -759,7 +765,7 @@ static umode_t is_visible_extra(struct kobject *kobj, struct attribute *attr, in
 	 * Setting attribute to invalid; assume that all extra attributes
 	 * are supported by all sensors.
 	 */
-	return _alveo_is_visible(pf_dev, sensor_da->index, sensor_type,
+	return _amc_is_visible(pf_dev, sensor_da->index, sensor_type,
 		SENSOR_ATTR_INVALID);
 }
 
@@ -864,7 +870,7 @@ static ssize_t sensor_status_show(struct device *dev, struct device_attribute *d
 	sensor_da = to_sensor_dev_attr_2(da);
 
 	get_sensor_value(pf_dev, (enum ami_sensor_type)sensor_da->nr,
-			SENSOR_ATTR_STATUS, sensor_da->index, &status);
+		SENSOR_ATTR_STATUS, sensor_da->index, &status);
 
 	return sprintf(buf, "%s\n", convert_sensor_status_name_map(status));
 }
@@ -1033,7 +1039,7 @@ static ssize_t sensor_label_show(struct device *dev, struct device_attribute *da
 	sensor_da = to_sensor_dev_attr_2(da);
 
 	get_sensor_value(pf_dev,(enum ami_sensor_type)sensor_da->nr,
-			SENSOR_ATTR_LABEL, sensor_da->index, &label_addr);
+		SENSOR_ATTR_LABEL, sensor_da->index, &label_addr);
 
 	if (label_addr)
 		return sprintf(buf, "%s\n", (char*)label_addr);
@@ -1396,7 +1402,7 @@ int register_hwmon(struct device *dev, struct pf_dev_struct *pf_dev)
 	}
 
 	hwmon_dev = devm_hwmon_device_register_with_info(
-		dev, "Alveo", pf_dev, &alveo_hwmon_info, extra_groups);
+		dev, "Alveo", pf_dev, &amc_hwmon_info, extra_groups);
 
 	if(IS_ERR(hwmon_dev))
 		return PTR_ERR(hwmon_dev);

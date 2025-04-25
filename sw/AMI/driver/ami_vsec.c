@@ -2,7 +2,7 @@
 /*
  * ami_vsec.c - This file contains logic to parse PCI XILINX VSEC.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include "ami_vsec.h"
@@ -45,7 +45,8 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 			(*endpoints)->gcq.start_addr,
 			(*endpoints)->gcq.bar_len);
 	if (!virt_addr) {
-		DEV_ERR(dev, "Could not map %s endpoint into virtual memory at start address 0x%llx",
+		DEV_ERR(dev, "Could not map "
+			"%s endpoint into virtual memory at start address 0x%llx",
 			(*endpoints)->gcq.name, (*endpoints)->gcq.start_addr);
 		ret = -EIO;
 		goto release_bar;
@@ -65,6 +66,7 @@ int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints)
 
 	virt_addr += shared_mem.uuid.amc_uuid_off;
 	(*endpoints)->logic_uuid_str[0] = '\0';
+
 	for (i = ARRAY_SIZE((*endpoints)->logic_uuid) - 1; i >= 0; i--) {
 		(*endpoints)->logic_uuid[i] = \
 			ioread32(virt_addr + sizeof(uint32_t) * i);
@@ -88,8 +90,7 @@ fail:
 	return ret;
 }
 
-int read_vsec(struct pci_dev *dev, uint32_t vsec_base_addr,
-	endpoints_struct **endpoints)
+int read_vsec(struct pci_dev *dev, endpoints_struct **endpoints)
 {
 	int ret = 0;
 	uint8_t pcie_function_num = 0;
