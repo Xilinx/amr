@@ -129,7 +129,7 @@ fi
 
 echo "===    Creating BSP    ==="
 cd ..
-mkdir amc_bsp
+mkdir -p amc_bsp
 cd amc_bsp
 sdtgen -eval "sdtgen set_dt_param -xsa $xsa -dir ${SDT}; generate_sdt"
 empyro repo -st ${XILINX_VITIS}/data/embeddedsw

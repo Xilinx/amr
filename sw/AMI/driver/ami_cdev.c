@@ -771,7 +771,7 @@ int create_cdev(unsigned baseminor, struct drv_cdev_struct *drv_cdev,
 
 	if(!drv_cdev->dev_class) {
 		cls_created = true;
-		#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,8,0)
+		#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
 			drv_cdev->dev_class = class_create(drv_cdev->drv_cls_str);
 		#else
 			drv_cdev->dev_class = class_create(THIS_MODULE, drv_cdev->drv_cls_str);

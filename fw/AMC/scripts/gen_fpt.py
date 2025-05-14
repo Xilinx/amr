@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # E.g.:
@@ -17,8 +17,8 @@ from collections import namedtuple
 
 # Constants
 FIELD_SIZE_U32 = 4
-FIELD_SIZE_U8 = 1
-TYPE_PDI = '0x00000E00'
+FIELD_SIZE_U8  = 1
+TYPE_PDI       = '0x00000E00'
 
 
 # Debug class uses to dump hex output
@@ -55,9 +55,9 @@ class hexdump:
 def main():
     parser = argparse.ArgumentParser(description='Generate binary file from FPT JSON',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-f', '--file', help='the FPT JSON file')
+    parser.add_argument('-f', '--file',        help='the FPT JSON file')
     parser.add_argument('-o', '--output_path', help='FPT output path')
-    parser.add_argument('-v', '--verbose', help="increase output verbosity")
+    parser.add_argument('-v', '--verbose',     help="increase output verbosity")
     args = parser.parse_args()
     if args.file is None:
         print('Error: Please specifiy a valid FPT JSON file')
@@ -86,11 +86,11 @@ def main():
 
     # Step3: Parse the FPT header from the JSON
     try:
-        fpt_entry_size = data['fpt_header(0)']['fpt_entry_size']
+        fpt_entry_size  = data['fpt_header(0)']['fpt_entry_size']
         fpt_header_size = data['fpt_header(0)']['fpt_header_size']
-        fpt_version = data['fpt_header(0)']['fpt_version']
-        magic_word = data['fpt_header(0)']['magic_word']
-        num_entries = data['fpt_header(0)']['num_entries']
+        fpt_version     = data['fpt_header(0)']['fpt_version']
+        magic_word      = data['fpt_header(0)']['magic_word']
+        num_entries     = data['fpt_header(0)']['num_entries']
         if args.verbose:
             print('fpt_header:', data['fpt_header(0)'])
     except Exception as e:
@@ -107,11 +107,11 @@ def main():
                                   data[fpt_str]['base_addr'],
                                   data[fpt_str]['partition_size']))
         if args.verbose:
-            print('magic_word:', magic_word)
-            print('num_entries:', num_entries)
-            print('fpt_version:', fpt_version)
+            print('magic_word:',      magic_word)
+            print('num_entries:',     num_entries)
+            print('fpt_version:',     fpt_version)
             print('fpt_header_size:', fpt_header_size)
-            print('fpt_entry_size:', fpt_entry_size)
+            print('fpt_entry_size:',  fpt_entry_size)
             for fpt_tuple in fpt_entry_list:
                 print(fpt_tuple)
     except Exception as e:

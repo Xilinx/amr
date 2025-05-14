@@ -3,15 +3,19 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
-import json
 import os
 import sys
+import json
+import getopt
 import shutil
 import subprocess
 import datetime
-import getopt
 import logging
 from io import StringIO
+from os import path
+from os.path import join
+from os.path import abspath
+
 
 # Get the root logger
 logger = logging.getLogger('')
@@ -32,6 +36,7 @@ formatter = logging.Formatter('%(levelname)s: %(message)s')
 # add
 string_handler.setFormatter(formatter)
 console_handler.setFormatter(formatter)
+
 logger.addHandler(string_handler)
 logger.addHandler(console_handler)
 
@@ -64,22 +69,25 @@ def exit_info(id, msg):
 def exit_error(id, msg):
     exit_msg(logging.ERROR, id, msg)
 
-def format_time_str(time_in):
+def time_str(time_in):
     return time_in.strftime('%Y-%m-%d, %H:%M:%S')
 
-def format_msg(id, msg):
-    return '[' + id + '] ' + msg
-
 def log_debug(id, msg):
-    logger.debug(format_msg(id,msg))
+    logger.debug(     '[' + id + '] ' + msg)
 def log_info(id, msg):
-    logger.info(format_msg(id,msg))
+    logger.info(      '[' + id + '] ' + msg)
 def log_warning(id, msg):
-    logger.warning(format_msg(id,msg))
+    logger.warning(   '[' + id + '] ' + msg)
 def log_error(id, msg):
-    logger.error(format_msg(id,msg))
+    logger.error(     '[' + id + '] ' + msg)
 def log_msg(level, id, msg):
-    logger.log(level, format_msg(id,msg))
+    logger.log(level, '[' + id + '] ' + msg)
+def log_newline():
+	string_handler.setFormatter(logging.Formatter(fmt=''))
+	console_handler.setFormatter(logging.Formatter(fmt=''))
+	logger.info( '\n')
+	console_handler.setFormatter(formatter)
+	string_handler.setFormatter(formatter)
 
 CWD = os.getcwd(); # get current working directory
 
@@ -111,39 +119,39 @@ SUPPORTED_ARCH = [
 
 def start(id, file):
     start_time = datetime.datetime.now().replace(microsecond=0)
-    log_info(id, '--------------------------------------------------------------------------------------')
-    log_info(id, '[' + format_time_str(start_time) + '] Starting ' + file)
-    log_info(id, '--------------------------------------------------------------------------------------')
+    log_info(id, '------------------------------------------------------------------------')
+    log_info(id, '[' + time_str(start_time) + '] Starting ' + file)
+    log_info(id, '-------------------------------------------------------------------------')
     return start_time
 
 def tear_down(id, file, start_time):
     end_time = datetime.datetime.now().replace(microsecond=0)
     elapsed_time = end_time - start_time
-    log_info(id, '--------------------------------------------------------------------------------------')
-    log_info(id, '[' + format_time_str(end_time) + '] ' + file + ' END. Total Elapsed Time: ' + str(elapsed_time))
-    log_info(id, '--------------------------------------------------------------------------------------')
+    log_info(id, '------------------------------------------------------------------------')
+    log_info(id, '[' + time_str(end_time) + '] ' + file + ' END. Total Elapsed Time: ' + str(elapsed_time))
+    log_info(id, '------------------------------------------------------------------------')
     sys.exit(0)
 
 def copy_source_dir(id, src_dir, dest_dir):
     log_debug(id, 'Source copied locally to: ' + dest_dir)
-    if not os.path.isdir(dest_dir):
+    if not path.isdir(dest_dir):
         os.makedirs(dest_dir)
     for root, dirs, files in os.walk(src_dir):
         for file in files:
-            shutil.copy(os.path.abspath(os.path.join(src_dir, file)), dest_dir)
-            os.chmod(os.path.abspath(os.path.join(dest_dir, file)), 511); # octal 777
+            shutil.copy(abspath(join(src_dir, file)), dest_dir)
+            os.chmod(abspath(join(dest_dir, file)), 511); # octal 777
         for dir in dirs:
-            dst = os.path.abspath(os.path.join(dest_dir, dir))
-            shutil.copytree(os.path.abspath(os.path.join(src_dir, dir)), dst)
+            dst = abspath(join(dest_dir, dir))
+            shutil.copytree(abspath(join(src_dir, dir)), dst)
             os.chmod(dst, 511); # octal 777
         break   #prevent descending into sub-folders
 
 def copy_source_file(id, src_file, dest_dir):
-    if not os.path.isfile(src_file):
+    if not path.isfile(src_file):
         exit_error(id, 'Source file does not exist: ' + src_file)
-    if not os.path.isdir(dest_dir):
+    if not path.isdir(dest_dir):
         os.makedirs(dest_dir)
-    log_debug(id, 'Source copied locally to: ' + os.path.abspath(os.path.join(dest_dir, os.path.basename(src_file))))
+    log_debug(id, 'Source copied locally to: ' + abspath(join(dest_dir, path.basename(src_file))))
     shutil.copy(src_file, dest_dir)
 
 def check_log_error(id, step, log_file_name):
@@ -161,14 +169,15 @@ def check_log_error(id, step, log_file_name):
 
 def start_step(id, step):
     start_time = datetime.datetime.now().replace(microsecond=0)
-    log_info(id, '*** [' + format_time_str(start_time) + '] Starting step: ' + step)
+    log_info(id, '********** [' + time_str(start_time) + '] Starting step: ' + step)
     return start_time
 
 def end_step(id, start_time):
     elapsed_time = datetime.datetime.now().replace(microsecond=0) - start_time
-    log_info(id, '************************** End of step. Elapsed time: ' + str(elapsed_time) + '\n\n')
+    log_info(id, '********** End of step. Elapsed time: ' + str(elapsed_time) + '\n\n')
 
-def exec_step_cmd(id, step, cmd, log_file_name = None, use_console = False, shell = False, ignore_error = False, env = None, expect_fail = False, cwd = None):
+def exec_step_cmd(id, step, cmd, log_file_name = None, use_console = False, shell = False,
+                  ignore_error = False, env = None, expect_fail = False, cwd = None):
     cmd_str = cmd if shell else ' '.join(cmd)
     log_info(id, 'Executing: $ ' + cmd_str)
 
@@ -204,7 +213,7 @@ def exec_step_cmd(id, step, cmd, log_file_name = None, use_console = False, shel
 
 def json_load(id, name, file):
     json_data = {}
-    if not os.path.isfile(file):
+    if not path.isfile(file):
         exit_error(id, 'Failed to load ' + name + '. File does not exist: ' + file)
     with open(file) as infile:
         try:
@@ -213,13 +222,13 @@ def json_load(id, name, file):
             exit_error(id, 'Failed to load ' + name + '. File contains invalid JSON content: ' + file + '. JSON parser error: ' + str(e))
     return json_data
 
-def check_output_file_exists(id, outfile):
-    if not os.path.isfile(outfile):
+def check_file_exists(id, outfile):
+    if not path.isfile(outfile):
         exit_error(id, 'Output file does not exist: ' + outfile)
     log_info(id, 'Successfully generated: ' + outfile)
 
-def check_output_dir_exists(id, outfile):
-    if not os.path.isdir(outfile):
+def check_dir_exists(id, outfile):
+    if not path.isdir(outfile):
         exit_error(id, 'Output directory does not exist: ' + outfile)
     log_info(id, 'Successfully generated: ' + outfile)
 
@@ -229,7 +238,7 @@ def force_remove_dir (id, output_dir):
     except OSError as e:
        exit_error(id, 'Failed to remove output directory: ' + output_dir + '. Exception caught: ' + str(e))
 
-    if os.path.isdir(output_dir):
+    if path.isdir(output_dir):
        exit_error(id, 'Failed to remove output directory: ' + output_dir + '. Directory still exists')
 
 def get_date_long():
