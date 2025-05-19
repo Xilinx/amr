@@ -9,7 +9,6 @@
 [![Glossary](https://img.shields.io/badge/-6._Glossary-yellow)](#5-glossary)
 [![References](https://img.shields.io/badge/-7._References-lightgrey)](#6-references)
 
-
 ### 1. Introduction
 AMR: Adaptive Management Runtime is to basic management of Rave embedded-plus boards. These boards have Versal device  connected to x86 host via PCIe. The versal is programmed with PDI in the OSPI and will boot normally. Any update to the OSPI is done through the PCIe.
 
@@ -25,27 +24,20 @@ following tools installed and follow the [build instructions](#2-build-instructi
 - [Vivado][1] 2025.1
 
 [1]: https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html
-[3]: https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html
+[2]: https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html
 
 <b>VPR-4616 Board:</b>
 ![VPR-4616 Board](https://www.amd.com/content/dam/amd/en/images/products/som/2474370-sapphire-edge-vpr-4616.png)
 
-
 ### 2. Build Instructions
 ```
 Defaults:
- RELEASE=2025.1
- BOARD=
- VIVADO_SETTINGS=/proj/xbuilds/2025.1_daily_latest/installs/lin64/2025.1/Vivado/settings64.sh
-```
-```bash
-./settings.sh	# Verify environment variable settings in a shell session
+source /proj/xbuilds/2025.1_daily_latest/installs/lin64/2025.1/Vivado/settings64.sh
 ```
 
 Use yocto procedure to build all necessary binary images
 The final artifacts will be in the build.<BOARD>/images folder.<br>
 - `MACHINE=emb-plus-ve2302-amr bitbake emb-plus-ospi-amr`
-
 
 ### 3. Directory Structure
 ```
@@ -114,7 +106,7 @@ The final artifacts will be in the build.<BOARD>/images folder.<br>
 Login to Embedded+ linux system, open a terminal and use the following interface
 commands for usage. Some of the commands are mentioned below. Each command has
 the help to get more info and command usage.
-
+```
 * ami_tool --help
 * ami_tool --version
 * ami_tool overview
@@ -122,28 +114,22 @@ the help to get more info and command usage.
 * ami_tool sensors -d <B:D:F>
 * ami_tool cfgmem_info -d <B:D:F> -t primary
 * ami_tool mfg_info -d <B:D:F>
-
-## 5. Glossary
+```
+### 5. Glossary
 | Name | Description   				             |
 | :----| :---------------------------------------|
 | AMC  | Adaptive Management Controller          |
 | AMI  | Adaptive Management Interface           |
 | AMR  | Adapative Management Runtime            |
-| BDF  |	Bus Device Function                  |
+| BDF  | Bus Device Function                     |
 | FPT  | Flash Partition Table		             |
 | OSPI | Octal SPI (Serial Peripheral Interface) |
 | RPU  | Realtime Processing Unit	             |
 | PF   | PCIe Physical Function  	             |
 | PL   | Programmable Logic			             |
-| PLD  | Programmable Logic Domain	             |
-| UUID |  Universal Unique Identifier            |
+| UUID | Universal Unique Identifier             |
 
 ## 6. References
-[versal-acap-trm]:	https://docs.xilinx.com/r/en-US/am011-versal-acap-trm/Introduction
-[embedded-plus]:	https://www.amd.com/en/products/embedded/embedded-plus.html
-1. [Versal ACAP Technical Reference Manual][versal-acap-trm]<br>
-2. [AMD Embedded+][embedded-plus]
-
-
-Full documentation for the ALVEO Versal Example Design can be found at the following link:
-[xilinx.github.io/AVED/](https://xilinx.github.io/AVED/)
+1. [Versal ACAP Technical Reference Manual](https://docs.xilinx.com/r/en-US/am011-versal-acap-trm/Introduction)
+2. [AMD Embedded+](https://www.amd.com/en/products/embedded/embedded-plus.html)
+3. [Alveo Versal Example Design](https://xilinx.github.io/AVED/)

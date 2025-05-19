@@ -10,7 +10,6 @@ import tarfile
 
 from os import walk
 from os.path import join
-from datetime import date
 from os.path import abspath
 
 SCRIPT_VERSION = '1.0'
@@ -23,8 +22,9 @@ sys.path.insert(0, BUILD_DIR)
 from pkg import *
 
 # Get date
-build_date_short = date.today().strftime("%Y-%m-%d")
-now              = date.today()
+build_date       = get_date_long()
+build_date_short = get_date_short()
+now              = datetime.datetime.now()
 
 class Options(object):
     def PrintVersion(self):
