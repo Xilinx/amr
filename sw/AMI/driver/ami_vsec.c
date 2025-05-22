@@ -113,7 +113,7 @@ int read_vsec(struct pci_dev *dev, endpoints_struct **endpoints)
 	/* sGCQ payload BAR 0: Offset 0 */
 	(*endpoints)->gcq.found = true;
 	(*endpoints)->gcq.bar_num = PCIE_BAR0;
-	(*endpoints)->gcq.start_addr = 0;
+	(*endpoints)->gcq.start_addr = 0x800000;
 	(*endpoints)->gcq.bar_len = XILINX_ENDPOINT_BAR_LEN_SGCQ;
 	(*endpoints)->gcq.end_addr = (*endpoints)->gcq.start_addr +
 						(*endpoints)->gcq.bar_len - 1;

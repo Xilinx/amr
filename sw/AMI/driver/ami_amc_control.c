@@ -1854,7 +1854,6 @@ int setup_amc(struct pci_dev		*dev,
 		}
 	}
 
-#if 0 //FixMe
 	/*
 	 * COMPAT MODE: heartbeat disabled, logging disabled.
 	 * When the AMC version does not match the current AMI version, we run
@@ -1881,7 +1880,7 @@ int setup_amc(struct pci_dev		*dev,
 			wake_up_process((*amc_ctrl_ctxt)->heartbeat_thread);
 		}
 	}
-#endif
+
 	if (ret)
 		goto fail;
 
