@@ -300,7 +300,7 @@ def main(args):
         exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
         check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
 
-        build_ami_tool = 'cd app && make clean && make'
+        build_ami_tool = 'cd app && make clean && make PROFILE=RAVE'
         exec_step_cmd('BUILD_AMI_TOOL', step, build_ami_tool, shell=True, cwd=PROJECT_DIR)
         check_file_exists('BUILD_AMI_TOOL', join(PROJECT_DIR, 'app', 'build', 'ami_tool'))
 

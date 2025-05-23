@@ -35,9 +35,14 @@ Defaults:
 source /proj/xbuilds/2025.1_daily_latest/installs/lin64/2025.1/Vivado/settings64.sh
 ```
 
-Use yocto procedure to build all necessary binary images
-The final artifacts will be in the build.<BOARD>/images folder.<br>
+Use yocto procedure to build all necessary binary OSPI images and packages. The following commands will build the AMR OSPI package and create the necessary artifacts. The AMR package is built using the Yocto https://github.com/Xilinx/meta-embedded-plus template. The final artifacts will be in the
+build/tmp/deploy/images/emb_plus_ve2302_amr folder.<br>
 - `MACHINE=emb-plus-ve2302-amr bitbake emb-plus-ospi-amr`
+
+Build x86 packages using the following commands.
+- `./sw/AMI/scripts/gen_pkg_driver.py  -o <output folder>`
+- `./sw/AMI/scripts/gen_pkg_libami.py  -o <output folder>`
+- `./sw/AMI/scripts/gen_pkg_amitool.py -o <output folder>`
 
 ### 3. Directory Structure
 ```
@@ -107,6 +112,12 @@ Login to Embedded+ linux system, open a terminal and use the following interface
 commands for usage. Some of the commands are mentioned below. Each command has
 the help to get more info and command usage.
 ```
+INSTALL:
+- sudo dpkg -i ami_x.x.x.xxx.xxx_amd64_22.04.deb
+- sudo dpkg -i amitool_x.x.x.xxx.xxx_amd64_22.04.deb
+- sudo dpkg -i libami.x.x.xxx.xxx_amd64_22.04.deb
+
+TEST:
 * ami_tool --help
 * ami_tool --version
 * ami_tool overview
