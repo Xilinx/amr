@@ -357,10 +357,10 @@ static uint32_t ulOspiRead( void *pvFwIf,
     uint32_t ulAddrOffset = ( uint32_t )ullAddrOffset;
 
     FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_CFG( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
+    if( CHECK_HDL( pxThisIf ) )       { return FW_IF_ERRORS_INVALID_HANDLE; }
+    if( CHECK_CFG( pxThisIf ) )       { return FW_IF_ERRORS_INVALID_CFG; }
     if( CHECK_FIREWALLS( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+    if( CHECK_DRIVER )                { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
 
     FW_IF_OSPI_CFG *pxCfg = ( FW_IF_OSPI_CFG* )pxThisIf->cfg;
 

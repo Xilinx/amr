@@ -488,7 +488,7 @@ typedef struct ASDM_PRIVATE_DATA
     uint32_t                       ulAveragePower;
     uint32_t                       ulMaxPower;
     APC_PROXY_DRIVER_FPT_HEADER    pxFptHeader[ MAX_APC_BOOT_DEVICES ];
-    APC_PROXY_DRIVER_FPT_PARTITION *ppxFptPartitions[ MAX_APC_BOOT_DEVICES ];
+    APC_PROXY_DRIVER_FPT_PARTITION *ppxFptPartitions[ MAX_APC_BOOT_DEVICES + 1 ];
     ASDM_BOARD_INFO_RECORD         *pxBoardInfo;
     uint32_t                       pulStatCounters[ ASDM_STATS_MAX ];
     uint32_t                       pulErrorCounters[ ASDM_ERRORS_MAX ];
@@ -1235,24 +1235,13 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
 
             for( iSensorIdx = 0; iSensorIdx < pxThis->pxAsdmSdsInfo[ iRepoIndex ].xHdr.ucTotalNumRecords; iSensorIdx++ )
             {
-                uint8_t ucId =
-                    pxThis->pxAsdmSdsInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].ucId;
-                uint8_t ucSize =
-                    pxThis->pxAsdmSdrInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].xSensorValue.ucLength;
-                uint32_t ulValue =
-                    pxThis->pxAsdmSdrInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].xSensorValue.ulValue;
-                uint8_t ucSensorStatus =
-                    pxThis->pxAsdmSdsInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].ucSensorStatus;
-                uint8_t ucSensorTag =
-                    pxThis->pxAsdmSdsInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].ucSensorTag;
-
                 PLL_INF( ASDM_NAME,
                          "[%04d]\t %04d\t%06d\t0x%x\t0x%x\r\n",
-                         ucId,
-                         ucSize,
-                         ulValue,
-                         ucSensorStatus,
-                         ucSensorTag );
+                         pxThis->pxAsdmSdsInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].ucId,
+                         pxThis->pxAsdmSdrInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].xSensorValue.ucLength,
+                         pxThis->pxAsdmSdrInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].xSensorValue.ulValue,
+                         pxThis->pxAsdmSdsInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].ucSensorStatus,
+                         pxThis->pxAsdmSdsInfo[ iRepoIndex ].pxSensorRecord[ iSensorIdx ].ucSensorTag );
             }
             break;
         }

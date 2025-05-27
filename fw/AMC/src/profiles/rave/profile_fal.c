@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the fal profile for the Rave
@@ -48,7 +48,7 @@
 #define FAL_PROFILE_NAME      "PROFILE_FAL"
 #define OSPI_PAGE_SIZE        ( 256 )
 #define OSPI_RPU_BASE_ADDRESS ( 0x0 )
-#define OSPI_RPU_LENGTH       ( 0x10000000 )    /* 2Gb (256MB) */
+#define OSPI_RPU_LENGTH       ( 0x08000000 )    /* 1Gb (128MB) */
 
 
 /*****************************************************************************/

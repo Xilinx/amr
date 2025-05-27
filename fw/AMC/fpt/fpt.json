@@ -4,16 +4,22 @@
         "fpt_version"       : 1,
         "fpt_header_size"   : 128,
         "fpt_entry_size"    : 128,
-        "num_entries"       : 2
+        "num_entries"       : 3,
+        "fpt_entry_offset"  : 131072
     },
     "fpt_entry(0, 0)": {
         "type"              : "PDI",
         "base_addr"         : "0x00008000",
-        "partition_size"    : "0x03F00000" 
+        "partition_size"    : "0x03A00000"
     },
     "fpt_entry(0, 1)": {
         "type"              : "PDI",
-        "base_addr"         : "0x03F08000",
-        "partition_size"    : "0x03F00000"
+        "base_addr"         : "0x03B80000",
+        "partition_size"    : "0x03A00000"
+    },
+    "fpt_entry(0, 2)": {
+        "type"              : "USER",
+        "base_addr"         : "0x07680000",
+        "partition_size"    : "0x00800000"
     }
 }

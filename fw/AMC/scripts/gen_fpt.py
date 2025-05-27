@@ -19,6 +19,7 @@ from collections import namedtuple
 FIELD_SIZE_U32 = 4
 FIELD_SIZE_U8  = 1
 TYPE_PDI       = '0x00000E00'
+TYPE_USER      = '0x00000F00'
 
 
 # Debug class uses to dump hex output
@@ -59,6 +60,7 @@ def main():
     parser.add_argument('-o', '--output_path', help='FPT output path')
     parser.add_argument('-v', '--verbose',     help="increase output verbosity")
     args = parser.parse_args()
+
     if args.file is None:
         print('Error: Please specifiy a valid FPT JSON file')
         parser.print_help()
@@ -86,11 +88,12 @@ def main():
 
     # Step3: Parse the FPT header from the JSON
     try:
-        fpt_entry_size  = data['fpt_header(0)']['fpt_entry_size']
-        fpt_header_size = data['fpt_header(0)']['fpt_header_size']
-        fpt_version     = data['fpt_header(0)']['fpt_version']
         magic_word      = data['fpt_header(0)']['magic_word']
+        fpt_version     = data['fpt_header(0)']['fpt_version']
+        fpt_header_size = data['fpt_header(0)']['fpt_header_size']
+        fpt_entry_size  = data['fpt_header(0)']['fpt_entry_size']
         num_entries     = data['fpt_header(0)']['num_entries']
+        fpt_entry_offset= data['fpt_header(0)']['fpt_entry_offset']
         if args.verbose:
             print('fpt_header:', data['fpt_header(0)'])
     except Exception as e:
@@ -107,11 +110,12 @@ def main():
                                   data[fpt_str]['base_addr'],
                                   data[fpt_str]['partition_size']))
         if args.verbose:
-            print('magic_word:',      magic_word)
-            print('num_entries:',     num_entries)
-            print('fpt_version:',     fpt_version)
-            print('fpt_header_size:', fpt_header_size)
-            print('fpt_entry_size:',  fpt_entry_size)
+            print('magic_word:',       magic_word)
+            print('fpt_version:',      fpt_version)
+            print('fpt_header_size:',  fpt_header_size)
+            print('fpt_entry_size:',   fpt_entry_size)
+            print('num_entries:',      num_entries)
+            print('fpt_entry_offset:', fpt_entry_offset)
             for fpt_tuple in fpt_entry_list:
                 print(fpt_tuple)
     except Exception as e:
@@ -120,7 +124,8 @@ def main():
 
     # Step5: Create an empty byte array of fixed size & populate
     try:
-        fpt_size = fpt_header_size + (fpt_entry_size * num_entries)
+        fpt_size = fpt_entry_offset * (num_entries + 1)
+        print('fpt_size ' +str(fpt_size))
         fpt_data = bytearray(fpt_size)
         pos = 0
         # reverse as little endian
@@ -135,12 +140,19 @@ def main():
         fpt_data.insert(pos, fpt_entry_size)
         pos += FIELD_SIZE_U8
         fpt_data.insert(pos, num_entries)
+        print('fpt_data_size ' + str(len(fpt_data)))
 
         index_tuple = 0
         for fpt_tuple in fpt_entry_list:
-            pos = fpt_header_size + (fpt_entry_size * index_tuple)
+            print('fpt_data_size ' + str(len(fpt_data)))
+            pos = fpt_entry_offset * (index_tuple + 1)
+            print('pos ' +str(pos))
             if fpt_tuple.type == 'PDI':
                 type_bytes = bytearray.fromhex(TYPE_PDI[2:])
+                type_bytes.reverse()
+                fpt_data[pos:0] = type_bytes
+            elif fpt_tuple.type == 'USER':
+                type_bytes = bytearray.fromhex(TYPE_USER[2:])
                 type_bytes.reverse()
                 fpt_data[pos:0] = type_bytes
             else:
@@ -155,6 +167,7 @@ def main():
             fpt_data[pos:0] = partition_size_bytes
             index_tuple += 1
 
+        fpt_data = fpt_data[:fpt_size]
         if args.verbose:
             # dump out the generated FPT
             print(hexdump(fpt_data))
@@ -164,6 +177,8 @@ def main():
 
     # Step6: Write bytearray to binary file
     try:
+        print('fpt_data_size ' + str(len(fpt_data)))
+
         fpt_bin_file = os.path.join(args.output_path, "amr_fpt.bin")
         print('FPT file: ' + fpt_bin_file)
 

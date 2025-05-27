@@ -359,39 +359,49 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucSysmonInitialised             %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SYSMON_INITIALISED         ? "TRUE" : "FALSE" ) );
+#ifndef PROFILE_RAVE
     PLL_INF( AMC_NAME,
              "ucSmbusPcieLinkInitialised      %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_PCIE_LINK_INITIALISED  ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucMuxedDeviceFalInitialised     %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ? "TRUE" : "FALSE" ) );
+#endif
     PLL_INF( AMC_NAME,
              "ucGcqFalInitialised             %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED         ? "TRUE" : "FALSE" ) );
+#ifndef PROFILE_RAVE
     PLL_INF( AMC_NAME,
              "ucEmmcFalInitialised            %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
+#endif
     PLL_INF( AMC_NAME,
              "ucOspiFalInitialised            %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
+#ifndef PROFILE_RAVE
     PLL_INF( AMC_NAME,
              "ucSmbusFalInitialised           %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED       ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucMuxedDeviceFalCreated         %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_CREATED     ? "TRUE" : "FALSE" ) );
+#endif
     PLL_INF( AMC_NAME,
              "ucGcqFalCreated                 %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_CREATED             ? "TRUE" : "FALSE" ) );
+#ifndef PROFILE_RAVE
     PLL_INF( AMC_NAME,
              "ucEmmcFalCreated                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_CREATED            ? "TRUE" : "FALSE" ) );
+#endif
     PLL_INF( AMC_NAME,
              "ucOspiFalCreated                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_CREATED            ? "TRUE" : "FALSE" ) );
+#ifndef PROFILE_RAVE
     PLL_INF( AMC_NAME,
              "ucSmbusFalCreated               %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_CREATED           ? "TRUE" : "FALSE" ) );
+#endif
     PLL_INF( AMC_NAME,
              "ucApcInitialised                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_APC_INITIALISED            ? "TRUE" : "FALSE" ) );
@@ -404,18 +414,22 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucAmiInitialised                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_AMI_INITIALISED            ? "TRUE" : "FALSE" ) );
+#ifndef PROFILE_RAVE
     PLL_INF( AMC_NAME,
              "ucBmcInitialised                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_BMC_INITIALISED            ? "TRUE" : "FALSE" ) );
+#endif
     PLL_INF( AMC_NAME,
              "ucAsdmInitialised               %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_ASDM_INITIALISED           ? "TRUE" : "FALSE" ) );
     PLL_INF( AMC_NAME,
              "ucInBandInitialised             %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_IN_BAND_INITIALISED         ? "TRUE" : "FALSE" ) );
+#ifndef PROFILE_RAVE
     PLL_INF( AMC_NAME,
              "ucOutOfBandInitialised          %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OUT_OF_BAND_INITIALISED      ? "TRUE" : "FALSE" ) );
+#endif
 
     for( ;; )
     {

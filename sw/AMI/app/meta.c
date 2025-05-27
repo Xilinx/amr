@@ -163,6 +163,9 @@ static char* fpt_partition_type_to_str(enum ami_fpt_type type)
 		case AMI_FPT_TYPE_SC_FW:
 			return "SC_FW";
 
+		case AMI_FPT_TYPE_PDI_USER:
+			return "PDI_USER";
+
 		default:
 			break;
 	}

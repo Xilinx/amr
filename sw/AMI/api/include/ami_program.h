@@ -48,6 +48,7 @@ struct ami_fpt_header {
  * @AMI_FPT_TYPE_PDI_SYS_DTB: SYS DTB.
  * @AMI_FPT_TYPE_PDI_META: PDI metadata.
  * @AMI_FPT_TYPE_PDI_META_BACKUP: PDI metadata backup.
+ * @AMI_FPT_TYPE_PDI_USER: PDI user.
  * @AMI_FPT_TYPE_SC_FW: SC FW.
  */
 enum ami_fpt_type {
@@ -61,6 +62,7 @@ enum ami_fpt_type {
 	AMI_FPT_TYPE_PDI_SYS_DTB     = 0x0E04,
 	AMI_FPT_TYPE_PDI_META        = 0x0E05,
 	AMI_FPT_TYPE_PDI_META_BACKUP = 0x0E06,
+	AMI_FPT_TYPE_PDI_USER        = 0x0F00,
 	AMI_FPT_TYPE_SC_FW           = 0x0C00,
 };
 

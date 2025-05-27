@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation for the Alveo Programming Control (APC)
@@ -22,20 +22,21 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
+#define UPPER_FIREWALL      ( 0xBABECAFE )
+#define LOWER_FIREWALL      ( 0xDEADFACE )
 
-#define APC_NAME "APC"
+#define APC_NAME            "APC"
 
-#define APC_TASK_SLEEP_MS ( 100 )
+#define APC_TASK_SLEEP_MS   ( 100 )
 
-#define APC_MAX_MSG_SIZE ( 64 )
-#define APC_MBOX_SIZE    ( 10 )
+#define APC_MAX_MSG_SIZE    ( 64 )
+#define APC_MBOX_SIZE       ( 10 )
 
-#define APC_FPT_HDR_SIZE ( 128 )
-#define APC_FPT_PTN_SIZE ( 128 )
+#define APC_FPT_HDR_SIZE    ( 128 )
+#define APC_FPT_PTN_SIZE    ( 128 )
+#define APC_FPT_PTN_OFFSET  ( 128 * 1024 )
 
-#define APC_POR_ENABLE ( 1 << 24 )
+#define APC_POR_ENABLE      ( 1 << 24 )
 #define APC_MULTIBOOT_OFFSET( r ) ( ( r ) / ( 1024 * 32 ) )
 #define APC_MULTIBOOT_REAL( r )   ( ( r ) * ( 1024 * 32 ) )
 
@@ -46,14 +47,14 @@
 #define APC_BASE_PACKET_SIZE    ( 1024 )
 #define APC_COPY_PACKET_SIZE_KB ( 32 )
 
-#define APC_COPY_CHUNK_LEN ( 0x1000 )                                          /* 4KB */
+#define APC_COPY_CHUNK_LEN  ( 0x1000 )                      /* 4KB */
 
 #ifndef APC_FPT_HDR_MAGIC_NUM
 #define APC_FPT_HDR_MAGIC_NUM ( 0x92F7A516 )
 #endif
 
 /* Stat & Error definitions */
-#define APC_PROXY_STATS( DO )                            \
+#define APC_PROXY_STATS( DO )                        \
 	DO( APC_PROXY_STATS_INIT_OVERALL_COMPLETE )      \
 	DO( APC_PROXY_STATS_MUTEX_CREATE )               \
 	DO( APC_PROXY_STATS_MUTEX_TAKE )                 \
@@ -83,7 +84,7 @@
 	DO( APC_PROXY_STATS_NUM_BOOT_DEVICES )           \
 	DO( APC_PROXY_STATS_MAX )
 
-#define APC_PROXY_ERRORS( DO )                                   \
+#define APC_PROXY_ERRORS( DO )                               \
 	DO( APC_PROXY_ERRORS_INIT_NOT_COMPLETE )                 \
 	DO( APC_PROXY_ERRORS_FW_IF_OPEN_FAILED )                 \
 	DO( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )                \
@@ -122,13 +123,13 @@
 	DO( APC_PROXY_ERRORS_INVALID_BOOT_DEVICE )               \
 	DO( APC_PROXY_ERRORS_MAX )
 
-#define PRINT_STAT_COUNTER( x )  PLL_INF( APC_NAME,                 \
-					  "%50s . . . . %d\r\n",    \
-					  APC_PROXY_STATS_STR[ x ], \
+#define PRINT_STAT_COUNTER( x )  PLL_INF( APC_NAME,         \
+					  "%50s . . . . %d\r\n",                \
+					  APC_PROXY_STATS_STR[ x ],             \
 					  pxThis->pulStats[ x ] )
-#define PRINT_ERROR_COUNTER( x ) PLL_INF( APC_NAME,                  \
-					  "%50s . . . . %d\r\n",     \
-					  APC_PROXY_ERRORS_STR[ x ], \
+#define PRINT_ERROR_COUNTER( x ) PLL_INF( APC_NAME,         \
+					  "%50s . . . . %d\r\n",                \
+					  APC_PROXY_ERRORS_STR[ x ],            \
 					  pxThis->pulErrors[ x ] )
 
 #define INC_STAT_COUNTER( x )             { if( x < APC_PROXY_STATS_MAX ) pxThis->pulStats[ x ]++; }
@@ -178,34 +179,34 @@ typedef enum
  */
 typedef struct APC_PRIVATE_DATA
 {
-	uint32_t ulUpperFirewall;
+	uint32_t    ulUpperFirewall;
 
-	int iInitialised;
-	uint8_t ucMyId;
+	int         iInitialised;
+	uint8_t     ucMyId;
 
-	FW_IF_CFG                      *ppxFwIf[ MAX_APC_BOOT_DEVICES ];
+	FW_IF_CFG   *ppxFwIf[ MAX_APC_BOOT_DEVICES ];
 
-	EVL_RECORD                     *pxEvlRecord;
+	EVL_RECORD  *pxEvlRecord;
 
-	void                           *pvOsalMutexHdl;
-	void                           *pvOsalFlashLockHdl;
-	void                           *pvOsalMBoxHdl;
-	void                           *pvOsalTaskHdl;
+	void        *pvOsalMutexHdl;
+	void        *pvOsalFlashLockHdl;
+	void        *pvOsalMBoxHdl;
+	void        *pvOsalTaskHdl;
 
-	int piValidFpt[ MAX_APC_BOOT_DEVICES ];
+	int         piValidFpt[ MAX_APC_BOOT_DEVICES ];
 	APC_PROXY_DRIVER_FPT_HEADER pxFptHeader[ MAX_APC_BOOT_DEVICES ];
 	APC_PROXY_DRIVER_FPT_PARTITION *ppxFptPartitions[ MAX_APC_BOOT_DEVICES ];
 
-	uint8_t pucChunkBuffer[ APC_COPY_CHUNK_LEN ];
+	uint8_t     pucChunkBuffer[ APC_COPY_CHUNK_LEN ];
 
-	uint32_t ulNextBootAddr;
+	uint32_t    ulNextBootAddr;
 
 	MODULE_STATE xState;
 
-	uint32_t pulStats[ APC_PROXY_STATS_MAX ];
-	uint32_t pulErrors[ APC_PROXY_ERRORS_MAX ];
+	uint32_t    pulStats[ APC_PROXY_STATS_MAX ];
+	uint32_t    pulErrors[ APC_PROXY_ERRORS_MAX ];
 
-	uint32_t ulLowerFirewall;
+	uint32_t    ulLowerFirewall;
 
 } APC_PRIVATE_DATA;
 
@@ -216,9 +217,9 @@ typedef struct APC_PRIVATE_DATA
 typedef struct APC_MBOX_DOWNLOAD_IMAGE
 {
 	APC_BOOT_DEVICES xBootDevice;                                          /* target boot device */
-	int iPartition;
-	int iUpdateFpt;
-	int iLastPacket;
+	int      iPartition;
+	int      iUpdateFpt;
+	int      iLastPacket;
 	uint32_t ulImageSize;
 	uint32_t ulSrcAddr;
 	uint16_t usPacketNum;
@@ -359,38 +360,38 @@ static int iRefreshFptData( APC_BOOT_DEVICES xBootDevice );
 
 static APC_PRIVATE_DATA xLocalData =
 {
-	UPPER_FIREWALL,                                                        /* ulUpperFirewall */
-	FALSE,                                                                 /* iInitialised */
-	0,                                                                     /* ucMyId */
+	UPPER_FIREWALL,                 /* ulUpperFirewall */
+	FALSE,                          /* iInitialised */
+	0,                              /* ucMyId */
 	{
 		NULL
-	},                                                                     /* ppxFwIf */
-	NULL,                                                                  /* pxEvlRecord */
-	NULL,                                                                  /* pvOsalMutexHdl */
-	NULL,                                                                  /* pvOsalFlashLockHdl */
-	NULL,                                                                  /* pvOsalMBoxHdl */
-	NULL,                                                                  /* pvOsalTaskHdl */
+	},                              /* ppxFwIf */
+	NULL,                           /* pxEvlRecord */
+	NULL,                           /* pvOsalMutexHdl */
+	NULL,                           /* pvOsalFlashLockHdl */
+	NULL,                           /* pvOsalMBoxHdl */
+	NULL,                           /* pvOsalTaskHdl */
 	{
 		FALSE
-	},                                                                     /* piValidFpt */
+	},                              /* piValidFpt */
 	{ {
 		  0
-	  } },                                                                 /* pxFptHeader */
+	  } },                          /* pxFptHeader */
 	{
 		NULL
-	},                                                                     /* ppxFptPartitions */
+	},                              /* ppxFptPartitions */
 	{
 		0
-	},                                                                     /* pucChunkBuffer */
-	0,                                                                     /* ulNextBootAddr */
-	MODULE_STATE_UNINITIALISED,                                            /* xState */
+	},                              /* pucChunkBuffer */
+	0,                              /* ulNextBootAddr */
+	MODULE_STATE_UNINITIALISED,     /* xState */
 	{
 		0
-	},                                                                     /* pulStats */
+	},                              /* pulStats */
 	{
 		0
-	},                                                                     /* puErrors */
-	LOWER_FIREWALL                                                         /* ulLowerFirewall */
+	},                              /* puErrors */
+	LOWER_FIREWALL                  /* ulLowerFirewall */
 };
 static APC_PRIVATE_DATA *pxThis = &xLocalData;
 
@@ -1296,7 +1297,7 @@ static int iLoadFpt( APC_BOOT_DEVICES xBootDevice )
 					if( NULL != pxThis->ppxFptPartitions[ xBootDevice ] )
 					{
 						int i        = 0;
-						uint32_t ulOffset = APC_FPT_HDR_SIZE;
+						uint32_t ulOffset = APC_FPT_PTN_OFFSET;
 
 						INC_STAT_COUNTER( APC_PROXY_STATS_FPT_CREATED )
 						iStatus = OK;
@@ -1309,7 +1310,7 @@ static int iLoadFpt( APC_BOOT_DEVICES xBootDevice )
 								break;
 							}
 
-							ulOffset += APC_FPT_PTN_SIZE;
+							ulOffset += APC_FPT_PTN_OFFSET;
 						}
 					}
 					else
