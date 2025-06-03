@@ -3,8 +3,8 @@
 # AMR - Adaptive Management Runtime
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Introduction](https://img.shields.io/badge/-1._Introduction-informational)](#1-introduction)
-[![Build Instructions](https://img.shields.io/badge/-2._Build_Instructions-critical)](#2-build-instructions)
-[![Directory Structure](https://img.shields.io/badge/-3._Directory_Structure-bluegreen)](#3-directory-structure)
+[![Directory Structure](https://img.shields.io/badge/-2._Directory_Structure-bluegreen)](#3-directory-structure)
+[![Build Instructions](https://img.shields.io/badge/-3._Build_Instructions-critical)](#2-build-instructions)
 [![Test](https://img.shields.io/badge/-4._Test-important)](#4-test)
 [![Glossary](https://img.shields.io/badge/-6._Glossary-yellow)](#5-glossary)
 [![References](https://img.shields.io/badge/-7._References-lightgrey)](#6-references)
@@ -29,22 +29,7 @@ following tools installed and follow the [build instructions](#2-build-instructi
 <b>VPR-4616 Board:</b>
 ![VPR-4616 Board](https://www.amd.com/content/dam/amd/en/images/products/som/2474370-sapphire-edge-vpr-4616.png)
 
-### 2. Build Instructions
-```
-Defaults:
-source /proj/xbuilds/2025.1_daily_latest/installs/lin64/2025.1/Vivado/settings64.sh
-```
-
-Use yocto procedure to build all necessary binary OSPI images and packages. The following commands will build the AMR OSPI package and create the necessary artifacts. The AMR package is built using the Yocto https://github.com/Xilinx/meta-embedded-plus template. The final artifacts will be in the
-build/tmp/deploy/images/emb_plus_ve2302_amr folder.<br>
-- `MACHINE=emb-plus-ve2302-amr bitbake emb-plus-ospi-amr`
-
-Build x86 packages using the following commands.
-- `./sw/AMI/scripts/gen_pkg_driver.py  -o <output folder>`
-- `./sw/AMI/scripts/gen_pkg_libami.py  -o <output folder>`
-- `./sw/AMI/scripts/gen_pkg_amitool.py -o <output folder>`
-
-### 3. Directory Structure
+### 2. Directory Structure
 ```
 .amr
 .
@@ -107,6 +92,21 @@ Build x86 packages using the following commands.
             └── pkg_data
 
 ```
+### 3. Build Instructions
+```
+Defaults:
+source /proj/xbuilds/2025.1_daily_latest/installs/lin64/2025.1/Vivado/settings64.sh
+```
+
+Use yocto procedure to build all necessary binary OSPI images and packages. The following commands will build the AMR OSPI package and create the necessary artifacts. The AMR package is built using the Yocto https://github.com/Xilinx/meta-embedded-plus template. The final artifacts will be in the
+build/tmp/deploy/images/emb_plus_ve2302_amr folder.<br>
+- `MACHINE=emb-plus-ve2302-amr bitbake emb-plus-ospi-amr`
+
+Build x86 packages using the following commands.
+- `./sw/AMI/scripts/gen_pkg_driver.py  -o <output folder>`
+- `./sw/AMI/scripts/gen_pkg_libami.py  -o <output folder>`
+- `./sw/AMI/scripts/gen_pkg_amitool.py -o <output folder>`
+
 ### 4. Test
 Login to Embedded+ linux system, open a terminal and use the following interface
 commands for usage. Some of the commands are mentioned below. Each command has
@@ -116,16 +116,27 @@ INSTALL:
 - sudo dpkg -i ami_x.x.x.xxx.xxx_amd64_22.04.deb
 - sudo dpkg -i amitool_x.x.x.xxx.xxx_amd64_22.04.deb
 - sudo dpkg -i libami.x.x.xxx.xxx_amd64_22.04.deb
-
-TEST:
-* ami_tool --help
-* ami_tool --version
-* ami_tool overview
-* ami_tool pcieinfo -d <B:D:F>
-* ami_tool sensors -d <B:D:F>
-* ami_tool cfgmem_info -d <B:D:F> -t primary
-* ami_tool mfg_info -d <B:D:F>
 ```
+TEST:
+|   |Device|  AMI          |   Command                                                             |         Notes            |
+|:--|:-----|:--------------|:----------------------------------------------------------------------|:-------------------------|
+| 1 | ami  | help          |ami_tool --help                                                        |AMI help                  |
+| 2 | ami  | version       |ami_tool --version                                                     |AMI version               |
+| 3 | ami  | overview      |ami_tool overview                                                      |AMI overview              |
+| 4 | ami  | pcie info     |ami_tool pcieinfo -d <b:d:f>                                           |AMI PCIe information      |
+| 5 | ami  | bar read      |sudo ami_tool bar_rd -d <b:d:f> -b 0 -a 0 -l 4                         |AMI PCIe read bar memory  |
+| 6 | ami  | bar write     |sudo ami_tool bar_wr -d <b:d:f> -b 0 -a 0 -i 0x1234                    |AMI PCIe write bar memory |
+| 7 | ami  | reload        |sudo ami_tool reload -d 1 -t driver	                                   |AMI reload driver/pci/sbr |
+| 8 |EEPROM| eeprom read   |ami_tool eeprom_rd -d <b:d:f> -a 0 -l 4	                               |Read one or more bytes of data from the EEPROM |
+| 9 |EEPROM| mfg info      |ami_tool mfg_info -d <b:d:f>	                                       |Read manufacturing  information|
+|10 |OSPI  | cfgmem info   |ami_tool cfgmem_info -d <b:d:f> -t primary                             |Read config memory information|
+|11 |OSPI  | cfgmem program|sudo ami_tool cfgmem_program -d <b:d:f> -i amr_ospi.bin -p 1 -t primary|Program a .pdi bitstream onto a device |
+|12 |OSPI  | cfgmem fpt    |sudo ami_tool cfgmem_fpt -d <b:d:f> -t primary -i <fpt file>	       |Program FPT onto a OSPI |
+|13 |OSPI  | cfgmem copy   |sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1	           |Copy one device partition to another |
+|14 |OSPI  | device boot   |sudo ami_tool device_boot -d <b:d:f> -p 0	                           |Set the device boot partition |
+|15 |Sensor| sensors       |ami_tool sensors -d <b:d:f>	                                           |Get the value of a sensor |
+|16 |Device|debug verbosity|ami_tool debug_verbosity -d <b:d:f> -l debug	                       |Set log level |
+
 ### 5. Glossary
 | Name | Description   				             |
 | :----| :---------------------------------------|
