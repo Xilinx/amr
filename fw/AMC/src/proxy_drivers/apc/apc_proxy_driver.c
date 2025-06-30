@@ -161,6 +161,7 @@ UTIL_MAKE_ENUM_AND_STRINGS( APC_PROXY_ERRORS, APC_PROXY_ERRORS, APC_PROXY_ERRORS
 typedef enum
 {
 	APC_MSG_TYPE_DOWNLOAD_PDI = 0,
+	APC_MSG_TYPE_PROGRAM_PDI,
 	APC_MSG_TYPE_COPY_PDI,
 	APC_MSG_TYPE_PARTITION_SELECT,
 	APC_MSG_TYPE_ENABLE_HOT_RESET,
@@ -185,6 +186,7 @@ typedef struct APC_PRIVATE_DATA
 	uint8_t     ucMyId;
 
 	FW_IF_CFG   *ppxFwIf[ MAX_APC_BOOT_DEVICES ];
+	XLoader_ClientInstance *pXLoaderInst;
 
 	EVL_RECORD  *pxEvlRecord;
 
@@ -219,6 +221,7 @@ typedef struct APC_MBOX_DOWNLOAD_IMAGE
 	APC_BOOT_DEVICES xBootDevice;                                          /* target boot device */
 	int      iPartition;
 	int      iUpdateFpt;
+	int      iPdiProgram;
 	int      iLastPacket;
 	uint32_t ulImageSize;
 	uint32_t ulSrcAddr;
@@ -308,6 +311,16 @@ static int iLoadFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, uint
 static int iDownloadImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData );
 
 /**
+ * @brief   Download pdi image
+ *
+ * @param   pxImageData Pointer to data regarding the image to download
+ *
+ * @return  OK if the image was successfully downloaded
+ *          ERROR if the image was not successfully downloaded
+ */
+static int iDownloadPdiImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData );
+
+/**
  * @brief   Copy image from one partition to another
  *
  * @param   pxCopyData Pointer to data regarding the image to copy
@@ -366,6 +379,7 @@ static APC_PRIVATE_DATA xLocalData =
 	{
 		NULL
 	},                              /* ppxFwIf */
+	NULL,                           /* pXLoaderInst */
 	NULL,                           /* pxEvlRecord */
 	NULL,                           /* pvOsalMutexHdl */
 	NULL,                           /* pvOsalFlashLockHdl */
@@ -410,6 +424,7 @@ static APC_PRIVATE_DATA *pxThis = &xLocalData;
 int iAPC_Initialise( uint8_t ucProxyId,
                      FW_IF_CFG *pxPrimaryFwIf,
                      FW_IF_CFG *pxSecondaryFwIf,
+					 XLoader_ClientInstance *pXLoaderInst,
                      uint32_t ulTaskPrio,
                      uint32_t ulTaskStack )
 {
@@ -424,6 +439,8 @@ int iAPC_Initialise( uint8_t ucProxyId,
 		pxThis->ucMyId = ucProxyId;
 		pxThis->ppxFwIf[ APC_BOOT_DEVICE_PRIMARY ]   = pxPrimaryFwIf;
 		pxThis->ppxFwIf[ APC_BOOT_DEVICE_SECONDARY ] = pxSecondaryFwIf;
+		pxThis->pXLoaderInst = pXLoaderInst;
+
 
 		/* used for primary boot device only */
 		pxThis->ulNextBootAddr = APC_MULTIBOOT_REAL( HAL_IO_READ32( HAL_APC_PMC_BOOT_REG ) );
@@ -617,6 +634,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
 			xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
 			xMsg.xDownloadImageData.iPartition   = iPartition;
 			xMsg.xDownloadImageData.iUpdateFpt   = FALSE;
+			xMsg.xDownloadImageData.iPdiProgram  = FALSE;
 			xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
 			xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
 			xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
@@ -676,6 +694,7 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
 		xMsg.ucRequestId                     = pxSignal->ucInstance;
 		xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
 		xMsg.xDownloadImageData.iUpdateFpt   = TRUE;
+		xMsg.xDownloadImageData.iPdiProgram  = FALSE;
 		xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
 		xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
 		xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
@@ -761,6 +780,60 @@ int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
 	{
 		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
 	}
+	return iStatus;
+}
+
+/**
+ * @brief Download an image to a location in NV memory
+ */
+int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
+					 APC_BOOT_DEVICES xBootDevice,
+					 int iPartition,
+					 uint32_t ulSrcAddr,
+					 uint32_t ulImageSize,
+					 uint16_t usPacketNum,
+					 uint16_t usPacketSize )
+{
+	int iStatus = ERROR;
+
+	if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+		( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+		( TRUE == pxThis->iInitialised ) &&
+		( NULL != pxSignal ) &&
+		( 0 != ulImageSize ) )
+	{
+		APC_MBOX_MSG xMsg =
+		{
+			0
+		};
+		xMsg.eMsgType                        = APC_MSG_TYPE_PROGRAM_PDI;
+		xMsg.ucRequestId                     = pxSignal->ucInstance;
+		xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
+		xMsg.xDownloadImageData.iPartition   = iPartition;
+		xMsg.xDownloadImageData.iUpdateFpt   = FALSE;
+		xMsg.xDownloadImageData.iPdiProgram  = TRUE;
+		xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
+		xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
+		xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
+		xMsg.xDownloadImageData.usPacketSize = usPacketSize;
+
+		if( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
+												( void* )&xMsg,
+												OSAL_TIMEOUT_NO_WAIT ) )
+		{
+			INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_POST )
+			iStatus = OK;
+		}
+		else
+		{
+			INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED )
+		}
+	}
+	else
+	{
+		INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
+	}
+
 	return iStatus;
 }
 
@@ -1074,6 +1147,78 @@ static void vProxyDriverTask( void *pArg )
 									INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_FAILED )
 									INC_ERROR_COUNTER( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
 									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+								}
+							}
+							else
+							{
+								INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
+								xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
+							}
+						}
+						else
+						{
+							INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
+							xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+						}
+
+						if( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( pxThis->pvOsalFlashLockHdl ) )
+						{
+							INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
+						}
+						else
+						{
+							INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
+						}
+					}
+					else
+					{
+						INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
+						xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_BUSY;
+					}
+
+					if( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
+					{
+						INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
+					}
+				}
+				break;
+
+			case APC_MSG_TYPE_PROGRAM_PDI:
+				INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_PEND )
+
+				xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_STARTED;
+				if( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
+				{
+					INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
+				}
+				else
+				{
+					if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalFlashLockHdl, OSAL_TIMEOUT_NO_WAIT ) )
+					{
+						INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_TAKE )
+
+						if( OK == iDownloadPdiImage( &xMBoxData.xDownloadImageData ) )
+						{
+							PLL_DBG( APC_NAME, "Download packet num %d\r\n",
+								xMBoxData.xDownloadImageData.usPacketNum );
+							/* Check if we need to program pdi image */
+							if( ( TRUE == xMBoxData.xDownloadImageData.iLastPacket ) &&
+								( TRUE == xMBoxData.xDownloadImageData.iPdiProgram ) )
+							{
+								INC_STAT_COUNTER( APC_PROXY_STATS_FPT_UPDATE )
+
+								xSignal.ucEventType = APC_PROXY_DRIVER_E_PROGRAM_STARTED;
+
+								if( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
+								{
+									INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED )
+									INC_ERROR_COUNTER( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+								}
+								else
+								{
+									INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
 								}
 							}
 							else
@@ -1493,6 +1638,81 @@ static int iDownloadImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 			}
 		}
 	}
+	return iStatus;
+}
+
+/**
+ * @brief   Download pdi image and update metadata
+ */
+static int iDownloadPdiImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
+{
+	int iStatus = ERROR;
+
+	if ( NULL != pxImageData )
+	{
+		uint32_t ulImageSize = pxImageData->ulImageSize;
+
+		/* flush shared memory buff before use */
+		HAL_FLUSH_CACHE_DATA( ( uintptr_t )( pxImageData->ulSrcAddr ), ulImageSize );
+
+		/* Check if image is smaller than a chunk */
+		if( ulImageSize < ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE ) )
+		{
+			PLL_WRN( APC_NAME,
+					"Image size (%d) is smaller than the chunk size (%d)\r\n",
+					ulImageSize,
+					( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE ) );
+		}
+
+		if( 0 == pxImageData->usPacketSize )
+		{
+			INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_PACKET_SIZE_ERROR )
+			PLL_ERR( APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->usPacketSize );
+		}
+		else
+		{
+			uint32_t ulDestAddr = pxImageData->usPacketNum * ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE );
+			uint32_t ulStartMs  = ulOSAL_GetUptimeMs();
+
+			PLL_DBG( APC_NAME, "Downloading PDI %d bytes\r\n", ulImageSize );
+
+			PLL_DBG( APC_NAME, "Src:  0x%08x\r\n", pxImageData->ulSrcAddr );
+			PLL_DBG( APC_NAME, "Dest: 0x%08x\r\n", ulDestAddr );
+
+			if ( TRUE == pxImageData->iPdiProgram )
+			{
+				pvOSAL_MemCpy((void *)( HAL_RPU_PDI_BUFFER_BASE + ulDestAddr ),
+					(void*)pxImageData->ulSrcAddr, ulImageSize);
+				PLL_DBG( APC_NAME, "Copied data to: 0x%08x\r\n", HAL_RPU_PDI_BUFFER_BASE + ulDestAddr );
+				iStatus = OK;
+
+				if ( 1 == pxImageData->iLastPacket )
+				{
+					u32 PdiLoadStatus = 0U;
+
+					iStatus = XLoader_LoadPartialPdi(pxThis->pXLoaderInst,
+													XLOADER_PDI_DDR,
+													HAL_RPU_PDI_BUFFER_BASE,
+													&PdiLoadStatus);
+					if (iStatus != XST_SUCCESS) {
+						INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
+						PLL_ERR( APC_NAME, "ERROR: PDI programming error status 0x%X \r\n", PdiLoadStatus );
+					}
+				}
+
+				PLL_DBG( APC_NAME,
+							"Write %s - %dms\r\n",
+							( OK == iStatus )?( "complete" ):( "failure" ),
+							ulOSAL_GetUptimeMs() - ulStartMs );
+			}
+			else
+			{
+				INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_SIZE_ERROR )
+				PLL_ERR( APC_NAME, "ERROR: %d bytes will overwrite\r\n", ulImageSize );
+			}
+		}
+	}
+
 	return iStatus;
 }
 

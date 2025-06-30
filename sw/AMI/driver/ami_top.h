@@ -22,13 +22,13 @@
 #include "ami_amc_control.h"
 
 /* Device state strings. */
-#define STATE_NAME_INIT		"INIT"
-#define STATE_NAME_READY	"READY"
+#define STATE_NAME_INIT			"INIT"
+#define STATE_NAME_READY		"READY"
 #define STATE_NAME_MISSING_INFO	"MISSING_INFO"
-#define STATE_NAME_NO_AMC	"NO_AMC"
+#define STATE_NAME_NO_AMC		"NO_AMC"
 #define STATE_NAME_INIT_ERROR	"INIT_ERROR"
-#define STATE_NAME_SHUTDOWN	"SHUTDOWN"
-#define STATE_NAME_COMPAT	"COMPAT"
+#define STATE_NAME_SHUTDOWN		"SHUTDOWN"
+#define STATE_NAME_COMPAT		"COMPAT"
 
 /**
  * enum pf_dev_state - List of possible device states.

@@ -43,7 +43,8 @@
 #endif
 
 /* Limits the length of the ami_debug_enabled input*/
-#define AMI_DEBUG_INPUT_LIMIT   (2)
+#define AMI_DEBUG_INPUT_LIMIT	(2)
+#define AMI_NUM_EMPTY_SDR		(2)
 
 static struct drv_cdev_struct driver_dev = { { 0 } };  /* Global device */
 static unsigned pf_dev_index = DEFAULT_CDEV_BASEMINOR;
@@ -305,7 +306,7 @@ static int create_pf_dev_data(struct pci_dev *dev)
 	pf_dev_index++;
 
 	if (pf_dev->state == PF_DEV_STATE_INIT) {
-		if (empty_sdr_count)
+		if (empty_sdr_count > AMI_NUM_EMPTY_SDR)
 			pf_dev->state = PF_DEV_STATE_MISSING_INFO;
 		else
 			pf_dev->state = PF_DEV_STATE_READY;

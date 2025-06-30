@@ -53,6 +53,8 @@ static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *bu
 
 	if (partition == FPT_UPDATE_MAGIC) {
 		part = FPT_UPDATE_FLAG;
+	} else if (partition == PDI_PROGRAM_MAGIC) {
+		part = PDI_PROGRAM_FLAG;
 	} else {
 		/* Basic sanity check */
 		if (partition > MAX_PARTITION)
@@ -77,7 +79,7 @@ static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *bu
 		 * Don't invalidate the boot tag if we're updating the FPT
 		 * or if there is only a single chunk.
 		 */
-		if ((part == FPT_UPDATE_FLAG) || (num_chunks == 1) ||
+		if ((part == FPT_UPDATE_FLAG) || (num_chunks == 1) || (part == PDI_PROGRAM_FLAG) ||
 			((num_chunks > 1) && (chunk != BOOT_TAG_CHUNK))) {
 			/*
 			* This will copy the bitstream buffer into shared memory and submit

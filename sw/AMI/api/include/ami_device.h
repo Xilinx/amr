@@ -29,10 +29,10 @@ extern "C" {
 #define AMI_DEV_READY_STR	"READY"
 
 /* Sysfs attributes. */
-#define AMI_LOGIC_UUID_SIZE	(32 + 1)
+#define AMI_LOGIC_UUID_SIZE		(32 + 1)
 #define AMI_PCI_CPULIST_SIZE	(32 + 1)
-#define AMI_DEV_STATE_SIZE	(32 + 1)
-#define AMI_DEV_NAME_SIZE	(32 + 1)
+#define AMI_DEV_STATE_SIZE		(32 + 1)
+#define AMI_DEV_NAME_SIZE		(32 + 1)
 #define AMI_DEV_PCI_PORT_SIZE	(13)  /* 0000:00:00.0 + NULL */
 
 /*****************************************************************************/

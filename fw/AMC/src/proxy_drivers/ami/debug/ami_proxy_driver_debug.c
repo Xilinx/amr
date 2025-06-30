@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the AVED Management Interface (AMI) debug implementation
@@ -75,6 +75,13 @@ static void vSetPdiDownloadResponse( void );
 static void vSetPdiCopyResponse( void );
 
 /**
+ * @brief   Debug function to set the pdi program response
+ *
+ * @return  N/A
+ */
+static void vSetPdiProgramResponse( void );
+
+/**
  * @brief   Debug function to set the sensor response
  *
  * @return  N/A
@@ -115,6 +122,13 @@ static void vGetPdiDownloadRequest( void );
  * @return  N/A
  */
 static void vGetPdiCopyRequest( void );
+
+/**
+ * @brief   Debug function to get the pdi program request
+ *
+ * @return  N/A
+ */
+static void vGetPdiProgramRequest( void );
 
 /**
  * @brief   Debug function to get the sensor request
@@ -207,6 +221,7 @@ void vAMI_DebugInit( DAL_HDL pxParentHandle )
             {
                 pxDAL_NewDebugFunction( "set_pdi_download_response", pxSetDir, vSetPdiDownloadResponse );
                 pxDAL_NewDebugFunction( "set_pdi_copy_response",     pxSetDir, vSetPdiCopyResponse );
+                pxDAL_NewDebugFunction( "set_pdi_program_response",  pxSetDir, vSetPdiProgramResponse );
                 pxDAL_NewDebugFunction( "set_sensor_response",       pxSetDir, vSetSensorResponse );
                 pxDAL_NewDebugFunction( "set_identity_response",     pxSetDir, vSetIdentityResponse );
                 pxDAL_NewDebugFunction( "set_boot_select_response",  pxSetDir, vSetBootSelectResponse );
@@ -216,6 +231,7 @@ void vAMI_DebugInit( DAL_HDL pxParentHandle )
             {
                 pxDAL_NewDebugFunction( "get_pdi_download_request", pxGetDir, vGetPdiDownloadRequest );
                 pxDAL_NewDebugFunction( "get_pdi_copy_request",     pxGetDir, vGetPdiCopyRequest );
+                pxDAL_NewDebugFunction( "get_pdi_program_request",  pxGetDir, vGetPdiProgramRequest );
                 pxDAL_NewDebugFunction( "get_sensor_request",       pxGetDir, vGetSensorRequest );
                 pxDAL_NewDebugFunction( "get_boot_select_request",  pxGetDir, vGetBootSelectRequest );
                 pxDAL_NewDebugFunction( "get_eeprom_rw_request",    pxGetDir, vGetEepromRwRequest );
@@ -348,6 +364,51 @@ static void vSetPdiCopyResponse( void )
             {
                 PLL_DAL( AMI_DBG_NAME, "Set result %s to instance %d\r\n",
                          pcResultStrings[ iResult ], iInstance );
+            }
+        }
+    }
+}
+
+/**
+ * @brief   Debug function to set the pdi program response
+ */
+static void vSetPdiProgramResponse( void )
+{
+    int iInstance = 0;
+    if( OK != iDAL_GetIntInRange( "Enter this request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
+    {
+        PLL_DAL( AMI_DBG_NAME, "Error setting instance\r\n" );
+    }
+    else
+    {
+        EVL_SIGNAL       xEv     = { 0 };
+        AMI_PROXY_RESULT xRes    = { 0 };
+        int              iResult = 0;
+        int              i       = 0;
+
+        xEv.ucInstance = ( uint8_t )iInstance;
+
+        for( i = 0; i < MAX_AMI_PROXY_RESULT; i++ )
+        {
+            PLL_DAL( AMI_DBG_NAME, "\t- %d - %s\r\n", i, pcResultStrings[ i ] );
+        }
+
+        if( OK != iDAL_GetIntInRange( "Select result:", &iResult, 0, MAX_AMI_PROXY_RESULT - 1 ) )
+        {
+            PLL_DAL( AMI_DBG_NAME, "Invalid result\r\n" );
+        }
+        else
+        {
+            xRes = ( AMI_PROXY_RESULT )iResult;
+            if( OK != iAMI_SetPdiProgramCompleteResponse( &xEv, xRes ) )
+            {
+                PLL_DAL( AMI_DBG_NAME, "Error setting result %s to instance %d\r\n",
+                                pcResultStrings[ iResult ], iInstance );
+            }
+            else
+            {
+                PLL_DAL( AMI_DBG_NAME, "Set result %s to instance %d\r\n",
+                                pcResultStrings[ iResult ], iInstance );
             }
         }
     }
@@ -631,6 +692,37 @@ static void vGetPdiCopyRequest( void )
             PLL_DAL( AMI_DBG_NAME, "PDI copy request (instance: %d) retrieved\r\n", iInstance );
             PLL_DAL( AMI_DBG_NAME, "\tSrc partition . . 0x%08X\r\n", xReq.ulSrcPartition );
             PLL_DAL( AMI_DBG_NAME, "\tDst partition . . 0x%08X\r\n", xReq.ulDestPartition );
+        }
+    }
+}
+
+/**
+ * @brief   Debug function to get the pdi download request
+ */
+static void vGetPdiProgramRequest( void )
+{
+    int iInstance = 0;
+    if( OK != iDAL_GetIntInRange( "Enter this request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
+    {
+        PLL_DAL( AMI_DBG_NAME, "Error setting instance\r\n" );
+    }
+    else
+    {
+        EVL_SIGNAL                    xEv  = { 0 };
+        AMI_PROXY_PDI_PROGRAM_REQUEST xReq = { 0 };
+
+        xEv.ucInstance = ( uint8_t )iInstance;
+
+        if( OK != iAMI_GetPdiProgramRequest( &xEv, &xReq ) )
+        {
+            PLL_DAL( AMI_DBG_NAME, "Error getting program request\r\n" );
+        }
+        else
+        {
+            PLL_DAL( AMI_DBG_NAME, "PDI program request (instance: %d) retrieved\r\n", iInstance );
+            PLL_DAL( AMI_DBG_NAME, "\tAddress . . . . . 0x%16llX\r\n", xReq.ullAddress );
+            PLL_DAL( AMI_DBG_NAME, "\tLength. . . . . . 0x%08X\r\n",   xReq.ulLength );
+            PLL_DAL( AMI_DBG_NAME, "\tPartition . . . . 0x%08X\r\n",   xReq.ulPartitionSel );
         }
     }
 }

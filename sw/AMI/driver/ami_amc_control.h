@@ -28,12 +28,12 @@
 #define AMI_VDBG(amc_ctrl_ctxt, fmt, arg ...)     DEV_VDBG(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
 #define AMI_AMC_LOG(amc_ctrl_ctxt, fmt, arg ...)  DEV_AMC_LOG(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
 
-#define AMC_LOG_PAGE_SIZE                        (1024 * 1024)
-#define AMC_LOG_PAGE_NUM                         (1)
-#define AMC_LOG_ADDR_OFF                         (0)
-#define AMC_DATA_ADDR_OFF                        (AMC_LOG_PAGE_SIZE * AMC_LOG_PAGE_NUM)
+#define AMC_LOG_PAGE_SIZE               (1024 * 1024)
+#define AMC_LOG_PAGE_NUM                (1)
+#define AMC_LOG_ADDR_OFF                (0)
+#define AMC_DATA_ADDR_OFF               (AMC_LOG_PAGE_SIZE * AMC_LOG_PAGE_NUM)
 
-#define SENSOR_RSP_LEN                           (4096)
+#define SENSOR_RSP_LEN                  (4096)
 
 /*
  * Response format:
@@ -46,33 +46,33 @@
  * While parsing, it saves the sensor's value, max value, average value and status information
  */
 
-#define SDR_NULL_BYTE                           (0x00)
-#define SDR_LENGTH_MASK                         (0x3F)
-#define SDR_TYPE_MASK                           (0x03)
-#define SDR_TYPE_POS                            (6)
-#define SDR_EOR                                 (0x454E44)  /* END */
+#define SDR_NULL_BYTE                   (0x00)
+#define SDR_LENGTH_MASK                 (0x3F)
+#define SDR_TYPE_MASK                   (0x03)
+#define SDR_TYPE_POS                    (6)
+#define SDR_EOR                         (0x454E44)  /* END */
 
-#define SDR_THRESHOLD_SUPPORT_BITS              (8)
+#define SDR_THRESHOLD_SUPPORT_BITS      (8)
 
-#define THRESHOLD_UPPER_WARNING_MASK            (0x01 << 0)
-#define THRESHOLD_UPPER_CRITICAL_MASK           (0x01 << 1)
-#define THRESHOLD_UPPER_FATAL_MASK              (0x01 << 2)
-#define THRESHOLD_LOWER_WARNING_MASK            (0x01 << 3)
-#define THRESHOLD_LOWER_CRITICAL_MASK           (0x01 << 4)
-#define THRESHOLD_LOWER_FATAL_MASK              (0x01 << 5)
-#define THRESHOLD_SENSOR_AVG_MASK               (0x01 << 6)
-#define THRESHOLD_SENSOR_MAX_MASK               (0x01 << 7)
+#define THRESHOLD_UPPER_WARNING_MASK    (0x01 << 0)
+#define THRESHOLD_UPPER_CRITICAL_MASK   (0x01 << 1)
+#define THRESHOLD_UPPER_FATAL_MASK      (0x01 << 2)
+#define THRESHOLD_LOWER_WARNING_MASK    (0x01 << 3)
+#define THRESHOLD_LOWER_CRITICAL_MASK   (0x01 << 4)
+#define THRESHOLD_LOWER_FATAL_MASK      (0x01 << 5)
+#define THRESHOLD_SENSOR_AVG_MASK       (0x01 << 6)
+#define THRESHOLD_SENSOR_MAX_MASK       (0x01 << 7)
 
-#define SENSOR_IDS_MAX                          (256)
+#define SENSOR_IDS_MAX                  (256)
 
-#define SDR_VALUE_MAX_LEN                       (64)    /* 63 (6 bits) + NULL byte */
-#define SDR_THRESHOLD_MAX_LEN                   (4)     /* max possible is uint32 */
-#define UNKNOWN_SENSOR_ID                       (-EINVAL)
+#define SDR_VALUE_MAX_LEN               (64)    /* 63 (6 bits) + NULL byte */
+#define SDR_THRESHOLD_MAX_LEN           (4)     /* max possible is uint32 */
+#define UNKNOWN_SENSOR_ID               (-EINVAL)
 
-#define NUM_SENSOR_REPOS                        (7)  /* temp, voltage, current, power, total power, board info, fpt */
+#define NUM_SENSOR_REPOS                (7)  /* temp, voltage, current, power, total power, board info, fpt */
 
 /* note: configurable POWER repos: SDR_TYPE_POWER / SDR_TYPE_TOTAL_POWER */
-#define SDR_POWER_TYPE                          (SDR_TYPE_TOTAL_POWER)
+#define SDR_POWER_TYPE                  (SDR_TYPE_TOTAL_POWER)
 
 
 /******************************************************************************************/
@@ -92,14 +92,14 @@
  *
  */
 enum gcq_submit_cmd_flags {
-	GCQ_CMD_FLAG_NONE			= 0x00,
+	GCQ_CMD_FLAG_NONE					= 0x00,
 	GCQ_CMD_FLAG_REPO_TYPE_BD_INFO		= 0x01 << 0,
-	GCQ_CMD_FLAG_REPO_TYPE_TEMP		= 0x01 << 1,
+	GCQ_CMD_FLAG_REPO_TYPE_TEMP			= 0x01 << 1,
 	GCQ_CMD_FLAG_REPO_TYPE_VOLTAGE		= 0x01 << 2,
 	GCQ_CMD_FLAG_REPO_TYPE_CURRENT		= 0x01 << 3,
 	GCQ_CMD_FLAG_REPO_TYPE_POWER		= 0x01 << 4,
 	GCQ_CMD_FLAG_REPO_TYPE_TOTAL_POWER	= 0x01 << 5,
-	GCQ_CMD_FLAG_REPO_TYPE_FPT		= 0x01 << 6,
+	GCQ_CMD_FLAG_REPO_TYPE_FPT			= 0x01 << 6,
 };
 
 /**
@@ -124,27 +124,27 @@ enum gcq_submit_cmd_flags {
  * @GCQ_SUBMIT_CMD_GET_VCC1V2_CURRENT: Get VCC1V2 current
  * @GCQ_SUBMIT_CMD_GET_12V_PEX_CURRENT: Get 12v_pex current
  * @GCQ_SUBMIT_CMD_GET_TOTAL_POWER: Get total power
- * @GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR: Get all voltage data
- * @GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR: Get all current data
- * @GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR: Get all power data
+ * @GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR: Get all voltage data
+ * @GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR: Get all current data
+ * @GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR: Get all power data
  * @GCQ_SUBMIT_CMD_GET_HEARTBEAT: Heartbeat response
  * @GCQ_SUBMIT_CMD_EEPROM_READ_WRITE: Read/write EEPROM
  * @GCQ_SUBMIT_CMD_MODULE_READ_WRITE: Read/write a QSFP module
  * @GCQ_SUBMIT_CMD_DEBUG_VERBOSITY: Debug verbosity
  */
 enum gcq_submit_cmd_req {
-	GCQ_SUBMIT_CMD_RSVD				= 0x00,
+	GCQ_SUBMIT_CMD_RSVD						= 0x00,
 	GCQ_SUBMIT_CMD_GET_GCQ_VERSION			= 0x01,
-	GCQ_SUBMIT_CMD_GET_SDR_SIZE			= 0x02,
-	GCQ_SUBMIT_CMD_GET_SDR				= 0x03,
-	GCQ_SUBMIT_CMD_DOWNLOAD_PDI			= 0x04,
-	GCQ_SUBMIT_CMD_DEVICE_BOOT			= 0x05,
+	GCQ_SUBMIT_CMD_GET_SDR_SIZE				= 0x02,
+	GCQ_SUBMIT_CMD_GET_SDR					= 0x03,
+	GCQ_SUBMIT_CMD_DOWNLOAD_PDI				= 0x04,
+	GCQ_SUBMIT_CMD_DEVICE_BOOT				= 0x05,
 	GCQ_SUBMIT_CMD_COPY_PARTITION			= 0x06,
-	GCQ_SUBMIT_CMD_GET_INLET_TEMP_SENSOR		= 0x10,
-	GCQ_SUBMIT_CMD_GET_OUTLET_TEMP_SENSOR		= 0x11,
-	GCQ_SUBMIT_CMD_GET_BOARD_TEMP_SENSOR		= 0x12,
+	GCQ_SUBMIT_CMD_GET_INLET_TEMP_SENSOR	= 0x10,
+	GCQ_SUBMIT_CMD_GET_OUTLET_TEMP_SENSOR	= 0x11,
+	GCQ_SUBMIT_CMD_GET_BOARD_TEMP_SENSOR	= 0x12,
 	GCQ_SUBMIT_CMD_GET_FPGA_TEMP_SENSOR		= 0x13,
-	GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR		= 0x20,
+	GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR	= 0x20,
 	GCQ_SUBMIT_CMD_GET_VCCINT_VOLTAGE		= 0x30,
 	GCQ_SUBMIT_CMD_GET_VCC1V2_VOLTAGE		= 0x31,
 	GCQ_SUBMIT_CMD_GET_12V_PEX_VOLTAGE		= 0x32,
@@ -153,9 +153,9 @@ enum gcq_submit_cmd_req {
 	GCQ_SUBMIT_CMD_GET_VCC1V2_CURRENT		= 0x41,
 	GCQ_SUBMIT_CMD_GET_12V_PEX_CURRENT		= 0x42,
 	GCQ_SUBMIT_CMD_GET_TOTAL_POWER			= 0x50,
-	GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR	= 0x60,
-	GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR	= 0x61,
-	GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR	= 0x62,
+	GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR	= 0x60,
+	GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR	= 0x61,
+	GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR	= 0x62,
 	GCQ_SUBMIT_CMD_GET_HEARTBEAT			= 0x70,
 	GCQ_SUBMIT_CMD_EEPROM_READ_WRITE		= 0x80,
 	GCQ_SUBMIT_CMD_MODULE_READ_WRITE		= 0x90,
@@ -180,19 +180,19 @@ enum gcq_submit_cmd_req {
  */
 enum gcq_sdr_repo_type {
 	SDR_TYPE_GET_SIZE	= 0x00,
-	SDR_TYPE_BDINFO		= 0xC0,
-	SDR_TYPE_TEMP		= 0xC1,
-	SDR_TYPE_VOLTAGE	= 0xC2,
-	SDR_TYPE_CURRENT	= 0xC3,
-	SDR_TYPE_POWER		= 0xC4,
-	SDR_TYPE_TOTAL_POWER	= 0xC6,
-	SDR_TYPE_QSFP		= 0xC5,
-	SDR_TYPE_VPD_PCIE	= 0xD0,
-	SDR_TYPE_IPMIFRU	= 0xD1,
-	SDR_TYPE_CSDR_LOGDATA	= 0xE0,
-	SDR_TYPE_VMC_LOGDATA	= 0xE1,
-	SDR_TYPE_FPT		= 0xF0,
-	SDR_TYPE_MAX		= 13, //increment if new entry added in this enum
+	SDR_TYPE_BDINFO		  = 0xC0,
+	SDR_TYPE_TEMP		  = 0xC1,
+	SDR_TYPE_VOLTAGE	  = 0xC2,
+	SDR_TYPE_CURRENT	  = 0xC3,
+	SDR_TYPE_POWER		  = 0xC4,
+	SDR_TYPE_TOTAL_POWER  = 0xC6,
+	SDR_TYPE_QSFP		  = 0xC5,
+	SDR_TYPE_VPD_PCIE	  = 0xD0,
+	SDR_TYPE_IPMIFRU	  = 0xD1,
+	SDR_TYPE_CSDR_LOGDATA = 0xE0,
+	SDR_TYPE_VMC_LOGDATA  = 0xE1,
+	SDR_TYPE_FPT		  = 0xF0,
+	SDR_TYPE_MAX		  = 13, //increment if new entry added in this enum
 };
 
 /**
@@ -205,12 +205,12 @@ enum gcq_sdr_repo_type {
  * @SDR_CODE_INVALID_SENSOR_ID: Invalid sensor ID
  */
 enum gcq_sdr_completion_code {
-	SDR_CODE_NOT_AVAILABLE		= 0x00,
-	SDR_CODE_OP_SUCCESS		= 0x01,
-	SDR_CODE_OP_FAILED		= 0x02,
-	SDR_CODE_FLOW_CNTRL_RD_STALE	= 0x03,
-	SDR_CODE_FLOW_CNTRL_WR_ERR	= 0x04,
-	SDR_CODE_INVALID_SENSOR_ID	= 0x05,
+	SDR_CODE_NOT_AVAILABLE		 = 0x00,
+	SDR_CODE_OP_SUCCESS			 = 0x01,
+	SDR_CODE_OP_FAILED			 = 0x02,
+	SDR_CODE_FLOW_CNTRL_RD_STALE = 0x03,
+	SDR_CODE_FLOW_CNTRL_WR_ERR	 = 0x04,
+	SDR_CODE_INVALID_SENSOR_ID	 = 0x05,
 };
 
 
@@ -222,9 +222,9 @@ enum gcq_sdr_completion_code {
  * SENSOR_STATUS_NOT_AVAILABLE: Status not available
  */
 enum sensor_status {
-	SENSOR_NOT_PRESENT		= 0x00,
+	SENSOR_NOT_PRESENT			= 0x00,
 	SENSOR_PRESENT_AND_VALID	= 0x01,
-	DATA_NOT_AVAILABLE		= 0x02,
+	DATA_NOT_AVAILABLE			= 0x02,
 	SENSOR_STATUS_NOT_AVAILABLE	= 0x7F,
 };
 
@@ -257,10 +257,10 @@ enum amc_cl_sensor_type {
 	AMC_CL_SENSOR_TEMPERATURE	= 0xC1,
 	AMC_CL_SENSOR_VOLTAGE		= 0xC2,
 	AMC_CL_SENSOR_CURRENT		= 0xC3,
-	AMC_CL_SENSOR_POWER		= 0xC4,
-	AMC_CL_SENSOR_QSFP		= 0xC5,
+	AMC_CL_SENSOR_POWER			= 0xC4,
+	AMC_CL_SENSOR_QSFP			= 0xC5,
 	AMC_CL_SENSOR_TOTAL_POWER	= 0xC6,
-	AMC_CL_SENSOR_ALL		= 0xFF,
+	AMC_CL_SENSOR_ALL			= 0xFF,
 };
 
 /**
@@ -547,14 +547,14 @@ struct bd_info_record {
  * @bd_info: Board info data - only for bdinfo type
  */
 struct sdr_repo {
-	uint8_t		repo_type;
-	uint8_t		repo_ver;
-	uint8_t		num_records;
-	uint16_t	size;
+	uint8_t			repo_type;
+	uint8_t			repo_ver;
+	uint8_t			num_records;
+	uint16_t		size;
 	unsigned long	last_update;
 	union {
-		struct sdr_record	*records;
-		struct fpt_record	fpt;
+		struct sdr_record		*records;
+		struct fpt_record		fpt;
 		struct bd_info_record	*bd_info;
 	};
 };

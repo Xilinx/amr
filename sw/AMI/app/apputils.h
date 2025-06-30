@@ -76,6 +76,15 @@ bool confirm_action(const char *prompt, const char yes, int attempts);
 int find_logic_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE]);
 
 /**
+ * find_parent_uuid() - Find the logic UUID of a PDI file.
+ * @pdi: Full PDI file path.
+ * @uuid: Variable to store UUID.
+ *
+  * Return: EXIT_SUCCESS or EXIT_FAILURE.
+ */
+int find_parent_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE]);
+
+/**
  * read_hex_data() - Read hex data from a file (to be written).
  * @fname: Full path to data file.
  * @values: Buffer to store values read from file.

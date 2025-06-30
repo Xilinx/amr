@@ -125,7 +125,6 @@ def main():
     # Step5: Create an empty byte array of fixed size & populate
     try:
         fpt_size = fpt_entry_offset * (num_entries + 1)
-        print('fpt_size ' +str(fpt_size))
         fpt_data = bytearray(fpt_size)
         pos = 0
         # reverse as little endian
@@ -140,13 +139,10 @@ def main():
         fpt_data.insert(pos, fpt_entry_size)
         pos += FIELD_SIZE_U8
         fpt_data.insert(pos, num_entries)
-        print('fpt_data_size ' + str(len(fpt_data)))
 
         index_tuple = 0
         for fpt_tuple in fpt_entry_list:
-            print('fpt_data_size ' + str(len(fpt_data)))
             pos = fpt_entry_offset * (index_tuple + 1)
-            print('pos ' +str(pos))
             if fpt_tuple.type == 'PDI':
                 type_bytes = bytearray.fromhex(TYPE_PDI[2:])
                 type_bytes.reverse()
@@ -177,8 +173,6 @@ def main():
 
     # Step6: Write bytearray to binary file
     try:
-        print('fpt_data_size ' + str(len(fpt_data)))
-
         fpt_bin_file = os.path.join(args.output_path, "amr_fpt.bin")
         print('FPT file: ' + fpt_bin_file)
 

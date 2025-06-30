@@ -28,6 +28,7 @@
 /* IOCTL data. Shared with userspace code. */
 
 #define AMI_IOC_FPT_UPDATE_MAGIC	(0xAAAAAAAA)
+#define AMI_IOC_PDI_PROGRAM_MAGIC	(0xBBBBBBBB)
 #define AMI_IOC_SENSOR_STATUS_LEN	(40)
 
 /**

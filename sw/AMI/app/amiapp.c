@@ -26,7 +26,7 @@
 
 /* First element in cmd map is for empty commands. */
 #define EMPTY_CMD_HANDLER	(0)
-#define CMD_INDEX		(1)
+#define CMD_INDEX			(1)
 
 /*****************************************************************************/
 /* Local function declarations                                               */
@@ -69,6 +69,7 @@ static const char help_msg[] = \
 	"\tcfgmem_copy        Copy one partition to another\r\n"
 	"\tcfgmem_info        Show partition information\r\n"
 	"\tdevice_boot        Set boot partition\r\n"
+	"\tpdi_program        Program pdi\n"
 	"\tmfg_info           View manufacturing information\r\n"
 	"\tbar_wr             Write to PCI BAR memory\r\n"
 	"\tbar_rd             Read from PCI BAR memory\r\n"
@@ -136,6 +137,7 @@ static const struct app_cmd_map commands[] = {
 	{ "cfgmem_program",  &cmd_cfgmem_program  },
 	{ "cfgmem_copy",     &cmd_cfgmem_copy     },
 	{ "cfgmem_info",     &cmd_cfgmem_info     },
+	{ "pdi_program",     &cmd_pdi_program     },
 	{ "bar_rd",          &cmd_bar_rd          },
 	{ "bar_wr",          &cmd_bar_wr          },
 	{ "overview",        &cmd_overview        },

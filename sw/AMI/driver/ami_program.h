@@ -27,20 +27,22 @@
  */
 #define MK_PARTITION_FLAGS(src_device, src_part, dest_device, dest_part) \
 				(((uint8_t)src_device << 24) | \
-				((uint8_t)src_part   << 16) | \
-				((uint8_t)dest_device << 8) | \
+				((uint8_t)src_part    << 16) | \
+				((uint8_t)dest_device << 8)  | \
 				((uint8_t)dest_part))
 
 
-#define DEVICE_SRC(flags)	((uint8_t)(flags >> 24))
+#define DEVICE_SRC(flags)		((uint8_t)(flags >> 24))
 #define PARTITION_SRC(flags)	((uint8_t)(flags >> 16))
-#define DEVICE_DEST(flags)	((uint8_t)(flags >> 8))
+#define DEVICE_DEST(flags)		((uint8_t)(flags >> 8))
 #define PARTITION_DEST(flags)	((uint8_t)(flags))
 
-#define FPT_UPDATE_FLAG		(0xAA)  /* uint8 - the other bytes are the boot device, and chunk num */
-#define FPT_UPDATE_MAGIC	(0xAAAAAAAA)
+#define FPT_UPDATE_FLAG			(0xAA)  /* uint8 - the other bytes are the boot device, and chunk num */
+#define FPT_UPDATE_MAGIC		(0xAAAAAAAA)
+#define PDI_PROGRAM_FLAG		(0xBB)  /* uint8 - the other bytes are the boot device, and chunk num */
+#define PDI_PROGRAM_MAGIC		(0xBBBBBBBB)
 #define PDI_CHUNK_MULTIPLIER	(1024)
-#define PDI_CHUNK_SIZE		(32)  /* Multiple of 1024 */
+#define PDI_CHUNK_SIZE			(128)	/* Multiple of 1024 */
 
 /*
  * Format of flags:
@@ -53,11 +55,11 @@
  */
 #define MK_PDI_FLAGS(boot, part, chunk, last) \
 					(((uint8_t)boot << 24) | ((uint8_t)part << 16 ) | ((last) ? \
-					((uint16_t)chunk | ((uint16_t)1 << 15)) : \
+					((uint16_t)chunk | ((uint16_t)1  << 15)) : \
 					((uint16_t)chunk & ~((uint16_t)1 << 15))))
 #define PDI_BOOT_DEVICE(flags)		((uint8_t)(flags >> 24))
 #define PDI_PARTITION(flags)		((uint8_t)(flags >> 16))
-#define PDI_CHUNK(flags)		(((uint16_t)(flags & 0x0000ffff)) & ~((uint16_t)1 << 15))
+#define PDI_CHUNK(flags)			(((uint16_t)(flags & 0x0000ffff)) & ~((uint16_t)1 << 15))
 #define PDI_CHUNK_IS_LAST(flags)	((uint16_t)(flags & 0x0000ffff) >> 15)  /* either 1 or 0 */
 
 /**
@@ -71,8 +73,9 @@
  *
  * Return: 0 or negative error code.
  */
-int download_pdi(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf, uint32_t size,
-	uint8_t boot_device, uint32_t partition, struct eventfd_ctx *efd_ctx);
+int download_pdi(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf,
+	uint32_t size, uint8_t boot_device, uint32_t partition,
+	struct eventfd_ctx *efd_ctx);
 
 /**
  * update_fpt() - Download a PDI containing an FPT onto a device.
@@ -106,6 +109,7 @@ int device_boot(struct pf_dev_struct *pf_dev, uint32_t partition);
  *
  * Return: 0 or negative error code.
  */
-int copy_partition(struct pf_dev_struct *pf_dev, uint32_t src_device, uint32_t src_part, uint32_t dest_device, uint32_t dest_part);
+int copy_partition(struct pf_dev_struct *pf_dev, uint32_t src_device,
+	uint32_t src_part, uint32_t dest_device, uint32_t dest_part);
 
 #endif  /* AMI_PROGRAM_H */

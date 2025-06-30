@@ -37,6 +37,235 @@
 /* Local function definitions                                                */
 /*****************************************************************************/
 
+#define SMAP_BUS_WIDTH		4
+
+#define ROM_BH_RESERVED		15
+#define PLM_BH_RESERVED		24
+#define SHA3_PAD_SIZE		19
+#define MAX_REG_INIT		512
+
+#define BLK_GRY_KEY_LENGTH	8
+#define IV_LENGTH			3
+#define PUF_DATA_LENGTH		1544
+#define MAX_IHT_RESERVED	8
+
+/* Version Updates :
+   v1 : Initial versal support
+   v2 : IHT,PHT sizes doubled
+   v3 : Partition secure chunk size changed to 32k from 64k
+   v4 : AAD support added for IHT
+      : Hash placemnet updated during chunking
+        Hash is included into the 32k secure chunk */
+#define VERSION_v1_00	0x01030000
+#define VERSION_v2_00	0x00020000
+#define VERSION_v3_00	0x00030000
+#define VERSION_v4_00	0x00040000
+
+typedef struct
+{
+	uint32_t smapWords[SMAP_BUS_WIDTH];          /* (0x00) */
+} PdiSmapWidthTable;
+
+typedef struct
+{
+	uint32_t smapWords[SMAP_BUS_WIDTH];          /* (0x00)  */
+	uint32_t widthDetectionWord;                 /* (0x10)  */
+	uint32_t identificationWord;                 /* (0x14)  */
+	uint32_t encryptionKeySource;                /* (0x18)  */
+	uint32_t sourceOffset;                       /* (0x1C)  */
+	uint32_t pmcCdoLoadAddress;                  /* (0x20)  */
+	uint32_t pmcCdoLength;                       /* (0x24)  */
+	uint32_t totalPmcCdoLength;                  /* (0x28)  */
+	uint32_t plmLength;                          /* (0x2C)  */
+	uint32_t totalPlmLength;                     /* (0x30)  */
+	uint32_t bhAttributes;                       /* (0x34)  */
+	uint32_t greyOrBlackKey[BLK_GRY_KEY_LENGTH]; /* (0x38)  */
+	uint32_t greyOrBlackIV[IV_LENGTH];           /* (0x58)  */
+	uint32_t plmSecureHdrIv[IV_LENGTH];          /* (0x64)  */
+	uint32_t shutterValue;                       /* (0x70)  */
+	uint32_t pmcCdoSecureHdrIv[IV_LENGTH];       /* (0x74)  */
+	uint32_t pufRoSwapConfigVal;                 /* (0x80)  */
+	uint32_t revokeId;                           /* (0x84)  */
+	uint32_t romReserved[ROM_BH_RESERVED];       /* (0x88)  */
+	uint32_t imageHeaderByteOffset;              /* (0xC4)  */
+	uint32_t plmReserved[PLM_BH_RESERVED];       /* (0xC8)  */
+	uint32_t reginit[MAX_REG_INIT];       	     /* (0x128) */
+	uint32_t puf[PUF_DATA_LENGTH / 4];           /* (0x928) */
+	uint32_t headerChecksum;                     /* (0xF30) */
+	uint32_t sha3Padding[SHA3_PAD_SIZE];  	     /* (0xF34) */
+} PdiBootHeader;
+
+typedef struct
+{
+	uint32_t version;                            /* 0x0  */
+	uint32_t imageTotalCount;                    /* 0x4  */
+	uint32_t firstImageHeaderWordOffset;         /* 0x8  */
+	uint32_t partitionTotalCount;                /* 0xc  */
+	uint32_t firstPartitionHeaderWordOffset;     /* 0x10 */
+	uint32_t secondaryBootDeviceAddress;         /* 0x14 */
+	uint32_t idCode;                             /* 0x18 */
+	uint32_t imageHeaderTableAttributes;         /* 0x1c */
+	uint32_t pdiId;                              /* 0x20 */
+	uint32_t parentId;                           /* 0x24 */
+	uint32_t identificationString;               /* 0x28 */
+	uint32_t headerSizes;                        /* 0x2C */
+	uint32_t totalMetaHdrLength;                 /* 0x30 */
+	uint32_t metaHdrSecureHdrIv[IV_LENGTH];      /* 0x34 */
+	uint32_t metaHdrKeySource;                   /* 0x40 */
+	uint32_t extendedIdCode;                     /* 0x44 */
+	uint32_t headerAuthCertificateWordOffset;    /* 0x48 */
+	uint32_t metaHdrGreyOrBlackIV[IV_LENGTH];    /* 0x4C */
+	uint32_t optionalDataSize;                   /* 0x58 */
+	uint32_t reserved[MAX_IHT_RESERVED];         /* 0x5C - 0x78 */
+	uint32_t ihtChecksum;                        /* 0x7C */
+} PdiImageHeaderTable;
+
+typedef struct
+{
+	uint32_t partitionHeaderWordOffset;         /* 0x00 */
+	uint32_t dataSectionCount;                  /* 0x04 */
+	uint32_t metaHdrRevokeId;                   /* 0x08 */
+	uint32_t imageAttributes;                   /* 0x0C */
+	char     imageName[16];                     /* 0x10 */
+	uint32_t imageId;                           /* 0x20 */
+	uint32_t uniqueId;                          /* 0x24 */
+	uint32_t parentUniqueId;                    /* 0x28 */
+	uint32_t functionId;                        /* 0x2C */
+	uint32_t memcpyAddressLo;                   /* 0x30 */
+	uint32_t memcpyAddressHi;                   /* 0x34 */
+	uint16_t pcrNumber;                         /* 0x38 */
+	uint16_t pcrMeasurementIndex;               /* 0x3A */
+	uint32_t ihChecksum;                        /* 0x3C */
+} PdiImageHeader;
+
+/**
+ * find_parent_uuid() - Utility function to get parent UUID
+ * @pdi: PDI file name.
+ * @uuid: Array to store found parent uuid string.
+ *
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
+ */
+int find_parent_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE])
+{
+	int ret = EXIT_FAILURE;
+	uint64_t offset = 0;
+	uint32_t smap_header_found = 0;
+	PdiBootHeader* boot_hdr = NULL;
+	PdiImageHeaderTable* img_hdr_table = NULL;
+	PdiImageHeader* img_hdr = NULL;
+	FILE *fp;
+
+	fp = fopen(pdi, "rb");
+
+	if (fp == NULL)
+	{
+		printf("Cannot read file %s", pdi);
+		return EXIT_FAILURE;
+	}
+
+	boot_hdr = (PdiBootHeader*)malloc(sizeof(PdiBootHeader));
+
+	/* Boot Header Table Extraction */
+	ret = fread(boot_hdr, 1, sizeof(PdiBootHeader), fp);
+	if ((boot_hdr->smapWords[0] == 0xDD000000) ||
+		(boot_hdr->smapWords[0] == 0x00DD0000) ||
+		(boot_hdr->smapWords[0] == 0x000000DD))
+	{
+		smap_header_found = 1;
+	}
+
+	if (boot_hdr->widthDetectionWord != 0xAA995566)
+	{
+		offset = smap_header_found ? sizeof(PdiSmapWidthTable) : 0;
+		free(boot_hdr);
+		boot_hdr = NULL;
+	}
+	else
+	{
+		offset = boot_hdr->imageHeaderByteOffset;
+	}
+
+	/* Image Header Table Extraction */
+	if ((fseek(fp, offset, SEEK_SET)) == 0)
+	{
+		img_hdr_table = (PdiImageHeaderTable*)malloc(sizeof(PdiImageHeaderTable));
+
+		ret = fread(img_hdr_table, 1, sizeof(PdiImageHeaderTable), fp);
+		if ((img_hdr_table->version != VERSION_v1_00) &&
+			(img_hdr_table->version != VERSION_v2_00) &&
+			(img_hdr_table->version != VERSION_v3_00) &&
+			(img_hdr_table->version != VERSION_v4_00))
+		{
+			printf("%s file image Header Table invalid version (0x%.8x)",
+				pdi, img_hdr_table->version);
+			ret = EXIT_FAILURE;
+			goto exit;
+		}
+
+		if (ret != sizeof(PdiImageHeaderTable))
+		{
+			printf("Error parsing %s Image Header Table", pdi);
+			ret = EXIT_FAILURE;
+			goto exit;
+		}
+
+		if (!((img_hdr_table->partitionTotalCount > 0) &&
+			(img_hdr_table->partitionTotalCount < 0xFF)))
+		{
+			printf("Invalid partititon count");
+			ret = EXIT_FAILURE;
+			goto exit;
+		}
+	}
+	else
+	{
+		printf("Error parsing %s Image Header Table", pdi);
+		ret = EXIT_FAILURE;
+		goto exit;
+	}
+
+	/* Image Header Extraction */
+	if (img_hdr_table->metaHdrKeySource == 0)
+	{
+		offset = img_hdr_table->firstImageHeaderWordOffset * 4;
+		img_hdr = (PdiImageHeader*)malloc(sizeof(PdiImageHeader));
+		if ((fseek(fp, offset, SEEK_SET)) == 0)
+		{
+			ret = fread(img_hdr, 1, sizeof(PdiImageHeader), fp);
+			if (ret != sizeof(PdiImageHeader))
+			{
+				printf("Error parsing %s Image Headers\n", pdi);
+				ret = EXIT_FAILURE;
+				goto exit;
+			}
+		}
+		else
+		{
+			printf("Error parsing %s Image Headers\n", pdi);
+			ret = EXIT_FAILURE;
+			goto exit;
+		}
+	}
+	snprintf(uuid, AMI_LOGIC_UUID_SIZE, "%0*x",
+		(AMI_LOGIC_UUID_SIZE - 1), img_hdr->parentUniqueId);
+
+	ret = EXIT_SUCCESS;
+
+exit:
+	if (img_hdr != NULL)
+		free(img_hdr);
+
+	if (img_hdr_table != NULL)
+		free(img_hdr_table);
+
+	if (boot_hdr != NULL)
+		free(boot_hdr);
+
+	fclose(fp);
+
+	return ret;
+}
+
 /**
  * parse_logic_uuid() - Utility function to parse logic UUID JSON.
  * @json: Raw JSON string.

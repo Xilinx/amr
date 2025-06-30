@@ -134,8 +134,9 @@ TEST:
 |12 |OSPI  | cfgmem fpt    |sudo ami_tool cfgmem_fpt -d <b:d:f> -t primary -i <fpt file>	       |Program FPT onto a OSPI |
 |13 |OSPI  | cfgmem copy   |sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1	           |Copy one device partition to another |
 |14 |OSPI  | device boot   |sudo ami_tool device_boot -d <b:d:f> -p 0	                           |Set the device boot partition |
-|15 |Sensor| sensors       |ami_tool sensors -d <b:d:f>	                                           |Get the value of a sensor |
-|16 |Device|debug verbosity|ami_tool debug_verbosity -d <b:d:f> -l debug	                       |Set log level |
+|15 |PL    | PDI program   |sudo ami_tool pdi_program -d <b:d:f> -i <pdi>	                       |Program partial pdi |
+|16 |Sensor| sensors       |ami_tool sensors -d <b:d:f>	                                           |Get the value of a sensor |
+|17 |Device|debug verbosity|ami_tool debug_verbosity -d <b:d:f> -l debug	                       |Set log level |
 
 ### 5. Glossary
 | Name | Description   				             |

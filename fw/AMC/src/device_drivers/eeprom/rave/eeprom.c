@@ -588,27 +588,6 @@ int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROM_CFG *pxEepromCfg )
 						                            pxThis->pucBoardMfgDate,
 						                            pxThis->ucSizeBoardMfgDate,
 						                            FALSE );
-						#if 0
-						if( OK == iStatus )
-						{
-							time_t ts;
-							const uint64_t secs_from_1970_1996 = 820454400;
-							uint32_t fru_ts = (uint32_t)(pxThis->pucBoardMfgDate[2] << 16) |  /* MSB */
-											    		(pxThis->pucBoardMfgDate[1] <<  8) |
-														(pxThis->pucBoardMfgDate[0]      ); /* LSB */
-
-
-							/*if (FRU_BOARD_DATE_UNSPEC == fru_ts) {
-								ts = IPMI_TIME_UNSPECIFIED;
-							}
-							else*/ {
-								ts = fru_ts * 60 + secs_from_1970_1996;
-							}
-							struct tm* tyme = gmtime(&ts);
-							PLL_ERR( EEPROM_NAME, "day=%d mon=%d year=%d\r\n", tyme->tm_mday, tyme->tm_mon, tyme->tm_year );
-
-						}
-						#endif
 					}
 
 					if( OK == iStatus )

@@ -42,29 +42,29 @@ char *convert_sensor_status_name_map(int status)
 const char *sdr_repo_type_to_str(enum gcq_sdr_repo_type sdr)
 {
 	switch (sdr) {
-	case SDR_TYPE_FPT:
-		return "fpt";
+		case SDR_TYPE_FPT:
+			return "fpt";
 
-	case SDR_TYPE_BDINFO:
-		return "board info";
+		case SDR_TYPE_BDINFO:
+			return "board info";
 
-	case SDR_TYPE_TEMP:
-		return "temperature";
+		case SDR_TYPE_TEMP:
+			return "temperature";
 
-	case SDR_TYPE_VOLTAGE:
-		return "voltage";
+		case SDR_TYPE_VOLTAGE:
+			return "voltage";
 
-	case SDR_TYPE_CURRENT:
-		return "current";
+		case SDR_TYPE_CURRENT:
+			return "current";
 
-	case SDR_TYPE_POWER:
-		return "power";
+		case SDR_TYPE_POWER:
+			return "power";
 
-	case SDR_TYPE_TOTAL_POWER:
-		return "total power";
+		case SDR_TYPE_TOTAL_POWER:
+			return "total power";
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return "";
@@ -86,36 +86,36 @@ enum gcq_submit_cmd_req get_flags_for_repo(enum gcq_sdr_repo_type repo_type)
 	enum gcq_submit_cmd_req ret = GCQ_CMD_FLAG_NONE;
 
 	switch (repo_type) {
-	case SDR_TYPE_BDINFO:
-		ret = GCQ_CMD_FLAG_REPO_TYPE_BD_INFO;
-		break;
+		case SDR_TYPE_BDINFO:
+			ret = GCQ_CMD_FLAG_REPO_TYPE_BD_INFO;
+			break;
 
-	case SDR_TYPE_TEMP:
-		ret = GCQ_CMD_FLAG_REPO_TYPE_TEMP;
-		break;
+		case SDR_TYPE_TEMP:
+			ret = GCQ_CMD_FLAG_REPO_TYPE_TEMP;
+			break;
 
-	case SDR_TYPE_VOLTAGE:
-		ret = GCQ_CMD_FLAG_REPO_TYPE_VOLTAGE;
-		break;
+		case SDR_TYPE_VOLTAGE:
+			ret = GCQ_CMD_FLAG_REPO_TYPE_VOLTAGE;
+			break;
 
-	case SDR_TYPE_CURRENT:
-		ret = GCQ_CMD_FLAG_REPO_TYPE_CURRENT;
-		break;
+		case SDR_TYPE_CURRENT:
+			ret = GCQ_CMD_FLAG_REPO_TYPE_CURRENT;
+			break;
 
-	case SDR_TYPE_POWER:
-		ret = GCQ_CMD_FLAG_REPO_TYPE_POWER;
-		break;
+		case SDR_TYPE_POWER:
+			ret = GCQ_CMD_FLAG_REPO_TYPE_POWER;
+			break;
 
-	case SDR_TYPE_TOTAL_POWER:
-		ret = GCQ_CMD_FLAG_REPO_TYPE_TOTAL_POWER;
-		break;
+		case SDR_TYPE_TOTAL_POWER:
+			ret = GCQ_CMD_FLAG_REPO_TYPE_TOTAL_POWER;
+			break;
 
-	case SDR_TYPE_FPT:
-		ret = GCQ_CMD_FLAG_REPO_TYPE_FPT;
-		break;
+		case SDR_TYPE_FPT:
+			ret = GCQ_CMD_FLAG_REPO_TYPE_FPT;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return ret;
@@ -131,7 +131,7 @@ enum gcq_submit_cmd_req get_flags_for_repo(enum gcq_sdr_repo_type repo_type)
  */
 int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	      uint8_t			*sdr_buf,
-	      struct sdr_repo		*repo) /* TODO: Test with board info SDR */
+	      struct sdr_repo	*repo) /* TODO: Test with board info SDR */
 {
 	int i = 0;
 	int ret = 0;
@@ -648,17 +648,17 @@ long make_val(enum sdr_value_type type, uint8_t size, uint8_t *data)
 		return 0;
 
 	switch (size) {
-	case SDR_VALUE_SIZE_BYTE:
-		return (long)(*(uint8_t *)data);
+		case SDR_VALUE_SIZE_BYTE:
+			return (long)(*(uint8_t *)data);
 
-	case SDR_VALUE_SIZE_WORD:
-		return (long)(*(uint16_t *)data);
+		case SDR_VALUE_SIZE_WORD:
+			return (long)(*(uint16_t *)data);
 
-	case SDR_VALUE_SIZE_DWORD:
-		return (long)(*(uint32_t *)data);
+		case SDR_VALUE_SIZE_DWORD:
+			return (long)(*(uint32_t *)data);
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return 0;
@@ -709,7 +709,8 @@ int discover_sensors(struct pf_dev_struct *pf_dev, int *empty_sdr_count)
 		return -ENOMEM;
 
 	for (i = 0; i < NUM_SENSOR_REPOS; i++) {
-		ret = get_sdr(pf_dev->amc_ctrl_ctxt, discovery_repos[i], &(pf_dev->sensor_repos[i]));
+		ret = get_sdr(pf_dev->amc_ctrl_ctxt, discovery_repos[i],
+				&(pf_dev->sensor_repos[i]));
 
 		if (ret == -ENODATA) {
 			*empty_sdr_count = *empty_sdr_count + 1;
@@ -743,41 +744,41 @@ static void delete_repo_records(struct pf_dev_struct *pf_dev, struct sdr_repo *r
 		return;
 
 	switch (repo->repo_type) {
-	case SDR_TYPE_FPT:
-		if (repo->fpt.partition_primary) {
-			devm_kfree(&(pf_dev->pci->dev), repo->fpt.partition_primary);
-			repo->fpt.partition_primary = NULL;
-			repo->num_records = 0;
-		}
-		if (repo->fpt.partition_secondary) {
-			devm_kfree(&(pf_dev->pci->dev), repo->fpt.partition_secondary);
-			repo->fpt.partition_secondary = NULL;
-			repo->num_records = 0;
-		}
-		break;
+		case SDR_TYPE_FPT:
+			if (repo->fpt.partition_primary) {
+				devm_kfree(&(pf_dev->pci->dev), repo->fpt.partition_primary);
+				repo->fpt.partition_primary = NULL;
+				repo->num_records = 0;
+			}
+			if (repo->fpt.partition_secondary) {
+				devm_kfree(&(pf_dev->pci->dev), repo->fpt.partition_secondary);
+				repo->fpt.partition_secondary = NULL;
+				repo->num_records = 0;
+			}
+			break;
 
-	case SDR_TYPE_BDINFO:
-		if (repo->bd_info) {
-			devm_kfree(&(pf_dev->pci->dev), repo->bd_info);
-			repo->bd_info = NULL;
-			repo->num_records = 0;
-		}
-		break;
+		case SDR_TYPE_BDINFO:
+			if (repo->bd_info) {
+				devm_kfree(&(pf_dev->pci->dev), repo->bd_info);
+				repo->bd_info = NULL;
+				repo->num_records = 0;
+			}
+			break;
 
-	case SDR_TYPE_TEMP:
-	case SDR_TYPE_VOLTAGE:
-	case SDR_TYPE_CURRENT:
-	case SDR_TYPE_POWER:
-	case SDR_TYPE_TOTAL_POWER:
-		if (repo->records) {
-			devm_kfree(&(pf_dev->pci->dev), repo->records);
-			repo->records = NULL;
-			repo->num_records = 0;
-		}
-		break;
+		case SDR_TYPE_TEMP:
+		case SDR_TYPE_VOLTAGE:
+		case SDR_TYPE_CURRENT:
+		case SDR_TYPE_POWER:
+		case SDR_TYPE_TOTAL_POWER:
+			if (repo->records) {
+				devm_kfree(&(pf_dev->pci->dev), repo->records);
+				repo->records = NULL;
+				repo->num_records = 0;
+			}
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 
@@ -853,7 +854,7 @@ void delete_sensors(struct pf_dev_struct *pf_dev)
  *
  * Return: The matched SDR record or NULL.
  */
-struct sdr_record *find_sdr_record(struct sdr_repo		*sensor_repos,
+struct sdr_record *find_sdr_record(struct sdr_repo *sensor_repos,
 				   uint8_t			num_sensor_repos,
 				   enum gcq_sdr_repo_type	type,
 				   int				sid)
@@ -1062,24 +1063,24 @@ static int read_sensors(struct pf_dev_struct	*pf_dev,
 		return -EINVAL;
 
 	switch (gcq_cmd) {
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR:
-		repo_type = SDR_TYPE_TEMP;
-		break;
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR:
+			repo_type = SDR_TYPE_TEMP;
+			break;
 
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR:
-		repo_type = SDR_TYPE_VOLTAGE;
-		break;
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR:
+			repo_type = SDR_TYPE_VOLTAGE;
+			break;
 
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR:
-		repo_type = SDR_TYPE_CURRENT;
-		break;
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR:
+			repo_type = SDR_TYPE_CURRENT;
+			break;
 
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR:
-		repo_type = SDR_POWER_TYPE;
-		break;
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR:
+			repo_type = SDR_POWER_TYPE;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (repo_type == SDR_TYPE_MAX)
@@ -1147,7 +1148,7 @@ int read_voltage_sensors(struct pf_dev_struct *pf_dev, bool *fresh)
 {
 	return read_sensors(
 		pf_dev,
-		GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR,
+		GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR,
 		fresh
 	);
 }
@@ -1166,7 +1167,7 @@ int read_current_sensors(struct pf_dev_struct *pf_dev, bool *fresh)
 {
 	return read_sensors(
 		pf_dev,
-		GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR,
+		GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR,
 		fresh
 	);
 }
@@ -1185,7 +1186,7 @@ int read_power_sensors(struct pf_dev_struct *pf_dev, bool *fresh)
 {
 	return read_sensors(
 		pf_dev,
-		GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR,
+		GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR,
 		fresh
 	);
 }
@@ -1219,17 +1220,17 @@ int read_fpt_hdr(struct pf_dev_struct *pf_dev, uint8_t boot_device, struct fpt_h
 		return -ENODATA;
 
 	switch (boot_device) {
-	case AMI_AMC_BOOT_DEVICE_PRIMARY:
-		*hdr = repo->fpt.hdr_primary;
-		break;
+		case AMI_AMC_BOOT_DEVICE_PRIMARY:
+			*hdr = repo->fpt.hdr_primary;
+			break;
 
-	case AMI_AMC_BOOT_DEVICE_SECONDARY:
-		*hdr = repo->fpt.hdr_secondary;
-		break;
+		case AMI_AMC_BOOT_DEVICE_SECONDARY:
+			*hdr = repo->fpt.hdr_secondary;
+			break;
 
-	default:
-		return -EINVAL;
-		break;
+		default:
+			return -EINVAL;
+			break;
 	}
 
 	return 0;
@@ -1266,33 +1267,29 @@ int read_fpt_partition(struct pf_dev_struct	*pf_dev,
 		return -ENODATA;
 
 	switch (boot_device) {
-	case AMI_AMC_BOOT_DEVICE_PRIMARY:
-	{
-		if (partition_id > (repo->fpt.hdr_primary.num_entries - 1))
+		case AMI_AMC_BOOT_DEVICE_PRIMARY:
+			if (partition_id > (repo->fpt.hdr_primary.num_entries - 1))
+				return -EINVAL;
+
+			if (repo->fpt.partition_primary == NULL)
+				return -ENODATA;
+
+			*partition = repo->fpt.partition_primary[partition_id];
+			break;
+
+		case AMI_AMC_BOOT_DEVICE_SECONDARY:
+			if (partition_id > (repo->fpt.hdr_secondary.num_entries - 1))
+				return -EINVAL;
+
+			if (repo->fpt.partition_secondary == NULL)
+				return -ENODATA;
+
+			*partition = repo->fpt.partition_secondary[partition_id];
+			break;
+
+		default:
 			return -EINVAL;
-
-		if (repo->fpt.partition_primary == NULL)
-			return -ENODATA;
-
-		*partition = repo->fpt.partition_primary[partition_id];
-		break;
-	}
-
-	case AMI_AMC_BOOT_DEVICE_SECONDARY:
-	{
-		if (partition_id > (repo->fpt.hdr_secondary.num_entries - 1))
-			return -EINVAL;
-
-		if (repo->fpt.partition_secondary == NULL)
-			return -ENODATA;
-
-		*partition = repo->fpt.partition_secondary[partition_id];
-		break;
-	}
-
-	default:
-		return -EINVAL;
-		break;
+			break;
 	}
 
 	return 0;

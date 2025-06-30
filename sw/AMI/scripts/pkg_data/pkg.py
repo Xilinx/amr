@@ -91,19 +91,10 @@ def log_newline():
 
 CWD = os.getcwd(); # get current working directory
 
-DIST_ID_CENTOS  = 'CentOS'
 DIST_ID_UBUNTU  = 'Ubuntu'
-DIST_ID_REDHAT  = 'RedHatEnterprise'
-DIST_ID_REDHAT2 = 'RedHatEnterpriseWorkstation'
-DIST_ID_SLES    = 'SUSE'
 SUPPORTED_DIST_ID = [
-    DIST_ID_CENTOS,
     DIST_ID_UBUNTU,
-    DIST_ID_REDHAT,
-    DIST_ID_REDHAT2,
-    DIST_ID_SLES,
 ]
-DIST_RPM = [DIST_ID_CENTOS, DIST_ID_REDHAT, DIST_ID_REDHAT2, DIST_ID_SLES]
 DIST_DEB = [DIST_ID_UBUNTU]
 
 ARCH_X86_64     = 'x86_64'

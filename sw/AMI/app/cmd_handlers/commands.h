@@ -29,6 +29,9 @@ extern struct app_cmd cmd_pcieinfo;
 /* "program" handler */
 extern struct app_cmd cmd_cfgmem_program;
 
+/* "program" handler */
+extern struct app_cmd cmd_pdi_program;
+
 /* "sensors" handler */
 extern struct app_cmd cmd_sensors;
 

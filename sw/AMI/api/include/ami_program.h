@@ -109,8 +109,9 @@ struct ami_pdi_progress {
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
-int ami_prog_download_pdi(ami_device *dev, const char *path, uint8_t boot_device,
-	uint32_t partition, ami_event_handler progress_handler);
+int ami_prog_download_pdi(ami_device *dev, const char *path,
+	uint8_t boot_device, uint32_t partition,
+	ami_event_handler progress_handler);
 
 /**
  * ami_prog_update_fpt() - Program a PDI containing an FPT onto a device.
@@ -153,8 +154,9 @@ int ami_prog_device_boot(struct ami_device **dev, uint32_t partition);
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
-int ami_prog_copy_partition(ami_device *dev, uint32_t src_device, uint32_t src_part,
-	uint32_t dest_device, uint32_t dest_part, ami_event_handler progress_handler);
+int ami_prog_copy_partition(ami_device *dev, uint32_t src_device,
+	uint32_t src_part, uint32_t dest_device, uint32_t dest_part,
+	ami_event_handler progress_handler);
 
 /**
  * ami_prog_get_fpt_header() - Get the FPT header information.
@@ -164,7 +166,8 @@ int ami_prog_copy_partition(ami_device *dev, uint32_t src_device, uint32_t src_p
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
-int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device, struct ami_fpt_header *header);
+int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device,
+	struct ami_fpt_header *header);
 
 /**
  * ami_prog_get_fpt_partition() - Get FPT partition information.
@@ -175,7 +178,23 @@ int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device, struct ami_fpt
  *
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
-int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device, uint32_t num, struct ami_fpt_partition *partition);
+int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device,
+	uint32_t num, struct ami_fpt_partition *partition);
+
+/**
+ * ami_prog_pdi() - Program a .pdi bitstream onto a device.
+ * @dev: Device handle.
+ * @path: Full path to PDI file.
+ * @progress_handler: An event handler to accept progress notifications.
+ *
+ * If a progress handler is given, a thread will be started to monitor driver
+ * events - `ctr` will be equal to the number of bytes successfully written
+ * and `data` will be a pointer to `struct ami_pdi_progress`.
+ *
+ * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
+ */
+int ami_prog_pdi(ami_device *dev, const char *path,
+	ami_event_handler progress_handler);
 
 #ifdef __cplusplus
 }

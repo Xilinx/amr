@@ -445,29 +445,29 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 		/* Currently, only the instant sensor value is supported with this API. */
 		switch (data.sensor_type) {
-		case IOC_SENSOR_TYPE_TEMP:
-			hwmon_type = hwmon_temp;
-			hwmon_attr = hwmon_temp_input;
-			break;
+			case IOC_SENSOR_TYPE_TEMP:
+				hwmon_type = hwmon_temp;
+				hwmon_attr = hwmon_temp_input;
+				break;
 
-		case IOC_SENSOR_TYPE_POWER:
-			hwmon_type = hwmon_power;
-			hwmon_attr = hwmon_power_input;
-			break;
+			case IOC_SENSOR_TYPE_POWER:
+				hwmon_type = hwmon_power;
+				hwmon_attr = hwmon_power_input;
+				break;
 
-		case IOC_SENSOR_TYPE_CURRENT:
-			hwmon_type = hwmon_curr;
-			hwmon_attr = hwmon_curr_input;
-			break;
+			case IOC_SENSOR_TYPE_CURRENT:
+				hwmon_type = hwmon_curr;
+				hwmon_attr = hwmon_curr_input;
+				break;
 
-		case IOC_SENSOR_TYPE_VOLTAGE:
-			hwmon_type = hwmon_in;
-			hwmon_attr = hwmon_in_input;
-			break;
+			case IOC_SENSOR_TYPE_VOLTAGE:
+				hwmon_type = hwmon_in;
+				hwmon_attr = hwmon_in_input;
+				break;
 
-		default:
-			ret = -EINVAL;
-			break;
+			default:
+				ret = -EINVAL;
+				break;
 		}
 
 		if (ret)
@@ -544,86 +544,86 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		break;
 	}
 
-		case AMI_IOC_READ_EEPROM:
-		{
-			struct ami_ioc_eeprom_payload data = { 0 };
-			uint8_t *buf = NULL;
+	case AMI_IOC_READ_EEPROM:
+	{
+		struct ami_ioc_eeprom_payload data = { 0 };
+		uint8_t *buf = NULL;
 
-			/* Read data payload. */
-			if (copy_from_user(&data, (struct ami_ioc_eeprom_payload*)arg, sizeof(data))) {
-					ret = -EFAULT;
-					goto done;
-			}
-
-			if ((data.len <= 0) || (data.addr == 0)) {
-				ret = -EINVAL;
-				goto done;
-			}
-
-			/* Allocate memory for response buffer. */
-			buf = vzalloc(data.len * sizeof(uint8_t));
-
-			if (!buf) {
-				ret = -ENOMEM;
-				goto done;
-			}
-
-			ret = eeprom_read(pf_dev->amc_ctrl_ctxt, buf, data.len, data.offset);
-			if (!ret) {
-				ret = copy_to_user((uint8_t*)data.addr, buf,
-					data.len * sizeof(uint8_t));
-			}
-			vfree(buf);
-			break;
-		}
-
-		case AMI_IOC_WRITE_EEPROM:
-		{
-			struct ami_ioc_eeprom_payload data = { 0 };
-			uint8_t *buf = NULL;
-
-			/* Read data payload. */
-			if (copy_from_user(&data, (struct ami_ioc_eeprom_payload*)arg, sizeof(data))) {
+		/* Read data payload. */
+		if (copy_from_user(&data, (struct ami_ioc_eeprom_payload*)arg, sizeof(data))) {
 				ret = -EFAULT;
 				goto done;
-			}
-
-			if ((data.len <= 0) || (data.addr == 0)) {
-				ret = -EINVAL;
-				goto done;
-			}
-
-			/* Allocate memory for payload buffer. */
-			buf = vzalloc(data.len * sizeof(uint8_t));
-
-			if (!buf) {
-				ret = -ENOMEM;
-				goto done;
-			}
-
-			/* Copy payload data. */
-			if (!copy_from_user(buf, (uint8_t*)data.addr, data.len * sizeof(uint8_t)))
-				ret = eeprom_write(pf_dev->amc_ctrl_ctxt, buf, data.len, data.offset);
-			else
-				ret = -EFAULT;
-
-			vfree(buf);
-			break;
 		}
+
+		if ((data.len <= 0) || (data.addr == 0)) {
+			ret = -EINVAL;
+			goto done;
+		}
+
+		/* Allocate memory for response buffer. */
+		buf = vzalloc(data.len * sizeof(uint8_t));
+
+		if (!buf) {
+			ret = -ENOMEM;
+			goto done;
+		}
+
+		ret = eeprom_read(pf_dev->amc_ctrl_ctxt, buf, data.len, data.offset);
+		if (!ret) {
+			ret = copy_to_user((uint8_t*)data.addr, buf,
+				data.len * sizeof(uint8_t));
+		}
+		vfree(buf);
+		break;
+	}
+
+	case AMI_IOC_WRITE_EEPROM:
+	{
+		struct ami_ioc_eeprom_payload data = { 0 };
+		uint8_t *buf = NULL;
+
+		/* Read data payload. */
+		if (copy_from_user(&data, (struct ami_ioc_eeprom_payload*)arg, sizeof(data))) {
+			ret = -EFAULT;
+			goto done;
+		}
+
+		if ((data.len <= 0) || (data.addr == 0)) {
+			ret = -EINVAL;
+			goto done;
+		}
+
+		/* Allocate memory for payload buffer. */
+		buf = vzalloc(data.len * sizeof(uint8_t));
+
+		if (!buf) {
+			ret = -ENOMEM;
+			goto done;
+		}
+
+		/* Copy payload data. */
+		if (!copy_from_user(buf, (uint8_t*)data.addr, data.len * sizeof(uint8_t)))
+			ret = eeprom_write(pf_dev->amc_ctrl_ctxt, buf, data.len, data.offset);
+		else
+			ret = -EFAULT;
+
+		vfree(buf);
+		break;
+	}
 
 	case AMI_IOC_APP_SETUP:
 		switch ((enum ami_ioc_app_setup)arg) {
-		case IOC_APP_SETUP_REGISTER:
-			ret = add_pf_dev_app(pf_dev, get_current());
-			break;
+			case IOC_APP_SETUP_REGISTER:
+				ret = add_pf_dev_app(pf_dev, get_current());
+				break;
 
-		case IOC_APP_SETUP_DEREGISTER:
-			ret = delete_pf_dev_app(pf_dev, get_current());
-			break;
+			case IOC_APP_SETUP_DEREGISTER:
+				ret = delete_pf_dev_app(pf_dev, get_current());
+				break;
 
-		default:
-			ret = -EINVAL;
-			break;
+			default:
+				ret = -EINVAL;
+				break;
 		}
 		break;
 

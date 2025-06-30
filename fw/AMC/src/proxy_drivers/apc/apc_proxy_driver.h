@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the API for the Alveo Programming Control (APC) proxy driver
@@ -17,6 +17,7 @@
 #include "standard.h"
 #include "evl.h"
 #include "fw_if.h"
+#include "xloader_client.h"
 
 
 /******************************************************************************/
@@ -40,7 +41,10 @@ typedef enum APC_PROXY_DRIVER_EVENTS
     APC_PROXY_DRIVER_E_COPY_FAILED,
     APC_PROXY_DRIVER_E_PARTITION_SELECTED,
     APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED,
-
+    APC_PROXY_DRIVER_E_PROGRAM_STARTED,
+    APC_PROXY_DRIVER_E_PROGRAM_COMPLETE,
+    APC_PROXY_DRIVER_E_PROGRAM_BUSY,
+    APC_PROXY_DRIVER_E_PROGRAM_FAILED,
     MAX_APC_PROXY_DRIVER_EVENTS
 
 } APC_PROXY_DRIVER_EVENTS;
@@ -100,6 +104,7 @@ typedef struct APC_PROXY_DRIVER_FPT_PARTITION
  * @param   ucProxyId       Unique ID for this Proxy driver
  * @param   pxPrimaryFwIf   Handle to the primary Firmware Interface to use
  * @param   pxSecondaryFwIf Handle to the secondary Firmware Interface to use
+ * @param   pXLoaderInst    Handle to the xilloader client interface
  * @param   ulTaskPrio      Priority of the Proxy driver task (if RR disabled)
  * @param   ulTaskStack     Stack size of the Proxy driver task
  *
@@ -109,9 +114,11 @@ typedef struct APC_PROXY_DRIVER_FPT_PARTITION
  * @note    A Primary Firmware Interface handle must be passed to iAPC_Initialise,
  *          the secondary Firmware Interface handle however is optional
  *          and can be set to NULL.
- *
  */
-int iAPC_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxPrimaryFwIf, FW_IF_CFG *pxSecondaryFwIf,
+int iAPC_Initialise( uint8_t ucProxyId,
+					 FW_IF_CFG *pxPrimaryFwIf,
+					 FW_IF_CFG *pxSecondaryFwIf,
+					 XLoader_ClientInstance *pXLoaderInst,
                      uint32_t ulTaskPrio, uint32_t ulTaskStack );
 
 /**
@@ -121,7 +128,6 @@ int iAPC_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxPrimaryFwIf, FW_IF_CFG *pxS
  *
  * @return  OK          Callback successfully bound
  *          ERROR       Callback not bound
- *
  */
 int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
 
@@ -138,7 +144,6 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
  *
  * @return  OK           Image downloaded successfully
  *          ERROR        Image not downloaded successfully
- *
  */
 int iAPC_DownloadImage( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulSrcAddr,
                         uint32_t ulImageSize, uint16_t usPacketNum, uint16_t usPacketSize );
@@ -156,7 +161,6 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, int 
  *
  * @return  OK           Image downloaded successfully
  *          ERROR        Image not downloaded successfully
- *
  */
 int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, uint32_t ulSrcAddr, uint32_t ulImageSize,
                     uint16_t usPacketNum, uint16_t usPacketSize, int iLastPacket );
@@ -174,11 +178,32 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xBootDevice, uint32_t
  *
  * @return  OK          Image copied successfully
  *          ERROR       Image not copied successfully
- *
  */
 int iAPC_CopyImage( EVL_SIGNAL *pxSignal, APC_BOOT_DEVICES xSrcBootDevice, int iSrcPartition,
-                    APC_BOOT_DEVICES xDestBootDevice, int iDestPartition, uint32_t ulCpyAddr, uint32_t ulAllocatedSize );
+                    APC_BOOT_DEVICES xDestBootDevice, int iDestPartition, uint32_t ulCpyAddr,
+					uint32_t ulAllocatedSize );
 
+/**
+ * @brief   Program PDI image to a location in memory
+ *
+ * @param   pxSignal     Current event occurance (used for tracking)
+ * @param   xBootDevice  Target boot device
+ * @param   iPartition   The partition in the FPT to store this image in
+ * @param   ulSrcAddr    Address (in RAM) to read the image from
+ * @param   ulImageSize  Size of image (in bytes)
+ * @param   usPacketNum  Image packet number
+ * @param   usPacketSize Size of image packet (in KB)
+ *
+ * @return  OK          Image copied successfully
+ *          ERROR       Image not copied successfully
+ */
+int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
+					APC_BOOT_DEVICES xBootDevice,
+					int iPartition,
+					uint32_t ulSrcAddr,
+					uint32_t ulImageSize,
+					uint16_t usPacketNum,
+					uint16_t usPacketSize );
 /**
  * @brief   Select which partition (from primary boot device) to boot from
  *
@@ -221,7 +246,6 @@ int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice, APC_PROXY_DRIVER_FPT_HEADER
  *
  * @return  OK              FPT partition retrieved successfully
  *          ERROR           FPT partition not retrieved successfully
- *
  */
 int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, APC_PROXY_DRIVER_FPT_PARTITION *pxFptPartition );
 
@@ -239,7 +263,6 @@ int iAPC_PrintStatistics( void );
  *
  * @return  OK          Stats cleared successfully
  *          ERROR       Stats not cleared successfully
- *
  */
 int iAPC_ClearStatistics( void );
 

@@ -685,6 +685,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             {
             case AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START:
             case AMI_PROXY_DRIVER_E_PDI_COPY_START:
+            case AMI_PROXY_DRIVER_E_PDI_PROGRAM_START:
             case AMI_PROXY_DRIVER_E_SENSOR_READ:
             case AMI_PROXY_DRIVER_E_GET_IDENTITY:
             case AMI_PROXY_DRIVER_E_BOOT_SELECT:

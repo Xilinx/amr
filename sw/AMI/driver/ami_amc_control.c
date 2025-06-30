@@ -132,9 +132,9 @@ static int get_sensor_id(int cmd_req, int flags)
 		break;
 
 	case GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR:
 		id = ALL_SENSOR_ID;
 		break;
 
@@ -182,9 +182,9 @@ int get_aid(int cmd_req, int flags)
 		break;
 
 	case GCQ_SUBMIT_CMD_GET_ALL_INST_TEMP_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR:
 		id = AMC_PROXY_CMD_SENSOR_REQUEST_ALL_SDR;
 		break;
 
@@ -780,13 +780,13 @@ static enum amc_cmd_id get_cmd_command_id(enum gcq_submit_cmd_req cmd_req)
 		case GCQ_SUBMIT_CMD_GET_VCC1V2_VOLTAGE:
 		case GCQ_SUBMIT_CMD_GET_12V_PEX_VOLTAGE:
 		case GCQ_SUBMIT_CMD_GET_12V_AUX0_VOLTAGE:
-		case GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR:
 		case GCQ_SUBMIT_CMD_GET_VCCINT_CURRENT:
 		case GCQ_SUBMIT_CMD_GET_VCC1V2_CURRENT:
 		case GCQ_SUBMIT_CMD_GET_12V_PEX_CURRENT:
-		case GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR:
 		case GCQ_SUBMIT_CMD_GET_TOTAL_POWER:
-		case GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR:
+		case GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR:
 			id = AMC_CMD_ID_SENSOR;
 			break;
 
@@ -955,6 +955,7 @@ static int heartbeat_health_thread(void *data)
 	} else {
 		amc_ctxt = (struct amc_control_ctxt *)data;
 	}
+	msleep(HEARTBEAT_REQUEST_INTERVAL * 100);
 
 	while (1) {
 		if (!fatal_event_raised && (fail_count < HEARTBEAT_FAIL_THRESHOLD)) {
@@ -1100,19 +1101,19 @@ int get_sid(int cmd_req, int flags)
 	case GCQ_SUBMIT_CMD_GET_VCC1V2_VOLTAGE:
 	case GCQ_SUBMIT_CMD_GET_12V_PEX_VOLTAGE:
 	case GCQ_SUBMIT_CMD_GET_12V_AUX0_VOLTAGE:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOLTAGE_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_VOL_SENSOR:
 		id = AMC_PROXY_CMD_SENSOR_REPO_VOLTAGE;
 		break;
 
 	case GCQ_SUBMIT_CMD_GET_VCCINT_CURRENT:
 	case GCQ_SUBMIT_CMD_GET_VCC1V2_CURRENT:
 	case GCQ_SUBMIT_CMD_GET_12V_PEX_CURRENT:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_CURRENT_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_CUR_SENSOR:
 		id = AMC_PROXY_CMD_SENSOR_REPO_CURRENT;
 		break;
 
 	case GCQ_SUBMIT_CMD_GET_TOTAL_POWER:
-	case GCQ_SUBMIT_CMD_GET_ALL_INST_POWER_SENSOR:
+	case GCQ_SUBMIT_CMD_GET_ALL_INST_PWR_SENSOR:
 		id = (SDR_TYPE_TOTAL_POWER == SDR_POWER_TYPE) ?
 		     (AMC_PROXY_CMD_SENSOR_REPO_TOTAL_POWER) : (AMC_PROXY_CMD_SENSOR_REPO_POWER);
 		break;
@@ -1463,15 +1464,18 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	case AMC_CMD_ID_DOWNLOAD_PDI:
 	{
 		struct amc_proxy_pdi_download_request pdi_download_request = { 0 };
+
 		pdi_download_request.length = payload_size;
 		pdi_download_request.address = payload_address;
 		pdi_download_request.boot_device = PDI_BOOT_DEVICE(flags);
 
 		/* Using the `flags` argument to select the partition. */
-		if (PDI_PARTITION(flags) != FPT_UPDATE_FLAG)
-			pdi_download_request.partition = PDI_PARTITION(flags);
-		else
+		if (PDI_PARTITION(flags) == FPT_UPDATE_FLAG)
 			pdi_download_request.partition = FPT_UPDATE_MAGIC;
+		else if (PDI_PARTITION(flags) == PDI_PROGRAM_FLAG)
+			pdi_download_request.partition = PDI_PROGRAM_MAGIC;
+		else
+			pdi_download_request.partition = PDI_PARTITION(flags);
 
 		pdi_download_request.last_chunk = PDI_CHUNK_IS_LAST(flags);
 		pdi_download_request.chunk = PDI_CHUNK(flags);
@@ -1854,6 +1858,7 @@ int setup_amc(struct pci_dev		*dev,
 		}
 	}
 
+#if 0 //FixMe
 	/*
 	 * COMPAT MODE: heartbeat disabled, logging disabled.
 	 * When the AMC version does not match the current AMI version, we run
@@ -1880,7 +1885,7 @@ int setup_amc(struct pci_dev		*dev,
 			wake_up_process((*amc_ctrl_ctxt)->heartbeat_thread);
 		}
 	}
-
+#endif
 	if (ret)
 		goto fail;
 

@@ -25,7 +25,7 @@
 #define APP_API_ERROR(s)	fprintf(stderr, "Error: %s\r\n%s", s, ami_get_last_error())
 
 /* For generic errors and warnings */
-#define APP_ERROR(s)		fprintf(stderr, "Error: %s\r\n", s)
+#define APP_ERROR(s)	fprintf(stderr, "Error: %s\r\n", s)
 #define APP_WARN(s)		fprintf(stderr, "Warning: %s\r\n", s)
 
 /*****************************************************************************/

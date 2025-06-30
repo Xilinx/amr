@@ -281,7 +281,8 @@ int ami_prog_copy_partition(ami_device *dev, uint32_t src_device, uint32_t src_p
 /*
  * Get the FPT header.
  */
-int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device, struct ami_fpt_header *header)
+int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device,
+	struct ami_fpt_header *header)
 {
 	int ret = AMI_STATUS_ERROR;
 	struct ami_ioc_fpt_hdr_value data = { 0 };
@@ -316,7 +317,8 @@ int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device, struct ami_fpt
 /*
  * Get FPT partition information.
  */
-int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device, uint32_t num, struct ami_fpt_partition *partition)
+int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device,
+	uint32_t num, struct ami_fpt_partition *partition)
 {
 	int ret = AMI_STATUS_ERROR;
 	struct ami_ioc_fpt_partition_value data = { 0 };
@@ -347,3 +349,22 @@ int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device, uint32_t nu
 
 	return ret;
 }
+
+/*
+ * Program a pdi bitstream onto a device.
+ */
+int ami_prog_pdi(ami_device *dev, const char *path,
+	ami_event_handler progress_handler)
+{
+	if (!dev || !path)
+		return AMI_API_ERROR(AMI_ERROR_EINVAL);
+
+	return do_image_download(
+		dev,
+		path,
+		0/*boot_device*/,
+		AMI_IOC_PDI_PROGRAM_MAGIC,
+		progress_handler
+	);
+}
+

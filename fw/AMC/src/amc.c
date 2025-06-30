@@ -78,16 +78,14 @@
 #define AMC_OUTPUT_LEVEL	( PLL_OUTPUT_LEVEL_WARNING )
 #define AMC_LOGGING_LEVEL	( PLL_OUTPUT_LEVEL_LOGGING )
 
-#define AMC_NAME "AMC"
+#define AMC_NAME 			"AMC"
 
-#define AMC_HASH_LEN ( 7 )
-#define AMC_DATE_LEN ( 8 )
+#define AMC_HASH_LEN 		( 7 )
+#define AMC_DATE_LEN 		( 8 )
 
-#define AMC_TASK_DEFAULT_STACK ( 0x1000 )
-#define AMC_PROXY_NAME_LEN     ( 15 )
-
-#define AMC_TASK_SLEEP_MS             ( 100 )
-#define AMC_GET_PROJECT_INFO_SLEEP_MS ( 1000 )
+#define AMC_TASK_DEFAULT_STACK 			( 0x1000 )
+#define AMC_TASK_SLEEP_MS             	( 100 )
+#define AMC_GET_PROJECT_INFO_SLEEP_MS	( 1000 )
 
 
 /******************************************************************************/
@@ -264,6 +262,7 @@ AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xDimmDevice =
 };
 
 uint64_t ullAmcInitStatus = 0;
+XLoader_ClientInstance XLoaderInstance;
 
 
 /******************************************************************************/
@@ -538,6 +537,18 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
                 iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
                 break;
 
+			case APC_PROXY_DRIVER_E_PROGRAM_COMPLETE:
+                iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                break;
+
+            case APC_PROXY_DRIVER_E_PROGRAM_FAILED:
+                iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
+
+            case APC_PROXY_DRIVER_E_PROGRAM_BUSY:
+                iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_ALREADY_IN_PROGRESS );
+                break;
+
             default:
                 break;
         }
@@ -771,6 +782,7 @@ static int iInitProxies( void )
         if( OK == iAPC_Initialise( AMC_CFG_UNIQUE_ID_APC,
                                    pxOspiIf,
                                    pxEmmcIf,
+                                   &XLoaderInstance,
                                    AMC_TASK_PRIO_DEFAULT,
                                    AMC_TASK_DEFAULT_STACK ) )
         {
@@ -1039,16 +1051,15 @@ static int iPlmGetUid(uint32_t* uuid)
 {
     int iStatus = XST_SUCCESS;
     XMailbox MailboxInstance;
-    XLoader_ClientInstance LoaderClientInstance;
     XLoader_ImageInfo ImageInfo;
 
     iStatus = XMailbox_Initialize(&MailboxInstance, XPAR_XIPIPSU_0_BASEADDR);
 	if (XST_SUCCESS == iStatus)
     {
-        iStatus = XLoader_ClientInit(&LoaderClientInstance, &MailboxInstance);
+        iStatus = XLoader_ClientInit(&XLoaderInstance, &MailboxInstance);
         if (XST_SUCCESS == iStatus)
         {
-            iStatus = XLoader_GetImageInfo(&LoaderClientInstance, PL_NODE_ID, &ImageInfo);
+            iStatus = XLoader_GetImageInfo(&XLoaderInstance, PL_NODE_ID, &ImageInfo);
             if (XST_SUCCESS == iStatus)
             {
                 *uuid = ImageInfo.UID;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the in band telemetry debug implementation
@@ -554,6 +554,7 @@ static int iAmiCallbackTestMode( EVL_SIGNAL *pxSignal )
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI download length  : 0x%x\r\n",   xDownloadRequest.ulLength );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI partition        : 0x%x\r\n",   xDownloadRequest.ulPartitionSel );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI has FPT          : 0x%x\r\n",   xDownloadRequest.iUpdateFpt );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI Program          : 0x%x\r\n",   xDownloadRequest.iPdiProgram );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI last packet      : 0x%x\r\n",   xDownloadRequest.iLastPacket );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet number    : 0x%hx\r\n",  xDownloadRequest.usPacketNum );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xDownloadRequest.usPacketSize );
@@ -601,6 +602,40 @@ static int iAmiCallbackTestMode( EVL_SIGNAL *pxSignal )
                          "Error copying p%d to p%d\r\n",
                          xCopyRequest.ulSrcPartition,
                          xCopyRequest.ulDestPartition );
+            }
+            break;
+        }
+
+        case AMI_PROXY_DRIVER_E_PDI_PROGRAM_START:
+        {
+            AMI_PROXY_PDI_PROGRAM_REQUEST xProgramRequest =
+            {
+                0
+            };
+            PLL_DBG( AMC_IN_BAND_DBG_NAME, "Event PDI Program Start (0x%02X)\r\n", pxSignal->ucEventType );
+
+            if( OK == iAMI_GetPdiProgramRequest( pxSignal, &xProgramRequest ) )
+            {
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI download address : 0x%llx\r\n", xProgramRequest.ullAddress );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI download length  : 0x%x\r\n",   xProgramRequest.ulLength );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI partition        : 0x%x\r\n",   xProgramRequest.ulPartitionSel );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI has FPT          : 0x%x\r\n",   xProgramRequest.iUpdateFpt );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI Program          : 0x%x\r\n",   xProgramRequest.iPdiProgram );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI last packet      : 0x%x\r\n",   xProgramRequest.iLastPacket );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet number    : 0x%hx\r\n",  xProgramRequest.usPacketNum );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xProgramRequest.usPacketSize );
+                iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+            }
+            else
+            {
+                iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_GET_REQUEST_FAILED );
+            }
+
+            if( OK != iStatus )
+            {
+                PLL_ERR( AMC_IN_BAND_DBG_NAME,
+                         "Error programming pdi %d\r\n",
+                         xProgramRequest.ulPartitionSel );
             }
             break;
         }

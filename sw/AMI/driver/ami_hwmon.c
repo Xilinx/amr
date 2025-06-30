@@ -1212,7 +1212,7 @@ int read_sensor_val(struct pf_dev_struct *pf_dev, enum hwmon_sensor_types type,
 	long value = 0;
 	long mapped_value = 0;
 	enum ami_sensor_attribute ami_attr = SENSOR_ATTR_INVALID;
-	enum ami_sensor_unit_mod unit_mod = SENSOR_UNIT_MOD_NONE;
+	enum ami_sensor_unit_mod unit_mod  = SENSOR_UNIT_MOD_NONE;
 
 	if(!pf_dev || !val)
 		return -EINVAL;
@@ -1220,12 +1220,12 @@ int read_sensor_val(struct pf_dev_struct *pf_dev, enum hwmon_sensor_types type,
 	/* Handle chip config */
 	if (type == hwmon_chip) {
 		switch (attr) {
-		case hwmon_chip_update_interval:
-			*val = pf_dev->sensor_refresh;
-			return 0;
+			case hwmon_chip_update_interval:
+				*val = pf_dev->sensor_refresh;
+				return 0;
 
-		default:
-			return -EINVAL;
+			default:
+				return -EINVAL;
 		}
 	}
 
@@ -1233,25 +1233,25 @@ int read_sensor_val(struct pf_dev_struct *pf_dev, enum hwmon_sensor_types type,
 	 * Update sensor readings.
 	 */
 	switch (type) {
-	case hwmon_temp:
-		ret = read_thermal_sensors(pf_dev, fresh);
-		break;
+		case hwmon_temp:
+			ret = read_thermal_sensors(pf_dev, fresh);
+			break;
 
-	case hwmon_curr:
-		ret = read_current_sensors(pf_dev, fresh);
-		break;
+		case hwmon_curr:
+			ret = read_current_sensors(pf_dev, fresh);
+			break;
 
-	case hwmon_in:
-		ret = read_voltage_sensors(pf_dev, fresh);
-		break;
+		case hwmon_in:
+			ret = read_voltage_sensors(pf_dev, fresh);
+			break;
 
-	case hwmon_power:
-		ret = read_power_sensors(pf_dev, fresh);
-		break;
+		case hwmon_power:
+			ret = read_power_sensors(pf_dev, fresh);
+			break;
 
-	default:
-		ret = -EINVAL;
-		break;
+		default:
+			ret = -EINVAL;
+			break;
 	}
 
 	if (ret)
@@ -1288,13 +1288,13 @@ int read_sensor_val(struct pf_dev_struct *pf_dev, enum hwmon_sensor_types type,
 	{
 		/* Get the unit mod attribute value. */
 		ret = get_sensor_value(pf_dev, to_ami_sensor_type(type),
-					SENSOR_ATTR_UNIT_MOD, channel, &unit_mod);
+				SENSOR_ATTR_UNIT_MOD, channel, &unit_mod);
 		if (ret)
 			return ret;
 
 		/* Get the sensor attribute value. */
 		ret = get_sensor_value(pf_dev, to_ami_sensor_type(type),
-					ami_attr, channel, &value);
+				ami_attr, channel, &value);
 		if (ret)
 			return ret;
 
@@ -1323,23 +1323,23 @@ int read_sensor_val(struct pf_dev_struct *pf_dev, enum hwmon_sensor_types type,
 		* Power Unit: microWatt
 		*/
 		switch (type) {
-		case hwmon_temp:
-		case hwmon_curr:
-		case hwmon_in:
-			ret = convert_milli_units(unit_mod, value, &mapped_value);
-			if(!ret)
-				*val = mapped_value;
-			break;
+			case hwmon_temp:
+			case hwmon_curr:
+			case hwmon_in:
+				ret = convert_milli_units(unit_mod, value, &mapped_value);
+				if(!ret)
+					*val = mapped_value;
+				break;
 
-		case hwmon_power:
-			ret = convert_micro_units(unit_mod, value, &mapped_value);
-			if(!ret)
-				*val = mapped_value;
-			break;
+			case hwmon_power:
+				ret = convert_micro_units(unit_mod, value, &mapped_value);
+				if(!ret)
+					*val = mapped_value;
+				break;
 
-		default:
-			ret = -EINVAL;
-			break;
+			default:
+				ret = -EINVAL;
+				break;
 		}
 
 		/* Check if the status was requested */

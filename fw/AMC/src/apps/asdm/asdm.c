@@ -157,7 +157,11 @@
  */
 static inline int iSensorIsEnabled( void )
 {
-    return TRUE;
+	#ifdef PROFILE_RAVE
+		return FALSE;
+	#else
+		return TRUE;
+	#endif
 }
 
 ASC_PROXY_DRIVER_SENSOR_DATA xTotalPowerData[ TOTAL_POWER_NUM_RECORDS ] =

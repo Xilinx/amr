@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the sensors profile for the Rave
@@ -33,39 +33,44 @@
 /******************************************************************************/
 
 /**
- * @brief   Wrapper for the iSYS_MON_ReadTemperature function, to keep it the standard driver API format
+ * @brief Wrapper for the iSYS_MON_ReadTemperature function, to keep it the
+ *  standard driver API format
  *
- * @param   unused1     Unused parameter (normally i2c bus)
- * @param   unused2     Unused parameter (normally i2c address)
- * @param   unused3     Unused parameter (normally i2c channel)
- * @param   pfValue     Pointer to latest sensor value
+ * @param unused1     Unused parameter (normally i2c bus)
+ * @param unused2     Unused parameter (normally i2c address)
+ * @param unused3     Unused parameter (normally i2c channel)
+ * @param pfValue     Pointer to latest sensor value
  *
  * @return  The return value of iSYS_MON_ReadTemperature
  *
  * @note    No sanity checks, etc, are done - this function is solely a wrapper API
  */
-static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1, uint8_t unused2, uint8_t unused3, float *pfValue )
+static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1,
+	uint8_t unused2, uint8_t unused3, float *pfValue )
 {
     (void)unused1;
     (void)unused2;
     (void)unused3;
+
     return iSYS_MON_ReadTemperature( pfValue );
 }
 
 /**
- * @brief   Wrapper for the iAXC_GetTemperature function, to keep it the standard driver API format
+ * @brief Wrapper for the iAXC_GetTemperature function, to keep it the standard
+ * 	driver API format
  *
- * @param   unused1      Unused parameter (normally i2c bus)
- * @param   unused2      Unused parameter (normally i2c address)
- * @param   ucChannelNum Channel Num, used to specify QSFP ID
- * @param   pfValue      Pointer to latest sensor value
+ * @param unused1      Unused parameter (normally i2c bus)
+ * @param unused2      Unused parameter (normally i2c address)
+ * @param ucChannelNum Channel Num, used to specify QSFP ID
+ * @param pfValue      Pointer to latest sensor value
  *
  * @return  OK           Data retrieved from proxy driver successfully
  *          ERROR        Data not retrieved successfully
  *
  * @note    No sanity checks, etc, are done - this function is solely a wrapper API
  */
-static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2, uint8_t ucChannelNum, float *pfValue )
+static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2,
+	uint8_t ucChannelNum, float *pfValue )
 {
     int iStatus = ERROR;
     (void)unused1;
@@ -77,26 +82,29 @@ static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2, 
 }
 
 /**
- * @brief   Wrapper for the iSYS_MON_ReadVoltage function, to keep it the standard driver API format
+ * @brief Wrapper for the iSYS_MON_ReadVoltage function, to keep it the
+ * 	standard driver API format
  *
- * @param   unused1     Unused parameter (normally i2c bus)
- * @param   unused2     Unused parameter (normally i2c address)
- * @param   ucVType     Voltage type to read (normally i2c channel)
- * @param   pfValue     Pointer to latest sensor value
+ * @param unused1     Unused parameter (normally i2c bus)
+ * @param unused2     Unused parameter (normally i2c address)
+ * @param ucVType     Voltage type to read (normally i2c channel)
+ * @param pfValue     Pointer to latest sensor value
  *
  * @return  The return value of iSYS_MON_WrappedReadVoltage
  *
  * @note    No sanity checks, etc, are done - this function is solely a wrapper API
  */
-static inline int iSYS_MON_WrappedReadVoltage( uint8_t unused1, uint8_t unused2, uint8_t ucVType, float *pfValue )
+static inline int iSYS_MON_WrappedReadVoltage( uint8_t unused1, uint8_t unused2,
+	uint8_t ucVType, float *pfValue )
 {
     (void)unused1;
     (void)unused2;
+
     return iSYS_MON_ReadVoltage( ucVType, pfValue );
 }
 
 /**
- * @brief   Function pointer called in profile to enable sensors that are used for Rave
+ * @brief Function pointer called in profile to enable sensors that are used for Rave
  *
  * @return  TRUE to indictate sensor is enabled
  */

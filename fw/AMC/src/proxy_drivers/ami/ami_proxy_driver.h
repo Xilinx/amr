@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the API for the Alveo Management Interface (AMI) proxy driver
@@ -39,6 +39,7 @@ typedef enum AMI_PROXY_DRIVER_EVENTS
 {
     AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START = 0,
     AMI_PROXY_DRIVER_E_PDI_COPY_START,
+    AMI_PROXY_DRIVER_E_PDI_PROGRAM_START,
     AMI_PROXY_DRIVER_E_SENSOR_READ,
     AMI_PROXY_DRIVER_E_GET_IDENTITY,
     AMI_PROXY_DRIVER_E_BOOT_SELECT,
@@ -145,6 +146,7 @@ typedef struct AMI_PROXY_PDI_DOWNLOAD_REQUEST
 {
     int      iBootDevice;
     int      iUpdateFpt;
+    int      iPdiProgram;
     int      iLastPacket;
     uint64_t ullAddress;
     uint32_t ulLength;
@@ -153,6 +155,24 @@ typedef struct AMI_PROXY_PDI_DOWNLOAD_REQUEST
     uint16_t usPacketSize;
 
 } AMI_PROXY_PDI_DOWNLOAD_REQUEST;
+
+/**
+ * @struct  AMI_PROXY_PDI_PROGRAM_REQUEST
+ * @brief   PDI program request
+ */
+typedef struct AMI_PROXY_PDI_PROGRAM_REQUEST
+{
+    int      iBootDevice;
+    int      iUpdateFpt;
+    int      iPdiProgram;
+    int      iLastPacket;
+    uint64_t ullAddress;
+    uint32_t ulLength;
+    uint32_t ulPartitionSel;
+    uint16_t usPacketNum;
+    uint16_t usPacketSize;
+
+} AMI_PROXY_PDI_PROGRAM_REQUEST;
 
 /**
  * @struct  AMI_PROXY_PDI_COPY_REQUEST
@@ -294,6 +314,17 @@ int iAMI_SetPdiDownloadCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT 
 int iAMI_SetPdiCopyCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
+ * @brief   Set the response after the PDI program has completed
+ *
+ * @param   pxSignal    Current event occurance (used for tracking)
+ * @param   xResult     The result of the pdi program request
+ *
+ * @return  OK          Data passed to proxy driver successfully
+ *          ERROR       Data not passed successfully
+ */
+int iAMI_SetPdiProgramCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+
+/**
  * @brief   Set the response after the sensor request has completed
  *
  * @param   pxSignal    Current event occurance (used for tracking)
@@ -388,6 +419,18 @@ int iAMI_GetPdiDownloadRequest( EVL_SIGNAL *pxSignal,
 int iAMI_GetPdiCopyRequest( EVL_SIGNAL *pxSignal,
                             AMI_PROXY_PDI_COPY_REQUEST *pxCopyRequest );
 /**
+ * @brief   Get the PDI program request
+ *
+ * @param   pxSignal                Current event occurance (used for tracking)
+ * @param   pxProgramRequest        Pointer to program pdi structure
+ *
+ * @return  OK                      Data retrieved from proxy driver successfully
+ *          ERROR                   Data not retrieved successfully
+ */
+int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
+	AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest );
+
+/**
  * @brief   Get the Sensor request
  *
  * @param   pxSignal                Current event occurance (used for tracking)
@@ -398,6 +441,18 @@ int iAMI_GetPdiCopyRequest( EVL_SIGNAL *pxSignal,
  *
  */
 int iAMI_GetSensorRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_SENSOR_REQUEST *pxSensorRequest );
+
+/**
+ * @brief   Get the PDI program request
+ *
+ * @param   pxSignal                Current event occurance (used for tracking)
+ * @param   pxProgramRequest        Pointer to program pdi structure
+ *
+ * @return  OK                      Data retrieved from proxy driver successfully
+ *          ERROR                   Data not retrieved successfully
+ */
+int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
+	AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest );
 
 /**
  * @brief   Get the Boot Select request

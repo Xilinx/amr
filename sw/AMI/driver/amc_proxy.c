@@ -20,13 +20,13 @@
 /*****************************************************************************/
 
 /* Create an artificial assertion via a bad divide by zero assertion. */
-#define AP_ASSERT_CONCAT_(a, b)       a##b
-#define AP_CONCAT(a, b)               AP_ASSERT_CONCAT_(a, b)
-#define AP_STATIC_ASSERT(e,m)         enum { AP_CONCAT(ap_assert_line_, __LINE__) = 1/(int)(!!(e)) }
+#define AP_ASSERT_CONCAT_(a, b)		a##b
+#define AP_CONCAT(a, b)				AP_ASSERT_CONCAT_(a, b)
+#define AP_STATIC_ASSERT(e,m)		enum { AP_CONCAT(ap_assert_line_, __LINE__) = 1/(int)(!!(e)) }
 
-#define AMC_PROXY_REQUEST_CMD_NEW     (1)
+#define AMC_PROXY_REQUEST_CMD_NEW	(1)
 
-#define AMC_PROXY_MSLEEP_1S	      (1000)
+#define AMC_PROXY_MSLEEP_1S			(1000)
 
 
 /*****************************************************************************/
@@ -41,6 +41,7 @@
  * @AMC_PROXY_CMD_OPCODE_MODULE_READ_WRITE: module read/write request
  * @AMC_PROXY_CMD_OPCODE_DEBUG_VERBOSITY: debug verbosity set request
  * @AMC_PROXY_CMD_OPCODE_PDI_DOWNLOAD: pdi download
+ * @AMC_PROXY_CMD_OPCODE_PDI_PROGRAM: pdi program
  * @AMC_PROXY_CMD_OPCODE_SENSOR: sensor request
  * @AMC_PROXY_CMD_OPCODE_PARTITION_COPY: partition copy request
  * @AMC_PROXY_CMD_OPCODE_IDENTIFY: identity request
@@ -52,6 +53,7 @@ enum amc_proxy_cmd_opcode {
 	AMC_PROXY_CMD_OPCODE_MODULE_READ_WRITE = 0x4,
 	AMC_PROXY_CMD_OPCODE_DEBUG_VERBOSITY   = 0x5,
 	AMC_PROXY_CMD_OPCODE_PDI_DOWNLOAD      = 0xA,
+	AMC_PROXY_CMD_OPCODE_PDI_PROGRAM       = 0xB,
 	AMC_PROXY_CMD_OPCODE_SENSOR            = 0xC,
 	AMC_PROXY_CMD_OPCODE_PARTITION_COPY    = 0xD,
 	AMC_PROXY_CMD_OPCODE_IDENTIFY          = 0x202,
@@ -250,10 +252,11 @@ struct amc_proxy_cmd_data_payload {
 	uint32_t dest_partition:4;
 	uint32_t partition_sel:4;
 	uint32_t update_fpt:1;
-    uint32_t boot_device:1;
-    uint32_t src_device:1;
-    uint32_t dest_device:1;
-	uint32_t partition_resvd:16;
+	uint32_t program_pdi:1;
+	uint32_t boot_device:1;
+	uint32_t src_device:1;
+	uint32_t dest_device:1;
+	uint32_t partition_resvd:15;
 	uint16_t last_chunk:1;
 	uint16_t chunk:15;
 	uint16_t chunk_size;
@@ -1071,17 +1074,21 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
         request_cmd_entry.pdi_payload.last_chunk = pdi_download->last_chunk;
         request_cmd_entry.pdi_payload.chunk = pdi_download->chunk;
         request_cmd_entry.pdi_payload.chunk_size = pdi_download->chunk_size;
+        request_cmd_entry.pdi_payload.update_fpt = 0;
+        request_cmd_entry.pdi_payload.program_pdi = 0;
 
         if (pdi_download->partition == FPT_UPDATE_MAGIC) {
             request_cmd_entry.pdi_payload.update_fpt = 1;
+        } else if (pdi_download->partition == PDI_PROGRAM_MAGIC) {
+            request_cmd_entry.pdi_payload.program_pdi = 1;
         } else {
-            request_cmd_entry.pdi_payload.update_fpt = 0;
             request_cmd_entry.pdi_payload.partition_sel = pdi_download->partition;
         }
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                        (uint8_t*)&(request_cmd_entry),
-                                                        sizeof(request_cmd_entry), 0);
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
+                                                 0,
+                                                 (uint8_t*)&(request_cmd_entry),
+                                                 sizeof(request_cmd_entry), 0);
         if (ret == FW_IF_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
@@ -1098,7 +1105,7 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
  * Generate a device boot select request
  */
 int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
-                                   struct amc_proxy_pdi_download_request *device_boot)
+                            struct amc_proxy_pdi_download_request *device_boot)
 {
     struct amc_proxy_list_entry *amc_ctxt = NULL;
     int ret = -EPERM;
@@ -1121,9 +1128,10 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
         /* Only set the partition */
         request_cmd_entry.pdi_payload.partition_sel = device_boot->partition;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                        (uint8_t*)&(request_cmd_entry),
-                                                        sizeof(request_cmd_entry), 0);
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
+                                                0,
+                                                (uint8_t*)&(request_cmd_entry),
+                                                sizeof(request_cmd_entry), 0);
         if (ret == FW_IF_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
@@ -1140,7 +1148,7 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
  * Generate a partition copy request
  */
 int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
-                                struct amc_proxy_partition_copy_request *partition_copy)
+                       struct amc_proxy_partition_copy_request *partition_copy)
 {
     struct amc_proxy_list_entry *amc_ctxt = NULL;
     int ret = -EPERM;
@@ -1208,9 +1216,10 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
         /* Only set the count used to identify the heartbeat message id */
         request_cmd_entry.heartbeat_payload.request_id = heartbeat->request_id;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                    (uint8_t*)&(request_cmd_entry),
-                                                    sizeof(request_cmd_entry), 0);
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
+                                                 0,
+                                                 (uint8_t*)&(request_cmd_entry),
+                                                 sizeof(request_cmd_entry), 0);
         if (ret == FW_IF_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
@@ -1227,7 +1236,7 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
  * Generate eeprom read/write request
  */
 int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
-                                        struct amc_proxy_eeprom_rw_request *eeprom_rw)
+                                 struct amc_proxy_eeprom_rw_request *eeprom_rw)
 {
     struct amc_proxy_list_entry *amc_ctxt = NULL;
     int ret = -EPERM;
@@ -1250,9 +1259,10 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
         request_cmd_entry.eeprom_payload.address = eeprom_rw->address;
         request_cmd_entry.eeprom_payload.len= eeprom_rw->length;
         request_cmd_entry.eeprom_payload.offset = eeprom_rw->offset;
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                    (uint8_t*)&(request_cmd_entry),
-                                                    sizeof(request_cmd_entry), 0);
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
+                                                0,
+                                                (uint8_t*)&(request_cmd_entry),
+                                                sizeof(request_cmd_entry), 0);
         if (ret == FW_IF_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
@@ -1269,7 +1279,7 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
  * Generate a module read/write request
  */
 int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
-                                        struct amc_proxy_module_rw_request *module_rw)
+                                 struct amc_proxy_module_rw_request *module_rw)
 {
     struct amc_proxy_list_entry *amc_ctxt = NULL;
     int ret = -EPERM;
@@ -1294,9 +1304,10 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
         request_cmd_entry.module_payload.offset = module_rw->offset;
         request_cmd_entry.module_payload.len = module_rw->length;
         request_cmd_entry.module_payload.req_type = module_rw->type;
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                    (uint8_t*)&(request_cmd_entry),
-                                                    sizeof(request_cmd_entry), 0);
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
+                                                0,
+                                                (uint8_t*)&(request_cmd_entry),
+                                                sizeof(request_cmd_entry), 0);
         if (ret == FW_IF_ERRORS_NONE) {
                 mutex_lock(&(amc_ctxt->inst.lock));
                 list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
@@ -1336,9 +1347,10 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
         /* Only set the verbosity level as part of the request */
         request_cmd_entry.debug_verbosity_payload = verbosity;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                    (uint8_t*)&(request_cmd_entry),
-                                                    sizeof(request_cmd_entry), 0);
+        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
+                                                0,
+                                                (uint8_t*)&(request_cmd_entry),
+                                                sizeof(request_cmd_entry), 0);
         if (ret == FW_IF_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
@@ -1356,7 +1368,7 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
  * Read back the identity response
  */
 int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
-                                    struct amc_proxy_identify_response *identity)
+                                struct amc_proxy_identify_response *identity)
 {
     struct amc_proxy_list_entry *amc_ctxt = NULL;
     int ret = -EPERM;

@@ -89,8 +89,8 @@
                                           IN_BAND_ERRORS_STR[ x ], \
                                           pxThis->pulErrorCounters[ x ] )
 
-#define INC_STAT_COUNTER( x )  { if( x < IN_BAND_STATS_MAX ) pxThis->pulStatCounters[ x ]++; }
-#define INC_ERROR_COUNTER( x ) { if( x < IN_BAND_ERRORS_MAX ) pxThis->pulErrorCounters[ x ]++; }
+#define INC_STAT_COUNTER( x )  { if (x < IN_BAND_STATS_MAX)  pxThis->pulStatCounters[ x ]++; }
+#define INC_ERROR_COUNTER( x ) { if (x < IN_BAND_ERRORS_MAX) pxThis->pulErrorCounters[ x ]++;}
 
 
 /******************************************************************************/
@@ -192,20 +192,20 @@ int iIN_BAND_TELEMETRY_Initialise( uint64_t ullSharedMemBaseAddr )
 {
     int iStatus = ERROR;
 
-    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+    if (( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( FALSE == pxThis->iInitialised ) )
+        ( FALSE == pxThis->iInitialised ))
     {
         /* Create mutex to protect ASDM access */
-        if( OSAL_ERRORS_NONE != iOSAL_Mutex_Create( &pxThis->pvOsalMutexHdl,
-                                                    "in band mutex" ) )
+        if (OSAL_ERRORS_NONE != iOSAL_Mutex_Create( &pxThis->pvOsalMutexHdl,
+                                                    "in band mutex" ))
         {
             INC_ERROR_COUNTER( IN_BAND_ERRORS_INIT_MUTEX_FAILED )
         }
         else
         {
             INC_STAT_COUNTER( IN_BAND_STATS_INIT_MUTEX )
-            if( OK == iAMI_BindCallback( &iAmiCallback ) )
+            if (OK == iAMI_BindCallback( &iAmiCallback ))
             {
                 PLL_DBG( IN_BAND_NAME, "AMI Proxy Driver bound\r\n" );
                 iStatus = OK;
@@ -216,7 +216,7 @@ int iIN_BAND_TELEMETRY_Initialise( uint64_t ullSharedMemBaseAddr )
                 iStatus = ERROR;
             }
 
-            if( OK == iStatus )
+            if (OK == iStatus)
             {
                 pxThis->ullSharedMemBaseAddr = ullSharedMemBaseAddr;
                 pxThis->iInitialised         = TRUE;
@@ -238,24 +238,24 @@ int iIN_BAND_TELEMETRY_PrintStatistics( void )
 {
     int iStatus = ERROR;
 
-    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if (( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ))
     {
         int i = 0;
         PLL_INF( IN_BAND_NAME, "============================================================\n\r" );
         PLL_INF( IN_BAND_NAME, "In Band App Statistics:\n\r" );
-        for( i = 0; i < IN_BAND_STATS_MAX; i++ )
+        for (i = 0; i < IN_BAND_STATS_MAX; i++)
         {
             PRINT_STAT_COUNTER( i );
         }
         PLL_INF( IN_BAND_NAME, "------------------------------------------------------------\n\r" );
         PLL_INF( IN_BAND_NAME, "In Band App Errors:\n\r" );
-        for( i = 0; i < IN_BAND_ERRORS_MAX; i++ )
+        for (i = 0; i < IN_BAND_ERRORS_MAX; i++)
         {
             PRINT_ERROR_COUNTER( i );
         }
         PLL_INF( IN_BAND_NAME, "============================================================\n\r" );
-        if( TRUE == pxThis->iInBandTestMode )
+        if (TRUE == pxThis->iInBandTestMode)
         {
             PLL_INF( IN_BAND_NAME, "In Band App Test Mode:\n\r" );
             PLL_INF( IN_BAND_NAME, "Test mode is activated\n\r" );
@@ -274,9 +274,9 @@ int iIN_BAND_TELEMETRY_ClearStatistics( void )
 {
     int iStatus = ERROR;
 
-    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+    if (( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) )
+        ( TRUE == pxThis->iInitialised ))
     {
         pvOSAL_MemSet( pxThis->pulStatCounters, 0, sizeof( pxThis->pulStatCounters ) );
         pvOSAL_MemSet( pxThis->pulErrorCounters, 0, sizeof( pxThis->pulErrorCounters ) );
@@ -292,9 +292,9 @@ int iIN_BAND_TELEMETRY_TestMode( int iActivate )
 {
     int iStatus = OK;
 
-    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+    if (( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) )
+        ( TRUE == pxThis->iInitialised ))
     {
         pxThis->iInBandTestMode = iActivate;
     }
@@ -313,11 +313,11 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
 {
     int iStatus = ERROR;
 
-    if( ( NULL != pxSignal ) &&
+    if (( NULL != pxSignal ) &&
         ( AMC_CFG_UNIQUE_ID_AMI == pxSignal->ucModule ) &&
-        ( TRUE != pxThis->iInBandTestMode ) )
+        ( TRUE != pxThis->iInBandTestMode ))
     {
-        switch( pxSignal->ucEventType )
+        switch (pxSignal->ucEventType)
         {
         case AMI_PROXY_DRIVER_E_SENSOR_READ:
         {
@@ -328,7 +328,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_SENSOR_REQUEST )
 
             iStatus = iAMI_GetSensorRequest( pxSignal, &xSensorRequest );
-            if( OK == iStatus )
+            if (OK == iStatus)
             {
                 ASDM_REPOSITORY_TYPE xRepo          = 0;
                 AMI_PROXY_RESULT     xResult        = AMI_PROXY_RESULT_INVALID_VALUE;
@@ -343,7 +343,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 /* Reset iStatus */
                 iStatus = ERROR;
 
-                if( SENSOR_RESP_BUFFER_SIZE > xSensorRequest.ulLength )
+                if (SENSOR_RESP_BUFFER_SIZE > xSensorRequest.ulLength)
                 {
                     PLL_DBG( IN_BAND_NAME,
                              "Response size 0x%x exceeding request size 0x%x",
@@ -354,10 +354,10 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 else
                 {
                     iStatus = iMapAmiProxyRequestRepo( xSensorRequest.xRepo, &xRepo );
-                    if( OK == iStatus )
+                    if (OK == iStatus)
                     {
                         /* Populate the response back to the AMI */
-                        switch( xSensorRequest.xRequest )
+                        switch (xSensorRequest.xRequest)
                         {
                             case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SIZE:
                                 /* Return the size of the SDR, including Header, Sensor Records and End of Repo marker */
@@ -408,8 +408,8 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 }
 
                 /* Check the response is not greater than the shared memory supplied */
-                if( ( OK == iStatus ) &&
-                    ( usResponseSize <= xSensorRequest.ulLength ) )
+                if (( OK == iStatus ) &&
+                    ( usResponseSize <= xSensorRequest.ulLength ))
                 {
                     /* Copy the data into the shared memory */
                     pvOSAL_MemCpy( pucDestAdd, ucRespBuffer, usResponseSize );
@@ -441,13 +441,13 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_EEPROM_RW_REQUEST )
 
             iStatus = iAMI_GetEepromReadWriteRequest( pxSignal, &xEepromReadWriteRequest );
-            if( OK == iStatus )
+            if (OK == iStatus)
             {
                 uintptr_t        ullDestAddr  = ( pxThis->ullSharedMemBaseAddr + xEepromReadWriteRequest.ullAddress );
                 uint8_t          *pucDestAddr = ( uint8_t* )( ullDestAddr );
                 AMI_PROXY_RESULT xResult      = AMI_PROXY_RESULT_FAILURE;
 
-                switch( xEepromReadWriteRequest.xRequest )
+                switch (xEepromReadWriteRequest.xRequest)
                 {
                     case AMI_PROXY_CMD_RW_REQUEST_READ:
                         iStatus = iEEPROM_ReadRawValue( pucDestAddr,
@@ -473,7 +473,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                         break;
                 }
 
-                if( OK == iStatus )
+                if (OK == iStatus)
                 {
                     xResult = AMI_PROXY_RESULT_SUCCESS;
                 }
@@ -491,7 +491,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_MODULE_RW_REQUEST )
 
             iStatus = iAMI_GetModuleReadWriteRequest( pxSignal, &xModuleReadWriteRequest );
-            if( OK == iStatus )
+            if (OK == iStatus)
             {
                 uintptr_t        ullDestAddr  = ( pxThis->ullSharedMemBaseAddr + xModuleReadWriteRequest.ullAddress );
                 uint8_t          *pucDestAddr = ( uint8_t* )( ullDestAddr );
@@ -502,12 +502,12 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                 xModuleReadWriteRequest.ucPage,
                                 xModuleReadWriteRequest.ucByteOffset );
 
-                if( OK == iStatus )
+                if (OK == iStatus)
                 {
-                    switch( xModuleReadWriteRequest.xRequest )
+                    switch (xModuleReadWriteRequest.xRequest)
                     {
                         case AMI_PROXY_CMD_RW_REQUEST_READ:
-                            if( 1 < xModuleReadWriteRequest.ucLength )
+                            if (1 < xModuleReadWriteRequest.ucLength)
                             {
                                 /* TODO: Implement block read. */
                                 iStatus = ERROR;
@@ -529,7 +529,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                             /* Flush shared memory so the latest data is available in cache. */
                             HAL_FLUSH_CACHE_DATA( ullDestAddr, xModuleReadWriteRequest.ucLength );
 
-                            if( 1 < xModuleReadWriteRequest.ucLength )
+                            if (1 < xModuleReadWriteRequest.ucLength)
                             {
                                 /* TODO: Implement block write. */
                                 iStatus = ERROR;
@@ -555,7 +555,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                     xResult = AMI_PROXY_RESULT_INVALID_CONFIGURATION;
                 }
 
-                if( OK == iStatus )
+                if (OK == iStatus)
                 {
                     xResult = AMI_PROXY_RESULT_SUCCESS;
                 }
@@ -572,18 +572,19 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             };
             PLL_LOG( IN_BAND_NAME, "PDI download has started\r\n" );
 
-            if( OK == iAMI_GetPdiDownloadRequest( pxSignal, &xDownloadRequest ) )
+            if (OK == iAMI_GetPdiDownloadRequest( pxSignal, &xDownloadRequest ))
             {
                 PLL_DBG( IN_BAND_NAME, "Target boot device   : 0x%x\r\n",   xDownloadRequest.iBootDevice );
                 PLL_DBG( IN_BAND_NAME, "PDI download address : 0x%llx\r\n", xDownloadRequest.ullAddress );
                 PLL_DBG( IN_BAND_NAME, "PDI download length  : 0x%x\r\n",   xDownloadRequest.ulLength );
                 PLL_DBG( IN_BAND_NAME, "PDI partition        : 0x%x\r\n",   xDownloadRequest.ulPartitionSel );
                 PLL_DBG( IN_BAND_NAME, "PDI has FPT          : 0x%x\r\n",   xDownloadRequest.iUpdateFpt );
+                PLL_DBG( IN_BAND_NAME, "PDI Program          : 0x%x\r\n",   xDownloadRequest.iPdiProgram );
                 PLL_DBG( IN_BAND_NAME, "PDI last packet      : 0x%x\r\n",   xDownloadRequest.iLastPacket );
                 PLL_DBG( IN_BAND_NAME, "PDI packet number    : 0x%hx\r\n",  xDownloadRequest.usPacketNum );
                 PLL_DBG( IN_BAND_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xDownloadRequest.usPacketSize );
 
-                if( TRUE == xDownloadRequest.iUpdateFpt )
+                if (TRUE == xDownloadRequest.iUpdateFpt)
                 {
                     iStatus = iAPC_UpdateFpt( pxSignal,
                                               xDownloadRequest.iBootDevice,
@@ -593,6 +594,17 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                               xDownloadRequest.usPacketNum,
                                               xDownloadRequest.usPacketSize,
                                               xDownloadRequest.iLastPacket );
+                }
+                else if (TRUE == xDownloadRequest.iPdiProgram)
+                {
+                    iStatus = iAPC_PdiProgram( pxSignal,
+                                              xDownloadRequest.iBootDevice,
+                                              ( int )xDownloadRequest.ulPartitionSel,
+                                              ( uint32_t )xDownloadRequest.ullAddress +
+                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
+                                              xDownloadRequest.ulLength,
+                                              xDownloadRequest.usPacketNum,
+                                              xDownloadRequest.usPacketSize );
                 }
                 else
                 {
@@ -606,7 +618,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                                   xDownloadRequest.usPacketSize );
                 }
 
-                if( OK != iStatus )
+                if (OK != iStatus)
                 {
                     iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED );
                 }
@@ -616,7 +628,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_GET_REQUEST_FAILED );
             }
 
-            if( OK != iStatus )
+            if (OK != iStatus)
             {
                 PLL_ERR( IN_BAND_NAME, "Error downloading to partition %d\r\n", xDownloadRequest.ulPartitionSel );
             }
@@ -631,7 +643,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             };
             PLL_LOG( IN_BAND_NAME, "PDI copy has started\r\n" );
 
-            if( OK == iAMI_GetPdiCopyRequest( pxSignal, &xCopyRequest ) )
+            if (OK == iAMI_GetPdiCopyRequest( pxSignal, &xCopyRequest ))
             {
                 PLL_DBG( IN_BAND_NAME, "PDI copy address     : 0x%llx\r\n", xCopyRequest.ullAddress );
                 PLL_DBG( IN_BAND_NAME, "PDI max copy length  : 0x%x\r\n",   xCopyRequest.ulMaxLength );
@@ -639,14 +651,14 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 PLL_DBG( IN_BAND_NAME, "PDI src partition    : 0x%x\r\n",   xCopyRequest.ulSrcPartition );
                 PLL_DBG( IN_BAND_NAME, "PDI dst device       : 0x%x\r\n",   xCopyRequest.ulDestDevice );
                 PLL_DBG( IN_BAND_NAME, "PDI dst partition    : 0x%x\r\n",   xCopyRequest.ulDestPartition );
-                if( OK == iAPC_CopyImage( pxSignal,
+                if (OK == iAPC_CopyImage( pxSignal,
                                           xCopyRequest.ulSrcDevice,
                                           ( int )xCopyRequest.ulSrcPartition,
                                           xCopyRequest.ulDestDevice,
                                           ( int )xCopyRequest.ulDestPartition,
                                           ( uint32_t )xCopyRequest.ullAddress +
                                           ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
-                                          xCopyRequest.ulMaxLength ) )
+                                          xCopyRequest.ulMaxLength ))
                 {
                     iStatus = OK;
                 }
@@ -660,12 +672,58 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_GET_REQUEST_FAILED );
             }
 
-            if( OK != iStatus )
+            if (OK != iStatus)
             {
                 PLL_ERR( IN_BAND_NAME,
                          "Error copying p%d to p%d\r\n",
                          xCopyRequest.ulSrcPartition,
                          xCopyRequest.ulDestPartition );
+            }
+            break;
+        }
+
+        case AMI_PROXY_DRIVER_E_PDI_PROGRAM_START:
+        {
+            AMI_PROXY_PDI_PROGRAM_REQUEST xProgramRequest =
+            {
+                0
+            };
+            PLL_LOG( IN_BAND_NAME, "PDI progress has started\r\n" );
+
+            if (OK == iAMI_GetPdiProgramRequest( pxSignal, &xProgramRequest ))
+            {
+                PLL_DBG( IN_BAND_NAME, "Target boot device   : 0x%x\r\n",   xProgramRequest.iBootDevice );
+                PLL_DBG( IN_BAND_NAME, "PDI download address : 0x%llx\r\n", xProgramRequest.ullAddress );
+                PLL_DBG( IN_BAND_NAME, "PDI download length  : 0x%x\r\n",   xProgramRequest.ulLength );
+                PLL_DBG( IN_BAND_NAME, "PDI partition        : 0x%x\r\n",   xProgramRequest.ulPartitionSel );
+                PLL_DBG( IN_BAND_NAME, "PDI has FPT          : 0x%x\r\n",   xProgramRequest.iUpdateFpt );
+                PLL_DBG( IN_BAND_NAME, "PDI Program          : 0x%x\r\n",   xProgramRequest.iPdiProgram );
+                PLL_DBG( IN_BAND_NAME, "PDI last packet      : 0x%x\r\n",   xProgramRequest.iLastPacket );
+                PLL_DBG( IN_BAND_NAME, "PDI packet number    : 0x%hx\r\n",  xProgramRequest.usPacketNum );
+                PLL_DBG( IN_BAND_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xProgramRequest.usPacketSize );
+
+                iStatus = iAPC_DownloadImage( pxSignal,
+                                              xProgramRequest.iBootDevice,
+                                              ( int )xProgramRequest.ulPartitionSel,
+                                              ( uint32_t )xProgramRequest.ullAddress +
+                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
+                                              xProgramRequest.ulLength,
+                                              xProgramRequest.usPacketNum,
+                                              xProgramRequest.usPacketSize );
+
+                if (OK != iStatus)
+                {
+                    iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED );
+                }
+            }
+            else
+            {
+                iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_GET_REQUEST_FAILED );
+            }
+
+            if (OK != iStatus)
+            {
+                PLL_ERR( IN_BAND_NAME, "Error programming pdi %d\r\n", xProgramRequest.ulPartitionSel );
             }
             break;
         }
@@ -678,10 +736,10 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             };
             PLL_DBG( IN_BAND_NAME, "Event Boot Select Request (0x%02X)\r\n", pxSignal->ucEventType );
 
-            if( OK == iAMI_GetBootSelectRequest( pxSignal, &xBootSelRequest ) )
+            if (OK == iAMI_GetBootSelectRequest( pxSignal, &xBootSelRequest ))
             {
                 PLL_DBG( IN_BAND_NAME, "Selecting partition %d\r\n", xBootSelRequest.ulPartitionSel );
-                if( OK == iAPC_SetNextPartition( pxSignal, ( int )xBootSelRequest.ulPartitionSel ) )
+                if (OK == iAPC_SetNextPartition( pxSignal, ( int )xBootSelRequest.ulPartitionSel ))
                 {
                     iStatus = OK;
                 }
@@ -695,7 +753,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 iStatus = iAMI_SetPdiCopyCompleteResponse( pxSignal, AMI_PROXY_RESULT_GET_REQUEST_FAILED );
             }
 
-            if( OK != iStatus )
+            if (OK != iStatus)
             {
                 PLL_ERR( IN_BAND_NAME, "Error selecting partition %d\r\n", xBootSelRequest.ulPartitionSel );
             }
@@ -710,12 +768,12 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
 
             iStatus = iAMI_GetDebugVerbosityRequest( pxSignal, &ucDebugVerbosityRequest );
 
-            if( OK == iStatus )
+            if (OK == iStatus)
             {
                 AMI_PROXY_RESULT xResult = AMI_PROXY_RESULT_SUCCESS;
 
-                if( ( MAX_PLL_OUTPUT_LEVEL <= ucDebugVerbosityRequest ) ||
-                    ( OK != iPLL_SetLoggingLevel( ucDebugVerbosityRequest ) ) )
+                if (( MAX_PLL_OUTPUT_LEVEL <= ucDebugVerbosityRequest ) ||
+                    ( OK != iPLL_SetLoggingLevel( ucDebugVerbosityRequest ) ))
                 {
                     xResult = AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED;
                 }
@@ -723,7 +781,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 iStatus = iAMI_SetDebugVerbosityResponse( pxSignal, xResult );
             }
 
-            if( OK != iStatus )
+            if (OK != iStatus)
             {
                 PLL_ERR( IN_BAND_NAME, "Error updating debug verbosity level\r\n" );
             }
@@ -748,11 +806,11 @@ static int iMapAmiProxyRequestRepo( AMI_PROXY_CMD_SENSOR_REPO xRepo, ASDM_REPOSI
 {
     int iStatus = ERROR;
 
-    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+    if (( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( NULL != pxRepo ) )
+        ( NULL != pxRepo ))
     {
-        switch( xRepo )
+        switch (xRepo)
         {
             case AMI_PROXY_CMD_SENSOR_REPO_BDINFO:
                 *pxRepo = ASDM_REPOSITORY_TYPE_BOARD_INFO;
