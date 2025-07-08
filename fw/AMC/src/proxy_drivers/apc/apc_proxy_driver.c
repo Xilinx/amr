@@ -791,6 +791,7 @@ int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
 					 int iPartition,
 					 uint32_t ulSrcAddr,
 					 uint32_t ulImageSize,
+					 uint32_t ulLastPacket,
 					 uint16_t usPacketNum,
 					 uint16_t usPacketSize )
 {
@@ -814,6 +815,7 @@ int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
 		xMsg.xDownloadImageData.iPdiProgram  = TRUE;
 		xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
 		xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
+		xMsg.xDownloadImageData.iLastPacket  = ulLastPacket;
 		xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
 		xMsg.xDownloadImageData.usPacketSize = usPacketSize;
 
@@ -1682,21 +1684,34 @@ static int iDownloadPdiImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 			if ( TRUE == pxImageData->iPdiProgram )
 			{
 				pvOSAL_MemCpy((void *)( HAL_RPU_PDI_BUFFER_BASE + ulDestAddr ),
-					(void*)pxImageData->ulSrcAddr, ulImageSize);
-				PLL_DBG( APC_NAME, "Copied data to: 0x%08x\r\n", HAL_RPU_PDI_BUFFER_BASE + ulDestAddr );
+					(const void*)(pxImageData->ulSrcAddr), ulImageSize);
+				HAL_FLUSH_CACHE_DATA( ( HAL_RPU_PDI_BUFFER_BASE + ulDestAddr ), ulImageSize );
 				iStatus = OK;
 
 				if ( 1 == pxImageData->iLastPacket )
 				{
 					u32 PdiLoadStatus = 0U;
 
-					iStatus = XLoader_LoadPartialPdi(pxThis->pXLoaderInst,
-													XLOADER_PDI_DDR,
-													HAL_RPU_PDI_BUFFER_BASE,
-													&PdiLoadStatus);
-					if (iStatus != XST_SUCCESS) {
+					if (NULL == pxThis->pXLoaderInst)
+					{
 						INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
-						PLL_ERR( APC_NAME, "ERROR: PDI programming error status 0x%X \r\n", PdiLoadStatus );
+						PLL_ERR( APC_NAME, "ERROR: Xloader instance NULL \r\n" );
+					}
+					else
+					{
+						iStatus = XLoader_LoadPartialPdi(pxThis->pXLoaderInst,
+													XLOADER_PDI_DDR,
+													(u64)HAL_RPU_PDI_BUFFER_BASE,
+													&PdiLoadStatus);
+						if (XST_SUCCESS == iStatus)
+						{
+							PLL_DBG( APC_NAME, "PDI Program successfull!!\r\n");
+						}
+						else
+						{
+							INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
+							PLL_ERR( APC_NAME, "ERROR: PDI programming error status 0x%X \r\n", PdiLoadStatus );
+						}
 					}
 				}
 

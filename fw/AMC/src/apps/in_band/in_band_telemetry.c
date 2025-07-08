@@ -570,7 +570,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             {
                 0
             };
-            PLL_LOG( IN_BAND_NAME, "PDI download has started\r\n" );
+            PLL_DBG( IN_BAND_NAME, "PDI downloading...\r\n" );
 
             if (OK == iAMI_GetPdiDownloadRequest( pxSignal, &xDownloadRequest ))
             {
@@ -603,6 +603,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                               ( uint32_t )xDownloadRequest.ullAddress +
                                               ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
                                               xDownloadRequest.ulLength,
+                                              xDownloadRequest.iLastPacket,
                                               xDownloadRequest.usPacketNum,
                                               xDownloadRequest.usPacketSize );
                 }

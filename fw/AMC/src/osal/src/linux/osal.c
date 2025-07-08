@@ -1531,7 +1531,7 @@ void vOSAL_ExitCritical( void )
 /**
  * @brief   OSAL wrapper for task/thread safe memory allocation.
  */
-void* pvOSAL_MemAlloc( uint16_t usSize )
+void* pvOSAL_MemAlloc( uint32_t usSize )
 {
     void* pvMemory = NULL;
 
@@ -1585,7 +1585,7 @@ void vOSAL_MemFree( void** ppv )
 /**
  * @brief   OSAL wrapper for task/thread safe memory set.
  */
-void* pvOSAL_MemSet( void* pvDestination, int iValue, uint16_t usSize )
+void* pvOSAL_MemSet( void* pvDestination, int iValue, uint32_t usSize )
 {
     void* pvSetMemory = NULL;
 
@@ -1595,14 +1595,14 @@ void* pvOSAL_MemSet( void* pvDestination, int iValue, uint16_t usSize )
         {
             if( OK == pthread_mutex_lock( &xMemSetMutexHandle ) )
             {
-                pvSetMemory = memset( pvDestination, iValue, ( size_t )usSize );
+                pvSetMemory = memset( pvDestination, iValue, usSize );
                 assert( OK == pthread_mutex_unlock( &xMemSetMutexHandle ) );
             }
         }
         else
         {
             /* Not thread safe */
-            pvSetMemory = memset( pvDestination, iValue, ( size_t )usSize );
+            pvSetMemory = memset( pvDestination, iValue, usSize );
         }
     }
 
@@ -1612,7 +1612,7 @@ void* pvOSAL_MemSet( void* pvDestination, int iValue, uint16_t usSize )
 /**
  * @brief   OSAL wrapper for task/thread safe memory copy.
  */
-void* pvOSAL_MemCpy( void* pvDestination, const void* pvSource, uint16_t usSize )
+void* pvOSAL_MemCpy( void* pvDestination, const void* pvSource, uint32_t usSize )
 {
     void* pvSetMemory = NULL;
 
@@ -1623,14 +1623,14 @@ void* pvOSAL_MemCpy( void* pvDestination, const void* pvSource, uint16_t usSize 
         {
             if( OK == pthread_mutex_lock( &xMemCpyMutexHandle ) )
             {
-                pvSetMemory = memcpy( pvDestination, pvSource, ( size_t )usSize );
+                pvSetMemory = memcpy( pvDestination, pvSource, usSize );
                 assert( OK == pthread_mutex_unlock( &xMemCpyMutexHandle ) );
             }
         }
         else
         {
             /* Not thread safe */
-            pvSetMemory = memcpy( pvDestination, pvSource, ( size_t )usSize );
+            pvSetMemory = memcpy( pvDestination, pvSource, usSize );
         }
     }
 
@@ -1640,7 +1640,7 @@ void* pvOSAL_MemCpy( void* pvDestination, const void* pvSource, uint16_t usSize 
 /**
  * @brief   OSAL wrapper for task/thread safe memory movement.
  */
-void vOSAL_MemMove( void *pvDestination, void *pvSource, uint16_t usPayload_size )
+void vOSAL_MemMove( void *pvDestination, void *pvSource, uint32_t usPayload_size )
 {
     if( ( NULL != pvDestination ) &&
         ( NULL != pvSource ) )
@@ -1652,7 +1652,7 @@ void vOSAL_MemMove( void *pvDestination, void *pvSource, uint16_t usPayload_size
                 /* thread safe */
                 memmove( pvDestination,
                          pvSource,
-                         ( size_t )usPayload_size );
+                         usPayload_size );
                 assert( OK == pthread_mutex_unlock( &xMemMoveMutexHandle ) );
             }
         }
@@ -1661,7 +1661,7 @@ void vOSAL_MemMove( void *pvDestination, void *pvSource, uint16_t usPayload_size
             /* set memory, note: Not thread safe */
             memmove( pvDestination,
                      pvSource,
-                     ( size_t )usPayload_size );
+                     usPayload_size );
         }
     }
 }
@@ -1727,7 +1727,7 @@ char cOSAL_GetChar( void )
 /**
  * @brief   OSAL wrapper for task/thread safe string copy.
  */
-char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize )
+char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint32_t usSize )
 {
     char *pcSetString = NULL;
 
@@ -1741,7 +1741,7 @@ char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize
             if( OSAL_ERRORS_NONE == pthread_mutex_lock( &xStrNCpyMutexHandle ) )
             {
                 /* mutex taken successfully, copy string */
-                pcSetString = strncpy( pcDestination, pcSource, ( size_t )usSize );
+                pcSetString = strncpy( pcDestination, pcSource, usSize );
 
                 /* release mutex */
                 assert( OK == pthread_mutex_unlock( &xStrNCpyMutexHandle ) );
@@ -1750,7 +1750,7 @@ char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize
         else
         {
             /* copy string, note: Not thread safe */
-            pcSetString = strncpy( pcDestination, pcSource, ( size_t )usSize );
+            pcSetString = strncpy( pcDestination, pcSource, usSize );
         }
     }
 
@@ -1760,7 +1760,7 @@ char* pcOSAL_StrNCpy( char *pcDestination, const char *pcSource, uint16_t usSize
 /**
  * @brief   OSAL wrapper for task/thread safe memory compare.
  */
-int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usSize )
+int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint32_t usSize )
 {
     int iStatus = OSAL_ERRORS_PARAMS;
 
@@ -1774,7 +1774,7 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usS
             if( OSAL_ERRORS_NONE == pthread_mutex_lock( &xMemCmpMutexHandle ) )
             {
                 /* mutex taken successfully, compare memory */
-                iStatus = memcmp( pvMemoryOne, pvMemoryTwo, ( size_t )usSize );
+                iStatus = memcmp( pvMemoryOne, pvMemoryTwo, usSize );
 
                 /* release mutex */
                 pthread_mutex_unlock( &xMemCmpMutexHandle );
@@ -1783,7 +1783,7 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint16_t usS
         else
         {
             /* compare memory, note: Not thread safe */
-            iStatus = memcmp( pvMemoryOne, pvMemoryTwo, ( size_t )usSize );
+            iStatus = memcmp( pvMemoryOne, pvMemoryTwo, usSize );
         }
     }
 

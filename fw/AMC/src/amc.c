@@ -16,10 +16,10 @@
 #include "util.h"
 #include "amc_cfg.h"
 #include "amc_version.h"
-#include "xloader_bsp_config.h"
 #include "xil_util.h"
 #include "xil_cache.h"
 #include "xloader_client.h"
+#include "xloader_bsp_config.h"
 
 /* osal */
 #include "osal.h"
@@ -1049,8 +1049,9 @@ static int iInitDebug( void )
  */
 static int iPlmGetUid(uint32_t* uuid)
 {
+    static XMailbox MailboxInstance;
+
     int iStatus = XST_SUCCESS;
-    XMailbox MailboxInstance;
     XLoader_ImageInfo ImageInfo;
 
     iStatus = XMailbox_Initialize(&MailboxInstance, XPAR_XIPIPSU_0_BASEADDR);
