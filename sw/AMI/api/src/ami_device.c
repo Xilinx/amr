@@ -55,7 +55,7 @@
 
 /* For PCI reloading */
 #define HOT_RESET_GPIO_BAR		(0)
-#define HOT_RESET_GPIO_OFFSET	(0x10000)
+#define HOT_RESET_GPIO_OFFSET	(0x20000)
 #define PCI_ENABLE				(1)
 /*
  * NOTE: The following delays may need tweaking.

@@ -42,7 +42,7 @@ static DEFINE_XARRAY_ALLOC(cid_xarray);
  */
 #define REQUEST_DOWNLOAD_TIMEOUT                (msecs_to_jiffies(30000))       /* 30 seconds */
 #define REQUEST_COPY_TIMEOUT                    (msecs_to_jiffies(3600000))     /* 60 minutes - based on example max parition size of 128MB */
-#define REQUEST_HEARTBEAT_TIMEOUT               (msecs_to_jiffies(500))         /* 0.5 seconds */
+#define REQUEST_HEARTBEAT_TIMEOUT               (msecs_to_jiffies(2000))        /* 2.0 seconds */
 #define HEARTBEAT_REQUEST_INTERVAL              (500)
 #define LOGGING_SLEEP_INTERVAL                  (500)
 
@@ -955,7 +955,7 @@ static int heartbeat_health_thread(void *data)
 	} else {
 		amc_ctxt = (struct amc_control_ctxt *)data;
 	}
-	msleep(HEARTBEAT_REQUEST_INTERVAL * 100);
+	msleep(HEARTBEAT_REQUEST_INTERVAL * 10);
 
 	while (1) {
 		if (!fatal_event_raised && (fail_count < HEARTBEAT_FAIL_THRESHOLD)) {
@@ -1858,7 +1858,6 @@ int setup_amc(struct pci_dev		*dev,
 		}
 	}
 
-#if 0 //FixMe
 	/*
 	 * COMPAT MODE: heartbeat disabled, logging disabled.
 	 * When the AMC version does not match the current AMI version, we run
@@ -1885,7 +1884,7 @@ int setup_amc(struct pci_dev		*dev,
 			wake_up_process((*amc_ctrl_ctxt)->heartbeat_thread);
 		}
 	}
-#endif
+
 	if (ret)
 		goto fail;
 

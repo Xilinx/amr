@@ -123,7 +123,7 @@ int read_vsec(struct pci_dev *dev, endpoints_struct **endpoints)
 
 	/* PL BAR 1: offset 0 */
 	(*endpoints)->pl.found = true;
-	(*endpoints)->pl.bar_num = PCIE_BAR1;
+	(*endpoints)->pl.bar_num = PCIE_BAR0;
 	(*endpoints)->pl.start_addr = 0;
 	(*endpoints)->pl.bar_len = XILINX_ENDPOINT_BAR_LEN_PL;
 	(*endpoints)->pl.end_addr = (*endpoints)->pl.start_addr +

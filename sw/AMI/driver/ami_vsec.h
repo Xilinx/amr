@@ -16,7 +16,7 @@
 
 /* CG TODO: Get this from hw design metadata or read from card? */
 #define XILINX_ENDPOINT_BAR_LEN_SGCQ		0x800000	/* 8M */
-#define XILINX_ENDPOINT_BAR_LEN_PL 			0x10000		/* 64K */
+#define XILINX_ENDPOINT_BAR_LEN_PL 			0x800000	/* 8M */
 
 /* CG TODO: Get this from hw design metadata */
 #define XILINX_ENDPOINT_NAME_SGCQ			"ep_gcq_mgmt_00"
