@@ -124,19 +124,17 @@ TEST:
 | 2 | ami  | version       |ami_tool --version                                                     |AMI version               |
 | 3 | ami  | overview      |ami_tool overview                                                      |AMI overview              |
 | 4 | ami  | pcie info     |ami_tool pcieinfo -d <b:d:f>                                           |AMI PCIe information      |
-| 5 | ami  | bar read      |sudo ami_tool bar_rd -d <b:d:f> -b 0 -a 0 -l 4                         |AMI PCIe read bar memory  |
-| 6 | ami  | bar write     |sudo ami_tool bar_wr -d <b:d:f> -b 0 -a 0 -i 0x1234                    |AMI PCIe write bar memory |
-| 7 | ami  | reload        |sudo ami_tool reload -d 1 -t driver	                                   |AMI reload driver/pci/sbr |
-| 8 |EEPROM| eeprom read   |ami_tool eeprom_rd -d <b:d:f> -a 0 -l 4	                               |Read one or more bytes of data from the EEPROM |
-| 9 |EEPROM| mfg info      |ami_tool mfg_info -d <b:d:f>	                                       |Read manufacturing  information|
-|10 |OSPI  | cfgmem info   |ami_tool cfgmem_info -d <b:d:f> -t primary                             |Read config memory information|
-|11 |OSPI  | cfgmem program|sudo ami_tool cfgmem_program -d <b:d:f> -i amr_ospi.bin -p 1 -t primary|Program a .pdi bitstream onto a device |
-|12 |OSPI  | cfgmem fpt    |sudo ami_tool cfgmem_fpt -d <b:d:f> -t primary -i <fpt file>	       |Program FPT onto a OSPI |
-|13 |OSPI  | cfgmem copy   |sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1	           |Copy one device partition to another |
-|14 |OSPI  | device boot   |sudo ami_tool device_boot -d <b:d:f> -p 0	                           |Set the device boot partition |
-|15 |PL    | PDI program   |sudo ami_tool pdi_program -d <b:d:f> -i <pdi>	                       |Program partial pdi |
-|16 |Sensor| sensors       |ami_tool sensors -d <b:d:f>	                                           |Get the value of a sensor |
-|17 |Device|debug verbosity|ami_tool debug_verbosity -d <b:d:f> -l debug	                       |Set log level |
+| 5 | ami  | reload        |sudo ami_tool reload -d 1 -t driver	                                   |AMI reload driver/pci/sbr |
+| 6 |EEPROM| eeprom read   |ami_tool eeprom_rd -d <b:d:f> -a 0 -l 4	                               |Read one or more bytes of data from the EEPROM |
+| 7 |EEPROM| mfg info      |ami_tool mfg_info -d <b:d:f>	                                       |Read manufacturing  information|
+| 8 |OSPI  | cfgmem info   |ami_tool cfgmem_info -d <b:d:f> -t primary                             |Read config memory information|
+| 9 |OSPI  | cfgmem program|sudo ami_tool cfgmem_program -d <b:d:f> -i amr_ospi.bin -p 1 -t primary|Program a .pdi bitstream onto a device |
+|10 |OSPI  | cfgmem fpt    |sudo ami_tool cfgmem_fpt -d <b:d:f> -t primary -i <fpt file>	       |Program FPT onto a OSPI |
+|11 |OSPI  | cfgmem copy   |sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1	           |Copy one device partition to another |
+|12 |OSPI  | device boot   |sudo ami_tool device_boot -d <b:d:f> -p 0	                           |Set the device boot partition |
+|13 |PL    | PDI program   |sudo ami_tool pdi_program -d <b:d:f> -i <pdi>	                       |Program partial pdi |
+|14 |Sensor| sensors       |ami_tool sensors -d <b:d:f>	                                           |Get the value of a sensor |
+|15 |Device|debug verbosity|ami_tool debug_verbosity -d <b:d:f> -l debug	                       |Set log level |
 
 ### 5. Glossary
 | Name | Description   				             |

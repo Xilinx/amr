@@ -71,8 +71,10 @@ static const char help_msg[] = \
 	"\tdevice_boot        Set boot partition\r\n"
 	"\tpdi_program        Program pdi\n"
 	"\tmfg_info           View manufacturing information\r\n"
+#ifndef RAVE
 	"\tbar_wr             Write to PCI BAR memory\r\n"
 	"\tbar_rd             Read from PCI BAR memory\r\n"
+#endif
 	"\toverview           Show basic AMI/device information\r\n"
 	"\tpcieinfo           View PCI-related information\r\n"
 	"\treload             Reload a device/devices\r\n"
@@ -138,8 +140,10 @@ static const struct app_cmd_map commands[] = {
 	{ "cfgmem_copy",     &cmd_cfgmem_copy     },
 	{ "cfgmem_info",     &cmd_cfgmem_info     },
 	{ "pdi_program",     &cmd_pdi_program     },
+#ifndef RAVE
 	{ "bar_rd",          &cmd_bar_rd          },
 	{ "bar_wr",          &cmd_bar_wr          },
+#endif
 	{ "overview",        &cmd_overview        },
 	{ "pcieinfo",        &cmd_pcieinfo        },
 	{ "reload",          &cmd_reload          },
