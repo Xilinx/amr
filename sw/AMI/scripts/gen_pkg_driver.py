@@ -260,7 +260,7 @@ def main(args):
             start_time = start_step('GET_VER', step)
             get_ver = './scripts/getVersion.sh ami'
             exec_step_cmd('GEN_VERSION', step, get_ver, shell=True, cwd=PROJECT_DIR)
-            check_file_exists('GET_VER', join(PROJECT_DIR, 'api', 'include', 'ami_version.h'))
+            check_file_exists('GET_VER', join(PROJECT_DIR, 'api', 'include', 'ami_version.h.in'))
             end_step('GET_VER', start_time)
 
             # Get GCQ driver version
@@ -295,7 +295,7 @@ def main(args):
         config['pkg']['descr'] = [config['pkg']['name'] + ' driver package', 'Built on ' + build_date_short + '.']
 
         # Find version from generated header file
-        with open(join(PROJECT_DIR, 'api', 'include', 'ami_version.h'), 'r') as fd:
+        with open(join(PROJECT_DIR, 'api', 'build', 'ami_version.h'), 'r') as fd:
                 data = fd.read()
 
                 v = re.findall(r'GIT_TAG.*?\"(\d+\.\d+\.\d+).*\"$', data, re.M)

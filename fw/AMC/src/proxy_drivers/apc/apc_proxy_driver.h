@@ -140,7 +140,7 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
  * @ulSrcAddr:    Address (in RAM) to read the image from
  * @ulImageSize:  Size of image (in bytes)
  * @usPacketNum:  Image packet number
- * @usPacketSize: Size of image packet (in KB)
+ * @ulPacketSize: Size of image packet (in KB)
  *
  * @return  OK    Image downloaded successfully
  *          ERROR Image not downloaded successfully
@@ -151,7 +151,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
 						uint32_t ulSrcAddr,
 						uint32_t ulImageSize,
 						uint16_t usPacketNum,
-						uint16_t usPacketSize );
+						uint32_t ulPacketSize );
 
 /**
  * iAPC_UpdateFpt() - Download an image with an FPT to a location in NV memory
@@ -161,7 +161,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
  * @ulSrcAddr:    Address (in RAM) to read the image from
  * @ulImageSize:  Size of image (in bytes)
  * @usPacketNum:  Image packet number
- * @usPacketSize: Size of image packet (in KB)
+ * @ulPacketSize: Size of image packet (in KB)
  * @iLastPacket:  Boolean indicating if this is the last data packet
  *
  * @return  OK    Image downloaded successfully
@@ -172,7 +172,7 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
 					uint32_t ulSrcAddr,
 					uint32_t ulImageSize,
 					uint16_t usPacketNum,
-					uint16_t usPacketSize,
+					uint32_t ulPacketSize,
 					int iLastPacket );
 
 /**
@@ -207,7 +207,7 @@ int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
  * @ulImageSize:  Size of image (in bytes)
  * @ulLastPacket: Last packet
  * @usPacketNum:  Image packet number
- * @usPacketSize: Size of image packet (in KB)
+ * @ulPacketSize: Size of image packet (in KB)
  *
  * @return  OK    Image copied successfully
  *          ERROR Image not copied successfully
@@ -219,7 +219,7 @@ int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
 					uint32_t ulImageSize,
 					 uint32_t ulLastPacket,
 					uint16_t usPacketNum,
-					uint16_t usPacketSize );
+					uint32_t ulPacketSize );
 /**
  * iAPC_SetNextPartition() - Select which partition (from primary boot device) to boot from
  *

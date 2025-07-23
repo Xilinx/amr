@@ -54,7 +54,7 @@ To see the full list of options:
 $ ./scripts/build.sh -help
 ```
 
-A minimum CMake version of 3.3.0 is required therefore you must ensure that this is installed and used in the place where you are building AMC i.e. server, VM or your local machine.
+A minimum CMake version of 3.5.0 is required therefore you must ensure that this is installed and used in the place where you are building AMC i.e. server, VM or your local machine.
 
 Compiled binary and auto-generated version information will be available:
 ```

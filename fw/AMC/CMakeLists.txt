@@ -175,6 +175,7 @@ else()
     #Include directories
     include_directories(amc_bsp/amc_bsp/include)
     include_directories(${CMAKE_LIBRARY_PATH})
+    include_directories(build)
     include_directories(src/common/include)
     include_directories(src/common/core_libs/pll)
     include_directories(src/common/core_libs/evl)

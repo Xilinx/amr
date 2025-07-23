@@ -937,8 +937,8 @@ int iASDM_Initialise( uint8_t ucNumSensors )
                     int iRepoIndex = 0;
                     for( iRepoIndex = 0; iRepoIndex < MAX_ASDM_SDR_REPO; iRepoIndex++ )
                     {
-                        pxThis->pxSensorList[ iRepoIndex ].pucSensorId = pvOSAL_MemAlloc( ucNumSensors *
-                                                                                          sizeof( uint8_t ) );
+                        pxThis->pxSensorList[ iRepoIndex ].pucSensorId =
+                            pvOSAL_MemAlloc( ucNumSensors * sizeof( uint8_t ) );
                         if( NULL == pxThis->pxSensorList[ iRepoIndex ].pucSensorId )
                         {
                             INC_ERROR_COUNTER( ASDM_ERRORS_MALLOC_FAILED )
@@ -947,8 +947,8 @@ int iASDM_Initialise( uint8_t ucNumSensors )
                         }
                         INC_STAT_COUNTER( ASDM_STATS_MALLOC )
 
-                        pxThis->pxSensorList[ iRepoIndex ].pucSensorIndex = pvOSAL_MemAlloc( ucNumSensors *
-                                                                                             sizeof( uint8_t ) );
+                        pxThis->pxSensorList[ iRepoIndex ].pucSensorIndex =
+                            pvOSAL_MemAlloc( ucNumSensors * sizeof( uint8_t ) );
                         if( NULL == pxThis->pxSensorList[ iRepoIndex ].pucSensorIndex )
                         {
                             INC_ERROR_COUNTER( ASDM_ERRORS_MALLOC_FAILED )

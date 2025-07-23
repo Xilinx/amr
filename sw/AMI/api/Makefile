@@ -18,7 +18,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 # Replace .o with .d for dependencies.
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := ./include  # Public headers only
+INC_DIRS := ./include ./build# Public headers only
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us.
@@ -31,6 +31,8 @@ LDFLAGS := -shared
 #
 all:
 	@$(MAKE) -s banner
+	mkdir -p "./build"
+	../scripts/getVersion.sh ami
 	@$(MAKE) -s $(BUILD_DIR)/$(TARGET)
 
 #

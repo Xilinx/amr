@@ -45,7 +45,7 @@
 
 #define APC_DEFAULT_PARTITION   ( 0 )
 #define APC_BASE_PACKET_SIZE    ( 1024 )
-#define APC_COPY_PACKET_SIZE_KB ( 32 )
+#define APC_COPY_PACKET_SIZE_KB ( 128 )
 
 #define APC_COPY_CHUNK_LEN  ( 0x1000 )                      /* 4KB */
 
@@ -226,7 +226,7 @@ typedef struct APC_MBOX_DOWNLOAD_IMAGE
 	uint32_t ulImageSize;
 	uint32_t ulSrcAddr;
 	uint16_t usPacketNum;
-	uint16_t usPacketSize;
+	uint32_t ulPacketSize;
 
 } APC_MBOX_DOWNLOAD_IMAGE;
 
@@ -611,7 +611,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
                         uint32_t ulSrcAddr,
                         uint32_t ulImageSize,
                         uint16_t usPacketNum,
-                        uint16_t usPacketSize )
+                        uint32_t ulPacketSize )
 {
 	int iStatus = ERROR;
 
@@ -638,7 +638,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
 			xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
 			xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
 			xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
-			xMsg.xDownloadImageData.usPacketSize = usPacketSize;
+			xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
 
 			if( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
 			                                         ( void* )&xMsg,
@@ -672,7 +672,7 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
                     uint32_t ulSrcAddr,
                     uint32_t ulImageSize,
                     uint16_t usPacketNum,
-                    uint16_t usPacketSize,
+                    uint32_t ulPacketSize,
                     int iLastPacket )
 {
 	int iStatus = ERROR;
@@ -698,7 +698,7 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
 		xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
 		xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
 		xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
-		xMsg.xDownloadImageData.usPacketSize = usPacketSize;
+		xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
 		xMsg.xDownloadImageData.iLastPacket  = iLastPacket;
 
 		if( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
@@ -793,7 +793,7 @@ int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
 					 uint32_t ulImageSize,
 					 uint32_t ulLastPacket,
 					 uint16_t usPacketNum,
-					 uint16_t usPacketSize )
+					 uint32_t ulPacketSize )
 {
 	int iStatus = ERROR;
 
@@ -817,7 +817,7 @@ int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
 		xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
 		xMsg.xDownloadImageData.iLastPacket  = ulLastPacket;
 		xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
-		xMsg.xDownloadImageData.usPacketSize = usPacketSize;
+		xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
 
 		if( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
 												( void* )&xMsg,
@@ -1543,12 +1543,12 @@ static int iDownloadImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 		HAL_FLUSH_CACHE_DATA( ( uintptr_t )( pxImageData->ulSrcAddr ), ulImageSize ); /* flush shared memory buff before use */
 
 		/* Check if image is smaller than a chunk */
-		if( ulImageSize < ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE ) )
+		if( ulImageSize < ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) )
 		{
 			PLL_WRN( APC_NAME,
 			         "Image size (%d) is smaller than the chunk size (%d)\r\n",
 			         ulImageSize,
-			         ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE ) );
+			         ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) );
 		}
 
 		/* Check partition size if we are not updating the FPT.  */
@@ -1561,14 +1561,14 @@ static int iDownloadImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 			         ulImageSize,
 			         pxThis->ppxFptPartitions[ pxImageData->xBootDevice ][ iPartition ].ulPartitionSize );
 		}
-		else if( 0 == pxImageData->usPacketSize )
+		else if( 0 == pxImageData->ulPacketSize )
 		{
 			INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_PACKET_SIZE_ERROR )
-			PLL_ERR( APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->usPacketSize );
+			PLL_ERR( APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->ulPacketSize );
 		}
 		else
 		{
-			uint32_t ulDestAddr = pxImageData->usPacketNum * ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE );
+			uint32_t ulDestAddr = pxImageData->usPacketNum * ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE );
 			uint32_t ulStartMs  = ulOSAL_GetUptimeMs();
 
 			if( FALSE == pxImageData->iUpdateFpt )
@@ -1658,22 +1658,22 @@ static int iDownloadPdiImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 		HAL_FLUSH_CACHE_DATA( ( uintptr_t )( pxImageData->ulSrcAddr ), ulImageSize );
 
 		/* Check if image is smaller than a chunk */
-		if( ulImageSize < ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE ) )
+		if( ulImageSize < ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) )
 		{
 			PLL_WRN( APC_NAME,
 					"Image size (%d) is smaller than the chunk size (%d)\r\n",
 					ulImageSize,
-					( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE ) );
+					( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) );
 		}
 
-		if( 0 == pxImageData->usPacketSize )
+		if( 0 == pxImageData->ulPacketSize )
 		{
 			INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_PACKET_SIZE_ERROR )
-			PLL_ERR( APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->usPacketSize );
+			PLL_ERR( APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->ulPacketSize );
 		}
 		else
 		{
-			uint32_t ulDestAddr = pxImageData->usPacketNum * ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE );
+			uint32_t ulDestAddr = pxImageData->usPacketNum * ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE );
 			uint32_t ulStartMs  = ulOSAL_GetUptimeMs();
 
 			PLL_DBG( APC_NAME, "Downloading PDI %d bytes\r\n", ulImageSize );
@@ -1683,9 +1683,9 @@ static int iDownloadPdiImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 
 			if ( TRUE == pxImageData->iPdiProgram )
 			{
-				pvOSAL_MemCpy((void *)( HAL_RPU_PDI_BUFFER_BASE + ulDestAddr ),
+				pvOSAL_MemCpy((void *)( HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr ),
 					(const void*)(pxImageData->ulSrcAddr), ulImageSize);
-				HAL_FLUSH_CACHE_DATA( ( HAL_RPU_PDI_BUFFER_BASE + ulDestAddr ), ulImageSize );
+					HAL_FLUSH_CACHE_DATA( ( HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr ), ulImageSize );
 				iStatus = OK;
 
 				if ( 1 == pxImageData->iLastPacket )
@@ -1701,7 +1701,7 @@ static int iDownloadPdiImage( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 					{
 						iStatus = XLoader_LoadPartialPdi(pxThis->pXLoaderInst,
 													XLOADER_PDI_DDR,
-													(u64)HAL_RPU_PDI_BUFFER_BASE,
+													(u64)HAL_RPU_MEMORY_BUFFER_BASE,
 													&PdiLoadStatus);
 						if (XST_SUCCESS == iStatus)
 						{
@@ -1778,7 +1778,7 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 				.ulImageSize  = ( APC_COPY_PACKET_SIZE_KB ) * ( APC_BASE_PACKET_SIZE ),
 				.ulSrcAddr    = pxCopyData->ulCpyAddr,
 				.usPacketNum  = 0,
-				.usPacketSize = APC_COPY_PACKET_SIZE_KB
+				.ulPacketSize = APC_COPY_PACKET_SIZE_KB
 			};
 
 			/* ensure that the smallest safe value is copied */
@@ -1794,13 +1794,13 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 			while( ulCopySize > ulTotalBytesWritten )
 			{
 				/* set packet size */
-				if( ulCopySize < ( ulTotalBytesWritten + ( xImageData.usPacketSize * APC_BASE_PACKET_SIZE ) ) )
+				if( ulCopySize < ( ulTotalBytesWritten + ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) )
 				{
 					xImageData.ulImageSize = ulCopySize - ulTotalBytesWritten; /* remaining bytes */
 				}
 				else
 				{
-					xImageData.ulImageSize = xImageData.usPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
+					xImageData.ulImageSize = xImageData.ulPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
 				}
 
 				/* Read each packet into the shared memory */
@@ -1808,30 +1808,20 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 				         "===== Reading packet %d from P.%d to RAM =====\r\n",
 				         xImageData.usPacketNum,
 				         iSrcPartition );
-				if( ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xSrcBootDevice ]->read( pxThis->ppxFwIf[ xSrcBootDevice ],
-				                                                                    ( uint64_t )( ulSrcAddr +
-				                                                                                  ( xImageData.
-				                                                                                    usPacketNum *
-				                                                                                    ( xImageData.
-				                                                                                      usPacketSize *
-				                                                                                      APC_BASE_PACKET_SIZE )
-				                                                                                  ) ),
-				                                                                    ( pucCpyData +
-				                                                                      ( xImageData.usPacketNum *
-				                                                                        ( xImageData.usPacketSize *
-				                                                                          APC_BASE_PACKET_SIZE ) ) ),
-				                                                                    &xImageData.ulImageSize,
-				                                                                    0 ) ) &&
-				    ( xImageData.ulImageSize <=
-				      pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize ) &&
+				if( ( FW_IF_ERRORS_NONE ==
+					pxThis->ppxFwIf[ xSrcBootDevice ]->read( pxThis->ppxFwIf[ xSrcBootDevice ],
+                        ( uint64_t )( ulSrcAddr + ( xImageData. usPacketNum * ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) ),
+				        ( pucCpyData + ( xImageData.usPacketNum * ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) ),
+				        &xImageData.ulImageSize,
+				        0 ) ) &&
+				    ( xImageData.ulImageSize <= pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize ) &&
 				    ( xImageData.ulImageSize <= ulAllocatedSize ) &&
 				    ( 0 < xImageData.ulImageSize ) )
 				{
 					if( 0 != xImageData.usPacketNum )
 					{
 						xImageData.ulSrcAddr   = ( pxCopyData->ulCpyAddr +
-						                           ( xImageData.usPacketNum *
-						                             ( xImageData.usPacketSize * APC_BASE_PACKET_SIZE ) ) );
+						                           ( xImageData.usPacketNum * ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) );
 						xImageData.xBootDevice = xSrcBootDevice;
 						xImageData.iPartition  = iSrcPartition;
 
@@ -1917,7 +1907,7 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 				xImageData.iPartition  = iSrcPartition;
 				xImageData.usPacketNum = 0;
 				xImageData.ulSrcAddr   = pxCopyData->ulCpyAddr;
-				xImageData.ulImageSize = xImageData.usPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
+				xImageData.ulImageSize = xImageData.ulPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
 
 				PLL_DBG( APC_NAME, "===== Verifying packet %d =====\r\n", xImageData.usPacketNum );
 				if( OK == iVerifyDownload( &xImageData ) )
@@ -2018,7 +2008,7 @@ static int iVerifyDownload( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 	{
 		uint8_t  *pucPdiData   = ( uint8_t* )( uintptr_t )( pxImageData->ulSrcAddr );
 		uint8_t  *pucSrcOffset = &pucPdiData[ 0 ];
-		uint32_t ulDestOffset  = pxImageData->usPacketNum * ( pxImageData->usPacketSize * APC_BASE_PACKET_SIZE );
+		uint32_t ulDestOffset  = pxImageData->usPacketNum * ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE );
 		uint32_t ulImageSize   = pxImageData->ulImageSize;
 		uint32_t ulRemLen      = ulImageSize;
 		uint32_t ulVerLen      = APC_COPY_CHUNK_LEN;

@@ -152,7 +152,7 @@ typedef struct AMI_PROXY_PDI_DOWNLOAD_REQUEST
     uint32_t ulLength;
     uint32_t ulPartitionSel;
     uint16_t usPacketNum;
-    uint16_t usPacketSize;
+    uint32_t ulPacketSize;
 
 } AMI_PROXY_PDI_DOWNLOAD_REQUEST;
 
@@ -170,7 +170,7 @@ typedef struct AMI_PROXY_PDI_PROGRAM_REQUEST
     uint32_t ulLength;
     uint32_t ulPartitionSel;
     uint16_t usPacketNum;
-    uint16_t usPacketSize;
+    uint32_t ulPacketSize;
 
 } AMI_PROXY_PDI_PROGRAM_REQUEST;
 

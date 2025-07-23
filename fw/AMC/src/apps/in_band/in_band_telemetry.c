@@ -582,7 +582,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 PLL_DBG( IN_BAND_NAME, "PDI Program          : 0x%x\r\n",   xDownloadRequest.iPdiProgram );
                 PLL_DBG( IN_BAND_NAME, "PDI last packet      : 0x%x\r\n",   xDownloadRequest.iLastPacket );
                 PLL_DBG( IN_BAND_NAME, "PDI packet number    : 0x%hx\r\n",  xDownloadRequest.usPacketNum );
-                PLL_DBG( IN_BAND_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xDownloadRequest.usPacketSize );
+                PLL_DBG( IN_BAND_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xDownloadRequest.ulPacketSize );
 
                 if (TRUE == xDownloadRequest.iUpdateFpt)
                 {
@@ -592,7 +592,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                               ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
                                               xDownloadRequest.ulLength,
                                               xDownloadRequest.usPacketNum,
-                                              xDownloadRequest.usPacketSize,
+                                              xDownloadRequest.ulPacketSize,
                                               xDownloadRequest.iLastPacket );
                 }
                 else if (TRUE == xDownloadRequest.iPdiProgram)
@@ -605,7 +605,8 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                               xDownloadRequest.ulLength,
                                               xDownloadRequest.iLastPacket,
                                               xDownloadRequest.usPacketNum,
-                                              xDownloadRequest.usPacketSize );
+                                              xDownloadRequest.ulPacketSize );
+PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
                 }
                 else
                 {
@@ -616,7 +617,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                                   ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
                                                   xDownloadRequest.ulLength,
                                                   xDownloadRequest.usPacketNum,
-                                                  xDownloadRequest.usPacketSize );
+                                                  xDownloadRequest.ulPacketSize );
                 }
 
                 if (OK != iStatus)
@@ -658,7 +659,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                           xCopyRequest.ulDestDevice,
                                           ( int )xCopyRequest.ulDestPartition,
                                           ( uint32_t )xCopyRequest.ullAddress +
-                                          ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
+                                          ( uint32_t )HAL_RPU_MEMORY_BUFFER_BASE,
                                           xCopyRequest.ulMaxLength ))
                 {
                     iStatus = OK;
@@ -701,7 +702,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                 PLL_DBG( IN_BAND_NAME, "PDI Program          : 0x%x\r\n",   xProgramRequest.iPdiProgram );
                 PLL_DBG( IN_BAND_NAME, "PDI last packet      : 0x%x\r\n",   xProgramRequest.iLastPacket );
                 PLL_DBG( IN_BAND_NAME, "PDI packet number    : 0x%hx\r\n",  xProgramRequest.usPacketNum );
-                PLL_DBG( IN_BAND_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xProgramRequest.usPacketSize );
+                PLL_DBG( IN_BAND_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xProgramRequest.ulPacketSize );
 
                 iStatus = iAPC_DownloadImage( pxSignal,
                                               xProgramRequest.iBootDevice,
@@ -710,7 +711,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                               ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
                                               xProgramRequest.ulLength,
                                               xProgramRequest.usPacketNum,
-                                              xProgramRequest.usPacketSize );
+                                              xProgramRequest.ulPacketSize );
 
                 if (OK != iStatus)
                 {

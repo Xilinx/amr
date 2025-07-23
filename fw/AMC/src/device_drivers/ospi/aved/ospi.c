@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the OSPI device driver.
@@ -150,20 +150,20 @@ UTIL_MAKE_ENUM_AND_STRINGS( OSPI_ERRORS, OSPI_ERRORS, OSPI_ERRORS_STR )
  */
 typedef struct OSPI_FLASH_INFO
 {
-    uint32_t ulJedecId;                                                        /* JEDEC ID */
-    uint32_t ulSectSize;                                                       /* Individual sector size or
-                                                                                * combined sector size in case of parallel config*/
-    uint32_t ululNumSect;                                                      /* Total no. of sectors in one/two flash devices */
-    uint32_t ulPageSize;                                                       /* Individual page size or
-                                                                                * combined page size in case of parallel config*/
-    uint32_t ulNumPage;                                                        /* Total no. of pages in one/two flash devices */
-    uint32_t ulFlashDeviceSize;                                                /* This is the size of one flash device */
-    uint8_t  ucNumDie;                                                         /* No. of die forming a single flash */
-    uint32_t ulReadCmd;                                                        /* Read command used to read data from flash */
-    uint32_t ulWriteCmd;                                                       /* Write command used to write data to flash */
-    uint32_t ulEraseCmd;                                                       /* Erase Command */
-    uint8_t  ucStatusCmd;                                                      /* Status Command */
-    uint8_t  ucDummyCycles;                                                    /* Number of Dummy cycles for Read operation */
+    uint32_t ulJedecId;         /* JEDEC ID */
+    uint32_t ulSectSize;        /* Individual sector size or
+                                 * combined sector size in case of parallel config*/
+    uint32_t ululNumSect;       /* Total no. of sectors in one/two flash devices */
+    uint32_t ulPageSize;        /* Individual page size or
+                                 * combined page size in case of parallel config*/
+    uint32_t ulNumPage;         /* Total no. of pages in one/two flash devices */
+    uint32_t ulFlashDeviceSize; /* This is the size of one flash device */
+    uint8_t  ucNumDie;          /* No. of die forming a single flash */
+    uint32_t ulReadCmd;         /* Read command used to read data from flash */
+    uint32_t ulWriteCmd;        /* Write command used to write data to flash */
+    uint32_t ulEraseCmd;        /* Erase Command */
+    uint8_t  ucStatusCmd;       /* Status Command */
+    uint8_t  ucDummyCycles;     /* Number of Dummy cycles for Read operation */
 
 } OSPI_FLASH_INFO;
 
@@ -824,17 +824,17 @@ int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLengt
         {
             int      iOspiStatus = XST_FAILURE;
             int      iPage       = 0;
-            uint32_t ucPageCount = 0;
+            uint32_t ulPageCount = 0;
             uint32_t ucPageSize  = pxThis->ulPageSize;
             pxThis->ucOspiFlashPercentage = 0;
 
             INC_STAT_COUNTER( OSPI_STATS_TAKE_MUTEX )
 
             /* Validation */
-            ucPageCount = ( ulLength / ucPageSize );
+            ulPageCount = ( ulLength / ucPageSize );
             if( ulLength % ucPageSize )
             {
-                ucPageCount++;
+                ulPageCount++;
                 PLL_WRN( OSPI_NAME, "Warning: len:%d is not page:%d aligned\r\n", ulLength, ucPageSize );
             }
 
@@ -844,7 +844,7 @@ int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLengt
                 PLL_WRN( OSPI_NAME, "Warning: address:%d is not page:%d aligned\r\n", ulAddr, ucPageSize );
             }
 
-            PLL_DBG( OSPI_NAME, "Flashing... page count:%d, page size:%d\r\n", ucPageCount, ucPageSize );
+            PLL_DBG( OSPI_NAME, "Flashing... page count:%d, page size:%d\r\n", ulPageCount, ucPageSize );
 
             /* Write first, then read back and verify */
             if( XOSPIPSV_DAC_EN_OPTION == XOspiPsv_GetOptions( &pxThis->xOspiPsvInstance ) )
@@ -855,7 +855,7 @@ int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLengt
 
                 iOspiStatus = iFlashLinearWrite( &pxThis->xOspiPsvInstance,
                                                  ulAddr,
-                                                 ( pxFlashConfigTable[ pxThis->ucFctIndex ].ulPageSize * ucPageCount ),
+                                                 ( pxFlashConfigTable[ pxThis->ucFctIndex ].ulPageSize * ulPageCount ),
                                                  pucWriteBuffer );
                 if( XST_SUCCESS == iOspiStatus )
                 {
@@ -874,16 +874,16 @@ int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLengt
                 PLL_DBG( OSPI_NAME,
                          "WriteCmd: 0x%x \r\n",
                          ( uint8_t )pxFlashConfigTable[ pxThis->ucFctIndex ].ulWriteCmd );
-                for( iPage = 0; iPage < ucPageCount; iPage++ )
+                for( iPage = 0; iPage < ulPageCount; iPage++ )
                 {
                     uint32_t ulWriteOffset = ( iPage * pxFlashConfigTable[ pxThis->ucFctIndex ].ulPageSize );
 
-                    pxThis->ucOspiFlashPercentage = ( iPage * 100 / ucPageCount );
+                    pxThis->ucOspiFlashPercentage = ( iPage * 100 / ulPageCount );
                     /* Only display when its been updated */
                     if( ucOspiPrevFlashPercentage != pxThis->ucOspiFlashPercentage )
                     {
                         PLL_DBG( OSPI_NAME,
-                                 "OSPI flashing progress percentage %d%%\r\n",
+                                 "OSPI flashing progress %d%%\r\n",
                                  pxThis->ucOspiFlashPercentage );
                         ucOspiPrevFlashPercentage = pxThis->ucOspiFlashPercentage;
                     }
@@ -918,7 +918,7 @@ int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLengt
                 pvOSAL_MemSet( ucReadBuffer, 0, sizeof( ucReadBuffer ) );
                 for( iCount = 0; iCount < ulLength; iCount += pxThis->ulPageSize )
                 {
-                    if( ( iCount != 0 ) && ( iCount % ( ucPageCount / 10 ) ) )
+                    if( ( iCount != 0 ) && ( iCount % ( ulPageCount / 10 ) ) )
                     {
                         continue;
                     }

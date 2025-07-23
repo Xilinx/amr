@@ -557,7 +557,7 @@ static int iAmiCallbackTestMode( EVL_SIGNAL *pxSignal )
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI Program          : 0x%x\r\n",   xDownloadRequest.iPdiProgram );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI last packet      : 0x%x\r\n",   xDownloadRequest.iLastPacket );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet number    : 0x%hx\r\n",  xDownloadRequest.usPacketNum );
-                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xDownloadRequest.usPacketSize );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xDownloadRequest.ulPacketSize );
                 iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
 
             }
@@ -623,7 +623,7 @@ static int iAmiCallbackTestMode( EVL_SIGNAL *pxSignal )
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI Program          : 0x%x\r\n",   xProgramRequest.iPdiProgram );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI last packet      : 0x%x\r\n",   xProgramRequest.iLastPacket );
                 PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet number    : 0x%hx\r\n",  xProgramRequest.usPacketNum );
-                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xProgramRequest.usPacketSize );
+                PLL_DBG( AMC_IN_BAND_DBG_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xProgramRequest.ulPacketSize );
                 iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
             }
             else

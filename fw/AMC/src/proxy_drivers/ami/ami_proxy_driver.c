@@ -396,7 +396,7 @@ typedef struct AMI_CMD_DATA_PAYLOAD
     uint32_t ulPartitionRsvd:15;
     uint16_t usLastPacket:1;
     uint16_t usPacketNum:15;
-    uint16_t usPacketSize; /* packet size in KB */
+    uint32_t ulPacketSize; /* packet size in KB */
     uint32_t ulPad;
 
 } AMI_CMD_DATA_PAYLOAD;
@@ -1021,8 +1021,8 @@ int iAMI_GetPdiDownloadRequest( EVL_SIGNAL *pxSignal,
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPartitionSel;
                 pxDownloadRequest->usPacketNum =
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.usPacketNum;
-                pxDownloadRequest->usPacketSize =
-                            pxThis->xRxData[ ucIndex ].xDownloadRequest.usPacketSize;
+                pxDownloadRequest->ulPacketSize =
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPacketSize;
                 pxDownloadRequest->iUpdateFpt =
                              pxThis->xRxData[ ucIndex ].xDownloadRequest.iUpdateFpt;
                 pxDownloadRequest->iPdiProgram =
@@ -1165,8 +1165,8 @@ int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
                             pxThis->xRxData[ ucIndex ].xProgramRequest.ulPartitionSel;
                 pxProgramRequest->usPacketNum =
                             pxThis->xRxData[ ucIndex ].xProgramRequest.usPacketNum;
-                pxProgramRequest->usPacketSize =
-                            pxThis->xRxData[ ucIndex ].xProgramRequest.usPacketSize;
+                pxProgramRequest->ulPacketSize =
+                            pxThis->xRxData[ ucIndex ].xProgramRequest.ulPacketSize;
                 pxProgramRequest->iUpdateFpt =
                              pxThis->xRxData[ ucIndex ].xProgramRequest.iUpdateFpt;
                 pxProgramRequest->iPdiProgram =
@@ -1671,8 +1671,8 @@ static void vProxyDriverTask( void *pvArgs )
                                 xCmdRequest.xPdiDownloadPayload.ulPartitionSel;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.usPacketNum =
                                 xCmdRequest.xPdiDownloadPayload.usPacketNum;
-                            pxThis->xRxData[ ucIndex ].xDownloadRequest.usPacketSize =
-                                xCmdRequest.xPdiDownloadPayload.usPacketSize;
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPacketSize =
+                                xCmdRequest.xPdiDownloadPayload.ulPacketSize;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iUpdateFpt =
                                 xCmdRequest.xPdiDownloadPayload.ulUpdateFpt;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iPdiProgram =
@@ -1795,8 +1795,8 @@ static void vProxyDriverTask( void *pvArgs )
                                 xCmdRequest.xPdiDownloadPayload.ulPartitionSel;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.usPacketNum =
                                 xCmdRequest.xPdiDownloadPayload.usPacketNum;
-                            pxThis->xRxData[ ucIndex ].xDownloadRequest.usPacketSize =
-                                xCmdRequest.xPdiDownloadPayload.usPacketSize;
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPacketSize =
+                                xCmdRequest.xPdiDownloadPayload.ulPacketSize;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iUpdateFpt =
                                 xCmdRequest.xPdiDownloadPayload.ulUpdateFpt;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iPdiProgram =
