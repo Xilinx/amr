@@ -248,7 +248,9 @@ int device_boot(struct pf_dev_struct *pf_dev, uint32_t partition)
 /*
  * Copy a device partition.
  */
-int copy_partition(struct pf_dev_struct *pf_dev, uint32_t src_device, uint32_t src_part, uint32_t dest_device, uint32_t dest_part)
+int copy_partition(struct pf_dev_struct *pf_dev,
+	uint32_t src_device, uint32_t src_part,
+	uint32_t dest_device, uint32_t dest_part)
 {
 	int ret = SUCCESS;
 	struct fpt_partition src_partition = { 0 };
@@ -261,7 +263,10 @@ int copy_partition(struct pf_dev_struct *pf_dev, uint32_t src_device, uint32_t s
 	);
 
 	/* Basic sanity check */
-	if ((src_device > MAX_DEVICE) || (src_part > MAX_PARTITION) || (dest_device > MAX_DEVICE) || (dest_part > MAX_PARTITION))
+	if ((src_device  > MAX_DEVICE)    ||
+	    (src_part    > MAX_PARTITION) ||
+		(dest_device > MAX_DEVICE)    ||
+		(dest_part   > MAX_PARTITION))
 		return -EINVAL;
 
 	/* Check that the partitions exist. */

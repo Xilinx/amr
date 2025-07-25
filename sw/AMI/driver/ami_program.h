@@ -42,7 +42,7 @@
 #define PDI_PROGRAM_FLAG		(0xBB)  /* uint8 - the other bytes are the boot device, and chunk num */
 #define PDI_PROGRAM_MAGIC		(0xBBBBBBBB)
 #define PDI_CHUNK_MULTIPLIER	(1024)
-#define PDI_CHUNK_SIZE			(128)	/* Multiple of 1024 */
+#define PDI_CHUNK_SIZE			(6144)	/* Multiple of 1024 */
 
 /*
  * Format of flags:

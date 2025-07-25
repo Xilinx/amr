@@ -24,10 +24,10 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define PDI_CHUNK_MULTIPLIER	(1024)
-#define PDI_CHUNK_SIZE			(128)	/* Multiple of 1024 */
-#define COPY_CHUNK_DUR_MS		(70)	/* Est duration for partition chunk copy (ms) */
-#define SECOND_IN_MS			(1000)
+#define PDI_CHUNK_MULTIPLIER    (1024)
+#define PDI_CHUNK_SIZE          (4096)  /* Multiple of 1024 */
+#define COPY_CHUNK_DUR_MS       (47625) /* Est duration for partition chunk copy (ms) */
+#define SECOND_IN_MS            (1000)
 
 /*****************************************************************************/
 /* Function declarations                                                     */
@@ -35,9 +35,9 @@
 
 /**
  * do_cmd_cfgmem_copy() - "cfgmem_copy" command callback.
- * @options:  Ordered list of options passed in at the command line
- * @num_args:  Number of non-option arguments (excluding command)
- * @args:  List of non-option arguments (excluding command)
+ * @options: Ordered list of options passed in at the command line
+ * @num_args: Number of non-option arguments (excluding command)
+ * @args: List of non-option arguments (excluding command)
  *
  * `args` may be an invalid pointer. It is the function's responsibility
  * to validate the `num_args` parameter.
@@ -128,7 +128,7 @@ static uint32_t calc_est_time(uint32_t part_size)
 	/* calc est copy duration */
 	est_num_chunks = (part_size + ((PDI_CHUNK_SIZE * PDI_CHUNK_MULTIPLIER) - 1)) /
 						(PDI_CHUNK_SIZE * PDI_CHUNK_MULTIPLIER);
-	est_dur_seconds = ((est_num_chunks*COPY_CHUNK_DUR_MS) / SECOND_IN_MS) + 1;
+	est_dur_seconds = ((est_num_chunks * COPY_CHUNK_DUR_MS) / SECOND_IN_MS) + 1;
 	return est_dur_seconds;
 }
 

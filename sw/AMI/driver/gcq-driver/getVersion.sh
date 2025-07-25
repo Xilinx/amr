@@ -11,11 +11,13 @@
 # & from /src/driver/gcq-driver for gcq
 #
 # This cats the output file "<ID>_version.h"
-# ami_version.h in the src/common/include directory
+# ami_version.h.in in the src/common/include directory
 # gcq_version.h in the src/device_drivers/gcq_driver/src directory
 #
 # This file will not be tracked by git
 #
+GIT_HASH="$(git rev-parse HEAD)"
+GIT_DATE="$(git log -1 --pretty=format:"%cd" --date=format:"%Y%m%d")"
 
 if [ "$#" -eq 1 ]; then
     MODULE_NAME=$1
@@ -23,7 +25,7 @@ else
     MODULE_NAME=${PWD##*/}
 fi
 
-VERSION_AMI_FILE="./api/include/ami_version.h"
+VERSION_AMI_FILE="./api/build/ami_version.h"
 AMI_STR="ami"
 VERSION_GCQ_FILE="./src/gcq_version.h"
 GCQ_STR="gcq"
@@ -33,10 +35,10 @@ function catVersionHeaderFile {
 
     if [ "$MODULE_NAME" = "$AMI_STR" ]; then
         cat $VERSION_AMI_FILE
-        elif [ "$MODULE_NAME" = "$GCQ_STR" ]; then
-            cat $VERSION_GCQ_FILE
-        else
-            echo "No version file found..."
+    elif [ "$MODULE_NAME" = "$GCQ_STR" ]; then
+        cat $VERSION_GCQ_FILE
+    else
+        echo "No version file found..."
     fi
 }
 

@@ -294,6 +294,16 @@ def main(args):
         config['pkg']['changelog']   =  config['pkg']['name'] + ' driver package. Built on $build_date_short.'
         config['pkg']['descr'] = [config['pkg']['name'] + ' driver package', 'Built on ' + build_date_short + '.']
 
+        # Build libami.so
+        step = 'build AMR library'
+        start_time = start_step('BUILD_AMI_LIB', step)
+
+        build_api = 'cd api && make clean && make'
+        exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
+        check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
+
+        end_step('BUILD_AMI_LIB', start_time)
+
         # Find version from generated header file
         with open(join(PROJECT_DIR, 'api', 'build', 'ami_version.h'), 'r') as fd:
                 data = fd.read()

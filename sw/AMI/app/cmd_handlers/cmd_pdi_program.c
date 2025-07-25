@@ -66,7 +66,7 @@ static void progress_handler(enum ami_event_status status, uint64_t ctr, void *d
  * y: Skip user confirmation
  * q: Quit after programming
  */
-static const char short_options[] = "hd:i:yq";
+static const char short_options[] = "hd:i:yqa";
 
 static const struct option long_options[] = {
 	{ "help", no_argument, NULL, 'h' },  /* help screen */
@@ -77,11 +77,12 @@ static const char help_msg[] = \
 	"mem_program - program a bitstream onto a device\r\n"
 	"\r\nThis command requires root/sudo permissions.\r\n"
 	"\r\nUsage:\r\n"
-	"\t" APP_NAME " mem_program -d <bdf> -i <path>\r\n"
+	"\t" APP_NAME " mem_program -d <bdf> -i <path> <-a>\r\n"
 	"\r\nOptions:\r\n"
 	"\t-h --help             Show this screen\r\n"
 	"\t-d <b>:[d].[f]        Specify the device BDF\r\n"
 	"\t-i <path>             Path to image file\r\n"
+	"\t-a                    APU image\r\n"
 	"\t-y                    Skip confirmation\r\n"
 	"\t-q                    Quit after programming\r\n"
 ;
@@ -157,7 +158,7 @@ static int do_cmd_pdi_program(struct app_option *options, int num_args, char **a
 	/* Must have at least an image and device. */
 	if (!options) {
 		APP_USER_ERROR("not enough options", help_msg);
-		return EXIT_FAILURE;
+		return ret;
 	}
 
 	/* Device and image are required. TODO: Should these be positional args? */
@@ -211,10 +212,11 @@ static int do_cmd_pdi_program(struct app_option *options, int num_args, char **a
 		image->arg
 	);
 
-	if (strcasecmp(current_uuid, parent_uuid) != 0) {
+
+	if ((NULL == find_app_option('a', options)) &&
+		(strcasecmp(current_uuid, parent_uuid) != 0)) {
 		printf("\r\nError: %s's parent ID doesn't match...\r\n",
 			image->arg);
-		ret = EXIT_SUCCESS;
 	}
 	else if ((NULL != find_app_option('y', options)) ||
 		confirm_action(APP_CONFIRM_PROMPT, 'Y', 3)) {
@@ -234,7 +236,6 @@ static int do_cmd_pdi_program(struct app_option *options, int num_args, char **a
 			APP_API_ERROR("could not program PDI");
 		}
 	} else {
-		ret = EXIT_SUCCESS;
 		printf("\r\nAborting...\r\n");
 	}
 

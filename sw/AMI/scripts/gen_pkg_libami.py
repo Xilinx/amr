@@ -252,11 +252,22 @@ def main(args):
         # on PROJECT_DIR, then split once more to remove the leading slash, e.g.
         # PROJECT_DIR/driver/foo.c -> /driver/foo.c -> driver/foo.c
 
+        # Build libami.so
+        step = 'build AMR library'
+        start_time = start_step('BUILD_AMI_LIB', step)
+
+        build_api = 'cd api && make clean && make'
+        exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
+        check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
+
+        end_step('BUILD_AMI_LIB', start_time)
+
+
         # Find API sources
         for path, _, files in walk(join(PROJECT_DIR, 'api', 'include')):
             for name in files:
                 api_headers.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
-                
+
         config['pkg']              =  {}
         config['pkg']['name']      =  'libami'
         config['pkg']['release']   =  opt.pkg_release
@@ -278,7 +289,7 @@ def main(args):
                 # Set release
                 config['pkg']['release'] = f'{c[0] if c else 0}.{h[0][:8] if h else ""}.{opt.pkg_release}'
 
-		# preinst.sh
+        # preinst.sh
         with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'preinst.sh')), 'r') as infile:
             fdata = infile.read()
             fdata = fdata.replace('#!/bin/sh',                '')
@@ -300,16 +311,6 @@ def main(args):
         config['pkg']['conflicts'] = {}
         config['pkg']['conflicts']['rpm'] = ['xrt']
         config['pkg']['conflicts']['deb'] = []
-
-        # Build libami.so
-        step = 'build AMR library'
-        start_time = start_step('BUILD_AMI_LIB', step)
-
-        build_api = 'cd api && make clean && make'
-        exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
-        check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
-
-        end_step('BUILD_AMI_LIB', start_time)
 
         # Define package content paths
         config['pkg']['usr_include_dir']   = 'usr/include/' + config['pkg']['name']

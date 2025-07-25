@@ -239,6 +239,17 @@ def main(args):
             check_file_exists('GET_VER', join(PROJECT_DIR, 'api', 'include', 'ami_version.h.in'))
             end_step('GET_VER', start_time)
 
+        # Build libami.so
+        step = 'build AMR library'
+        start_time = start_step('BUILD_AMI_LIB', step)
+
+        build_api = 'cd api && make clean && make'
+        exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
+        check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
+
+        end_step('BUILD_AMI_LIB', start_time)
+
+
         # When building the list of sources, we need a relative path so we split
         # on PROJECT_DIR, then split once more to remove the leading slash, e.g.
         # PROJECT_DIR/driver/foo.c -> /driver/foo.c -> driver/foo.c
@@ -287,13 +298,9 @@ def main(args):
         config['pkg']['conflicts']['rpm'] = ['xrt']
         config['pkg']['conflicts']['deb'] = []
 
-        # Build libami.so and ami_tool
-        step = 'build AMR library and ami tool'
+        # Build ami_tool
+        step = 'build AMR ami tool'
         start_time = start_step('BUILD_AMI', step)
-
-        build_api = 'cd api && make clean && make'
-        exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
-        check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
 
         build_ami_tool = 'cd app && make clean && make PROFILE=RAVE'
         exec_step_cmd('BUILD_AMI_TOOL', step, build_ami_tool, shell=True, cwd=PROJECT_DIR)

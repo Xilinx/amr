@@ -259,7 +259,7 @@ struct amc_proxy_cmd_data_payload {
 	uint32_t partition_resvd:15;
 	uint16_t last_chunk:1;
 	uint16_t chunk:15;
-	uint16_t chunk_size;
+	uint32_t chunk_size;
 };
 
 /**
