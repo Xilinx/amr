@@ -55,8 +55,7 @@
 #define DEFAULT_TIMER_PERIOD_MS     ( 100 )
 #define DEFAULT_OS_NAME             ( "freeRTOS" )
 #define LINE_SEPARATOR              ( "--------------------------------------------------------------------------------------------------------------------------\r\n" )
-#undef pdMS_TO_TICKS
-#define pdMS_TO_TICKS(ms)           (ms)
+
 
 /*****************************************************************************/
 /* Structs                                                                   */

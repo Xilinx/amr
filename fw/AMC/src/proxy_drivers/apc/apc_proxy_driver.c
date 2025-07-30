@@ -1895,6 +1895,7 @@ static int iCopyImage( APC_MBOX_COPY_IMAGE *pxCopyData )
 					break;
 				}
 				xImageData.usPacketNum++;
+				iOSAL_Task_SleepMs( 1 );
 			}
 
 			if( ulCopySize == ulTotalBytesWritten )
@@ -2038,6 +2039,7 @@ static int iVerifyDownload( APC_MBOX_DOWNLOAD_IMAGE *pxImageData )
 			                                                         &ulVerLen, 0 ) ) &&
 			    ( 0 < ulVerLen ) )
 			{
+				HAL_FLUSH_CACHE_DATA((uintptr_t)pxThis->pucChunkBuffer, ulVerLen);
 				if( 0 == iOSAL_MemCmp( pxThis->pucChunkBuffer, pucSrcOffset, ulVerLen ) )
 				{
 					ulRemLen     -= ulVerLen;

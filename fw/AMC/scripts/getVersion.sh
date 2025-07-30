@@ -35,6 +35,7 @@ GCQ_STR="gcq"
 function catVersionHeaderFile {
 
     if [ "$MODULE_NAME" = "$AMC_STR" ]; then
+        mkdir -p build
         cat $AMC_SRC_VERSION_FILE > $AMC_DST_VERSION_FILE
         sed -i -E "s/#define GIT_HASH.*/#define GIT_HASH                  \"${GIT_HASH}\"/" $AMC_DST_VERSION_FILE
         sed -i -E "s/#define GIT_DATE.*/#define GIT_DATE                  \"${GIT_DATE}\"/" $AMC_DST_VERSION_FILE
