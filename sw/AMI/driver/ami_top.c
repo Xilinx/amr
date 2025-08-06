@@ -410,7 +410,7 @@ void shutdown_pf_dev_services(struct pf_dev_struct *pf_dev)
  *
  * Return: None.
  */
-void delete_pf_dev_data(struct pf_dev_struct *pf_dev, bool delete_managed)
+static void delete_pf_dev_data(struct pf_dev_struct *pf_dev, bool delete_managed)
 {
 	struct pf_dev_application *pos = NULL, *next = NULL;
 
@@ -712,7 +712,7 @@ int kill_pf_dev_apps(struct pf_dev_struct *pf_dev, int sig)
  *
  * Return: 0 or negative error code
  */
-int create_map_str(char **map_str, int *map_str_sz)
+static int create_map_str(char **map_str, int *map_str_sz)
 {
 	int ret = 0;
 	int num_entries = 0;
@@ -871,7 +871,7 @@ static ssize_t ami_debug_enabled_show(struct device_driver *drv, char *buf)
 }
 static DRIVER_ATTR_RW(ami_debug_enabled);
 
-int __init vmc_entry(void)
+static int __init vmc_entry(void)
 {
 	int ret = 0;
 
@@ -933,7 +933,7 @@ fail:
  * to enable this code only at module removal time.
  * Note - Do not call this function from anywhere in the code
  */
-void __exit vmc_exit(void)
+static void __exit vmc_exit(void)
 {
 	PR_DBG("Removing driver from the kernel");
 	PR_DBG("Unregister driver from PCIE Stack");

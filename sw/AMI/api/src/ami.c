@@ -17,10 +17,12 @@
 #include <poll.h>
 #include <time.h>
 #include <sys/eventfd.h>
+#include <sys/utsname.h>
 
 /* Private API includes */
 #include "ami_internal.h"
 #include "ami_version.h"
+#include "ami_program.h"
 
 /*****************************************************************************/
 /* Defines                                                                   */
@@ -53,6 +55,27 @@ static char last_error_str[MAX_ERROR_STR] = { 0 };
 /*****************************************************************************/
 /* Local function definitions                                                */
 /*****************************************************************************/
+
+/**
+ * kernel_version_cmp() - Compare with current kernel version.
+ * @v: char pointer to version (major.minor.pat)
+ *
+ * Return: current kernel version - v.
+ */
+static int kernel_version_cmp(const char *v) {
+	struct utsname uts;
+	int cmaj, cmin, cpat;
+	int vmaj, vmin, vpat;
+	uname(&uts);
+	sscanf(uts.release, "%d.%d.%d", &cmaj, &cmin, &cpat);
+	sscanf(v,           "%d.%d.%d", &vmaj, &vmin, &vpat);
+	if (cmaj != vmaj)
+		return cmaj - vmaj;
+	if (cmin != vmin)
+		return cmin - vmin;
+
+	return cpat - vpat;
+}
 
 /**
  * ami_event_thread() - Internal event watcher thread.
@@ -89,11 +112,19 @@ static void *ami_event_thread(void *data)
 			status = AMI_EVENT_STATUS_TIMEOUT;
 		}
 
-		d->callback(
-			status,
-			efd_ctr,
-			d->callback_data
-		);
+		if (kernel_version_cmp("6.8.0")) {
+			d->callback(
+				status,
+				PDI_CHUNK_SIZE * PDI_CHUNK_MULTIPLIER,
+				d->callback_data
+			);
+		} else {
+			d->callback(
+				status,
+				efd_ctr,
+				d->callback_data
+			);
+		}
 	}
 
 	return NULL;

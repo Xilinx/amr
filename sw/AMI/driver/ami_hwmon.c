@@ -1190,12 +1190,12 @@ static struct attribute *label_attributes[] = {
 	NULL
 };
 
-static struct attribute_group label_attr_group = {
+static const struct attribute_group label_attr_group = {
 	.attrs = label_attributes,
 	.is_visible = is_visible_extra,
 };
 
-const static struct attribute_group *extra_groups[] = {
+static const struct attribute_group *extra_groups[] = {
 	&label_attr_group,
 	&status_attr_group,
 	&temp_avg_attr_group,

@@ -24,8 +24,6 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define PDI_CHUNK_MULTIPLIER    (1024)
-#define PDI_CHUNK_SIZE          (4096)  /* Multiple of 1024 */
 #define COPY_CHUNK_DUR_MS       (47625) /* Est duration for partition chunk copy (ms) */
 #define SECOND_IN_MS            (1000)
 

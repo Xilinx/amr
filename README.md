@@ -3,8 +3,8 @@
 # AMR - Adaptive Management Runtime
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Introduction](https://img.shields.io/badge/-1._Introduction-informational)](#1-introduction)
-[![Directory Structure](https://img.shields.io/badge/-2._Directory_Structure-bluegreen)](#3-directory-structure)
-[![Build Instructions](https://img.shields.io/badge/-3._Build_Instructions-critical)](#2-build-instructions)
+[![Directory Structure](https://img.shields.io/badge/-2._Directory_Structure-bluegreen)](#2-directory-structure)
+[![Build Instructions](https://img.shields.io/badge/-3._Build_Instructions-critical)](#3-build-instructions)
 [![Test](https://img.shields.io/badge/-4._Test-important)](#4-test)
 [![Glossary](https://img.shields.io/badge/-6._Glossary-yellow)](#5-glossary)
 [![References](https://img.shields.io/badge/-7._References-lightgrey)](#6-references)
@@ -17,8 +17,8 @@ The Versal design will contain the basic PCIe configuration information for shar
 ```
  ```
 
-To build sample designs from source code in this repository, you will need to have the
-following tools installed and follow the [build instructions](#2-build-instructions):
+To build sample design from source code in this repository, you will need to have the
+following tools installed and follow the [build instructions](#3-build-instructions):
 
 - A Linux-based host OS with AMD tools installed. It requires about 50GB free disk space
 - [Vivado][1] 2025.1
@@ -133,8 +133,9 @@ TEST:
 |11 |OSPI  | cfgmem copy   |sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1	           |Copy one device partition to another |
 |12 |OSPI  | device boot   |sudo ami_tool device_boot -d <b:d:f> -p 0	                           |Set the device boot partition |
 |13 |PL    | PDI program   |sudo ami_tool pdi_program -d <b:d:f> -i <pdi>	                       |Program partial pdi |
-|14 |Sensor| sensors       |ami_tool sensors -d <b:d:f>	                                           |Get the value of a sensor |
-|15 |Device|debug verbosity|ami_tool debug_verbosity -d <b:d:f> -l debug	                       |Set log level |
+|14 |APU   | PDI program   |sudo ami_tool pdi_program -d <b:d:f> -i <apu.image> -a                 |Download APU image |
+|15 |Sensor| sensors       |ami_tool sensors -d <b:d:f>	                                           |Get the value of a sensor |
+|16 |Device|debug verbosity|ami_tool debug_verbosity -d <b:d:f> -l debug	                       |Set log level |
 
 ### 5. Glossary
 | Name | Description   				             |

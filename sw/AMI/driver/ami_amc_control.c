@@ -153,7 +153,7 @@ static int get_sensor_id(int cmd_req, int flags)
  *
  * Return: the AID.
  */
-int get_aid(int cmd_req, int flags)
+static int get_aid(int cmd_req, int flags)
 {
 	enum amc_proxy_cmd_sensor_request id = AMC_PROXY_CMD_SENSOR_REQUEST_UNKNOWN;
 
@@ -203,7 +203,7 @@ int get_aid(int cmd_req, int flags)
  *
  * Return: None.
  */
-bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
+static bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 {
 	int i = 0;
 	int retry = DEVICE_READY_RETRY_COUNT;
@@ -507,7 +507,7 @@ static void release_amc_log_page_sema(struct amc_control_ctxt *amc_ctrl_ctxt)
  *
  * Return: Shared memory size or 0.
  */
-static size_t inline amc_shared_mem_size(struct amc_control_ctxt *amc_ctrl_ctxt)
+static inline size_t amc_shared_mem_size(struct amc_control_ctxt *amc_ctrl_ctxt)
 {
 	if (amc_ctrl_ctxt)
 		return amc_ctrl_ctxt->amc_shared_mem.data.amc_data_end -
@@ -521,7 +521,7 @@ static size_t inline amc_shared_mem_size(struct amc_control_ctxt *amc_ctrl_ctxt)
  *
  * Return: Total size (page size * pages).
  */
-static size_t inline shm_size_log_page(void)
+static inline size_t shm_size_log_page(void)
 {
 	return AMC_LOG_PAGE_SIZE * AMC_LOG_PAGE_NUM;
 }
@@ -532,7 +532,7 @@ static size_t inline shm_size_log_page(void)
  *
  * Return: Data size or 0.
  */
-static size_t inline shm_size_data(struct amc_control_ctxt *amc_ctrl_ctxt)
+static inline size_t shm_size_data(struct amc_control_ctxt *amc_ctrl_ctxt)
 {
 	if (amc_ctrl_ctxt)
 		return amc_shared_mem_size(amc_ctrl_ctxt) - shm_size_log_page();
@@ -546,7 +546,7 @@ static size_t inline shm_size_data(struct amc_control_ctxt *amc_ctrl_ctxt)
  *
  * Return: Offset or 0.
  */
-static u32 inline shm_addr_data(struct amc_control_ctxt *amc_ctrl_ctxt)
+static inline u32 shm_addr_data(struct amc_control_ctxt *amc_ctrl_ctxt)
 {
 	if (amc_ctrl_ctxt)
 		return amc_ctrl_ctxt->amc_shared_mem.data.amc_data_start + AMC_DATA_ADDR_OFF;
@@ -919,7 +919,7 @@ static void unmap_pci_io(struct pci_dev *dev, void __iomem **virt_addr)
  *
  * Return: None.
  */
-void release_amc(struct amc_control_ctxt **amc_ctrl_ctxt)
+static void release_amc(struct amc_control_ctxt **amc_ctrl_ctxt)
 {
 	if (amc_ctrl_ctxt && *amc_ctrl_ctxt) {
 		kfree(*amc_ctrl_ctxt);
