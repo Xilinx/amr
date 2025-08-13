@@ -35,12 +35,12 @@ static DEFINE_XARRAY_ALLOC(cid_xarray);
 
 #define DEVICE_READY_SLEEP_INTERVAL     (100)
 #define DEVICE_READY_RETRY_COUNT        (5)
-#define REQUEST_MSQ_TIMEOUT             (msecs_to_jiffies(30000))   /* 30 seconds */
+#define REQUEST_MSQ_TIMEOUT             (msecs_to_jiffies(120000))   /* 120 seconds */
 /*
  * Timeout for the PDI download can be small as we are packetising the
  * image and sending across one chunk at a time.
  */
-#define REQUEST_DOWNLOAD_TIMEOUT        (msecs_to_jiffies(60000))   /* 60 seconds */
+#define REQUEST_DOWNLOAD_TIMEOUT        (msecs_to_jiffies(120000))  /* 120 seconds */
 #define REQUEST_COPY_TIMEOUT            (msecs_to_jiffies(3600000)) /* 60 minutes - based on example max parition size of 64MB */
 #define REQUEST_HEARTBEAT_TIMEOUT       (msecs_to_jiffies(500))     /* 0.5 seconds */
 #define HEARTBEAT_REQUEST_INTERVAL      (500)

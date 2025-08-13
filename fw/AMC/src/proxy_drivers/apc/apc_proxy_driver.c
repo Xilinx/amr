@@ -29,7 +29,6 @@
 
 #define APC_TASK_SLEEP_MS   ( 100 )
 
-#define APC_MAX_MSG_SIZE    ( 64 )
 #define APC_MBOX_SIZE       ( 10 )
 
 #define APC_FPT_HDR_SIZE    ( 128 )
@@ -40,17 +39,17 @@
 #define APC_MULTIBOOT_OFFSET( r ) ( ( r ) / ( 1024 * 32 ) )
 #define APC_MULTIBOOT_REAL( r )   ( ( r ) * ( 1024 * 32 ) )
 
-#define APC_PMC_BOOT_TAG( d ) ( *( uint32_t* )( ( d ) + HAL_APC_PDI_BIT_MASK ) )
-#define APC_INVALID_PDI_TAG ( 0xFFFFFFFF )
+#define APC_PMC_BOOT_TAG( d )   ( *( uint32_t* )( ( d ) + HAL_APC_PDI_BIT_MASK ) )
+#define APC_INVALID_PDI_TAG     ( 0xFFFFFFFF )
 
 #define APC_DEFAULT_PARTITION   ( 0 )
 #define APC_BASE_PACKET_SIZE    ( 1024 )
 #define APC_COPY_PACKET_SIZE_KB ( 128 )
 
-#define APC_COPY_CHUNK_LEN  ( 0x1000 )                      /* 4KB */
+#define APC_COPY_CHUNK_LEN      ( 0x1000 )           /* 4KB */
 
 #ifndef APC_FPT_HDR_MAGIC_NUM
-#define APC_FPT_HDR_MAGIC_NUM ( 0x92F7A516 )
+#define APC_FPT_HDR_MAGIC_NUM   ( 0x92F7A516 )
 #endif
 
 /* Stat & Error definitions */

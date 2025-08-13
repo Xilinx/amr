@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <ctype.h>
+#include <math.h>
 
 /* App includes */
 #include "json.h"
@@ -346,7 +347,7 @@ char print_progress_bar(uint32_t cur, uint32_t max, uint32_t width,
 		putchar(empty);
 
 	putchar(right);
-	printf(" %.0f%% ", ((double)cur / (double)max) * 100);
+	printf(" %.0f%% ", fmin(((double)cur / (double)max) * 100.0, 100.0));
 
 	switch (state) {
 		case '|':

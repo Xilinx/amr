@@ -53,7 +53,7 @@
 #define HAL_RPU_SHARED_MEMORY_END_ADDR          ( 0x107FF000 )
 #define HAL_RPU_SHARED_MEMORY_SIZE              ( HAL_RPU_SHARED_MEMORY_END_ADDR - HAL_RPU_SHARED_MEMORY_BASE_ADDR )
 #define HAL_RPU_RING_BUFFER_BASE                ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + HAL_PARTITION_TABLE_SIZE )
-#define HAL_RPU_MEMORY_BUFFER_BASE              ( 0x800000 ) /* 8MB - 128MB RPU Memory (0-8MB RPU code/data) */
+#define HAL_RPU_MEMORY_BUFFER_BASE              ( 0x2000000 ) /* 32MB - 128MB RPU Memory (0-32MB RPU code/data) */
 
 #define HAL_FLUSH_CACHE_DATA( addr, size ) Xil_DCacheFlushRange( addr, size )
 

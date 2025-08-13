@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file containing the FW IF sGCQ abstraction definitions.
@@ -124,16 +124,16 @@ typedef struct _FW_IF_GCQ_INIT_CFG
  */
 typedef struct _FW_IF_GCQ_CFG
 {
-    uint64_t                  		ullBaseAddress;
-    FW_IF_GCQ_MODE_TYPE          	xMode;
-    FW_IF_GCQ_INTERRUPT_MODE_TYPE	xInterruptMode;
-    uint64_t                   		ullRingAddress;
-    uint32_t           				ulRingLength;
-    uint32_t                 		ulCompletionQueueSlotSize;
-    uint32_t                    	ulSubmissionQueueSlotSize;
-    uint8_t                 		udid[ FW_IF_GCQ_UDID_LEN ];
+    uint64_t                        ullBaseAddress;
+    FW_IF_GCQ_MODE_TYPE             xMode;
+    FW_IF_GCQ_INTERRUPT_MODE_TYPE   xInterruptMode;
+    uint64_t                        ullRingAddress;
+    uint32_t                        ulRingLength;
+    uint32_t                        ulCompletionQueueSlotSize;
+    uint32_t                        ulSubmissionQueueSlotSize;
+    uint8_t                         udid[ FW_IF_GCQ_UDID_LEN ];
 
-    void                      		*pvProfile;      /* opaque handle to store internal context */
+    void                            *pvProfile;      /* opaque handle to store internal context */
 
 } FW_IF_GCQ_CFG;
 

@@ -183,6 +183,11 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 
 	/* parse source boot device */
 	char *source_token = strtok((char *)source->arg, ":");
+	if (source_token == NULL) {
+		APP_USER_ERROR("not enough arguments", help_msg);
+		return AMI_STATUS_ERROR;
+	}
+
 	if (strcmp(source_token, "primary") == 0) {
 		source_device = AMI_BOOT_DEVICES_PRIMARY;
 	} else if (strcmp(source_token, "secondary") == 0) {
@@ -194,10 +199,20 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 
 	/* parse source partition */
 	source_token = strtok(NULL, ":");
-	source_partition = (uint32_t)strtoul(source_token, NULL, 0);
+	if (source_token == NULL) {
+		APP_USER_ERROR("arguments are wrong", help_msg);
+		return AMI_STATUS_ERROR;
+	}
+
+	source_partition = (uint32_t)strtoul(source_token, NULL, 10);
 
 	/* parse dest boot device */
 	char *dest_token = strtok((char *)dest->arg, ":");
+	if (dest_token == NULL) {
+		APP_USER_ERROR("not enough arguments", help_msg);
+		return AMI_STATUS_ERROR;
+	}
+
 	if (strcmp(dest_token, "primary") == 0) {
 		dest_device = AMI_BOOT_DEVICES_PRIMARY;
 	} else if (strcmp(dest_token, "secondary") == 0) {
@@ -209,7 +224,11 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 
 	/* parse dest partition */
 	dest_token = strtok(NULL, ":");
-	dest_partition = (uint32_t)strtoul(dest_token, NULL, 0);
+	if (dest_token == NULL) {
+		APP_USER_ERROR("arguments are wrong", help_msg);
+		return AMI_STATUS_ERROR;
+	}
+	dest_partition = (uint32_t)strtoul(dest_token, NULL, 10);
 
 	printf("Copying partition %d to partition %d\r\n", source_partition, dest_partition);
 
