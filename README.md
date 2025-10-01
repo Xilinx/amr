@@ -10,10 +10,10 @@
 [![References](https://img.shields.io/badge/-7._References-lightgrey)](#6-references)
 
 ### 1. Introduction
-AMR: Adaptive Management Runtime is to basic management of Rave embedded-plus boards. These boards have Versal device  connected to x86 host via PCIe. The versal is programmed with PDI in the OSPI and will boot normally. Any update to the OSPI is done through the PCIe.
+AMR: Adaptive Management Runtime is to basic management of Alveo, embedded-plus boards. These boards have Versal device  connected to x86 host via PCIe. The versal device is programmed with PDI in the OSPI and will boot normally. Any update to the OSPI is done through the PCIe.
 
-There are two types of Versal devices are used, one with CPM5 and another with PCIe IP.
-The Versal design will contain the basic PCIe configuration information for shared memory communication. The RPU0 will be used as device management controller. The OSPI device will contain two partitions each with boot PDIs. On power up the bootrom loads the pdi from OSPI selected partition and runs Adaptive Management Controller (AMC) on RPU0 core which is part of boot PDIs. The x86 will enumerate the Versal PCIe device and configures it. Once the x86 configuration is done, the communication is established between the x86 and AMC.
+There are two types of Versal devices are used, one with CPM and another with PL PCIe IP.
+The Versal design will contain the basic PCIe configuration information for shared memory communication. The RPU0 will be used as device Adaptive Management Controller (AMC). The OSPI flash will contain three partitions. The first two partitions contains each with boot PDIs and third PDI is used for storing user design. On power up the boot ROM loads the pdi from OSPI flash selected partition and runs AMC on RPU0 core which is part of boot PDIs. The x86 will enumerate the Versal PCIe device and configures it. Once the x86 configuration is done, the communication is established between the x86 Adaptive Management Interface (AMI) and AMC.
 ```
  ```
 
