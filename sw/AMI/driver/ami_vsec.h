@@ -14,9 +14,13 @@
 #include "ami.h"
 #include "ami_pcie.h"
 
-/* CG TODO: Get this from hw design metadata or read from card? */
-#define XILINX_ENDPOINT_BAR_LEN_SGCQ		0x800000	/* 8M */
-#define XILINX_ENDPOINT_BAR_LEN_PL 			0x800000	/* 8M */
+/* PCIe BAR OFFSETS and Lengths */
+#define XILINX_ENDPOINT_BAR_SGCQ_RAVE_OFFSET    0x800000       /* 8M */
+#define XILINX_ENDPOINT_BAR_PL_RAVE_OFFSET      0x000000       /* 0M */
+#define XILINX_ENDPOINT_BAR_SGCQ_V80_OFFSET     0x8000000      /* 128M */
+#define XILINX_ENDPOINT_BAR_PL_V80_OFFSET       0x8000000      /* 128M */
+#define XILINX_ENDPOINT_BAR_SGCQ_LEN            0x800000       /* 8M   */
+#define XILINX_ENDPOINT_BAR_PL_LEN              0x800000       /* 8M   */
 
 /* CG TODO: Get this from hw design metadata */
 #define XILINX_ENDPOINT_NAME_SGCQ			"ep_gcq_mgmt_00"

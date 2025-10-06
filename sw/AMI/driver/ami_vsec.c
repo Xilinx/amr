@@ -113,8 +113,11 @@ int read_vsec(struct pci_dev *dev, endpoints_struct **endpoints)
 	/* sGCQ payload BAR 0: Offset 0 */
 	(*endpoints)->gcq.found = true;
 	(*endpoints)->gcq.bar_num = PCIE_BAR0;
-	(*endpoints)->gcq.start_addr = 0x800000;
-	(*endpoints)->gcq.bar_len = XILINX_ENDPOINT_BAR_LEN_SGCQ;
+	(*endpoints)->gcq.start_addr = (dev->device == AMI_PCIE_DEVICE_ID_RAVE) ?
+						XILINX_ENDPOINT_BAR_SGCQ_RAVE_OFFSET :
+						XILINX_ENDPOINT_BAR_SGCQ_V80_OFFSET;
+
+	(*endpoints)->gcq.bar_len = XILINX_ENDPOINT_BAR_SGCQ_LEN;
 	(*endpoints)->gcq.end_addr = (*endpoints)->gcq.start_addr +
 						(*endpoints)->gcq.bar_len - 1;
 
@@ -124,8 +127,11 @@ int read_vsec(struct pci_dev *dev, endpoints_struct **endpoints)
 	/* PL BAR 1: offset 0 */
 	(*endpoints)->pl.found = true;
 	(*endpoints)->pl.bar_num = PCIE_BAR0;
-	(*endpoints)->pl.start_addr = 0;
-	(*endpoints)->pl.bar_len = XILINX_ENDPOINT_BAR_LEN_PL;
+        (*endpoints)->pl.start_addr = (dev->device == AMI_PCIE_DEVICE_ID_RAVE) ?
+							XILINX_ENDPOINT_BAR_PL_RAVE_OFFSET :
+							XILINX_ENDPOINT_BAR_PL_V80_OFFSET;
+	(*endpoints)->pl.bar_len = XILINX_ENDPOINT_BAR_PL_LEN;
+
 	(*endpoints)->pl.end_addr = (*endpoints)->pl.start_addr +
 					(*endpoints)->pl.bar_len - 1;
 

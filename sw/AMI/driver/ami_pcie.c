@@ -969,7 +969,7 @@ int write_pcie_configuration(struct pci_dev *dev)
 		ret = write_pcie_bar(
 			dev,
 			PCI_GPIO_RESET_BAR,
-			PCI_GPIO_RESET_OFFSET,
+			(dev->device == AMI_PCIE_DEVICE_ID_RAVE)? PCI_RESET_RAVE_GPIO_OFFSET : PCI_RESET_V80_GPIO_OFFSET,
 			1,
 			&gpio_reset
 		);

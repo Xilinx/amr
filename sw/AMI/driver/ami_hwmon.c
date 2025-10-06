@@ -299,7 +299,7 @@ static const struct hwmon_chip_info amc_hwmon_info = {
  *
  * Return: The equivalent sensor type or SENSOR_TYPE_INVALID.
  */
-enum ami_sensor_type to_ami_sensor_type(enum hwmon_sensor_types type)
+static enum ami_sensor_type to_ami_sensor_type(enum hwmon_sensor_types type)
 {
 	/* The ami sensor type maps directly to the SDR repo type. */
 	enum ami_sensor_type ret = SENSOR_TYPE_INVALID;
@@ -322,7 +322,7 @@ enum ami_sensor_type to_ami_sensor_type(enum hwmon_sensor_types type)
  *
  * Return: Corresponding ami_sensor_attribute (may be INVALID).
  */
-enum ami_sensor_attribute to_ami_attribute(enum hwmon_sensor_types hwmon_type,
+static enum ami_sensor_attribute to_ami_attribute(enum hwmon_sensor_types hwmon_type,
 		u32 hwmon_attr)
 {
 	enum ami_sensor_attribute ret = SENSOR_ATTR_INVALID;
@@ -482,7 +482,7 @@ static umode_t amc_is_visible(const void *data, enum hwmon_sensor_types type,
  *
  * Return: 0 on success or negative error code.
  */
-int get_sensor_value(struct pf_dev_struct *pf_dev, enum ami_sensor_type type,
+static int get_sensor_value(struct pf_dev_struct *pf_dev, enum ami_sensor_type type,
 	enum ami_sensor_attribute attr, int sid, void *value)
 {
 	int ret = 0;
@@ -628,7 +628,7 @@ static int convert_milli_units(enum ami_sensor_unit_mod unit_mod, long val, long
 	if (!mapped_val)
 		return -EINVAL;
 
-	switch(unit_mod)
+	switch((int)(signed char)unit_mod)
 	{
 	case SENSOR_UNIT_MOD_MEGA:
 		*mapped_val = MEGA_TO_MILLI_UNIT(val);
@@ -672,7 +672,7 @@ static int convert_micro_units(enum ami_sensor_unit_mod unit_mod, long val, long
 	if (!mapped_val)
 		return -EINVAL;
 
-	switch(unit_mod)
+	switch((int)(signed char)unit_mod)
 	{
 	case SENSOR_UNIT_MOD_MEGA:
 		*mapped_val = MEGA_TO_MICRO_UNIT(val);
@@ -851,7 +851,7 @@ static struct attribute *temp_avg_attributes[] = {
 	NULL
 };
 
-static struct attribute_group temp_avg_attr_group = {
+static const struct attribute_group temp_avg_attr_group = {
 	.attrs = temp_avg_attributes,
 	.is_visible = is_visible_extra,
 };
