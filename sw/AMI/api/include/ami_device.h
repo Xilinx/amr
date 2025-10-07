@@ -82,6 +82,24 @@ enum ami_amc_debug_level {
 	AMI_AMC_DEBUG_LEVEL_DEBUG,
 };
 
+/**
+ * enum AMI_PCIE_DEVICE_ID - List of supported PCIe ID's
+ * @AMI_PCIE_DEVICE_ID_V70_PF0: V70 PF0
+ * @AMI_PCIE_DEVICE_ID_VCK5000_PF0: VCK5000 PF0
+ * @AMI_PCIE_DEVICE_ID_V80: V80
+ * @AMI_PCIE_DEVICE_ID_V80P: V80P
+ * @AMI_PCIE_DEVICE_ID_RAVE: RAVE
+ *
+ */
+enum AMI_PCIE_DEVICE_ID {
+       AMI_PCIE_DEVICE_ID_V70_PF0              = 0x5094,
+       AMI_PCIE_DEVICE_ID_VCK5000_PF0          = 0x5048,
+       AMI_PCIE_DEVICE_ID_V80                  = 0x50B4,
+       AMI_PCIE_DEVICE_ID_V80P                 = 0x50BC,
+       AMI_PCIE_DEVICE_ID_RAVE                 = 0x5710,
+};
+
+
 /*****************************************************************************/
 /* Function Declarations                                                     */
 /*****************************************************************************/

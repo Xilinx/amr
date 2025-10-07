@@ -54,9 +54,11 @@
 #define SYSFS_PCI_LINK_WIDTH_M	"link_width_max"
 
 /* For PCI reloading */
-#define HOT_RESET_GPIO_BAR		(0)
-#define HOT_RESET_GPIO_OFFSET	(0x20000)
-#define PCI_ENABLE				(1)
+#define PCI_RESET_GPIO_BAR                     (0)
+#define PCI_RESET_RAVE_GPIO_OFFSET             (0x20000)
+#define PCI_RESET_V80_GPIO_OFFSET              (0x1040000)
+#define PCI_ENABLE                             (1)
+
 /*
  * NOTE: The following delays may need tweaking.
  * It is possible that a device may not show up after a rescan
@@ -613,6 +615,7 @@ int ami_dev_hot_reset(ami_device **dev)
 	int config = AMI_INVALID_FD;
 	char port[AMI_DEV_PCI_PORT_SIZE] = { 0 };
 	uint16_t bridge_ctl = 0;
+	uint16_t device = 0;
 
 	/* Store data so we can restore the handle later. */
 	uint16_t bdf = 0;
@@ -639,9 +642,16 @@ int ami_dev_hot_reset(ami_device **dev)
 	if (config == AMI_INVALID_FD)
 		return AMI_API_ERROR(AMI_ERROR_EBADF);
 
+	ret = ami_dev_get_pci_device(*dev, &device);
+
+	if(ret)
+		return ret;
+
 	/* Set PMC GPIO */
 	ret = ami_mem_bar_write(
-		*dev, HOT_RESET_GPIO_BAR, HOT_RESET_GPIO_OFFSET, PCI_ENABLE
+			*dev, PCI_RESET_GPIO_BAR,
+			(device == AMI_PCIE_DEVICE_ID_RAVE) ? PCI_RESET_RAVE_GPIO_OFFSET : PCI_RESET_V80_GPIO_OFFSET,
+			PCI_ENABLE
 	);
 
 	if (ret)
