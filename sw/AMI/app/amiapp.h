@@ -28,6 +28,10 @@
 #define APP_ERROR(s)	fprintf(stderr, "Error: %s\r\n", s)
 #define APP_WARN(s)		fprintf(stderr, "Warning: %s\r\n", s)
 
+#define PROFILE_DEFAULT     (0xFFFF)
+#define PROFILE_V80         (1 << 0)
+#define PROFILE_RAVE        (1 << 1)
+
 /*****************************************************************************/
 /* Typedefs                                                                  */
 /*****************************************************************************/
@@ -92,6 +96,8 @@ struct app_cmd {
 struct app_cmd_map {
 	const char      *name;
 	struct app_cmd  *command;
+	uint32_t 	valid_profiles_mask; // Bitmask for profile filtering
+	const char      *msg;
 };
 
 /*****************************************************************************/

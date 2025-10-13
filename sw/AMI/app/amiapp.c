@@ -14,6 +14,7 @@
 /* API includes */
 #include "ami.h"
 #include "ami_version.h"
+#include "ami_device.h"
 
 /* App includes */
 #include "amiapp.h"
@@ -45,47 +46,16 @@
  */
 static int do_cmd_none(struct app_option *options, int num_args, char **args);
 
+/**
+ * init_profile_from_device() - Helper function to get the V80|Rave profile based on PCIE device id
+ *
+ * Return: PROFILE_V80, PROFILE_RAVE or PROFILE_DEFAULT
+ */
+static uint16_t init_profile_from_device(void);
+
 /*****************************************************************************/
 /* Global variables                                                          */
 /*****************************************************************************/
-
-/*
- * The program help/usage string.
- */
-static const char help_msg[] = \
-	APP_NAME " - command line tool for the AMI driver API\r\n"
-	"\r\nUsage:\r\n"
-	"\t" APP_NAME " {command} [arguments]\r\n"
-	"\t" APP_NAME " {command} -h | --help\r\n"
-	"\t" APP_NAME " -h | --help\r\n"
-	"\t" APP_NAME " --version\r\n"
-	"\r\nOptions:\r\n"
-	"\t-h --help          Show this screen\r\n"
-	"\t--version          Show version\r\n"
-	"\r\nCommands:\r\n"
-	"\tsensors            Show sensor information\r\n"
-	"\tcfgmem_program     Program a device\r\n"
-	"\tcfgmem_fpt         Program a device and update the FPT\r\n"
-	"\tcfgmem_copy        Copy one partition to another\r\n"
-	"\tcfgmem_info        Show partition information\r\n"
-	"\tdevice_boot        Set boot partition\r\n"
-	"\tpdi_program        Program pdi\n"
-	"\tmfg_info           View manufacturing information\r\n"
-#ifndef RAVE
-	"\tbar_wr             Write to PCI BAR memory\r\n"
-	"\tbar_rd             Read from PCI BAR memory\r\n"
-#endif
-	"\toverview           Show basic AMI/device information\r\n"
-	"\tpcieinfo           View PCI-related information\r\n"
-	"\treload             Reload a device/devices\r\n"
-	"\teeprom_rd          Read data from the device EEPROM\r\n"
-#ifndef RAVE
-	"\teeprom_wr          Write data to the device EEPROM\r\n"
-	"\tmodule_byte_rd     Read data from a QSFP module\r\n"
-	"\tmodule_byte_wr     Write data to a QSFP module\r\n"
-#endif
-	"\tdebug_verbosity    Set the AMC debug level\r\n"
-;
 
 /*
  * The program version information string.
@@ -127,43 +97,90 @@ static struct app_cmd cmd_none = {
 	.short_options = short_options,
 	.long_options  = long_options,
 	.root_required = false,
-	.help_msg      = help_msg
+	.help_msg      = NULL
 };
 
 /*
  * List of supported commands.
  */
-static const struct app_cmd_map commands[] = {
-	{ "",                &cmd_none            },
-	{ "sensors",         &cmd_sensors         },
-	{ "cfgmem_program",  &cmd_cfgmem_program  },
-	{ "cfgmem_copy",     &cmd_cfgmem_copy     },
-	{ "cfgmem_info",     &cmd_cfgmem_info     },
-	{ "pdi_program",     &cmd_pdi_program     },
-#ifndef RAVE
-	{ "bar_rd",          &cmd_bar_rd          },
-	{ "bar_wr",          &cmd_bar_wr          },
-#endif
-	{ "overview",        &cmd_overview        },
-	{ "pcieinfo",        &cmd_pcieinfo        },
-	{ "reload",          &cmd_reload          },
-	{ "device_boot",     &cmd_device_boot     },
-	{ "mfg_info",        &cmd_mfg_info        },
-	{ "eeprom_rd",       &cmd_eeprom_rd       },
-#ifndef RAVE
-	{ "eeprom_wr",       &cmd_eeprom_wr       },
-#endif
-	{ "cfgmem_fpt",      &cmd_cfgmem_fpt      },
-#ifndef RAVE
-	{ "module_byte_rd",  &cmd_module_byte_rd  },
-	{ "module_byte_wr",  &cmd_module_byte_wr  },
-#endif
-	{ "debug_verbosity", &cmd_debug_verbosity },
+static const struct app_cmd_map commands[] =  {
+	{ "",                &cmd_none,
+		PROFILE_DEFAULT,"\t\r\n"},
+	{ "sensors",         &cmd_sensors,
+		PROFILE_DEFAULT,"\tShow sensors details\r\n"},
+	{ "cfgmem_program",  &cmd_cfgmem_program,
+		PROFILE_DEFAULT,"\tProgram a device\r\n" },
+	{ "cfgmem_copy",     &cmd_cfgmem_copy,
+		PROFILE_DEFAULT,"\tCopy one partition to another\r\n"  },
+	{ "cfgmem_info",     &cmd_cfgmem_info,
+		PROFILE_DEFAULT,"\tShow partition details \r\n" },
+	{ "pdi_program",     &cmd_pdi_program,
+		PROFILE_DEFAULT,"\tProgram pdi\r\n"  },
+	{ "bar_rd",          &cmd_bar_rd,
+		PROFILE_V80,	"\tRead from PCI BAR memory\r\n" },
+	{ "bar_wr",          &cmd_bar_wr,
+		PROFILE_V80,	"\tWrite to PCI BAR memory\r\n" },
+	{ "overview",        &cmd_overview,
+		PROFILE_DEFAULT,"\tShow basic AMI/device details\r\n" },
+	{ "pcieinfo",        &cmd_pcieinfo,
+		PROFILE_DEFAULT,"\tView PCI-related details\r\n" },
+	{ "reload",          &cmd_reload,
+		PROFILE_DEFAULT,"\tReload a device/devices\r\n" },
+	{ "device_boot",     &cmd_device_boot,
+		PROFILE_DEFAULT,"\tSet boot partition\r\n" },
+	{ "mfg_info",        &cmd_mfg_info,
+		PROFILE_DEFAULT,"\tView manufacturing details\r\n" },
+	{ "eeprom_rd",       &cmd_eeprom_rd,
+		PROFILE_DEFAULT,"\tRead data from the device EEPROM\r\n" },
+	{ "eeprom_wr",       &cmd_eeprom_wr,
+		PROFILE_V80,	"\tWrite data to the device EEPROM\r\n" },
+	{ "cfgmem_fpt",      &cmd_cfgmem_fpt,
+		PROFILE_DEFAULT,"\tProgram a device and update the FPT\r\n" },
+	{ "module_byte_rd",  &cmd_module_byte_rd,
+		PROFILE_V80,	"\tRead data from a QSFP module\r\n" },
+	{ "module_byte_wr",  &cmd_module_byte_wr,
+		PROFILE_V80,	"\tWrite data to a QSFP module\r\n" },
+	{ "debug_verbosity", &cmd_debug_verbosity,
+		PROFILE_DEFAULT,"\tSet the AMC debug level\r\n" },
 };
 
 /*****************************************************************************/
 /* Public function definitions                                               */
 /*****************************************************************************/
+
+/*
+ * Print the help msg
+ */
+static const char *get_profile_help_msg(void)
+{
+	static char buffer[4096];  // Make sure this is big enough
+	size_t offset = 0;
+	uint16_t current_profile;
+
+	current_profile = init_profile_from_device();
+
+	offset += snprintf(buffer + offset, sizeof(buffer) - offset,
+			APP_NAME " - command line tool for the AMI driver API\r\n"
+			"Usage:\r\n"
+			"\t" APP_NAME " {command} [arguments]\r\n"
+			"\t" APP_NAME " {command} -h | --help\r\n"
+			"\t" APP_NAME " -h | --help\r\n"
+			"\t" APP_NAME " --version\r\n"
+			"Options:\r\n"
+			"\t-h --help          Show this screen\r\n"
+			"\t--version          Show version\r\n"
+			"Commands:\r\n" );
+
+	for (size_t i = 0; i < ARRAY_SIZE(commands); i++) {
+		if (commands[i].valid_profiles_mask & current_profile) {
+			offset += snprintf(buffer + offset, sizeof(buffer) - offset,
+			"\t%-18s %s",
+			commands[i].name,
+			commands[i].msg ? commands[i].msg : "");
+		}
+	}
+	return buffer;
+}
 
 /*
  * Find a CLI option.
@@ -207,6 +224,37 @@ int find_app_command(const char *name)
 /*****************************************************************************/
 
 /*
+ * Initialize device profile
+ */
+static uint16_t init_profile_from_device(void)
+{
+	uint16_t num_devs = 0;
+	uint16_t pci_dev_id;
+	uint16_t current_profile = PROFILE_DEFAULT;
+	ami_device *dev = NULL;
+
+	if (ami_dev_get_num_devices(&num_devs) != AMI_STATUS_OK) {
+		APP_API_ERROR("Error getting number of devices");
+		return current_profile;
+	}
+	/* Find device */
+	if (ami_dev_find_next(&dev, AMI_ANY_DEV, AMI_ANY_DEV, AMI_ANY_DEV, NULL) != AMI_STATUS_OK) {
+		APP_API_ERROR("could not find the requested device");
+		return current_profile;
+	}
+
+	if (ami_dev_get_pci_device(dev, &pci_dev_id) != AMI_STATUS_OK) {
+		APP_API_ERROR("could not get pci device id");
+		return current_profile;
+	}
+
+	// use pci_dev_id to choose profile
+	current_profile = (pci_dev_id == AMI_PCIE_DEVICE_ID_RAVE) ? PROFILE_RAVE : PROFILE_V80;
+	return current_profile;
+}
+
+
+/*
  * Empty command callback.
  */
 static int do_cmd_none(struct app_option *options, int num_args, char **args)
@@ -218,7 +266,7 @@ static int do_cmd_none(struct app_option *options, int num_args, char **args)
 	/* There should be no positional arguments. */
 	if (num_args == 0) {
 		if (!options) {
-			APP_USER_ERROR("not enough arguments", help_msg);
+			APP_USER_ERROR("not enough arguments", get_profile_help_msg());
 		} else {
 			while (next_opt && parse_options) {
 				switch (next_opt->val)
@@ -258,7 +306,7 @@ static int do_cmd_none(struct app_option *options, int num_args, char **args)
 				}
 
 				default:
-					APP_USER_ERROR("invalid options", help_msg);
+					APP_USER_ERROR("invalid options", get_profile_help_msg());
 					parse_options = false;
 					break;
 				}
@@ -267,7 +315,7 @@ static int do_cmd_none(struct app_option *options, int num_args, char **args)
 			}
 		}
 	} else {
-		APP_USER_ERROR("too many arguments", help_msg);
+		APP_USER_ERROR("too many arguments", get_profile_help_msg());
 	}
 
 	return ret;
@@ -302,7 +350,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (cmd_ind == APP_INVALID_INDEX) {
-		APP_USER_ERROR("unrecognised command", help_msg);
+		APP_USER_ERROR("unrecognised command", get_profile_help_msg());
 		exit(EXIT_FAILURE);
 	}
 
@@ -354,7 +402,9 @@ int main(int argc, char *argv[])
 	/* Check if help was requested */
 	if (NULL != find_app_option('h', options_head)) {
 		if (cmd->help_msg)
-			printf("%s", cmd->help_msg);
+			printf("%s",cmd->help_msg);
+		else if (cmd_ind == EMPTY_CMD_HANDLER)
+			printf("%s", get_profile_help_msg());
 		else
 			printf("Error. No help available for command '%s'\r\n", commands[cmd_ind].name);
 
