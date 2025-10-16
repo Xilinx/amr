@@ -1,11 +1,12 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
  * for the EMMC driver.
  *
  * @file emmc.h
+ *
  */
 
 #ifndef _EMMC_H_
@@ -31,12 +32,12 @@
 /**
  * @brief   Initialises the EMMC driver.
  *
- * @param   ucDeviceId          The EMMC device ID
+ * @param   ulBaseAddr          The EMMC device base address
  *
  * @return  OK                  Driver successfully init
  *          ERROR               Driver init failed
  */
-int iEMMC_Initialise( uint16_t ucDeviceId );
+int iEMMC_Initialise( uint32_t ulBaseAddr );
 
 /**
  * @brief   Read from the EMMC.

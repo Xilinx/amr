@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the sensors profile for the V80
@@ -36,12 +36,13 @@
 /******************************************************************************/
 
 /**
- * @brief   Wrapper for the iSYS_MON_ReadTemperature function, to keep it the standard driver API format
+ * @brief Wrapper for the iSYS_MON_ReadTemperature function, to keep it the
+ *  standard driver API format
  *
- * @param   unused1     Unused parameter (normally i2c bus)
- * @param   unused2     Unused parameter (normally i2c address)
- * @param   unused3     Unused parameter (normally i2c channel)
- * @param   pfValue     Pointer to latest sensor value
+ * @param unused1     Unused parameter (normally i2c bus)
+ * @param unused2     Unused parameter (normally i2c address)
+ * @param unused3     Unused parameter (normally i2c channel)
+ * @param pfValue     Pointer to latest sensor value
  *
  * @return  The return value of iSYS_MON_ReadTemperature
  *
@@ -53,12 +54,13 @@ static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1, uint8_t unus
 }
 
 /**
- * @brief   Wrapper for the iAXC_GetTemperature function, to keep it the standard driver API format
+ * @brief Wrapper for the iAXC_GetTemperature function, to keep it the standard
+ * 	driver API format
  *
- * @param   unused1      Unused parameter (normally i2c bus)
- * @param   unused2      Unused parameter (normally i2c address)
- * @param   ucChannelNum Channel Num, used to specify QSFP ID
- * @param   pfValue      Pointer to latest sensor value
+ * @param unused1      Unused parameter (normally i2c bus)
+ * @param unused2      Unused parameter (normally i2c address)
+ * @param ucChannelNum Channel Num, used to specify QSFP ID
+ * @param pfValue      Pointer to latest sensor value
  *
  * @return  OK           Data retrieved from proxy driver successfully
  *          ERROR        Data not retrieved successfully
@@ -78,12 +80,13 @@ static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2, 
 }
 
 /**
- * @brief   Wrapper for the iSYS_MON_ReadVoltage function, to keep it the standard driver API format
+ * @brief Wrapper for the iSYS_MON_ReadVoltage function, to keep it the
+ * 	standard driver API format
  *
- * @param   unused1     Unused parameter (normally i2c bus)
- * @param   unused2     Unused parameter (normally i2c address)
- * @param   ucVType     Voltage type to read (normally i2c channel)
- * @param   pfValue     Pointer to latest sensor value
+ * @param unused1     Unused parameter (normally i2c bus)
+ * @param unused2     Unused parameter (normally i2c address)
+ * @param ucVType     Voltage type to read (normally i2c channel)
+ * @param pfValue     Pointer to latest sensor value
  *
  * @return  The return value of iSYS_MON_WrappedReadVoltage
  *

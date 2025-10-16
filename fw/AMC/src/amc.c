@@ -1128,11 +1128,10 @@ static void vConfigurePartitionTable( void )
      * UUID
      */
     iPlmGetUid(&uuid);
-    PLL_INF( AMC_NAME, "UUID = 0x%08x\r\n", uuid );
-
-	Xil_Out32(XPAR_UUID_REGISTER_0_BASEADDR, uuid);
+#ifdef PROFILE_RAVE
+    Xil_Out32(XPAR_UUID_REGISTER_0_BASEADDR, uuid);
     Xil_DCacheFlushRange(XPAR_UUID_REGISTER_0_BASEADDR, sizeof(uint32_t));
-
+#endif
     pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xUuid.ulUuidOff );
     pvOSAL_MemSet( pucDestAdd, 0, xPartTable.xUuid.ulUuidLen );
     pvOSAL_MemCpy( pucDestAdd, &uuid, sizeof(uuid) );

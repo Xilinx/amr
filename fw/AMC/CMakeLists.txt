@@ -1,4 +1,4 @@
-# Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 cmake_minimum_required(VERSION 3.5.0)
@@ -122,6 +122,8 @@ else()
         set(PROFILE "v80")
         set(PROFILE_FAL_PATH "src/profiles/v80/profile_fal.c")
         set(PROFILE_DEBUG_MENU_PATH "src/profiles/v80/profile_debug_menu.c")
+        set(EEPROM_PATH "src/device_drivers/eeprom/aved/eeprom.c")
+        add_definitions(-DPROFILE_V80)
         add_definitions(-DOOB_ENABLED)
     elseif(PROFILE MATCHES "^(v70)$")
         include_directories(src/profiles/v70)
@@ -168,9 +170,7 @@ else()
     find_library(XIL_FPGA NAMES xilfpga PATHS ${CMAKE_LIBRARY_PATH})
     find_library(XIL_MAILBOX NAMES xilmailbox PATHS ${CMAKE_LIBRARY_PATH})
     find_library(XIL_STANDALONE NAMES xilstandalone PATHS ${CMAKE_LIBRARY_PATH})
-    if((PROFILE MATCHES "^(rave)$"))
-        find_library(XIL_XLOADER NAMES xilloader PATHS ${CMAKE_LIBRARY_PATH})
-    endif()
+    find_library(XIL_XLOADER NAMES xilloader PATHS ${CMAKE_LIBRARY_PATH})
 
     #Include directories
     include_directories(amc_bsp/amc_bsp/include)
@@ -330,11 +330,7 @@ else()
 
     #linking libraries with executable
     if(OS MATCHES "^(FreeRTOS)$")
-        if((PROFILE MATCHES "^(rave)$"))
-            target_link_libraries(amc.elf "-Wl,-T -Wl,${amc_SOURCE_DIR}/src/lscript.ld" -Wl,--start-group,${FREERTOS_LIB},${XIL_LIB},${XIL_TIMER},${XIL_MAILBOX},${XIL_XLOADER},${XIL_STANDALONE},-lgcc,-lc,--end-group)
-        else()
-            target_link_libraries(amc.elf "-Wl,-T -Wl,${amc_SOURCE_DIR}/src/lscript.ld" -Wl,--start-group,${XIL_TIMER},${XIL_STANDALONE},${XIL_LIB},${FREERTOS_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_FPGA},${XIL_LIB},-lgcc,-lc,--end-group -Wl,--start-group,${XIL_TIMER},${XIL_STANDALONE},${XIL_MAILBOX},${XIL_LIB},-lgcc,-lc,--end-group)
-        endif()
+        target_link_libraries(amc.elf "-Wl,-T -Wl,${amc_SOURCE_DIR}/src/lscript.ld" -Wl,--start-group,${FREERTOS_LIB},${XIL_LIB},${XIL_TIMER},${XIL_MAILBOX},${XIL_XLOADER},${XIL_STANDALONE},-lgcc,-lc,--end-group)
         target_compile_definitions(amc.elf PRIVATE $<$<CONFIG:Debug>:DEBUG_PRINT> GCQ_MAX_INSTANCES=1)
     endif()
 

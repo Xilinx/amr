@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This file contains the FW IF EMMC interface implementation for AMC.
@@ -747,7 +747,7 @@ uint32_t ulFW_IF_EMMC_Init( FW_IF_EMMC_INIT_CFG *pxInitCfg )
         /*
          * Initialise the driver based on the device id supplied in the cfg
          */
-        ulStatus = iEMMC_Initialise( pxThis->xLocalCfg.usDeviceId );
+        ulStatus = iEMMC_Initialise( pxThis->xLocalCfg.ulBaseAddr );
         if( OK != ulStatus )
         {
             ulStatus = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;

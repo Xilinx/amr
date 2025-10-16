@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function implementations for the System Monnitor
@@ -243,10 +243,10 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
 
             switch( xVoltageType )
             {
-#ifdef PROFILE_RAVE
             case SYS_MON_VOLTAGES_VCCAUX:
                 iMappedVType = VCCAUX;
                 break;
+#ifdef PROFILE_RAVE
             case SYS_MON_VOLTAGES_VCCSOC:
                 iMappedVType = VCC_SOC;
                 break;
@@ -281,14 +281,11 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
                 iMappedVType = VCCAUX_PMC;
                 break;
 #else
-            case SYS_MON_VOLTAGES_VCCAUX:
-                iMappedVType = VCCAUX;
-                break;
             case SYS_MON_VOLTAGES_VCCAUXSMON:
-                iMappedVType = VCCAUXSMON;
+                iMappedVType = VCCAUX_SMON;
                 break;
             case SYS_MON_VOLTAGES_VCCAUXPMC:
-                iMappedVType = VCCAUXPMC;
+                iMappedVType = VCCAUX_PMC;
                 break;
 #endif
             default:

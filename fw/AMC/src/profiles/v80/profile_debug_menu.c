@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the profile debug menu for the V80
@@ -48,7 +48,7 @@
 /**
  * @brief   Initialise Debug Menu
  */
-void vDebugMenu_Initialise()
+void vDebugMenu_Initialise( )
 {
     /* top level directories */
     static DAL_HDL pxDeviceDrivers   = NULL;

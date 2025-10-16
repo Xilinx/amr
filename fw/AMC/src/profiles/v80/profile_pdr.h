@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the PLDM PDR profile for the V80
@@ -21,10 +21,10 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define TOTAL_PDR_TEMPERATURE          ( 6 )
-#define TOTAL_PDR_VOLTAGE              ( 9 )
-#define TOTAL_PDR_CURRENT              ( 8 )
-#define TOTAL_PDR_POWER                ( 4 )
+#define TOTAL_PDR_TEMPERATURE     ( 6 )
+#define TOTAL_PDR_VOLTAGE         ( 9 )
+#define TOTAL_PDR_CURRENT         ( 8 )
+#define TOTAL_PDR_POWER           ( 4 )
 #define TOTAL_PDR_NUMERIC_ASCI_SENSORS ( TOTAL_PDR_TEMPERATURE + TOTAL_PDR_VOLTAGE + TOTAL_PDR_CURRENT + \
                                          TOTAL_PDR_POWER )
 
@@ -33,16 +33,16 @@
 
 /* Macros to set bits for 'ucRangeFieldSupport' field in PDR */
 
-#define NORMAL_MIN_MAX  ( 0x3 << 1 )
-#define RATED_MIN_MAX   ( 0x3 << 3 )
-#define HIGH_THRESHOLDS ( 0x5 << 3 )
-#define LOW_THRESHOLDS  ( 0x5 << 4 )
-#define NOMINAL_VALUE   ( 0x1 )
+#define NORMAL_MIN_MAX            ( 0x3 << 1 )
+#define RATED_MIN_MAX             ( 0x3 << 3 )
+#define HIGH_THRESHOLDS           ( 0x5 << 3 )
+#define LOW_THRESHOLDS            ( 0x5 << 4 )
+#define NOMINAL_VALUE             ( 0x1 )
 
 /* Macros to set bits for 'ucSupportedThresholds' field in PDR */
 
-#define HAS_LOW_THRESHOLDS  ( 0x7 << 3 )
-#define HAS_HIGH_THRESHOLDS ( 0x7 )
+#define HAS_LOW_THRESHOLDS         ( 0x7 << 3 )
+#define HAS_HIGH_THRESHOLDS        ( 0x7 )
 
 /* AMC Device ID Defines */
 
@@ -276,11 +276,11 @@
 
 /* VR_12V_AUX2 Power PDR Defines */
 
-#define VR_12V_AUX2_POWER_UPDATE_INTERVAL ( 1.0 )
+#define VR_12V_AUX2_POWER_UPDATE_INTERVAL	( 1.0 )
 
 /* VR_3V3_PEX Voltage PDR Defines */
 
-#define VR_3V3_PEX_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
+#define VR_3V3_PEX_VOLTAGE_UPDATE_INTERVAL	( 1.0 )
 
 /* VR_3V3_PEX Current PDR Defines */
 
@@ -292,23 +292,23 @@
 
 /* VR_3V3_PEX Power PDR Defines */
 
-#define VR_3V3_PEX_POWER_UPDATE_INTERVAL ( 1.0 )
+#define VR_3V3_PEX_POWER_UPDATE_INTERVAL	( 1.0 )
 
 /* VR_12V_PEX Voltage PDR Defines */
 
-#define VR_12V_PEX_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
+#define VR_12V_PEX_VOLTAGE_UPDATE_INTERVAL	( 1.0 )
 
 /* VR_12V_PEX Current PDR Defines */
 
-#define VR_12V_PEX_CURRENT_UPDATE_INTERVAL ( 1.0 )
-#define VR_12V_PEX_CURRENT_NORMAL_MAX      ( 5499 )
-#define VR_12V_PEX_CURRENT_WARNING_HIGH    ( 5500 )
-#define VR_12V_PEX_CURRENT_CRITICAL_HIGH   ( 5750 )
-#define VR_12V_PEX_CURRENT_FATAL_HIGH      ( 5751 )
+#define VR_12V_PEX_CURRENT_UPDATE_INTERVAL	( 1.0 )
+#define VR_12V_PEX_CURRENT_NORMAL_MAX		( 5499 )
+#define VR_12V_PEX_CURRENT_WARNING_HIGH		( 5500 )
+#define VR_12V_PEX_CURRENT_CRITICAL_HIGH	( 5750 )
+#define VR_12V_PEX_CURRENT_FATAL_HIGH		( 5751 )
 
 /* VR_12V_PEX Power PDR Defines */
 
-#define VR_12V_PEX_POWER_UPDATE_INTERVAL ( 1.0 )
+#define VR_12V_PEX_POWER_UPDATE_INTERVAL	( 1.0 )
 
 /* VR_1V5_VCCAUX Voltage PDR Defines */
 
