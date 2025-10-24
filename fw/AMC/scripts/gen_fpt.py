@@ -4,22 +4,83 @@
 # SPDX-License-Identifier: MIT
 #
 # E.g.:
-#./scripts/gen_fpt.py -f ./fpt/fpt.json
+#./scripts/gen_fpt.py <-p rave|v80> [-o output_folder]
 #
-# Generate FPT binary from JSON file
+# Generate FPT binary file with profile input. Default rave profile
 #
 
 import os
-import json
+import yaml
 import argparse
 from collections import namedtuple
 
 
+# FPT configuration data
+#  ------------------------------
+# |   FPT HEADER   (size = 128K) |
+#  ------------------------------
+# RAVE
+#        ------------------------------
+#       |  FPT entriy 0  (size = 128K) |
+#        ------------------------------
+#       |  FPT entriy 1  (size = 128K) |
+#        ------------------------------
+#       |  FPT entriy 2  (size = 128K) |
+#        ------------------------------
+# V80
+#        ------------------------------
+#       |  FPT entriy 0  (size = 128K) |
+#        ------------------------------
+#       |  FPT entriy 1  (size = 128K) |
+#        ------------------------------
+#       |  FPT entriy 2  (size = 128K) |
+#        ------------------------------
+
+fpt_config_data = """
+fpt_header:
+  magic_word:       0x92F7A516
+  fpt_version:      2
+  fpt_header_size:  128
+  fpt_entry_size:   128
+  num_entries:      3
+  fpt_entry_offset: 128 * 1024           # 0x0002_0000
+
+fpt_entry_rave:
+    - type:            0x00000E00        # "PDI"
+      base_addr:       0x00080000
+      partition_size:  58 * 1024 * 1024  # 0x03A0_0000
+      partition_flags: 0x00
+
+    - type:            0x00000E00        # "PDI"
+      base_addr:       0x03B80000
+      partition_size:  58 * 1024 * 1024  # 0x03A0_0000
+      partition_flags: 0x00
+
+    - type:            0x00000F00        # "USER"
+      base_addr:       0x07680000
+      partition_size:  8 * 1024 * 1024  # 0x0080_0000
+      partition_flags: 0x00
+
+fpt_entry_v80:
+    - type:            0x00000E00        # "PDI"
+      base_addr:       0x00080000
+      partition_size:  116 * 1024 * 1024 # 0x0740_0000
+      partition_flags: 0x00
+
+    - type:            0x00000E00        # "PDI"
+      base_addr:       0x07480000
+      partition_size:  116 * 1024 * 1024 # 0x0740_0000
+      partition_flags: 0x00
+
+    - type:            0x00000F00        # "USER"
+      base_addr:       0x0E880000
+      partition_size:  16 * 1024 * 1024  # 0x0170_0000
+      partition_flags: 0x00
+"""
+
 # Constants
-FIELD_SIZE_U32 = 4
-FIELD_SIZE_U8  = 1
-TYPE_PDI       = '0x00000E00'
-TYPE_USER      = '0x00000F00'
+U32_SIZE_BYTES = 4
+U8_SIZE_BYTES  = 1
 
 
 # Debug class uses to dump hex output
@@ -54,113 +115,99 @@ class hexdump:
 
 # The main loop
 def main():
-    parser = argparse.ArgumentParser(description='Generate binary file from FPT JSON',
+
+    parser = argparse.ArgumentParser(description='Generate FPT binary file',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-f', '--file',        help='the FPT JSON file')
-    parser.add_argument('-o', '--output_path', help='FPT output path')
-    parser.add_argument('-v', '--verbose',     help="increase output verbosity")
+    parser.add_argument('-p', '--profile',     help='profile [rave|v80]', default = 'rave')
+    parser.add_argument('-o', '--output_path', help='FPT output path', default = './')
+    parser.add_argument('-v', '--verbose',     action='store_true', help="increase output verbosity")
     args = parser.parse_args()
 
-    if args.file is None:
-        print('Error: Please specifiy a valid FPT JSON file')
+    args.profile = args.profile.lower()
+    if args.profile != 'rave' and args.profile != 'v80':
+        print('Error: Invalid profile, supported profiles: rave | v80')
         parser.print_help()
         raise SystemExit(1)
 
-    # Step1: open the JSON file
-    try:
-        if args.verbose:
-            print('Input filename:' + args.file)
-            print('Output path:' + args.output_path)
-        fp = open(args.file)
-    except Exception as e:
-        print('Error: Failed to open file: ' + str(e))
-        raise SystemExit(1)
+    # Step1: Print verbose args
+    if args.verbose:
+        print('profile:     ' + args.profile)
+        print('Output path: ' + args.output_path)
 
-    # Step2: load the JSON file
-    try:
-        data = json.load(fp)
-    except Exception as e:
-        print('Error: Failed to load JSON data: ' + str(e))
-        raise SystemExit(1)
-    finally:
-        # Finished with the file
-        fp.close()
+    # Step2: load the FPT configuration data
+    data = yaml.safe_load(fpt_config_data)
 
-    # Step3: Parse the FPT header from the JSON
-    try:
-        magic_word      = data['fpt_header(0)']['magic_word']
-        fpt_version     = data['fpt_header(0)']['fpt_version']
-        fpt_header_size = data['fpt_header(0)']['fpt_header_size']
-        fpt_entry_size  = data['fpt_header(0)']['fpt_entry_size']
-        num_entries     = data['fpt_header(0)']['num_entries']
-        fpt_entry_offset= data['fpt_header(0)']['fpt_entry_offset']
-        if args.verbose:
-            print('fpt_header:', data['fpt_header(0)'])
-    except Exception as e:
-        print('Error: FPT header not as expected: ' + str(e))
-        raise SystemExit(1)
+    # Step3: Parse the FPT header
+    magic_word       = data['fpt_header']['magic_word']
+    fpt_version      = data['fpt_header']['fpt_version']
+    fpt_header_size  = data['fpt_header']['fpt_header_size']
+    fpt_entry_size   = data['fpt_header']['fpt_entry_size']
+    num_entries      = data['fpt_header']['num_entries']
+    fpt_entry_offset = eval(data['fpt_header']['fpt_entry_offset'])
 
-    # Step4: Parse the FPT enteries from the JSON
-    try:
-        fpt_entry = namedtuple('fpt_entry', 'type base_addr partition_size')
-        fpt_entry_list = []
-        for x in range(0, int(num_entries)):
-            fpt_str = "fpt_entry(0, " + str(x) + ")"
-            fpt_entry_list.append(fpt_entry(data[fpt_str]['type'],
-                                  data[fpt_str]['base_addr'],
-                                  data[fpt_str]['partition_size']))
-        if args.verbose:
-            print('magic_word:',       magic_word)
-            print('fpt_version:',      fpt_version)
-            print('fpt_header_size:',  fpt_header_size)
-            print('fpt_entry_size:',   fpt_entry_size)
-            print('num_entries:',      num_entries)
-            print('fpt_entry_offset:', fpt_entry_offset)
-            for fpt_tuple in fpt_entry_list:
-                print(fpt_tuple)
-    except Exception as e:
-        print('Error: Failed to parse the FPT enteries: ' + str(e))
-        raise SystemExit(1)
+    # Step4: Parse the FPT entries
+    fpt_entry = namedtuple('fpt_entry', 'type base_addr partition_size partition_flags')
+    fpt_entry_list = []
+    for entry in data['fpt_entry_' + args.profile]:
+        fpt_entry_list.append(fpt_entry(
+                              entry.get('type'),
+                              entry.get('base_addr'),
+                              eval(entry.get('partition_size')),
+                              entry.get('partition_flags')))
+    if args.verbose:
+        print('\nFPT Header:')
+        print('    magic_word:      ', hex(magic_word))
+        print('    fpt_version:     ', fpt_version)
+        print('    fpt_header_size: ', fpt_header_size)
+        print('    fpt_entry_size:  ', fpt_entry_size)
+        print('    num_entries:     ', num_entries)
+        print('    fpt_entry_offset:', hex(fpt_entry_offset))
+        for i, fpt_tuple in enumerate(fpt_entry_list):
+            print('FPT entry:',        i)
+            print('    type:           ', hex(fpt_tuple.type))
+            print('    base_addr:      ', hex(fpt_tuple.base_addr))
+            print(f'    partition_size:  {fpt_tuple.partition_size / (1024 * 1024):.2f} MB')
+            print('    partition_flags:', hex(fpt_tuple.partition_flags))
+        print('')
 
     # Step5: Create an empty byte array of fixed size & populate
     try:
         fpt_size = fpt_entry_offset * (num_entries + 1)
         fpt_data = bytearray(fpt_size)
+
         pos = 0
-        # reverse as little endian
-        magic_bytes = bytearray.fromhex(magic_word[2:])
-        magic_bytes.reverse()
-        fpt_data[pos:0] = magic_bytes
-        pos += FIELD_SIZE_U32
+        fpt_data[pos:0] = magic_word.to_bytes(U32_SIZE_BYTES, 'little')
+
+        pos += U32_SIZE_BYTES
         fpt_data.insert(pos, fpt_version)
-        pos += FIELD_SIZE_U8
+
+        pos += U8_SIZE_BYTES
         fpt_data.insert(pos, fpt_header_size)
-        pos += FIELD_SIZE_U8
+
+        pos += U8_SIZE_BYTES
         fpt_data.insert(pos, fpt_entry_size)
-        pos += FIELD_SIZE_U8
+
+        pos += U8_SIZE_BYTES
         fpt_data.insert(pos, num_entries)
 
         index_tuple = 0
         for fpt_tuple in fpt_entry_list:
+            # FPT entry type
             pos = fpt_entry_offset * (index_tuple + 1)
-            if fpt_tuple.type == 'PDI':
-                type_bytes = bytearray.fromhex(TYPE_PDI[2:])
-                type_bytes.reverse()
-                fpt_data[pos:0] = type_bytes
-            elif fpt_tuple.type == 'USER':
-                type_bytes = bytearray.fromhex(TYPE_USER[2:])
-                type_bytes.reverse()
-                fpt_data[pos:0] = type_bytes
-            else:
-                raise Exception('Invalid type field found, only PDI is supported')
-            pos += FIELD_SIZE_U32
-            base_addr_bytes = bytearray.fromhex((fpt_tuple.base_addr)[2:])
-            base_addr_bytes.reverse()
-            fpt_data[pos:0] = base_addr_bytes
-            pos += FIELD_SIZE_U32
-            partition_size_bytes = bytearray.fromhex((fpt_tuple.partition_size)[2:])
-            partition_size_bytes.reverse()
-            fpt_data[pos:0] = partition_size_bytes
+            fpt_data[pos:0] = fpt_tuple.type.to_bytes(U32_SIZE_BYTES, 'little')
+
+            # FPT entry base address
+            pos += U32_SIZE_BYTES
+            fpt_data[pos:0] = fpt_tuple.base_addr.to_bytes(U32_SIZE_BYTES, 'little')
+
+            # FPT entry partition size
+            pos += U32_SIZE_BYTES
+            fpt_data[pos:0] =  fpt_tuple.partition_size.to_bytes(U32_SIZE_BYTES, 'little')
+
+            # FPT entry partition flag
+            pos += U32_SIZE_BYTES
+            fpt_data[pos:0] = fpt_tuple.partition_flags.to_bytes(U32_SIZE_BYTES, 'little')
+
             index_tuple += 1
 
         fpt_data = fpt_data[:fpt_size]
