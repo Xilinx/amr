@@ -574,10 +574,8 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
 
                 AMI_PROXY_RESULT xResult = AMI_PROXY_RESULT_SUCCESS;
 
-                GCQ_VERSION_TYPE xGcqVersion =
-                {
-                    0
-                };
+                GCQVersion xGcqVersion = { 0 };
+
                 if( OK != iGCQGetVersion( &xGcqVersion ) )
                 {
                     PLL_DBG( AMC_NAME, "Error getting sGCQ version\r\n" );
@@ -658,18 +656,18 @@ static void vGetProjectInfo( void )
     iOSAL_Task_SleepMs( AMC_GET_PROJECT_INFO_SLEEP_MS );
 
     vPLL_Printf( "\r\n" );
-    vPLL_Printf( "###############################################################\r\n" );
-    vPLL_Printf( "#                                                             #\r\n" );
-    vPLL_Printf( "#                             AMC                             #\r\n" );
-    vPLL_Printf( "#                                                             #\r\n" );
-    vPLL_Printf( "# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc.      #\r\n" );
-    vPLL_Printf( "# All rights reserved.                                        #\r\n" );
-    vPLL_Printf( "#                                                             #\r\n" );
-    vPLL_Printf( "# SPDX-License-Identifier: MIT                                #\r\n" );
-    vPLL_Printf( "#                                                             #\r\n" );
-    vPLL_Printf( "###############################################################\r\n" );
+    vPLL_Printf( "################################################################\r\n" );
+    vPLL_Printf( "#                                                              #\r\n" );
+    vPLL_Printf( "#                             A M C                            #\r\n" );
+    vPLL_Printf( "#                                                              #\r\n" );
+    vPLL_Printf( "# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc.       #\r\n" );
+    vPLL_Printf( "# All rights reserved.                                         #\r\n" );
+    vPLL_Printf( "#                                                              #\r\n" );
+    vPLL_Printf( "# SPDX-License-Identifier: MIT                                 #\r\n" );
+    vPLL_Printf( "#                                                              #\r\n" );
+    vPLL_Printf( "################################################################\r\n" );
     PLL_LOG( AMC_NAME,
-             "AMC: %d.%d.%d-%d.%.*s.%.*s%c\r\n",
+             "AMC: %d.%d.%d-%d.%.*s.%.*s%c [%s]\r\n",
              GIT_TAG_VER_MAJOR,
              GIT_TAG_VER_MINOR,
              GIT_TAG_VER_PATCH,
@@ -678,7 +676,8 @@ static void vGetProjectInfo( void )
              GIT_HASH,
              AMC_DATE_LEN,
              GIT_DATE,
-             ( GIT_STATUS )?( '*' ):( ' ' ) );
+             ( GIT_STATUS )?( '*' ):( ' ' ),
+             UTC_BUILD_TIME );
     PLL_LOG( AMC_NAME,
              "OS:  %s v%u.%u.%u\r\n",
              pcOsName,

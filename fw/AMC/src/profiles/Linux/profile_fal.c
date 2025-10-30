@@ -185,11 +185,10 @@ static FW_IF_MUXED_DEVICE_CFG xDimmCfg =
     DIMM_I2C_ADDR,
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
 };                                                                             /* DIMM */
-static FW_IF_GCQ_CFG xGcqCfg =
+static FW_IF_GCQCfg xGcqCfg =
 {
     ( uint64_t )HAL_BASE_LOGIC_GCQ_M2R_S01_AXI_BASEADDR,
     FW_IF_GCQ_MODE_PRODUCER,
-    FW_IF_GCQ_INTERRUPT_MODE_NONE,
     ( uint64_t )HAL_RPU_RING_BUFFER_BASE,
     HAL_RPU_RING_BUFFER_LEN,
     AMI_PROXY_RESPONSE_SIZE,
@@ -197,7 +196,7 @@ static FW_IF_GCQ_CFG xGcqCfg =
     ""
 };
 
-static FW_IF_GCQ_INIT_CFG myGcqIf =
+static FW_IF_GCQInitCfg myGcqIf =
 {
     NULL
 };

@@ -125,21 +125,21 @@ typedef uint32_t ( FW_IF_bindCallback )( void *pvFwIf, FW_IF_callback *pxNewFunc
  */
 typedef enum _FW_IF_ERRORS
 {
-    FW_IF_ERRORS_NONE = 0,                  /* no errors, call was successful */
-    FW_IF_ERRORS_PARAMS,                    /* invalid parameters passed in to function */
-    FW_IF_ERRORS_INVALID_HANDLE,            /* invalid handle to the fw_if */
-    FW_IF_ERRORS_INVALID_CFG,               /* invalid config in the fw_if */
-    FW_IF_ERRORS_UNRECOGNISED_OPTION,       /* invalid option passed in to ioctrl function */
-    FW_IF_ERRORS_DRIVER_IN_USE,             /* driver was in use by another process */
-    FW_IF_ERRORS_DRIVER_NOT_INITIALISED,    /* driver was not initialised correctly */
-    FW_IF_ERRORS_DRIVER_RX_MODE,            /* driver was requested to operate in a mode with which it is not compatible */
-    FW_IF_ERRORS_TIMEOUT,                   /* a non-0 timeout value was requested and expired */
-    FW_IF_ERRORS_BINDING,                   /* the callback was not successfully bound in */
-    FW_IF_ERRORS_OPEN,                      /* this should cause a driver-specific event to be raised to the bound callback */
-    FW_IF_ERRORS_CLOSE,                     /* this should cause a driver-specific event to be raised to the bound callback */
-    FW_IF_ERRORS_WRITE,                     /* this should cause a driver-specific event to be raised to the bound callback */
-    FW_IF_ERRORS_READ,                      /* this should cause a driver-specific event to be raised to the bound callback */
-    FW_IF_ERRORS_IOCTRL,                    /* this should cause a driver-specific event to be raised to the bound callback */
+    FW_IF_ERRORS_NONE = 0,              /* no errors, call was successful */
+    FW_IF_ERRORS_PARAMS,                /* invalid parameters passed in to function */
+    FW_IF_ERRORS_INVALID_HANDLE,        /* invalid handle to the fw_if */
+    FW_IF_ERRORS_INVALID_CFG,           /* invalid config in the fw_if */
+    FW_IF_ERRORS_UNRECOGNISED_OPTION,   /* invalid option passed in to ioctrl function */
+    FW_IF_ERRORS_DRIVER_IN_USE,         /* driver was in use by another process */
+    FW_IF_ERRORS_DRIVER_NOT_INITIALISED,/* driver was not initialised correctly */
+    FW_IF_ERRORS_DRIVER_RX_MODE,        /* driver was requested to operate in a mode with which it is not compatible */
+    FW_IF_ERRORS_TIMEOUT,               /* a non-0 timeout value was requested and expired */
+    FW_IF_ERRORS_BINDING,               /* the callback was not successfully bound in */
+    FW_IF_ERRORS_OPEN,                  /* this should cause a driver-specific event to be raised to the bound callback */
+    FW_IF_ERRORS_CLOSE,                 /* this should cause a driver-specific event to be raised to the bound callback */
+    FW_IF_ERRORS_WRITE,                 /* this should cause a driver-specific event to be raised to the bound callback */
+    FW_IF_ERRORS_READ,                  /* this should cause a driver-specific event to be raised to the bound callback */
+    FW_IF_ERRORS_IOCTRL,                /* this should cause a driver-specific event to be raised to the bound callback */
 
     MAX_FW_IF_ERROR,
 

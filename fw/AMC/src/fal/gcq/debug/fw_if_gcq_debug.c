@@ -56,9 +56,9 @@ static void vClearStats( void );
  */
 void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle )
 {
-    if( FALSE == iIsInitialised )
+    if ( FALSE == iIsInitialised )
     {
-        if( NULL == pxParentHandle )
+        if ( NULL == pxParentHandle )
         {
             pxFwIfGcqTop = pxDAL_NewDirectory( "fw_if_gcq" );
         }
@@ -67,7 +67,7 @@ void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle )
             pxFwIfGcqTop = pxDAL_NewSubDirectory( "fw_if_gcq", pxParentHandle );
         }
 
-        if( NULL != pxFwIfGcqTop )
+        if ( NULL != pxFwIfGcqTop )
         {
             pxDAL_NewDebugFunction( "print_all_stats", pxFwIfGcqTop, vPrintStats );
             pxDAL_NewDebugFunction( "clear_all_stats", pxFwIfGcqTop, vClearStats );
@@ -87,7 +87,7 @@ void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle )
  */
 static void vPrintStats( void )
 {
-    if( OK != iFW_IF_GCQ_PrintStatistics() )
+    if ( OK != iFW_IF_GCQ_PrintStatistics() )
     {
         PLL_DAL( FW_IF_GCQ_DBG_NAME, "Error printing statistics\r\n" );
     }
@@ -98,7 +98,7 @@ static void vPrintStats( void )
  */
 static void vClearStats( void )
 {
-    if( OK != iFW_IF_GCQ_ClearStatistics() )
+    if ( OK != iFW_IF_GCQ_ClearStatistics() )
     {
         PLL_DAL( FW_IF_GCQ_DBG_NAME, "Error printing statistics\r\n" );
     }

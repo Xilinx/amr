@@ -36,7 +36,6 @@
 
 #define CHECK_HDL( f )              if( NULL == f ) return FW_IF_ERRORS_INVALID_HANDLE
 #define CHECK_CFG( f )              if( NULL == ( f )->cfg  ) return FW_IF_ERRORS_INVALID_CFG
-#define CHECK_PROFILE( f )          if( NULL == ( f )->pvProfile ) return
 
 /* Stat & Error definitions */
 #define FW_IF_QSFP_STATS( DO )   \

@@ -10,25 +10,17 @@
 #ifndef _GCQ_DEBUG_H_
 #define _GCQ_DEBUG_H_
 
-#ifdef  __KERNEL__
-#include <linux/types.h>
-#include <linux/kernel.h>
-#include <linux/idr.h>
-#else
 #include <stdint.h>
 #include <stdio.h>
 #include "osal.h"
-#endif
+
 
 #ifndef GCQ_DEBUG_ENABLE
 #define GCQ_DEBUG_ENABLE        ( 0 )   /**< Debug logging disabled by default */
 #endif
+
 #if GCQ_DEBUG_ENABLE
-#ifdef __KERNEL__
-#define GCQ_DEBUG( x... )       {  printk( "[sGCQ Driver] " x ); }
-#else
-#define GCQ_DEBUG( x... )       {  vOSAL_Printf( "[sGCQ Driver] " x ); }
-#endif
+#define GCQ_DEBUG( x... )       { vOSAL_Printf( "[sGCQ Driver] " x ); }
 #else
 #define GCQ_DEBUG( x... )       ( void ) ( 0 )
 #endif

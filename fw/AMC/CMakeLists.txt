@@ -1,7 +1,7 @@
 # Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.7.0)
 
 project(amc)
 
@@ -103,12 +103,15 @@ else()
     endif()
 
     #set custom profile with -DPROFILE flag (v80, Linux, etc), Defaults to v80 if not specified
+    string(TIMESTAMP BUILD_TIME "%a %b %Y %H:%M:%S" UTC)
+    add_definitions(-DOOB_ENABLED)
+    add_definitions(-DUTC_BUILD_TIME="${BUILD_TIME} UTC")
+
     if(NOT PROFILE)
         include_directories(src/profiles/v80)
         set(PROFILE "v80")
         set(PROFILE_FAL_PATH "src/profiles/v80/profile_fal.c")
         set(PROFILE_DEBUG_MENU_PATH "src/profiles/v80/profile_debug_menu.c")
-        add_definitions(-DOOB_ENABLED)
     elseif(PROFILE MATCHES "^(rave)$")
         include_directories(src/profiles/rave)
         set(PROFILE "rave")
@@ -116,15 +119,11 @@ else()
         set(PROFILE_DEBUG_MENU_PATH "src/profiles/rave/profile_debug_menu.c")
         set(EEPROM_PATH "src/device_drivers/eeprom/rave/eeprom.c")
         add_definitions(-DPROFILE_RAVE)
-        add_definitions(-DOOB_ENABLED)
     elseif(PROFILE MATCHES "^(v80*)$")
         include_directories(src/profiles/v80)
         set(PROFILE "v80")
         set(PROFILE_FAL_PATH "src/profiles/v80/profile_fal.c")
         set(PROFILE_DEBUG_MENU_PATH "src/profiles/v80/profile_debug_menu.c")
-        set(EEPROM_PATH "src/device_drivers/eeprom/aved/eeprom.c")
-        add_definitions(-DPROFILE_V80)
-        add_definitions(-DOOB_ENABLED)
     elseif(PROFILE MATCHES "^(v70)$")
         include_directories(src/profiles/v70)
         set(FW_IF_QSFP_PATH "")
@@ -143,7 +142,6 @@ else()
         set(PROFILE_FAL_PATH "src/profiles/v80/profile_fal.c")
         set(PROFILE_DEBUG_MENU_PATH "src/profiles/v80/profile_debug_menu.c")
         set(EEPROM_PATH "src/device_drivers/eeprom/aved/eeprom.c")
-        add_definitions(-DOOB_ENABLED)
     endif()
 
 
@@ -159,7 +157,6 @@ else()
 
     #Running prerequisite script
     execute_process(COMMAND ./scripts/getVersion.sh amc WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    execute_process(COMMAND ./getVersion.sh gcq WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/device_drivers/gcq_driver)
     execute_process(COMMAND ./getVersion.sh smbus WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/device_drivers/smbus_driver)
 
     #adding static libraries
@@ -257,8 +254,6 @@ else()
         ${FW_IF_EMMC_PATH}
         ${FW_IF_SMBUS_BLOCK_IO_PATH}
         src/device_drivers/gcq_driver/src/gcq_driver.c
-        src/device_drivers/gcq_driver/src/gcq_features.c
-        src/device_drivers/gcq_driver/src/gcq_hw.c
         src/device_drivers/sensors/ina3221/ina3221.c
         src/device_drivers/sensors/isl68221/isl68221.c
         src/device_drivers/sensors/cat34ts02/cat34ts02.c
