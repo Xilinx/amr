@@ -8,10 +8,6 @@
  * @file sys_mon.c
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "standard.h"
 #include "util.h"
 #include "pll.h"
@@ -87,10 +83,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( SYS_MON_ERRORS, SYS_MON_ERRORS, SYS_MON_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  SYS_MON_PRIVATE_DATA
+ * @struct  SYS_MON_PrivateData
  * @brief   Private driver data
  */
-typedef struct SYS_MON_PRIVATE_DATA
+typedef struct
 {
     uint32_t    ulUpperFirewall;
 
@@ -107,14 +103,14 @@ typedef struct SYS_MON_PRIVATE_DATA
 
     uint32_t    ulLowerFirewall;
 
-} SYS_MON_PRIVATE_DATA;
+} SYS_MON_PrivateData;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static SYS_MON_PRIVATE_DATA xPrivateData =
+static SYS_MON_PrivateData xPrivateData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall */
     FALSE,              /* iIsInitialised */
@@ -127,7 +123,7 @@ static SYS_MON_PRIVATE_DATA xPrivateData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 };
 
-static SYS_MON_PRIVATE_DATA *pxThis = &xPrivateData;
+static SYS_MON_PrivateData *pxThis = &xPrivateData;
 
 
 /******************************************************************************/
@@ -225,7 +221,7 @@ int iSYS_MON_ReadTemperature( float *pfTemperatureInC )
 /**
  * @brief   Read voltage from System Monitor
  */
-int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageInMV )
+int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES xVoltageType, float *pfVoltageInMV )
 {
     int iStatus = ERROR;
 
@@ -246,7 +242,7 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
             case SYS_MON_VOLTAGES_VCCAUX:
                 iMappedVType = VCCAUX;
                 break;
-#ifdef PROFILE_RAVE
+        #ifdef HAL_PROFILE_RAVE
             case SYS_MON_VOLTAGES_VCCSOC:
                 iMappedVType = VCC_SOC;
                 break;
@@ -280,14 +276,14 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageIn
             case SYS_MON_VOLTAGES_VCCAUXSMON:
                 iMappedVType = VCCAUX_PMC;
                 break;
-#else
+        #else
             case SYS_MON_VOLTAGES_VCCAUXSMON:
                 iMappedVType = VCCAUX_SMON;
                 break;
             case SYS_MON_VOLTAGES_VCCAUXPMC:
                 iMappedVType = VCCAUX_PMC;
                 break;
-#endif
+        #endif
             default:
                 iMappedVType = SYS_MON_DEFAULT_V_TYPE;
                 break;

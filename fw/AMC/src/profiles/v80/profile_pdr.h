@@ -10,10 +10,6 @@
 #ifndef _PROFILE_PDR_H_
 #define _PROFILE_PDR_H_
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "util.h"
 
 
@@ -21,10 +17,10 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define TOTAL_PDR_TEMPERATURE     ( 6 )
-#define TOTAL_PDR_VOLTAGE         ( 9 )
-#define TOTAL_PDR_CURRENT         ( 8 )
-#define TOTAL_PDR_POWER           ( 4 )
+#define TOTAL_PDR_TEMPERATURE          ( 6 )
+#define TOTAL_PDR_VOLTAGE              ( 9 )
+#define TOTAL_PDR_CURRENT              ( 8 )
+#define TOTAL_PDR_POWER                ( 4 )
 #define TOTAL_PDR_NUMERIC_ASCI_SENSORS ( TOTAL_PDR_TEMPERATURE + TOTAL_PDR_VOLTAGE + TOTAL_PDR_CURRENT + \
                                          TOTAL_PDR_POWER )
 
@@ -32,41 +28,37 @@
 #define LOGICAL_PLDM_ENTITY_ADDIN_CARD  ( 32835 )
 
 /* Macros to set bits for 'ucRangeFieldSupport' field in PDR */
-
-#define NORMAL_MIN_MAX            ( 0x3 << 1 )
-#define RATED_MIN_MAX             ( 0x3 << 3 )
-#define HIGH_THRESHOLDS           ( 0x5 << 3 )
-#define LOW_THRESHOLDS            ( 0x5 << 4 )
-#define NOMINAL_VALUE             ( 0x1 )
+#define NORMAL_MIN_MAX              ( 0x3 << 1 )
+#define RATED_MIN_MAX               ( 0x3 << 3 )
+#define HIGH_THRESHOLDS             ( 0x5 << 3 )
+#define LOW_THRESHOLDS              ( 0x5 << 4 )
+#define NOMINAL_VALUE               ( 0x1 )
 
 /* Macros to set bits for 'ucSupportedThresholds' field in PDR */
-
-#define HAS_LOW_THRESHOLDS         ( 0x7 << 3 )
-#define HAS_HIGH_THRESHOLDS        ( 0x7 )
+#define HAS_LOW_THRESHOLDS          ( 0x7 << 3 )
+#define HAS_HIGH_THRESHOLDS         ( 0x7 )
 
 /* AMC Device ID Defines */
-
-#define PCB_DEVICE_ID              ( 12 )
-#define DEVICE_DEVICE_ID           ( 13 )
-#define VR_VCCINT_DEVICE_ID        ( 14 )
-#define QSFP_MODULE_0_DEVICE_ID    ( 15 )
-#define QSFP_MODULE_1_DEVICE_ID    ( 16 )
-#define QSFP_MODULE_2_DEVICE_ID    ( 17 )
-#define QSFP_MODULE_3_DEVICE_ID    ( 18 )
-#define DIMM_DEVICE_ID             ( 43 )
-#define VR_1V2_VCC_HBM_DEVICE_ID   ( 20 )
-#define VR_12V_AUX1_DEVICE_ID      ( 21 )
-#define VR_12V_AUX2_DEVICE_ID      ( 22 )
-#define VR_1V2_VCCO_DIMM_DEVICE_ID ( 23 )
-#define VR_3V3_PEX_DEVICE_ID       ( 24 )
-#define VR_12V_PEX_DEVICE_ID       ( 25 )
-#define VR_3V3_QSFP_DEVICE_ID      ( 34 )
-#define VR_1V5_VCCAUX_DEVICE_ID    ( 36 )
-#define VR_1V2_GTXAVTT_DEVICE_ID   ( 38 )
-#define VR_0V88_VCC_CPM5_DEVICE_ID ( 41 )
+#define PCB_DEVICE_ID               ( 12 )
+#define DEVICE_DEVICE_ID            ( 13 )
+#define VR_VCCINT_DEVICE_ID         ( 14 )
+#define QSFP_MODULE_0_DEVICE_ID     ( 15 )
+#define QSFP_MODULE_1_DEVICE_ID     ( 16 )
+#define QSFP_MODULE_2_DEVICE_ID     ( 17 )
+#define QSFP_MODULE_3_DEVICE_ID     ( 18 )
+#define DIMM_DEVICE_ID              ( 43 )
+#define VR_1V2_VCC_HBM_DEVICE_ID    ( 20 )
+#define VR_12V_AUX1_DEVICE_ID       ( 21 )
+#define VR_12V_AUX2_DEVICE_ID       ( 22 )
+#define VR_1V2_VCCO_DIMM_DEVICE_ID  ( 23 )
+#define VR_3V3_PEX_DEVICE_ID        ( 24 )
+#define VR_12V_PEX_DEVICE_ID        ( 25 )
+#define VR_3V3_QSFP_DEVICE_ID       ( 34 )
+#define VR_1V5_VCCAUX_DEVICE_ID     ( 36 )
+#define VR_1V2_GTXAVTT_DEVICE_ID    ( 38 )
+#define VR_0V88_VCC_CPM5_DEVICE_ID  ( 41 )
 
 /* AMC Reading Channel Defines */
-
 #define PCB_TEMPERATURE_READING_CHANNEL              ( 0 )
 #define DEVICE_TEMPERATURE_READING_CHANNEL           ( 0 )
 #define VR_VCCINT_TEMPERATURE_READING_CHANNEL        ( 0 )
@@ -96,48 +88,36 @@
 #define VR_0V88_VCC_CPM5_CURRENT_READING_CHANNEL     ( 2 )
 
 /* PLDM Type 2 (DSP0248) Numeric Sensor ID Defines */
-
-#define PCB_TEMPERATURE_SENSOR_ID              ( PCB_DEVICE_ID + ( PCB_TEMPERATURE_READING_CHANNEL << 8 ) )
-#define DEVICE_TEMPERATURE_SENSOR_ID           ( DEVICE_DEVICE_ID + ( DEVICE_TEMPERATURE_READING_CHANNEL << 8 ) )
-#define VR_VCCINT_TEMPERATURE_SENSOR_ID        ( VR_VCCINT_DEVICE_ID + ( VR_VCCINT_TEMPERATURE_READING_CHANNEL << 8 ) )
-#define VR_VCCINT_VOLTAGE_SENSOR_ID            ( VR_VCCINT_DEVICE_ID + ( VR_VCCINT_VOLTAGE_READING_CHANNEL << 8 ) )
-#define VR_VCCINT_CURRENT_SENSOR_ID            ( VR_VCCINT_DEVICE_ID + ( VR_VCCINT_CURRENT_READING_CHANNEL << 8 ) )
-#define VR_1V2_VCC_HBM_TEMPERATURE_SENSOR_ID   ( VR_1V2_VCC_HBM_DEVICE_ID + \
-                                                 ( VR_1V2_VCC_HBM_TEMPERATURE_READING_CHANNEL << 8 ) )
-#define VR_1V2_VCC_HBM_VOLTAGE_SENSOR_ID       ( VR_1V2_VCC_HBM_DEVICE_ID + ( VR_1V2_VCC_HBM_VOLTAGE_READING_CHANNEL << \
-                                                                              8 ) )
-#define VR_1V2_VCC_HBM_CURRENT_SENSOR_ID       ( VR_1V2_VCC_HBM_DEVICE_ID + ( VR_1V2_VCC_HBM_CURRENT_READING_CHANNEL << \
-                                                                              8 ) )
-#define VR_12V_AUX1_VOLTAGE_SENSOR_ID          ( VR_12V_AUX1_DEVICE_ID + ( VR_12V_AUX1_VOLTAGE_READING_CHANNEL << 8 ) )
-#define VR_12V_AUX1_CURRENT_SENSOR_ID          ( VR_12V_AUX1_DEVICE_ID + ( VR_12V_AUX1_CURRENT_READING_CHANNEL << 8 ) )
-#define VR_12V_AUX1_POWER_SENSOR_ID            ( VR_12V_AUX1_DEVICE_ID + ( VR_12V_AUX1_POWER_READING_CHANNEL << 8 ) )
-#define VR_12V_AUX2_VOLTAGE_SENSOR_ID          ( VR_12V_AUX2_DEVICE_ID + ( VR_12V_AUX2_VOLTAGE_READING_CHANNEL << 8 ) )
-#define VR_12V_AUX2_CURRENT_SENSOR_ID          ( VR_12V_AUX2_DEVICE_ID + ( VR_12V_AUX2_CURRENT_READING_CHANNEL << 8 ) )
-#define VR_12V_AUX2_POWER_SENSOR_ID            ( VR_12V_AUX2_DEVICE_ID + ( VR_12V_AUX2_POWER_READING_CHANNEL << 8 ) )
-#define VR_3V3_PEX_VOLTAGE_SENSOR_ID           ( VR_3V3_PEX_DEVICE_ID + ( VR_3V3_PEX_VOLTAGE_READING_CHANNEL << 8 ) )
-#define VR_3V3_PEX_CURRENT_SENSOR_ID           ( VR_3V3_PEX_DEVICE_ID + ( VR_3V3_PEX_CURRENT_READING_CHANNEL << 8 ) )
-#define VR_3V3_PEX_POWER_SENSOR_ID             ( VR_3V3_PEX_DEVICE_ID + ( VR_3V3_PEX_POWER_READING_CHANNEL << 8 ) )
-#define VR_12V_PEX_VOLTAGE_SENSOR_ID           ( VR_12V_PEX_DEVICE_ID + ( VR_12V_PEX_VOLTAGE_READING_CHANNEL << 8 ) )
-#define VR_12V_PEX_CURRENT_SENSOR_ID           ( VR_12V_PEX_DEVICE_ID + ( VR_12V_PEX_CURRENT_READING_CHANNEL << 8 ) )
-#define VR_12V_PEX_POWER_SENSOR_ID             ( VR_12V_PEX_DEVICE_ID + ( VR_12V_PEX_POWER_READING_CHANNEL << 8 ) )
-#define VR_1V5_VCCAUX_VOLTAGE_SENSOR_ID        ( VR_1V5_VCCAUX_DEVICE_ID + ( VR_1V5_VCCAUX_VOLTAGE_READING_CHANNEL << \
-                                                                             8 ) )
-#define VR_1V2_GTXAVTT_TEMPERATURE_SENSOR_ID   ( VR_1V2_GTXAVTT_DEVICE_ID + \
-                                                 ( VR_1V2_GTXAVTT_TEMPERATURE_READING_CHANNEL << 8 ) )
-#define VR_1V2_GTXAVTT_VOLTAGE_SENSOR_ID       ( VR_1V2_GTXAVTT_DEVICE_ID + ( VR_1V2_GTXAVTT_VOLTAGE_READING_CHANNEL << \
-                                                                              8 ) )
-#define VR_1V2_GTXAVTT_CURRENT_SENSOR_ID       ( VR_1V2_GTXAVTT_DEVICE_ID + ( VR_1V2_GTXAVTT_CURRENT_READING_CHANNEL << \
-                                                                              8 ) )
-#define VR_0V88_VCC_CPM5_TEMPERATURE_SENSOR_ID ( VR_0V88_VCC_CPM5_DEVICE_ID + \
-                                                 ( VR_0V88_VCC_CPM5_TEMPERATURE_READING_CHANNEL << 8 ) )
-#define VR_0V88_VCC_CPM5_VOLTAGE_SENSOR_ID     ( VR_0V88_VCC_CPM5_DEVICE_ID + \
-                                                 ( VR_0V88_VCC_CPM5_VOLTAGE_READING_CHANNEL << 8 ) )
-#define VR_0V88_VCC_CPM5_CURRENT_SENSOR_ID     ( VR_0V88_VCC_CPM5_DEVICE_ID + \
-                                                 ( VR_0V88_VCC_CPM5_CURRENT_READING_CHANNEL << 8 ) )
+#define PCB_TEMPERATURE_SENSOR_ID              ( PCB_DEVICE_ID              + ( PCB_TEMPERATURE_READING_CHANNEL              << 8 ) )
+#define DEVICE_TEMPERATURE_SENSOR_ID           ( DEVICE_DEVICE_ID           + ( DEVICE_TEMPERATURE_READING_CHANNEL           << 8 ) )
+#define VR_VCCINT_TEMPERATURE_SENSOR_ID        ( VR_VCCINT_DEVICE_ID        + ( VR_VCCINT_TEMPERATURE_READING_CHANNEL        << 8 ) )
+#define VR_VCCINT_VOLTAGE_SENSOR_ID            ( VR_VCCINT_DEVICE_ID        + ( VR_VCCINT_VOLTAGE_READING_CHANNEL            << 8 ) )
+#define VR_VCCINT_CURRENT_SENSOR_ID            ( VR_VCCINT_DEVICE_ID        + ( VR_VCCINT_CURRENT_READING_CHANNEL            << 8 ) )
+#define VR_1V2_VCC_HBM_TEMPERATURE_SENSOR_ID   ( VR_1V2_VCC_HBM_DEVICE_ID   + ( VR_1V2_VCC_HBM_TEMPERATURE_READING_CHANNEL   << 8 ) )
+#define VR_1V2_VCC_HBM_VOLTAGE_SENSOR_ID       ( VR_1V2_VCC_HBM_DEVICE_ID   + ( VR_1V2_VCC_HBM_VOLTAGE_READING_CHANNEL       << 8 ) )
+#define VR_1V2_VCC_HBM_CURRENT_SENSOR_ID       ( VR_1V2_VCC_HBM_DEVICE_ID   + ( VR_1V2_VCC_HBM_CURRENT_READING_CHANNEL       << 8 ) )
+#define VR_12V_AUX1_VOLTAGE_SENSOR_ID          ( VR_12V_AUX1_DEVICE_ID      + ( VR_12V_AUX1_VOLTAGE_READING_CHANNEL          << 8 ) )
+#define VR_12V_AUX1_CURRENT_SENSOR_ID          ( VR_12V_AUX1_DEVICE_ID      + ( VR_12V_AUX1_CURRENT_READING_CHANNEL          << 8 ) )
+#define VR_12V_AUX1_POWER_SENSOR_ID            ( VR_12V_AUX1_DEVICE_ID      + ( VR_12V_AUX1_POWER_READING_CHANNEL            << 8 ) )
+#define VR_12V_AUX2_VOLTAGE_SENSOR_ID          ( VR_12V_AUX2_DEVICE_ID      + ( VR_12V_AUX2_VOLTAGE_READING_CHANNEL          << 8 ) )
+#define VR_12V_AUX2_CURRENT_SENSOR_ID          ( VR_12V_AUX2_DEVICE_ID      + ( VR_12V_AUX2_CURRENT_READING_CHANNEL          << 8 ) )
+#define VR_12V_AUX2_POWER_SENSOR_ID            ( VR_12V_AUX2_DEVICE_ID      + ( VR_12V_AUX2_POWER_READING_CHANNEL            << 8 ) )
+#define VR_3V3_PEX_VOLTAGE_SENSOR_ID           ( VR_3V3_PEX_DEVICE_ID       + ( VR_3V3_PEX_VOLTAGE_READING_CHANNEL           << 8 ) )
+#define VR_3V3_PEX_CURRENT_SENSOR_ID           ( VR_3V3_PEX_DEVICE_ID       + ( VR_3V3_PEX_CURRENT_READING_CHANNEL           << 8 ) )
+#define VR_3V3_PEX_POWER_SENSOR_ID             ( VR_3V3_PEX_DEVICE_ID       + ( VR_3V3_PEX_POWER_READING_CHANNEL             << 8 ) )
+#define VR_12V_PEX_VOLTAGE_SENSOR_ID           ( VR_12V_PEX_DEVICE_ID       + ( VR_12V_PEX_VOLTAGE_READING_CHANNEL           << 8 ) )
+#define VR_12V_PEX_CURRENT_SENSOR_ID           ( VR_12V_PEX_DEVICE_ID       + ( VR_12V_PEX_CURRENT_READING_CHANNEL           << 8 ) )
+#define VR_12V_PEX_POWER_SENSOR_ID             ( VR_12V_PEX_DEVICE_ID       + ( VR_12V_PEX_POWER_READING_CHANNEL             << 8 ) )
+#define VR_1V5_VCCAUX_VOLTAGE_SENSOR_ID        ( VR_1V5_VCCAUX_DEVICE_ID    + ( VR_1V5_VCCAUX_VOLTAGE_READING_CHANNEL        << 8 ) )
+#define VR_1V2_GTXAVTT_TEMPERATURE_SENSOR_ID   ( VR_1V2_GTXAVTT_DEVICE_ID   + ( VR_1V2_GTXAVTT_TEMPERATURE_READING_CHANNEL   << 8 ) )
+#define VR_1V2_GTXAVTT_VOLTAGE_SENSOR_ID       ( VR_1V2_GTXAVTT_DEVICE_ID   + ( VR_1V2_GTXAVTT_VOLTAGE_READING_CHANNEL       << 8 ) )
+#define VR_1V2_GTXAVTT_CURRENT_SENSOR_ID       ( VR_1V2_GTXAVTT_DEVICE_ID   + ( VR_1V2_GTXAVTT_CURRENT_READING_CHANNEL       << 8 ) )
+#define VR_0V88_VCC_CPM5_TEMPERATURE_SENSOR_ID ( VR_0V88_VCC_CPM5_DEVICE_ID + ( VR_0V88_VCC_CPM5_TEMPERATURE_READING_CHANNEL << 8 ) )
+#define VR_0V88_VCC_CPM5_VOLTAGE_SENSOR_ID     ( VR_0V88_VCC_CPM5_DEVICE_ID + ( VR_0V88_VCC_CPM5_VOLTAGE_READING_CHANNEL     << 8 ) )
+#define VR_0V88_VCC_CPM5_CURRENT_SENSOR_ID     ( VR_0V88_VCC_CPM5_DEVICE_ID + ( VR_0V88_VCC_CPM5_CURRENT_READING_CHANNEL     << 8 ) )
 
 
 /* PLDM Type 2 (DSP2061&DSP0241) Entity Type and Number */
-
 #define LOGICAL_PLDM_ENTITY_ADDIN_CARD_1_DEVICE_TEMPERATURE             ( 1 )
 #define LOGICAL_PLDM_ENTITY_ADDIN_CARD_2_VR_12V_AUX1_CURRENT            ( 2 )
 #define LOGICAL_PLDM_ENTITY_ADDIN_CARD_3_VR_12V_AUX1_POWER              ( 3 )
@@ -167,39 +147,33 @@
 #define PHYSICAL_PLDM_ENTITY_ADDIN_CARD_34_VR_0V88_VCC_CPM5_CURRENT     ( 34 )
 
 /* PCB Temperature PDR Defines */
-
-#define PCB_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
-#define PCB_TEMPERATURE_NORMAL_MAX      ( 79 )
-#define PCB_TEMPERATURE_WARNING_HIGH    ( 80 )
-#define PCB_TEMPERATURE_CRITICAL_HIGH   ( 85 )
-#define PCB_TEMPERATURE_FATAL_HIGH      ( 95 )
+#define PCB_TEMPERATURE_UPDATE_INTERVAL           ( 1.0 )
+#define PCB_TEMPERATURE_NORMAL_MAX                ( 79 )
+#define PCB_TEMPERATURE_WARNING_HIGH              ( 80 )
+#define PCB_TEMPERATURE_CRITICAL_HIGH             ( 85 )
+#define PCB_TEMPERATURE_FATAL_HIGH                ( 95 )
 
 /* Device Temperature PDR Defines */
-
-#define DEVICE_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
-#define DEVICE_TEMPERATURE_NORMAL_MAX      ( 91 )
-#define DEVICE_TEMPERATURE_WARNING_HIGH    ( 92 )
-#define DEVICE_TEMPERATURE_CRITICAL_HIGH   ( 100 )
-#define DEVICE_TEMPERATURE_FATAL_HIGH      ( 105 )
+#define DEVICE_TEMPERATURE_UPDATE_INTERVAL        ( 1.0 )
+#define DEVICE_TEMPERATURE_NORMAL_MAX             ( 91 )
+#define DEVICE_TEMPERATURE_WARNING_HIGH           ( 92 )
+#define DEVICE_TEMPERATURE_CRITICAL_HIGH          ( 100 )
+#define DEVICE_TEMPERATURE_FATAL_HIGH             ( 105 )
 
 /* VR_VCCINT Temperature PDR Defines */
-
-#define VR_VCCINT_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
-#define VR_VCCINT_TEMPERATURE_NORMAL_MAX      ( 99 )
-#define VR_VCCINT_TEMPERATURE_WARNING_HIGH    ( 100 )
-#define VR_VCCINT_TEMPERATURE_CRITICAL_HIGH   ( 110 )
-#define VR_VCCINT_TEMPERATURE_FATAL_HIGH      ( 125 )
+#define VR_VCCINT_TEMPERATURE_UPDATE_INTERVAL     ( 1.0 )
+#define VR_VCCINT_TEMPERATURE_NORMAL_MAX          ( 99 )
+#define VR_VCCINT_TEMPERATURE_WARNING_HIGH        ( 100 )
+#define VR_VCCINT_TEMPERATURE_CRITICAL_HIGH       ( 110 )
+#define VR_VCCINT_TEMPERATURE_FATAL_HIGH          ( 125 )
 
 /* VR_VCCINT Voltage PDR Defines */
-
-#define VR_VCCINT_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
+#define VR_VCCINT_VOLTAGE_UPDATE_INTERVAL         ( 1.0 )
 
 /* VR_VCCINT Current PDR Defines */
-
-#define VR_VCCINT_CURRENT_UPDATE_INTERVAL ( 1.0 )
+#define VR_VCCINT_CURRENT_UPDATE_INTERVAL         ( 1.0 )
 
 /* QSFP Module 0 Temperature PDR Defines */
-
 #define QSFP_MODULE_0_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
 #define QSFP_MODULE_0_TEMPERATURE_NORMAL_MAX      ( 79 )
 #define QSFP_MODULE_0_TEMPERATURE_WARNING_HIGH    ( 80 )
@@ -207,7 +181,6 @@
 #define QSFP_MODULE_0_TEMPERATURE_FATAL_HIGH      ( 95 )
 
 /* QSFP Module 1 Temperature PDR Defines */
-
 #define QSFP_MODULE_1_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
 #define QSFP_MODULE_1_TEMPERATURE_NORMAL_MAX      ( 79 )
 #define QSFP_MODULE_1_TEMPERATURE_WARNING_HIGH    ( 80 )
@@ -215,7 +188,6 @@
 #define QSFP_MODULE_1_TEMPERATURE_FATAL_HIGH      ( 95 )
 
 /* QSFP Module 2 Temperature PDR Defines */
-
 #define QSFP_MODULE_2_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
 #define QSFP_MODULE_2_TEMPERATURE_NORMAL_MAX      ( 79 )
 #define QSFP_MODULE_2_TEMPERATURE_WARNING_HIGH    ( 80 )
@@ -223,7 +195,6 @@
 #define QSFP_MODULE_2_TEMPERATURE_FATAL_HIGH      ( 95 )
 
 /* QSFP Module 3 Temperature PDR Defines */
-
 #define QSFP_MODULE_3_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
 #define QSFP_MODULE_3_TEMPERATURE_NORMAL_MAX      ( 79 )
 #define QSFP_MODULE_3_TEMPERATURE_WARNING_HIGH    ( 80 )
@@ -231,27 +202,21 @@
 #define QSFP_MODULE_3_TEMPERATURE_FATAL_HIGH      ( 95 )
 
 /* DIMM Temperature PDR Defines */
-
-#define DIMM_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
+#define DIMM_TEMPERATURE_UPDATE_INTERVAL          ( 1.0 )
 
 /* VR_1V2_VCC_HBM Temperature PDR Defines */
-
 #define VR_1V2_VCC_HBM_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
 
 /* VR_1V2_VCC_HBM Voltage PDR Defines */
-
-#define VR_1V2_VCC_HBM_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
+#define VR_1V2_VCC_HBM_VOLTAGE_UPDATE_INTERVAL    ( 1.0 )
 
 /* VR_1V2_VCC_HBM Current PDR Defines */
-
-#define VR_1V2_VCC_HBM_CURRENT_UPDATE_INTERVAL ( 1.0 )
+#define VR_1V2_VCC_HBM_CURRENT_UPDATE_INTERVAL    ( 1.0 )
 
 /* VR_12V_AUX1 Voltage PDR Defines */
-
 #define VR_12V_AUX1_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
 
 /* VR_12V_AUX1 Current PDR Defines */
-
 #define VR_12V_AUX1_CURRENT_UPDATE_INTERVAL ( 1.0 )
 #define VR_12V_AUX1_CURRENT_NORMAL_MAX      ( 12499 )
 #define VR_12V_AUX1_CURRENT_WARNING_HIGH    ( 12500 )
@@ -259,15 +224,12 @@
 #define VR_12V_AUX1_CURRENT_FATAL_HIGH      ( 12751 )
 
 /* VR_12V_AUX1 Power PDR Defines */
-
-#define VR_12V_AUX1_POWER_UPDATE_INTERVAL ( 1.0 )
+#define VR_12V_AUX1_POWER_UPDATE_INTERVAL   ( 1.0 )
 
 /* VR_12V_AUX2 Voltage PDR Defines */
-
 #define VR_12V_AUX2_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
 
 /* VR_12V_AUX2 Current PDR Defines */
-
 #define VR_12V_AUX2_CURRENT_UPDATE_INTERVAL ( 1.0 )
 #define VR_12V_AUX2_CURRENT_NORMAL_MAX      ( 12499 )
 #define VR_12V_AUX2_CURRENT_WARNING_HIGH    ( 12500 )
@@ -275,68 +237,54 @@
 #define VR_12V_AUX2_CURRENT_FATAL_HIGH      ( 12751 )
 
 /* VR_12V_AUX2 Power PDR Defines */
-
-#define VR_12V_AUX2_POWER_UPDATE_INTERVAL	( 1.0 )
+#define VR_12V_AUX2_POWER_UPDATE_INTERVAL   ( 1.0 )
 
 /* VR_3V3_PEX Voltage PDR Defines */
-
-#define VR_3V3_PEX_VOLTAGE_UPDATE_INTERVAL	( 1.0 )
+#define VR_3V3_PEX_VOLTAGE_UPDATE_INTERVAL  ( 1.0 )
 
 /* VR_3V3_PEX Current PDR Defines */
-
-#define VR_3V3_PEX_CURRENT_UPDATE_INTERVAL ( 1.0 )
-#define VR_3V3_PEX_CURRENT_NORMAL_MAX      ( 2999 )
-#define VR_3V3_PEX_CURRENT_WARNING_HIGH    ( 3000 )
-#define VR_3V3_PEX_CURRENT_CRITICAL_HIGH   ( 3150 )
-#define VR_3V3_PEX_CURRENT_FATAL_HIGH      ( 3151 )
+#define VR_3V3_PEX_CURRENT_UPDATE_INTERVAL  ( 1.0 )
+#define VR_3V3_PEX_CURRENT_NORMAL_MAX       ( 2999 )
+#define VR_3V3_PEX_CURRENT_WARNING_HIGH     ( 3000 )
+#define VR_3V3_PEX_CURRENT_CRITICAL_HIGH    ( 3150 )
+#define VR_3V3_PEX_CURRENT_FATAL_HIGH       ( 3151 )
 
 /* VR_3V3_PEX Power PDR Defines */
-
-#define VR_3V3_PEX_POWER_UPDATE_INTERVAL	( 1.0 )
+#define VR_3V3_PEX_POWER_UPDATE_INTERVAL    ( 1.0 )
 
 /* VR_12V_PEX Voltage PDR Defines */
-
-#define VR_12V_PEX_VOLTAGE_UPDATE_INTERVAL	( 1.0 )
+#define VR_12V_PEX_VOLTAGE_UPDATE_INTERVAL  ( 1.0 )
 
 /* VR_12V_PEX Current PDR Defines */
-
-#define VR_12V_PEX_CURRENT_UPDATE_INTERVAL	( 1.0 )
-#define VR_12V_PEX_CURRENT_NORMAL_MAX		( 5499 )
-#define VR_12V_PEX_CURRENT_WARNING_HIGH		( 5500 )
-#define VR_12V_PEX_CURRENT_CRITICAL_HIGH	( 5750 )
-#define VR_12V_PEX_CURRENT_FATAL_HIGH		( 5751 )
+#define VR_12V_PEX_CURRENT_UPDATE_INTERVAL  ( 1.0 )
+#define VR_12V_PEX_CURRENT_NORMAL_MAX       ( 5499 )
+#define VR_12V_PEX_CURRENT_WARNING_HIGH     ( 5500 )
+#define VR_12V_PEX_CURRENT_CRITICAL_HIGH    ( 5750 )
+#define VR_12V_PEX_CURRENT_FATAL_HIGH       ( 5751 )
 
 /* VR_12V_PEX Power PDR Defines */
-
-#define VR_12V_PEX_POWER_UPDATE_INTERVAL	( 1.0 )
+#define VR_12V_PEX_POWER_UPDATE_INTERVAL            ( 1.0 )
 
 /* VR_1V5_VCCAUX Voltage PDR Defines */
-
-#define VR_1V5_VCCAUX_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
+#define VR_1V5_VCCAUX_VOLTAGE_UPDATE_INTERVAL       ( 1.0 )
 
 /* VR_1V2_GTXAVTT Temperature PDR Defines */
-
-#define VR_1V2_GTXAVTT_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
+#define VR_1V2_GTXAVTT_TEMPERATURE_UPDATE_INTERVAL  ( 1.0 )
 
 /* VR_1V2_GTXAVTT Voltage PDR Defines */
-
-#define VR_1V2_GTXAVTT_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
+#define VR_1V2_GTXAVTT_VOLTAGE_UPDATE_INTERVAL      ( 1.0 )
 
 /* VR_1V2_GTXAVTT Current PDR Defines */
-
-#define VR_1V2_GTXAVTT_CURRENT_UPDATE_INTERVAL ( 1.0 )
+#define VR_1V2_GTXAVTT_CURRENT_UPDATE_INTERVAL      ( 1.0 )
 
 /* VR_0V88_VCC_CPM5 Temperature PDR Defines */
-
 #define VR_0V88_VCC_CPM5_TEMPERATURE_UPDATE_INTERVAL ( 1.0 )
 
 /* VR_0V88_VCC_CPM5 Voltage PDR Defines */
-
-#define VR_0V88_VCC_CPM5_VOLTAGE_UPDATE_INTERVAL ( 1.0 )
+#define VR_0V88_VCC_CPM5_VOLTAGE_UPDATE_INTERVAL     ( 1.0 )
 
 /* VR_0V88_VCC_CPM5 Current PDR Defines */
-
-#define VR_0V88_VCC_CPM5_CURRENT_UPDATE_INTERVAL ( 1.0 )
+#define VR_0V88_VCC_CPM5_CURRENT_UPDATE_INTERVAL     ( 1.0 )
 
 
 /******************************************************************************/

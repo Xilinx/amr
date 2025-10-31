@@ -2,7 +2,7 @@
  * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the printing profile for the AVED v80 platform
+ * This file contains the printing platform profile
  *
  * @file profile_print.h
  */

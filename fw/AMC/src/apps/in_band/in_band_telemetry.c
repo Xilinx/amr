@@ -7,10 +7,6 @@
  * @file in_band_telemetry.c
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 /* common includes */
 #include "standard.h"
 #include "util.h"
@@ -589,7 +585,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                     iStatus = iAPC_UpdateFpt( pxSignal,
                                               xDownloadRequest.iBootDevice,
                                               ( uint32_t )xDownloadRequest.ullAddress +
-                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
+                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR,
                                               xDownloadRequest.ulLength,
                                               xDownloadRequest.usPacketNum,
                                               xDownloadRequest.ulPacketSize,
@@ -601,7 +597,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                               xDownloadRequest.iBootDevice,
                                               ( int )xDownloadRequest.ulPartitionSel,
                                               ( uint32_t )xDownloadRequest.ullAddress +
-                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
+                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR,
                                               xDownloadRequest.ulLength,
                                               xDownloadRequest.iLastPacket,
                                               xDownloadRequest.usPacketNum,
@@ -614,7 +610,7 @@ PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
                                                   xDownloadRequest.iBootDevice,
                                                   ( int )xDownloadRequest.ulPartitionSel,
                                                   ( uint32_t )xDownloadRequest.ullAddress +
-                                                  ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
+                                                  ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR,
                                                   xDownloadRequest.ulLength,
                                                   xDownloadRequest.usPacketNum,
                                                   xDownloadRequest.ulPacketSize );
@@ -708,7 +704,7 @@ PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
                                               xProgramRequest.iBootDevice,
                                               ( int )xProgramRequest.ulPartitionSel,
                                               ( uint32_t )xProgramRequest.ullAddress +
-                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASE_ADDR,
+                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR,
                                               xProgramRequest.ulLength,
                                               xProgramRequest.usPacketNum,
                                               xProgramRequest.ulPacketSize );

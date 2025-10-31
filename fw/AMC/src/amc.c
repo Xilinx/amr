@@ -7,10 +7,6 @@
  * @file amc.c
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 /* common includes */
 #include "standard.h"
 #include "util.h"
@@ -189,11 +185,11 @@ static int iInitDebug( void );
 static void vTaskFuncMain( void );
 
 /**
- * @brief   Configure the partition table stored at the start of
+ * @brief   Configure the shared memory table stored at the start of
  *          shared memory and used by the AMI to deremine the AMC state
  * @return  N/A
  */
-static void vConfigurePartitionTable( void );
+static void vConfigureSharedMemTable( void );
 
 
 /******************************************************************************/
@@ -276,7 +272,7 @@ static void vTaskFuncMain( void )
 {
     int iStatus = ERROR;
 
-    vConfigurePartitionTable();
+    vConfigureSharedMemTable();
 
     if( OK == iInitCoreLibs() )
     {
@@ -358,7 +354,7 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucSysmonInitialised             %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SYSMON_INITIALISED         ? "TRUE" : "FALSE" ) );
-#ifndef PROFILE_RAVE
+#if (HAL_SMBUS_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucSmbusPcieLinkInitialised      %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_PCIE_LINK_INITIALISED  ? "TRUE" : "FALSE" ) );
@@ -369,7 +365,7 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucGcqFalInitialised             %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED         ? "TRUE" : "FALSE" ) );
-#ifndef PROFILE_RAVE
+#if (HAL_EMMC_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucEmmcFalInitialised            %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
@@ -377,7 +373,7 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucOspiFalInitialised            %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED        ? "TRUE" : "FALSE" ) );
-#ifndef PROFILE_RAVE
+#if (HAL_SMBUS_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucSmbusFalInitialised           %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED       ? "TRUE" : "FALSE" ) );
@@ -388,7 +384,7 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucGcqFalCreated                 %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_GCQ_FAL_CREATED             ? "TRUE" : "FALSE" ) );
-#ifndef PROFILE_RAVE
+#if (HAL_EMMC_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucEmmcFalCreated                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_EMMC_FAL_CREATED            ? "TRUE" : "FALSE" ) );
@@ -396,7 +392,7 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucOspiFalCreated                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OSPI_FAL_CREATED            ? "TRUE" : "FALSE" ) );
-#ifndef PROFILE_RAVE
+#if (HAL_SMBUS_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucSmbusFalCreated               %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_CREATED           ? "TRUE" : "FALSE" ) );
@@ -413,7 +409,7 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucAmiInitialised                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_AMI_INITIALISED            ? "TRUE" : "FALSE" ) );
-#ifndef PROFILE_RAVE
+#if (HAL_SMBUS_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucBmcInitialised                %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_BMC_INITIALISED            ? "TRUE" : "FALSE" ) );
@@ -424,7 +420,7 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucInBandInitialised             %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_IN_BAND_INITIALISED         ? "TRUE" : "FALSE" ) );
-#ifndef PROFILE_RAVE
+#if (HAL_SMBUS_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucOutOfBandInitialised          %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_OUT_OF_BAND_INITIALISED      ? "TRUE" : "FALSE" ) );
@@ -802,7 +798,7 @@ static int iInitProxies( void )
         }
     }
 
-    if( 0 != MAX_NUM_EXTERNAL_DEVICES_AVAILABLE )
+    if( 0 != MAX_NUM_EXTERNAL_DEVICES )
     {
         if( AMC_CFG_AXC_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_AXC_PREREQUISITES ) )
         {
@@ -843,7 +839,11 @@ static int iInitProxies( void )
         ullAmcInitStatus |= AMC_CFG_AXC_INITIALISED;
     }
 
-    if( AMC_CFG_ASC_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASC_PREREQUISITES ) )
+    #if HAL_I2C_MUXED_DEVICE
+    if ( AMC_CFG_ASC_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASC_MUX_PREREQUISITES ) )
+    #else
+    if ( AMC_CFG_ASC_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASC_PREREQUISITES ) )
+    #endif
     {
         if( OK == iASC_Initialise( AMC_CFG_UNIQUE_ID_ASC,
                                    AMC_TASK_PRIO_DEFAULT,
@@ -981,7 +981,7 @@ static int iInitApp( void )
 
     if( AMC_CFG_IN_BAND_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_IN_BAND_PREREQUISITES ) )
     {
-        if( OK != iIN_BAND_TELEMETRY_Initialise( HAL_RPU_SHARED_MEMORY_BASE_ADDR ) )
+        if( OK != iIN_BAND_TELEMETRY_Initialise( HAL_RPU_SHARED_MEMORY_BASEADDR ) )
         {
             PLL_ERR( AMC_NAME, "In Band Telemetry Initialisation ERROR\r\n" );
             iStatus = ERROR;
@@ -1076,64 +1076,61 @@ static int iPlmGetUid(uint32_t* uuid)
 }
 
 /**
- * @brief   Configure the partition table stored at the start of
+ * @brief   Configure the shared memory table stored at the start of
  *          shared memory and used by the AMI to determine the AMC state
  */
-static void vConfigurePartitionTable( void )
+static void vConfigureSharedMemTable( void )
 {
-    HAL_PARTITION_TABLE xPartTable =
-    {
-        0
-    };
+    HALShmTable xShmTable = { 0 };
     uint8_t *pucDestAdd = NULL;
     uint32_t uuid = 0;
 
-    xPartTable.ulMagicNum                  = HAL_PARTITION_TABLE_MAGIC_NO;
-    xPartTable.xRingBuffer.ulRingBufferOff = HAL_PARTITION_TABLE_SIZE;
-    xPartTable.xRingBuffer.ulRingBufferLen = HAL_RPU_RING_BUFFER_LEN;
-    xPartTable.xStatus.ulStatusOff         = HAL_PARTITION_TABLE_SIZE + HAL_RPU_RING_BUFFER_LEN;
-    xPartTable.xStatus.ulStatusLen         = sizeof( uint32_t );
-    xPartTable.xUuid.ulUuidOff             = xPartTable.xStatus.ulStatusOff + xPartTable.xStatus.ulStatusLen;
-    xPartTable.xUuid.ulUuidLen             = HAL_UUID_SIZE;
-    xPartTable.xLogMsg.ulLogMsgIndex       = 0;
-    xPartTable.xLogMsg.ulLogMsgBufferOff   = xPartTable.xUuid.ulUuidOff + xPartTable.xUuid.ulUuidLen;
-    xPartTable.xLogMsg.ulLogMsgBufferLen   = PLL_LOG_BUF_LEN;
-    xPartTable.xData.ulDataStart           = xPartTable.xLogMsg.ulLogMsgBufferOff +
-                                             xPartTable.xLogMsg.ulLogMsgBufferLen;
-    xPartTable.xData.ulDataEnd             = HAL_RPU_SHARED_MEMORY_SIZE;
+    xShmTable.ulMagicNum                = HAL_SHARED_MEM_TABLE_MAGIC_NO;
+    xShmTable.xRingBuf.ulRingBufOffset  = HAL_SHARED_MEM_TABLE_SIZE;
+    xShmTable.xRingBuf.ulRingBufLen     = HAL_RPU_RING_BUFFER_LEN;
+    xShmTable.xStatus.ulStatusOff       = HAL_SHARED_MEM_TABLE_SIZE + HAL_RPU_RING_BUFFER_LEN;
+    xShmTable.xStatus.ulStatusLen       = sizeof( uint32_t );
+    xShmTable.xUuid.ulUuidOff           = xShmTable.xStatus.ulStatusOff + xShmTable.xStatus.ulStatusLen;
+    xShmTable.xUuid.ulUuidLen           = HAL_UUID_SIZE;
+    xShmTable.xLogMsg.ulLogMsgIndex     = 0;
+    xShmTable.xLogMsg.ulLogMsgBufOffset = xShmTable.xUuid.ulUuidOff + xShmTable.xUuid.ulUuidLen;
+    xShmTable.xLogMsg.ulLogMsgBufLen    = PLL_LOG_BUF_LEN;
+    xShmTable.xData.ulDataStart         = xShmTable.xLogMsg.ulLogMsgBufOffset +
+                                          xShmTable.xLogMsg.ulLogMsgBufLen;
+    xShmTable.xData.ulDataEnd           = HAL_RPU_SHARED_MEMORY_SIZE;
 
     /* Copy the populated table into the start of shared memory */
-    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR );
-    pvOSAL_MemCpy( pucDestAdd, ( uint8_t* )&xPartTable, sizeof( xPartTable ) );
-    HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR, sizeof( xPartTable ) );
+    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASEADDR );
+    pvOSAL_MemCpy( pucDestAdd, ( uint8_t* )&xShmTable, sizeof( xShmTable ) );
+    HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASEADDR, sizeof( xShmTable ) );
 
     /* Flush stale logs */
-    pvOSAL_MemSet( ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff ),
+    pvOSAL_MemSet( ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASEADDR + xShmTable.xLogMsg.ulLogMsgBufOffset ),
                     0,
-                    xPartTable.xLogMsg.ulLogMsgBufferLen );
-    HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xLogMsg.ulLogMsgBufferOff,
-                            xPartTable.xLogMsg.ulLogMsgBufferLen );
+                    xShmTable.xLogMsg.ulLogMsgBufLen );
+    HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASEADDR + xShmTable.xLogMsg.ulLogMsgBufOffset,
+                            xShmTable.xLogMsg.ulLogMsgBufLen );
 
     /*
      * AMI is waiting for the status to be set to a value of 0x1, currently we have no
      * concept of stopping/starting the AMC so once initialised this will always be valid
      */
-    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xStatus.ulStatusOff );
-    pvOSAL_MemSet( pucDestAdd, HAL_ENABLE_AMI_COMMS, xPartTable.xStatus.ulStatusLen );
-    HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xStatus.ulStatusOff ),
-                          xPartTable.xStatus.ulStatusLen );
+    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASEADDR + xShmTable.xStatus.ulStatusOff );
+    pvOSAL_MemSet( pucDestAdd, HAL_ENABLE_AMI_COMMS, xShmTable.xStatus.ulStatusLen );
+    HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASEADDR + xShmTable.xStatus.ulStatusOff ),
+                          xShmTable.xStatus.ulStatusLen );
 
     /*
      * UUID
      */
     iPlmGetUid(&uuid);
-#ifdef PROFILE_RAVE
+#ifdef XPAR_UUID_REGISTER_0_BASEADDR
     Xil_Out32(XPAR_UUID_REGISTER_0_BASEADDR, uuid);
     Xil_DCacheFlushRange(XPAR_UUID_REGISTER_0_BASEADDR, sizeof(uint32_t));
 #endif
-    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xUuid.ulUuidOff );
-    pvOSAL_MemSet( pucDestAdd, 0, xPartTable.xUuid.ulUuidLen );
+    pucDestAdd = ( uint8_t* )( HAL_RPU_SHARED_MEMORY_BASEADDR + xShmTable.xUuid.ulUuidOff );
+    pvOSAL_MemSet( pucDestAdd, 0, xShmTable.xUuid.ulUuidLen );
     pvOSAL_MemCpy( pucDestAdd, &uuid, sizeof(uuid) );
-    HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xPartTable.xUuid.ulUuidOff ),
-                          xPartTable.xUuid.ulUuidLen );
+    HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASEADDR + xShmTable.xUuid.ulUuidOff ),
+                          xShmTable.xUuid.ulUuidLen );
 }

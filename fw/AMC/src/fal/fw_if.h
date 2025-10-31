@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This file contains the API for a generic Firmware Interface abstraction
@@ -10,15 +10,7 @@
 #ifndef _FW_IF_H_
 #define _FW_IF_H_
 
-/*****************************************************************************/
-/* includes                                                                  */
-/*****************************************************************************/
-
-#if defined __KERNEL__
-#include <linux/types.h>
-#else
 #include "stdint.h"
-#endif
 
 
 /*****************************************************************************/

@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the profile debug menu for the Linux
+ * This file contains the profile debug menu
  *
  * @file profile_debug_menu.h
  */

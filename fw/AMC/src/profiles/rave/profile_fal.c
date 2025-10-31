@@ -7,10 +7,6 @@
  * @file profile_fal.c
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* core libs */
 #include "pll.h"
 
@@ -24,6 +20,7 @@
 
 /* device drivers */
 #include "i2c.h"
+#include "eeprom.h"
 
 /* proxy drivers*/
 #include "apc_proxy_driver.h"
@@ -32,12 +29,10 @@
 /* hardware definitions */
 #include "profile_fal.h"
 #include "profile_hal.h"
-#include "profile_muxed_device.h"
 
 #ifdef DEBUG_BUILD
 #include "fw_if_gcq_debug.h"
 #include "fw_if_ospi_debug.h"
-#include "fw_if_muxed_device_debug.h"
 #endif
 
 
@@ -46,9 +41,6 @@
 /******************************************************************************/
 
 #define FAL_PROFILE_NAME      "PROFILE_FAL"
-#define OSPI_PAGE_SIZE        ( 256 )
-#define OSPI_RPU_BASE_ADDRESS ( 0x0 )
-#define OSPI_RPU_LENGTH       ( 0x08000000 )    /* 1Gb (128MB) */
 
 
 /*****************************************************************************/
@@ -96,7 +88,7 @@ FW_IF_CFG *pxSMBusIf = NULL;
 
 static FW_IF_GCQCfg xGcqCfg =
 {
-    ( uint64_t )HAL_BASE_LOGIC_GCQ_M2R_S01_AXI_BASEADDR,
+    ( uint64_t )HAL_GCQ_SHARED_BASEADDR,
     FW_IF_GCQ_MODE_PRODUCER,
     ( uint64_t )HAL_RPU_RING_BUFFER_BASE,
     HAL_RPU_RING_BUFFER_LEN,
@@ -112,16 +104,16 @@ static FW_IF_GCQInitCfg myGcqIf =
 
 static FW_IF_OSPI_CFG xOspiCfg =
 {
-    OSPI_RPU_BASE_ADDRESS,
-    OSPI_RPU_LENGTH,
-    TRUE,                                                                      /* Enable erase before write */
+    HAL_OSPI_RPU_BASE_ADDR,
+    HAL_OSPI_RPU_LENGTH,
+    TRUE,                               /* Enable erase before write */
     FW_IF_OSPI_STATE_INIT
 };
 
 static FW_IF_OSPI_INIT_CFG myOspiIf =
 {
     HAL_OSPI_0_DEVICE_ID,
-    OSPI_PAGE_SIZE
+    HAL_OSPI_PAGE_SIZE
 };
 
 
@@ -137,10 +129,7 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
 {
     int     iStatus                         = OK;
     uint8_t ucUuidSize                      = 0;
-    uint8_t pucUuid[ FW_IF_SMBUS_UDID_LEN ] =
-    {
-        0
-    };
+    uint8_t pucUuid[ FW_IF_SMBUS_UDID_LEN ] = { 0 };
 
     if( NULL != pullAmcInitStatus )
     {

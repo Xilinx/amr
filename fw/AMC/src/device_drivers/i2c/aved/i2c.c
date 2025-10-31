@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the I2C driver.
  *
  * @file i2c.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -609,7 +605,7 @@ int iI2C_Recv( uint8_t ucDeviceId,
         while( ( ( XST_SUCCESS != iI2cStatus ) ||
                  ( OK != iWaitBusIdleStatus ) ||
                  ( OK != iReInitStatus ) ) &&
-               ( ucTryCount < pxThis->pxI2cCfg[ ucDeviceId ].ucReTryCount ) )
+                 ( ucTryCount < pxThis->pxI2cCfg[ ucDeviceId ].ucReTryCount ) )
         {
             if( TRUE == pxIicProfile->iI2cEnabled )
             {

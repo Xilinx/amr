@@ -64,9 +64,7 @@ following tools installed and follow the [build instructions](#3-build-instructi
 │           ├── osal
 │           │   └── src
 │           ├── profiles
-│           │   ├── Linux
 │           │   ├── rave
-│           │   ├── v70
 │           │   └── v80
 │           └── proxy_drivers
 │               ├── ami

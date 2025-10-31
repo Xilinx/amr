@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains PLDM PDR enums, structures and functions
@@ -10,11 +10,6 @@
 #ifndef PLDM_PDR_H_
 #define PLDM_PDR_H_
 
-
-/******************************************************************************/
-/* Includes                                                                    */
-/******************************************************************************/
-
 #include "standard.h"
 
 
@@ -22,24 +17,24 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define PDR_HEADER_VERSION 0x1
+#define PDR_HEADER_VERSION      0x1
 
-#define PLDM_ENTITY_ADDIN_CARD ( 68 )
-#define PDR_PARAM_NONE         ( 0 )
-#define EFFECTER_MAX_VALUE     ( 1 )
-#define EFFECTER_MIN_VALUE     ( 0 )
-#define MILLISECOND( x ) ( ( float )x / 1000 )
-#define UNITS_IN_MILLI ( -3 )
+#define PLDM_ENTITY_ADDIN_CARD  ( 68 )
+#define PDR_PARAM_NONE          ( 0 )
+#define EFFECTER_MAX_VALUE      ( 1 )
+#define EFFECTER_MIN_VALUE      ( 0 )
+#define MILLISECOND( x )        ( ( float )x / 1000 )
+#define UNITS_IN_MILLI          ( -3 )
 
 /* Macros to set bits for 'rangeFieldSupport' field in PDR */
-#define NORMAL_MIN_MAX  ( 0x3 << 1 )
-#define RATED_MIN_MAX   ( 0x3 << 3 )
-#define HIGH_THRESHOLDS ( 0x5 << 3 )
-#define LOW_THRESHOLDS  ( 0x5 << 4 )
-#define NOMINAL_VALUE   ( 0x1 )
+#define NORMAL_MIN_MAX          ( 0x3 << 1 )
+#define RATED_MIN_MAX           ( 0x3 << 3 )
+#define HIGH_THRESHOLDS         ( 0x5 << 3 )
+#define LOW_THRESHOLDS          ( 0x5 << 4 )
+#define NOMINAL_VALUE           ( 0x1 )
 /* Macros to set bits for 'supportedThresholds' field in PDR */
-#define HAS_LOW_THRESHOLDS  ( 0x7 << 3 )
-#define HAS_HIGH_THRESHOLDS ( 0x7 )
+#define HAS_LOW_THRESHOLDS      ( 0x7 << 3 )
+#define HAS_HIGH_THRESHOLDS     ( 0x7 )
 
 #define CONTAINER_ENTITY_CONTAINER_ID 1
 #define CONTAINED_ENTITY_CONTAINER_ID 1000

@@ -6,7 +6,6 @@
  * for the EMMC driver.
  *
  * @file emmc.h
- *
  */
 
 #ifndef _EMMC_H_

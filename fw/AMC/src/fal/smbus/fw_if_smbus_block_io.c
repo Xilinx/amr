@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This file contains the FW IF SMBus Block IO interface implementation.
@@ -7,10 +7,6 @@
 * @file fw_if_smbus_block_io.c
 */
 
-
-/*****************************************************************************/
-/* includes                                                                  */
-/*****************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -115,10 +111,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( FW_IF_SMBUS_BLOCK_IO_ERROR_COUNTS, FW_IF_SMBUS_BLOCK
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_SMBUS_BLOCK_IO_PRIVATE_DATA
+ * @struct  FW_IF_SMBusBlockIOPrivateData
  * @brief   Structure to hold this FAL's private data
  */
-typedef struct FW_IF_SMBUS_BLOCK_IO_PRIVATE_DATA
+typedef struct
 {
     uint32_t                    ulUpperFirewall;
 
@@ -135,14 +131,14 @@ typedef struct FW_IF_SMBUS_BLOCK_IO_PRIVATE_DATA
 
     uint32_t                    ulLowerFirewall;
 
-} FW_IF_SMBUS_BLOCK_IO_PRIVATE_DATA;
+} FW_IF_SMBusBlockIOPrivateData;
 
 
 /*****************************************************************************/
 /* local variables                                                           */
 /*****************************************************************************/
 
-static FW_IF_SMBUS_BLOCK_IO_PRIVATE_DATA xLocalData =
+static FW_IF_SMBusBlockIOPrivateData xLocalData =
 {
     SMBUS_BLOCK_IO_UPPER_FIREWALL,  /* ulUpperFirewall */
 
@@ -159,7 +155,7 @@ static FW_IF_SMBUS_BLOCK_IO_PRIVATE_DATA xLocalData =
 
     SMBUS_BLOCK_IO_LOWER_FIREWALL   /* ulLowerFirewall */
 };
-static FW_IF_SMBUS_BLOCK_IO_PRIVATE_DATA *pxThis = &xLocalData;
+static FW_IF_SMBusBlockIOPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/

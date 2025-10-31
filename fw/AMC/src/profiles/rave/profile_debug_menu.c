@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the profile debug menu for the Rave
  *
- * @file profile_debug_menu.h
+ * @file profile_debug_menu.c
  */
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 
 #include "profile_debug_menu.h"
 #include "profile_hal.h"
@@ -25,13 +21,13 @@
 #include "sys_mon_debug.h"
 #include "i2c_debug.h"
 #include "ospi_debug.h"
+#include "asdm_debug.h"
+#include "bim_debug.h"
 #include "ami_proxy_driver_debug.h"
 #include "apc_proxy_driver_debug.h"
 #include "axc_proxy_driver_debug.h"
 #include "asc_proxy_driver_debug.h"
-#include "asdm_debug.h"
 #include "in_band_telemetry_debug.h"
-#include "bim_debug.h"
 
 
 /******************************************************************************/
@@ -80,6 +76,6 @@ void vDebugMenu_Initialise( )
     pxAppsTop = pxDAL_NewDirectory( "apps" );
 
     vASDM_DebugInit( pxAppsTop );
-    vIN_BAND_TELEMETRY_DebugInit( pxAppsTop, HAL_RPU_SHARED_MEMORY_BASE_ADDR );
+    vIN_BAND_TELEMETRY_DebugInit( pxAppsTop, HAL_RPU_SHARED_MEMORY_BASEADDR );
     vBIM_DebugInit( pxAppsTop );
 }

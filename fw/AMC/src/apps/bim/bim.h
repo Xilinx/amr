@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the public API of the Built in Monitoring (BIM) Application.
@@ -8,11 +8,6 @@
  */
 #ifndef _BIM_H_
 #define _BIM_H_
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 #include "osal.h"
@@ -28,7 +23,7 @@
  * @enum    BIM_STATUS
  * @brief   Status levels for the overall health of AMC.
  */
-typedef enum BIM_STATUS
+typedef enum
 {
     BIM_STATUS_HEALTHY = 0,
     BIM_STATUS_DEGRADED,
@@ -47,7 +42,7 @@ typedef enum BIM_STATUS
  * @struct  BIM_EVENTS
  * @brief   Structure to hold individual event info.
  */
-typedef struct BIM_EVENTS
+typedef struct
 {
     uint32_t   ulEventId;
     uint32_t   ulCallCount;
@@ -59,7 +54,7 @@ typedef struct BIM_EVENTS
  * @struct  BIM_MODULES
  * @brief   Structure to hold individual module health info.
  */
-typedef struct BIM_MODULES
+typedef struct
 {
     AMC_CFG_UNIQUE_IDS xModuleId;
     BIM_STATUS         xCurrentStatus;

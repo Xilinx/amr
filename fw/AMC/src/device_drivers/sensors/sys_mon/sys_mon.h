@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function declarations for the System Monitor
- * sensor.
+ * sensors.
  *
  * @file sys_mon.h
  */
@@ -11,11 +11,8 @@
 #ifndef _SYS_MON_H_
 #define _SYS_MON_H_
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "standard.h"
+#include "profile_hal.h"
 
 
 /******************************************************************************/
@@ -23,31 +20,30 @@
 /******************************************************************************/
 
 /**
- * @enum    SYS_MON_VOLTAGES_ENUM
+ * @enum    SYS_MON_VOLTAGES
  * @brief   Enumeration of available SYS_MON voltage values
  */
-typedef enum SYS_MON_VOLTAGES_ENUM
+typedef enum
 {
-#ifdef PROFILE_RAVE
-    SYS_MON_VOLTAGES_VCCAUX     = 0,
-    SYS_MON_VOLTAGES_VCCSOC     = 1,
-    SYS_MON_VOLTAGES_VCCO302    = 2,
-    SYS_MON_VOLTAGES_VCCAUXPMC  = 3,
-    SYS_MON_VOLTAGES_VCCO500    = 4,
-    SYS_MON_VOLTAGES_VCCPMC     = 5,
-    SYS_MON_VOLTAGES_VCCPSFP    = 6,
-    SYS_MON_VOLTAGES_VCCPSLP    = 7,
-    SYS_MON_VOLTAGES_VPVN       = 8,
-    SYS_MON_VOLTAGES_VCCO703    = 9,
+    SYS_MON_VOLTAGES_VCCAUX     =  0,
+#ifdef HAL_PROFILE_RAVE
+    SYS_MON_VOLTAGES_VCCSOC     =  1,
+    SYS_MON_VOLTAGES_VCCO302    =  2,
+    SYS_MON_VOLTAGES_VCCAUXPMC  =  3,
+    SYS_MON_VOLTAGES_VCCO500    =  4,
+    SYS_MON_VOLTAGES_VCCPMC     =  5,
+    SYS_MON_VOLTAGES_VCCPSFP    =  6,
+    SYS_MON_VOLTAGES_VCCPSLP    =  7,
+    SYS_MON_VOLTAGES_VPVN       =  8,
+    SYS_MON_VOLTAGES_VCCO703    =  9,
     SYS_MON_VOLTAGES_VAUXCH0    = 10,
     SYS_MON_VOLTAGES_VCCAUXSMON = 11,
 #else
-    SYS_MON_VOLTAGES_VCCAUX     = 0,
-    SYS_MON_VOLTAGES_VCCAUXSMON = 1,
-    SYS_MON_VOLTAGES_VCCAUXPMC  = 2,
+    SYS_MON_VOLTAGES_VCCAUXSMON =  1,
+    SYS_MON_VOLTAGES_VCCAUXPMC  =  2,
 #endif
     MAX_SYS_MON_VOLTAGE
-} SYS_MON_VOLTAGES_ENUM;
+} SYS_MON_VOLTAGES;
 
 
 /******************************************************************************/
@@ -84,7 +80,7 @@ int iSYS_MON_ReadTemperature( float *pfTemperatureInC );
  *          ERROR               Voltage not read successfully
  *
  */
-int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES_ENUM xVoltageType, float *pfVoltageInMV );
+int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES xVoltageType, float *pfVoltageInMV );
 
 /**
  * @brief   Print all the stats gathered by the driver

@@ -56,9 +56,9 @@ If a system was changing from one protocol to another, this is the only aspect t
 
 ### Implementation
 
-Each protocol directory then has a subdirectory for each platform (e.g. **v70**, **v80**, **linux**, etc). Additional subdirectories can be used for adapter-specific implementations (e.g. **aardvark**), which should be treated the same as platforms.
+Each protocol directory then has a subdirectory for each platform (e.g. **rave**, **v80**, etc). Additional subdirectories can be used for adapter-specific implementations (e.g. **aardvark**), which should be treated the same as platforms.
 
-Within each implementation directory is the source file for that platform and protocol (e.g. **fw_if_smbus_v70.c**). It should implement the generic API provided in **fw_if.h**, and the protocol-specific API provided in the common protocol  header file (in this example, **fw_if_smbus.h**).
+Within each implementation directory is the source file for that platform and protocol (e.g. **fw_if_smbus_v80.c**). It should implement the generic API provided in **fw_if.h**, and the protocol-specific API provided in the common protocol  header file (in this example, **fw_if_smbus.h**).
 
 
 
@@ -137,7 +137,7 @@ typedef struct _FW_IF_SMBUS_INIT_CFG
 ```
 In this example, **ulBaseAddr** and **ulBaudRate** are configuration values that will be required for all implementions of an SMBus driver.
 
-If any configuration values aren't required for a specific implementation, they can be ignored (e.g. the Linux implementation probably won't need a Base Address value).
+If any configuration values aren't required for a specific implementation, they can be ignored (e.g. the implementation probably won't need a Base Address value).
 
 ```
 /*
@@ -517,7 +517,7 @@ Note - to avoid losing the benefits of the firmware abstraction, the user applic
 
 # Examples
 
-Unless otherwise stated, each example shown here uses the V70 SMBus driver implementation.
+Unless otherwise stated, each example shown here uses the V80 SMBus driver implementation.
 
 
 ## Initialising the driver

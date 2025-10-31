@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of the Printing and Logging Library (PLL)
  *
  * @file pll.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 /* Standard includes */
 #include <string.h>
@@ -37,21 +33,21 @@
 
 
 /* Stat & Error definitions */
-#define PLL_STATS( DO )                         \
-    DO( PLL_STATS_INIT_OVERALL_COMPLETE )       \
-    DO( PLL_STATS_CREATE_MUTEX )                \
-    DO( PLL_STATS_CREATE_SEMAPHORE )            \
-    DO( PLL_STATS_TAKE_MUTEX )                  \
-    DO( PLL_STATS_RELEASE_MUTEX )               \
-    DO( PLL_STATS_PEND_SEMAPHORE )              \
-    DO( PLL_STATS_POST_SEMAPHORE )              \
-    DO( PLL_STATS_THREAD_SAFE_PRINT_COUNT )     \
-    DO( PLL_STATS_NON_THREAD_SAFE_PRINT_COUNT ) \
-    DO( PLL_STATS_LEVEL_CHANGE )                \
-    DO( PLL_STATS_LEVEL_RETRIEVAL )             \
-    DO( PLL_STATS_LOG_COLLECT_SUCCESS )         \
-    DO( PLL_STATS_MALLOC )                      \
-    DO( PLL_STATS_FREE )                        \
+#define PLL_STATS( DO )                           \
+    DO( PLL_STATS_INIT_OVERALL_COMPLETE )         \
+    DO( PLL_STATS_CREATE_MUTEX )                  \
+    DO( PLL_STATS_CREATE_SEMAPHORE )              \
+    DO( PLL_STATS_TAKE_MUTEX )                    \
+    DO( PLL_STATS_RELEASE_MUTEX )                 \
+    DO( PLL_STATS_PEND_SEMAPHORE )                \
+    DO( PLL_STATS_POST_SEMAPHORE )                \
+    DO( PLL_STATS_THREAD_SAFE_PRINT_COUNT )       \
+    DO( PLL_STATS_NON_THREAD_SAFE_PRINT_COUNT )   \
+    DO( PLL_STATS_LEVEL_CHANGE )                  \
+    DO( PLL_STATS_LEVEL_RETRIEVAL )               \
+    DO( PLL_STATS_LOG_COLLECT_SUCCESS )           \
+    DO( PLL_STATS_MALLOC )                        \
+    DO( PLL_STATS_FREE )                          \
     DO( PLL_STATS_MAX )
 
 #define PLL_ERRORS( DO )                          \
@@ -103,10 +99,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( PLL_ERRORS, PLL_ERRORS, PLL_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  PLL_PRIVATE_DATA
+ * @struct  PLL_PrivateData
  * @brief   Locally held private data
  */
-typedef struct PLL_PRIVATE_DATA
+typedef struct
 {
     uint32_t            ulUpperFirewall;
 
@@ -127,14 +123,14 @@ typedef struct PLL_PRIVATE_DATA
 
     uint32_t            ulLowerFirewall;
 
-} PLL_PRIVATE_DATA;
+} PLL_PrivateData;
 
 
 /******************************************************************************/
 /* Local data                                                                 */
 /******************************************************************************/
 
-static PLL_PRIVATE_DATA xLocalData =
+static PLL_PrivateData xLocalData =
 {
     UPPER_FIREWALL, /* ulUpperFirewall   */
 
@@ -157,7 +153,7 @@ static PLL_PRIVATE_DATA xLocalData =
     LOWER_FIREWALL
 };
 
-static PLL_PRIVATE_DATA *pxThis = &xLocalData;
+static PLL_PrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -533,8 +529,8 @@ int iPLL_DumpLog( void )
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iIsInitialised ) )
     {
-        HAL_PARTITION_TABLE_LOG_MSG xLogMsg = { 0 };
-        uintptr_t ulLogMsgSrcAddr = HAL_RPU_SHARED_MEMORY_BASE_ADDR + offsetof( HAL_PARTITION_TABLE, xLogMsg );
+        HALShmTableLogMsg xLogMsg = { 0 };
+        uintptr_t ulLogMsgSrcAddr = HAL_RPU_SHARED_MEMORY_BASEADDR + offsetof( HALShmTable, xLogMsg );
 
         if( NULL != pvOSAL_MemCpy( &xLogMsg, ( void * )ulLogMsgSrcAddr, sizeof( xLogMsg ) ) )
         {
@@ -542,7 +538,7 @@ int iPLL_DumpLog( void )
             vPLL_Printf( "Dumping log from shared memory...\r\n" );
             vPLL_Printf( "======================================================================\r\n\r\n" );
 
-            HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASE_ADDR, sizeof( HAL_PARTITION_TABLE ) );
+            HAL_FLUSH_CACHE_DATA( HAL_RPU_SHARED_MEMORY_BASEADDR, sizeof( HALShmTable ) );
 
             int i = 0;
             for( i = 0; i < PLL_LOG_MAX_RECS; i++ )
@@ -550,7 +546,8 @@ int iPLL_DumpLog( void )
                 PLL_LOG_MSG xMsg = { 0 };
 
                 /* Calculate the address of the log message for the current index */
-                uintptr_t ulLogMsgAddr = ( uintptr_t )( HAL_RPU_SHARED_MEMORY_BASE_ADDR + xLogMsg.ulLogMsgBufferOff ) + ( i * sizeof( PLL_LOG_MSG ) );
+                uintptr_t ulLogMsgAddr = ( uintptr_t )( HAL_RPU_SHARED_MEMORY_BASEADDR + xLogMsg.ulLogMsgBufOffset ) +
+                                         ( i * sizeof( PLL_LOG_MSG ) );
 
                 pvOSAL_MemCpy( &xMsg, ( uint32_t* )ulLogMsgAddr, sizeof( PLL_LOG_MSG ) );
 
@@ -586,18 +583,18 @@ int iPLL_ClearLog( void )
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iIsInitialised ) )
     {
-        HAL_PARTITION_TABLE_LOG_MSG xLogMsg = { 0 };
-        uintptr_t ulLogMsgSrcAddr = HAL_RPU_SHARED_MEMORY_BASE_ADDR + offsetof( HAL_PARTITION_TABLE, xLogMsg );
+        HALShmTableLogMsg xLogMsg = { 0 };
+        uintptr_t ulLogMsgSrcAddr = HAL_RPU_SHARED_MEMORY_BASEADDR + offsetof( HALShmTable, xLogMsg );
 
         /* Load partition table */
         if( NULL != pvOSAL_MemCpy( &xLogMsg, ( void * )ulLogMsgSrcAddr, sizeof( xLogMsg ) ) )
         {
-            uintptr_t ulLogBufStartAddr = HAL_RPU_SHARED_MEMORY_BASE_ADDR + xLogMsg.ulLogMsgBufferOff;
+            uintptr_t ulLogBufStartAddr = HAL_RPU_SHARED_MEMORY_BASEADDR + xLogMsg.ulLogMsgBufOffset;
 
-            if( PLL_LOG_BUF_LEN >= xLogMsg.ulLogMsgBufferLen )
+            if( PLL_LOG_BUF_LEN >= xLogMsg.ulLogMsgBufLen )
             {
-                pvOSAL_MemSet( ( uint8_t* )ulLogBufStartAddr, 0, xLogMsg.ulLogMsgBufferLen );
-                HAL_FLUSH_CACHE_DATA( ulLogBufStartAddr, xLogMsg.ulLogMsgBufferLen );
+                pvOSAL_MemSet( ( uint8_t* )ulLogBufStartAddr, 0, xLogMsg.ulLogMsgBufLen );
+                HAL_FLUSH_CACHE_DATA( ulLogBufStartAddr, xLogMsg.ulLogMsgBufLen );
 
                 iStatus = OK;
             }
@@ -682,7 +679,7 @@ int iPLL_SendBootRecords( void )
     {
         int i = 0;
         char *pcPlmLogBuffer = NULL;
-        uintptr_t ulLogMsgAddr = HAL_RPU_SHARED_MEMORY_BASE_ADDR + offsetof( HAL_PARTITION_TABLE, xLogMsg );
+        uintptr_t ulLogMsgAddr = HAL_RPU_SHARED_MEMORY_BASEADDR + offsetof( HALShmTable, xLogMsg );
 
         HAL_IO_WRITE32( 0, ulLogMsgAddr );
 
@@ -807,8 +804,8 @@ static int iLogCollect( char *pcBuf )
 {
     int iStatus = ERROR;
 
-    HAL_PARTITION_TABLE_LOG_MSG xLogMsg = { 0 };
-    uintptr_t ulLogMsgAddr = HAL_RPU_SHARED_MEMORY_BASE_ADDR + offsetof( HAL_PARTITION_TABLE, xLogMsg );
+    HALShmTableLogMsg xLogMsg = { 0 };
+    uintptr_t ulLogMsgAddr = HAL_RPU_SHARED_MEMORY_BASEADDR + offsetof( HALShmTable, xLogMsg );
 
     /* Logging is enabled, we can send logs directly to shared memory */
     if( TRUE == pxThis->iIsLogReady )
@@ -816,7 +813,7 @@ static int iLogCollect( char *pcBuf )
         /* Load partition table */
         if( NULL != pvOSAL_MemCpy( &xLogMsg, ( void * )ulLogMsgAddr, sizeof( xLogMsg ) ) )
         {
-            uint32_t ulMsgBufAddr = HAL_RPU_SHARED_MEMORY_BASE_ADDR + xLogMsg.ulLogMsgBufferOff;
+            uint32_t ulMsgBufAddr = HAL_RPU_SHARED_MEMORY_BASEADDR + xLogMsg.ulLogMsgBufOffset;
             char pcTempBuf[PLL_LOG_ENTRY_SIZE] = { 0 };
             uint32_t ulLogIdx = 0;
             PLL_LOG_MSG xLog = { 0 };

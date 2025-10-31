@@ -42,11 +42,11 @@ Enable Xilinx software command-line tools:
 
 To build from clean:
 ```
-$ ./scripts/build.sh -os <target os (freertos10_xilinx, standalone etc.)> -profile <target profile (v70, v80, rave etc.)> -xsa <path to xsa>
+$ ./scripts/build.sh -os <target os (freertos10_xilinx, standalone etc.)> -profile <target profile (v80, rave etc.)> -xsa <path to xsa>
 ```
--xsa parameter is not required for Linux builds, or if building with the "-amc" option.
+-xsa parameter is not required for building with the "-amc" option.
 
-This will generate a BSP (on non-Linux builds) using vitis build tools to get all the libraries required by AMC, then build using CMake with the CMakeLists file on the top level.
+This will generate a BSP using vivado build tools to get all the libraries required by AMC, then build using CMake with the CMakeLists file on the top level.
 
 
 To see the full list of options:

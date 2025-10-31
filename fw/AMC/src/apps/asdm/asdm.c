@@ -8,10 +8,6 @@
  *
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 /* common includes */
 #include "standard.h"
 #include "util.h"
@@ -157,11 +153,7 @@
  */
 static inline int iSensorIsEnabled( void )
 {
-	#ifdef PROFILE_RAVE
-		return FALSE;
-	#else
-		return TRUE;
-	#endif
+    return HAL_POWER_SENSORS_ENBALED;
 }
 
 ASC_PROXY_DRIVER_SENSOR_DATA xTotalPowerData[ TOTAL_POWER_NUM_RECORDS ] =

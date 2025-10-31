@@ -10,9 +10,6 @@
 #ifndef _PROFILES_SENSORS_H_
 #define _PROFILES_SENSORS_H_
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "profile_muxed_device.h"
 #include "profile_pdr.h"
@@ -46,7 +43,7 @@
  * @note    No sanity checks, etc, are done - this function is solely a wrapper API
  */
 static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1,
-	uint8_t unused2, uint8_t unused3, float *pfValue )
+    uint8_t unused2, uint8_t unused3, float *pfValue )
 {
     (void)unused1;
     (void)unused2;
@@ -57,7 +54,7 @@ static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1,
 
 /**
  * @brief Wrapper for the iAXC_GetTemperature function, to keep it the standard
- * 	driver API format
+ *        driver API format
  *
  * @param unused1      Unused parameter (normally i2c bus)
  * @param unused2      Unused parameter (normally i2c address)
@@ -70,20 +67,21 @@ static inline int iSYS_MON_WrappedReadTemperature( uint8_t unused1,
  * @note    No sanity checks, etc, are done - this function is solely a wrapper API
  */
 static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2,
-	uint8_t ucChannelNum, float *pfValue )
+    uint8_t ucChannelNum, float *pfValue )
 {
-    int iStatus = ERROR;
     (void)unused1;
     (void)unused2;
     (void)ucChannelNum;
     (void)pfValue;
+
+    int iStatus = ERROR;
 
     return iStatus;
 }
 
 /**
  * @brief Wrapper for the iSYS_MON_ReadVoltage function, to keep it the
- * 	standard driver API format
+ *        standard driver API format
  *
  * @param unused1     Unused parameter (normally i2c bus)
  * @param unused2     Unused parameter (normally i2c address)
@@ -95,7 +93,7 @@ static inline int iAXC_WrappedGetTemperature( uint8_t unused1, uint8_t unused2,
  * @note    No sanity checks, etc, are done - this function is solely a wrapper API
  */
 static inline int iSYS_MON_WrappedReadVoltage( uint8_t unused1, uint8_t unused2,
-	uint8_t ucVType, float *pfValue )
+    uint8_t ucVType, float *pfValue )
 {
     (void)unused1;
     (void)unused2;

@@ -153,7 +153,7 @@ static void vGetVoltage( void )
     {
         PLL_DAL( SYS_MON_DBG_NAME, "Error retrieving voltage type\r\n" );
     }
-    else if( OK != iSYS_MON_ReadVoltage( ( SYS_MON_VOLTAGES_ENUM )iVType, &fVoltageMv ) )
+    else if( OK != iSYS_MON_ReadVoltage( ( SYS_MON_VOLTAGES )iVType, &fVoltageMv ) )
     {
         PLL_DAL( SYS_MON_DBG_NAME, "Error retrieving SYS_MON Voltage\r\n" );
     }

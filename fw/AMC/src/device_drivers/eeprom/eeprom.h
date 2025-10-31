@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function declarations for accessing the
@@ -10,10 +10,6 @@
 
 #ifndef _EEPROM_H_
 #define _EEPROM_H_
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 
@@ -34,19 +30,15 @@
  * @struct  EEPROM_CFG_TYPE
  * @brief   The EEPROM device configuration
  */
-typedef struct EEPROM_CFG
+typedef struct
 {
-    uint8_t ucEepromI2cBus;             /* I2C Bus number of the device*/
-    uint8_t ucEepromSlaveAddress;       /* I2C Slave address of the device */
-    uint8_t ucEepromAddressSize;        /* The number of bytes in the EEPROM register address */
-    uint8_t ucEepromPageSize;           /* Eeprom page size */
-#ifdef PROFILE_RAVE
-    uint16_t ucEepromNumPages;          /* The number of page in Eeprom */
-#else
-    uint8_t ucEepromNumPages;           /* The number of page in Eeprom */
-#endif
-    uint8_t ucEepromDeviceIdAddress;    /* I2C Slave address for reaching the device id register */
-    uint8_t ucEepromDeviceIdRegister;   /* Device ID register */
+    uint8_t  ucEepromI2cBus;            /* I2C Bus number of the device*/
+    uint8_t  ucEepromSlaveAddress;      /* I2C Slave address of the device */
+    uint8_t  ucEepromAddressSize;       /* The number of bytes in the EEPROM register address */
+    uint8_t  ucEepromPageSize;          /* Eeprom page size */
+    uint16_t usEepromNumPages;          /* The number of page in Eeprom */
+    uint8_t  ucEepromDeviceIdAddress;   /* I2C Slave address for reaching the device id register */
+    uint8_t  ucEepromDeviceIdRegister;  /* Device ID register */
     uint16_t usEepromDeviceId;          /* The device id of eeprom */
 
 } EEPROM_CFG;

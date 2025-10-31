@@ -7,10 +7,6 @@
  * @file profile_fal.c
  */
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 /* core libs */
 #include "pll.h"
 
@@ -26,6 +22,7 @@
 /* device drivers */
 #include "i2c.h"
 #include "smbus.h"
+#include "eeprom.h"
 
 /* proxy drivers*/
 #include "apc_proxy_driver.h"
@@ -50,9 +47,6 @@
 /******************************************************************************/
 
 #define FAL_PROFILE_NAME      "PROFILE_FAL"
-#define OSPI_PAGE_SIZE        ( 256 )
-#define OSPI_RPU_BASE_ADDRESS ( 0x0 )
-#define OSPI_RPU_LENGTH       ( 0x10000000 )       /* 2Gb (256MB) */
 #define EMMC_RPU_BASE_ADDRESS ( 0x0 )
 #define EMMC_RPU_LENGTH       ( ( uint64_t )HAL_EMMC_MAX_BLOCKS * ( uint64_t )HAL_EMMC_BLOCK_SIZE ) /* 64Gb */
 
@@ -131,6 +125,7 @@ static FW_IF_MUXED_DEVICE_CFG xQsfpCfg1 =
     QSFP_I2C_ADDR,
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
 };                                                  /* QSFP 1 */
+
 static FW_IF_MUXED_DEVICE_CFG xQsfpCfg2 =
 {
     FW_IF_DEVICE_QSFP,
@@ -146,6 +141,7 @@ static FW_IF_MUXED_DEVICE_CFG xQsfpCfg2 =
     QSFP_I2C_ADDR,
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
 };                                                  /* QSFP 2 */
+
 static FW_IF_MUXED_DEVICE_CFG xQsfpCfg3 =
 {
     FW_IF_DEVICE_QSFP,
@@ -161,6 +157,7 @@ static FW_IF_MUXED_DEVICE_CFG xQsfpCfg3 =
     QSFP_I2C_ADDR,
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
 };                                                  /* QSFP 3 */
+
 static FW_IF_MUXED_DEVICE_CFG xQsfpCfg4 =
 {
     FW_IF_DEVICE_QSFP,
@@ -176,6 +173,7 @@ static FW_IF_MUXED_DEVICE_CFG xQsfpCfg4 =
     QSFP_I2C_ADDR,
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
 };                                                  /* QSFP 4 */
+
 static FW_IF_MUXED_DEVICE_CFG xDimmCfg =
 {
     FW_IF_DEVICE_DIMM,
@@ -191,9 +189,10 @@ static FW_IF_MUXED_DEVICE_CFG xDimmCfg =
     DIMM_I2C_ADDR,
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
 };                                                  /* DIMM */
+
 static FW_IF_GCQCfg xGcqCfg =
 {
-    ( uint64_t )HAL_BASE_LOGIC_GCQ_M2R_S01_AXI_BASEADDR,
+    ( uint64_t )HAL_GCQ_SHARED_BASEADDR,
     FW_IF_GCQ_MODE_PRODUCER,
     ( uint64_t )HAL_RPU_RING_BUFFER_BASE,
     HAL_RPU_RING_BUFFER_LEN,
@@ -209,8 +208,8 @@ static FW_IF_GCQInitCfg myGcqIf =
 
 static FW_IF_OSPI_CFG xOspiCfg =
 {
-    OSPI_RPU_BASE_ADDRESS,
-    OSPI_RPU_LENGTH,
+    HAL_OSPI_RPU_BASE_ADDR,
+    HAL_OSPI_RPU_LENGTH,
     TRUE,                               /* Enable erase before write */
     FW_IF_OSPI_STATE_INIT
 };
@@ -229,7 +228,7 @@ static FW_IF_SMBUS_CFG xSMBusCfg =
     HAL_SMBUS_ADDR,                     /* SMBus address */
     FW_IF_SMBUS_ROLE_CONTROLLER,        /* initial SMBus role */
     FW_IF_SMBUS_ARP_NON_ARP_CAPABLE,    /* SMBus ARP capability */
-    FW_IF_SMBUS_PROTOCOL_SMBUS,                     /* driver protocol */
+    FW_IF_SMBUS_PROTOCOL_SMBUS,         /* driver protocol */
     {
         0
     },                                  /* UDID */
@@ -241,7 +240,7 @@ static FW_IF_SMBUS_CFG xSMBusCfg =
 static FW_IF_OSPI_INIT_CFG myOspiIf =
 {
     HAL_OSPI_0_DEVICE_ID,
-    OSPI_PAGE_SIZE
+    HAL_OSPI_PAGE_SIZE
 };
 
 static FW_IF_EMMC_INIT_CFG myEmmcIf =
@@ -261,30 +260,30 @@ static FW_IF_SMBUS_INIT_CFG mySMBusIf =
     HAL_SMBUS_BASE_ADDR,
     SMBUS_FREQ_100KHZ,
     {
-        FW_IF_SMBUS_COMMAND_CODE_QUICK_COMMAND_LO,
-        FW_IF_SMBUS_COMMAND_CODE_QUICK_COMMAND_HI,
-        FW_IF_SMBUS_COMMAND_CODE_SEND_BYTE,
-        FW_IF_SMBUS_COMMAND_CODE_RECEIVE_BYTE,
-        FW_IF_SMBUS_COMMAND_CODE_WRITE_BYTE,
-        FW_IF_SMBUS_COMMAND_CODE_WRITE_WORD,
-        FW_IF_SMBUS_COMMAND_CODE_READ_BYTE,
-        FW_IF_SMBUS_COMMAND_CODE_READ_WORD,
-        FW_IF_SMBUS_COMMAND_CODE_PROCESS_CALL,
-        FW_IF_SMBUS_COMMAND_CODE_BLOCK_WRITE,
-        FW_IF_SMBUS_COMMAND_CODE_BLOCK_READ,
-        FW_IF_SMBUS_COMMAND_CODE_BLOCK_WRITE_BLOCK_READ_PROCESS_CALL,
-        FW_IF_SMBUS_COMMAND_CODE_HOST_NOTIFY,
-        FW_IF_SMBUS_COMMAND_CODE_WRITE_32,
-        FW_IF_SMBUS_COMMAND_CODE_READ_32,
-        FW_IF_SMBUS_COMMAND_CODE_WRITE_64,
-        FW_IF_SMBUS_COMMAND_CODE_READ_64,
-        FW_IF_SMBUS_COMMAND_CODE_PREPARE_TO_ARP,
-        FW_IF_SMBUS_COMMAND_CODE_RESET_DEVICE,
-        FW_IF_SMBUS_COMMAND_CODE_GET_UDID,
-        FW_IF_SMBUS_COMMAND_CODE_ASSIGN_ADDRESS,
-        FW_IF_SMBUS_COMMAND_CODE_GET_UDID_DIRECTED,
-        FW_IF_SMBUS_COMMAND_CODE_RESET_DEVICE_DIRECTED,
-        FW_IF_SMBUS_COMMAND_CODE_NONE
+        FW_IF_SMBUS_CMD_CODE_QUICK_COMMAND_LO,
+        FW_IF_SMBUS_CMD_CODE_QUICK_COMMAND_HI,
+        FW_IF_SMBUS_CMD_CODE_SEND_BYTE,
+        FW_IF_SMBUS_CMD_CODE_RECEIVE_BYTE,
+        FW_IF_SMBUS_CMD_CODE_WRITE_BYTE,
+        FW_IF_SMBUS_CMD_CODE_WRITE_WORD,
+        FW_IF_SMBUS_CMD_CODE_READ_BYTE,
+        FW_IF_SMBUS_CMD_CODE_READ_WORD,
+        FW_IF_SMBUS_CMD_CODE_PROCESS_CALL,
+        FW_IF_SMBUS_CMD_CODE_BLK_WRITE,
+        FW_IF_SMBUS_CMD_CODE_BLK_READ,
+        FW_IF_SMBUS_CMD_CODE_BLK_WRITE_BLK_READ_PROCESS_CALL,
+        FW_IF_SMBUS_CMD_CODE_HOST_NOTIFY,
+        FW_IF_SMBUS_CMD_CODE_WRITE_32,
+        FW_IF_SMBUS_CMD_CODE_READ_32,
+        FW_IF_SMBUS_CMD_CODE_WRITE_64,
+        FW_IF_SMBUS_CMD_CODE_READ_64,
+        FW_IF_SMBUS_CMD_CODE_PREPARE_TO_ARP,
+        FW_IF_SMBUS_CMD_CODE_RESET_DEVICE,
+        FW_IF_SMBUS_CMD_CODE_GET_UDID,
+        FW_IF_SMBUS_CMD_CODE_ASSIGN_ADDRESS,
+        FW_IF_SMBUS_CMD_CODE_GET_UDID_DIRECTED,
+        FW_IF_SMBUS_CMD_CODE_RESET_DEVICE_DIRECTED,
+        FW_IF_SMBUS_CMD_CODE_NONE
     }
 };
 
@@ -347,10 +346,7 @@ static uint8_t ucEnableSMBusPcieLink( void );
 uint8_t ucTca6416aRegisterRead( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegister, uint8_t *pucRegisterValue )
 {
     uint8_t ucStatus = ERROR;
-    uint8_t pucSendData[ TCA6416AR_READ_BUFF_SIZE ] =
-    {
-        0
-    };
+    uint8_t pucSendData[ TCA6416AR_READ_BUFF_SIZE ] = { 0 };
 
     if( NULL != pucRegisterValue )
     {
@@ -373,10 +369,7 @@ uint8_t ucTca6416aRegisterRead( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t u
 uint8_t ucTca6416aRegisterWrite( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegister, uint8_t ucRegisterValue )
 {
     uint8_t ucStatus = ERROR;
-    uint8_t pucSendData[ TCA6416AR_WRITE_BUFF_SIZE ] =
-    {
-        0
-    };
+    uint8_t pucSendData[ TCA6416AR_WRITE_BUFF_SIZE ] = { 0 };
 
     pucSendData[ 0 ] = ucRegister;
     pucSendData[ 1 ] = ucRegisterValue;
@@ -465,7 +458,7 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
         /* Init the Muxed Device FAL */
         if( AMC_CFG_I2C_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
         {
-            if( 0 != MAX_NUM_EXTERNAL_DEVICES_AVAILABLE )
+            if( 0 != MAX_NUM_EXTERNAL_DEVICES )
             {
                 if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Init( &myQsfpIf ) )
                 {
@@ -540,7 +533,7 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
 
         if( AMC_CFG_MUXED_DEVICE_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ) )
         {
-            if( 0 != MAX_NUM_EXTERNAL_DEVICES_AVAILABLE )
+            if( 0 != MAX_NUM_EXTERNAL_DEVICES )
             {
                 if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create( &xQsfpIf1, &xQsfpCfg1 ) )
                 {
@@ -713,7 +706,7 @@ void vFAL_DebugInitialise( void )
     vFW_IF_OSPI_DebugInit( pxFwIfTop );
     vFW_IF_EMMC_DebugInit( pxFwIfTop );
 
-    if( 0 != MAX_NUM_EXTERNAL_DEVICES_AVAILABLE )
+    if( 0 != MAX_NUM_EXTERNAL_DEVICES )
     {
         vFW_IF_MUXED_DEVICE_DebugInit( pxFwIfTop );
     }

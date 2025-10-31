@@ -8,10 +8,6 @@
  *
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include <string.h>
 
 #include "standard.h"
@@ -251,7 +247,7 @@ int iBIM_Initialise( BIM_MODULES *pxModuleData )
 
             iStatus = OK;
 
-            if( 0 != MAX_NUM_EXTERNAL_DEVICES_AVAILABLE )
+            if( 0 != MAX_NUM_EXTERNAL_DEVICES )
             {
                 if( OK == iAXC_BindCallback( &iAxcCallback ) )
                 {

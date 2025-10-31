@@ -20,7 +20,7 @@ SW_DIR=$(realpath ./sw/AMI)
 function print_help() {
 	echo "=================================== AMC Build script ===================================="
 	echo
-	echo "-profile <profile_name> : set the profile to build for (v70/v80/Linux/rave, etc)"
+	echo "-profile <profile_name> : set the profile to build for (rave/v80, etc)"
 	echo "-xsa <abs_path_to_xsa>  : XSA to generate BSP from"
 	echo "-sdt                    : SDT folder name"
 	echo
