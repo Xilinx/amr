@@ -48,7 +48,7 @@
 
 static struct drv_cdev_struct driver_dev = { { 0 } };  /* Global device */
 static unsigned pf_dev_index = DEFAULT_CDEV_BASEMINOR;
-static FW_IF_GCQ_INIT_CFG fw_if_gcq_init_cfg = { 0 };
+static FW_IF_GCQInitCfg fw_if_gcq_init_cfg = { 0 };
 
 /* Declared as extern in ami.h */
 bool ami_debug_enabled = true;

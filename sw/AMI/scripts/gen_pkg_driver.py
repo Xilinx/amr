@@ -263,14 +263,6 @@ def main(args):
             check_file_exists('GET_VER', join(PROJECT_DIR, 'api', 'include', 'ami_version.h.in'))
             end_step('GET_VER', start_time)
 
-            # Get GCQ driver version
-            step = 'get GCQ version'
-            start_time = start_step('GET_VER', step)
-            get_ver = './getVersion.sh gcq'
-            exec_step_cmd('GEN_VERSION', step, get_ver, shell=True, cwd=join(PROJECT_DIR, 'driver', 'gcq-driver'))
-            check_file_exists('GET_VER', join(PROJECT_DIR, 'driver', 'gcq-driver', 'src', 'gcq_version.h'))
-            end_step('GET_VER', start_time)
-
         # When building the list of sources, we need a relative path so we split
         # on PROJECT_DIR, then split once more to remove the leading slash, e.g.
         # PROJECT_DIR/driver/foo.c -> /driver/foo.c -> driver/foo.c

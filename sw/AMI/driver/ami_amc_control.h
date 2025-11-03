@@ -681,7 +681,7 @@ struct amc_control_ctxt {
 	void __iomem		*gcq_ring_buf_base_virt_addr;
 	struct amc_shared_mem	amc_shared_mem;
 	FW_IF_CFG			fw_if_cfg;
-	FW_IF_GCQ_CFG		fw_if_gcq_consumer;
+	FW_IF_GCQCfg		fw_if_gcq_consumer;
 	struct mutex		lock;
 	struct mutex		gcq_cmd_lock;
 	bool				gcq_halted;

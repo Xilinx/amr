@@ -19,9 +19,18 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
+#ifndef GCQ_DEBUG_ENABLE
+#define GCQ_DEBUG_ENABLE    (0)   /**< Debug logging disabled by default */
+#endif
+#if GCQ_DEBUG_ENABLE
+#define GCQ_DEBUG(x...)     { printk("[sGCQ Driver] " x); }
+#else
+#define GCQ_DEBUG(x...)     (void) (0)
+#endif
+
 
 #ifndef GCQ_MAX_INSTANCES
-#define GCQ_MAX_INSTANCES	(4)   /**< Default value, but can be overridden by build environmental variable  */
+#define GCQ_MAX_INSTANCES   (4)   /**< Default value, but can be overridden by build environmental variable */
 #endif
 
 #define gcq_assert(x)                                                           \
@@ -34,26 +43,6 @@ do {    if (x) break;                                                           
 /******************************************************************************/
 /* Typedefs                                                                   */
 /******************************************************************************/
-
-/**
- * @brief   Bound in function ptr for reading from a register
- *
- * @param   ullRegAddr is the register address to be read
- *
- * @return  The 32-bit value read from the register
- *
- */
-typedef uint32_t ( *GCQ_READ_REG_32 )( uint64_t ullRegAddr );
-
-/**
- * @brief   Bound in function ptr for writing to a register
- *
- * @param   ullRegAddr is the register address to write
- * @param   ulvalue is the 32-bit value to write
- *
- * @return  N/A
- */
-typedef void ( *GCQ_WRITE_REG_32 )( uint64_t ullRegAddr, uint32_t ulValue );
 
 /**
  * @brief   Bound in function ptr for reading from a memory address
@@ -80,32 +69,30 @@ typedef void ( *GCQ_WRITE_MEM_32 )( uint64_t ullMemAddr, uint32_t ulValue );
 /******************************************************************************/
 
 /*
- * @struct GCQ_INSTANCE_TYPE
+ * @struct GCQInstance
  * @brief  Forward declaration of structure to hold a sGCQ instance
  */
-struct GCQ_INSTANCE_TYPE;
+typedef struct GCQInstance GCQInstance;
 
 /*
- * @struct GCQ_IO_ACCESS_TYPE
+ * @struct GCQIOAccess
  * @brief  Bound in function pointers for memory & register access
  */
-typedef struct GCQ_IO_ACCESS_TYPE
+typedef struct
 {
-    GCQ_READ_REG_32     xGCQReadReg32;
-    GCQ_WRITE_REG_32    xGCQWriteReg32;
     GCQ_READ_MEM_32     xGCQReadMem32;
     GCQ_WRITE_MEM_32    xGCQWriteMem32;
 
-} GCQ_IO_ACCESS_TYPE;
+} GCQIOAccess;
 
-typedef struct GCQ_VERSION_TYPE
+typedef struct
 {
     uint8_t     ucVerMajor;
     uint8_t     ucVerMinor;
     uint8_t     ucVerPatch;
     uint8_t     ucDevCommits;
 
-} GCQ_VERSION_TYPE;
+} GCQVersion;
 
 
 /******************************************************************************/
@@ -116,70 +103,24 @@ typedef struct GCQ_VERSION_TYPE
  * @enum GCQ_ERRORS_TYPE
  * @brief Enumeration of sGCQ driver return values
  */
-typedef enum GCQ_ERRORS_TYPE
+typedef enum
 {
-    GCQ_ERRORS_NONE = 0,
-    GCQ_ERRORS_DRIVER_NOT_INITIALISED,
-    GCQ_ERRORS_NO_FREE_INSTANCES,
-    GCQ_ERRORS_INVALID_INSTANCE,
-    GCQ_ERRORS_INVALID_ARG,
-    GCQ_ERRORS_INVALID_SLOT_SIZE,
-    GCQ_ERRORS_INVALID_VERSION,
-    GCQ_ERRORS_INVALID_NUM_SLOTS,
-    GCQ_ERRORS_CONSUMER_NOT_ATTACHED,
-    GCQ_ERRORS_CONSUMER_NOT_AVAILABLE,
-    GCQ_ERRORS_CONSUMER_NO_DATA_RECEIVED,
-    GCQ_ERRORS_PRODUCER_NO_FREE_SLOTS,
+    GCQ_ERRORS_NONE                      =  0,
+    GCQ_ERRORS_DRIVER_NOT_INITIALISED    =  1,
+    GCQ_ERRORS_NO_FREE_INSTANCES         =  2,
+    GCQ_ERRORS_INVALID_INSTANCE          =  3,
+    GCQ_ERRORS_INVALID_ARG               =  4,
+    GCQ_ERRORS_INVALID_SLOT_SIZE         =  5,
+    GCQ_ERRORS_INVALID_VERSION           =  6,
+    GCQ_ERRORS_INVALID_NUM_SLOTS         =  7,
+    GCQ_ERRORS_CONSUMER_NOT_ATTACHED     =  8,
+    GCQ_ERRORS_CONSUMER_NOT_AVAILABLE    =  9,
+    GCQ_ERRORS_CONSUMER_NO_DATA_RECEIVED = 10,
+    GCQ_ERRORS_PRODUCER_NO_FREE_SLOTS    = 11,
 
     MAX_GCQ_ERRORS_TYPE
 
 } GCQ_ERRORS_TYPE;
-
-/*
- * @enum GCQ_MODE_TYPE
- * @brief Enumeration of sGCQ supported modes
- */
-typedef enum GCQ_MODE_TYPE
-{
-    GCQ_MODE_TYPE_CONSUMER_MODE = 0,
-    GCQ_MODE_TYPE_PRODUCER_MODE,
-
-    MAX_GCQ_MODE_TYPE
-
-} GCQ_MODE_TYPE;
-
-/*
- * @enum GCQ_INTERRUPT_MODE_TYPE
- * @brief Enumeration of sGCQ supported interrupt modes
- */
-typedef enum GCQ_INTERRUPT_MODE_TYPE
-{
-    GCQ_INTERRUPT_MODE_POLLING = 0,
-    GCQ_INTERRUPT_MODE_TAIL_POINTER,
-    GCQ_INTERRUPT_MODE_INTERRUPT_REG,
-
-    MAX_GCQ_INTERRUPT_MODE
-
-} GCQ_INTERRUPT_MODE_TYPE;
-
-/*
- * @enum GCQ_FLAGS_TYPE
- * @brief Enumeration of sGCQ supported driver flags to enable
- *        relevant functionality
- */
-typedef enum GCQ_FLAGS_TYPE
-{
-    /*
-     * Extra flags used to support features/hacks required
-     * for specific platforms
-     */
-    GCQ_FLAGS_TYPE_DOUBLE_READ_ENABLE  = ( 1 << 0 ),
-    GCQ_FLAGS_TYPE_IN_MEM_PTR_ENABLE   = ( 1 << 1 ),
-
-    MAX_GCQ_FLAGS_TYPE
-
-} GCQ_FLAGS_TYPE;
-
 
 /******************************************************************************/
 /* Driver External APIs                                                       */
@@ -197,9 +138,6 @@ typedef enum GCQ_FLAGS_TYPE
  *
  * @param    ppxGCQInstance is the instance of the of the sGCQ returned by driver
  * @param    pxIOAccess is the bound in function pointers for memory & register access
- * @param    xMode is the supported mode, consumer or producer
- * @param    xIntMode is the supported interrupt mode
- * @param    xFlags is the extended driver functionality
  * @param    ullBaseAddr is the base address of the sGCQ
  * @param    ullRingAddr is the base address of the shared memory for allocating slots
  * @param    ullRingLen is the length of the shared memory provided
@@ -208,16 +146,13 @@ typedef enum GCQ_FLAGS_TYPE
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
  */
-GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
-                          const GCQ_IO_ACCESS_TYPE *pxIOAccess,
-                          GCQ_MODE_TYPE xMode,
-                          GCQ_INTERRUPT_MODE_TYPE xIntMode,
-                          GCQ_FLAGS_TYPE xFlags,
-                          uint64_t ullBaseAddr,
-                          uint64_t ullRingAddr,
-                          uint64_t ullRingLen,
-                          uint32_t ulSQSlotSize,
-                          uint32_t ulCQSlotSize );
+GCQ_ERRORS_TYPE xGCQInit(GCQInstance **ppxGCQInstance,
+                         const GCQIOAccess *pxIOAccess,
+                         uint64_t ullBaseAddr,
+                         uint64_t ullRingAddr,
+                         uint64_t ullRingLen,
+                         uint32_t ulSQSlotSize,
+                         uint32_t ulCQSlotSize);
 
 /**
  * @brief    De-initialise a sGCQ driver instance
@@ -226,7 +161,7 @@ GCQ_ERRORS_TYPE xGCQInit( struct GCQ_INSTANCE_TYPE **ppxGCQInstance,
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
  */
-GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
+GCQ_ERRORS_TYPE xGCQDeinit(GCQInstance *pxGCQInstance);
 
 /**
  * @brief    Attempt to attach to the consumer, needs to be called before
@@ -241,7 +176,7 @@ GCQ_ERRORS_TYPE xGCQDeinit( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
  */
-GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
+GCQ_ERRORS_TYPE xGCQAttachConsumer(GCQInstance *pxGCQInstance);
 
 /**
  * @brief    Function to consume/read data from the sGCQ
@@ -256,7 +191,8 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( struct GCQ_INSTANCE_TYPE *pxGCQInstance );
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
  */
-GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDatalLen );
+GCQ_ERRORS_TYPE xGCQConsumeData(GCQInstance *pxGCQInstance,
+    uint8_t *pucData, uint32_t ulDatalLen);
 
 /**
  * @brief    Function to produce/send data to the sGCQ
@@ -270,7 +206,8 @@ GCQ_ERRORS_TYPE xGCQConsumeData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
  *
  * @return   See GCQ_ERRORS_TYPE for possible return values
  */
-GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_t *pucData, uint32_t ulDataLen );
+GCQ_ERRORS_TYPE xGCQProduceData(GCQInstance *pxGCQInstance,
+    uint8_t *pucData, uint32_t ulDataLen);
 
 /**
  * @brief    Gets version information from gcq_version.h
@@ -278,6 +215,6 @@ GCQ_ERRORS_TYPE xGCQProduceData( struct GCQ_INSTANCE_TYPE *pxGCQInstance, uint8_
  * @return   OK                  Version set successfully
  *           ERROR               Version not set successfully
  */
-int iGCQGetVersion( GCQ_VERSION_TYPE *pxVersion );
+int iGCQGetVersion( GCQVersion *pxVersion );
 
 #endif /* _GCQ_H_ */

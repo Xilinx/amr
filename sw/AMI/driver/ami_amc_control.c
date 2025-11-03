@@ -684,7 +684,7 @@ static int check_gcq_supported_version(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				       const uint16_t		major,
 				       const uint16_t		minor)
 {
-	GCQ_VERSION_TYPE ver = { 0 };
+	GCQVersion ver = { 0 };
 
 	if (!amc_ctrl_ctxt)
 		return -EINVAL;
@@ -1745,8 +1745,6 @@ int setup_amc(struct pci_dev		*dev,
 
 	/* Create sGCQ instance */
 	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.ullBaseAddress = (uint64_t)(*amc_ctrl_ctxt)->gcq_base_virt_addr;
-	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.xInterruptMode = FW_IF_GCQ_INTERRUPT_MODE_NONE;
-	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.xMode = FW_IF_GCQ_MODE_CONSUMER;
 	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.ullRingAddress = (uint64_t)(*amc_ctrl_ctxt)->gcq_ring_buf_base_virt_addr;
 	(*amc_ctrl_ctxt)->fw_if_gcq_consumer.ulRingLength =
 		(uint64_t)(*amc_ctrl_ctxt)->amc_shared_mem.ring_buffer.ring_buffer_len;

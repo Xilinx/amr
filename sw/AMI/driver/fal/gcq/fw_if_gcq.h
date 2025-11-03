@@ -26,51 +26,12 @@
 /*****************************************************************************/
 
 /**
- * @enum FW_IF_GCQ_MODE_TYPE
- * @brief Enumeration of sGCQ mode as 'producer' or a 'consumer'
- */
-typedef enum _FW_IF_GCQ_MODE_TYPE
-{
-    FW_IF_GCQ_MODE_PRODUCER = 0,
-    FW_IF_GCQ_MODE_CONSUMER,
-
-    MAX_FW_IF_GCQ_MODE
-
-} FW_IF_GCQ_MODE_TYPE;
-
-/**
- * @enum FW_IF_GCQ_INTERRUPT_MODE_TYPE
- * @brief Enumeration of the mechanisum used to trigger interrupt
- */
-typedef enum _FW_IF_GCQ_INTERRUPT_MODE_TYPE
-{
-    FW_IF_GCQ_INTERRUPT_MODE_NONE = 0,          	/* No interrupts enabled */
-    FW_IF_GCQ_INTERRUPT_MODE_TAIL_POINTER_TRIGGER,	/* Interrupt is triggered on a write operation to the tail pointer register */
-    FW_IF_GCQ_INTERRUPT_MODE_MANUAL_TRIGGER,		/* Interrupt is triggered by setting the interrupt field of the interrupt register */
-
-    MAX_FW_IF_GCQ_INTERRUPT_MODE
-
-} FW_IF_GCQ_INTERRUPT_MODE_TYPE;
-
-/**
- * @enum    FW_IF_GCQ_EVENTS
- * @brief   sGCQ events raised in the callback (generic across all sGCQ interface)
- */
-typedef enum _FW_IF_GCQ_EVENTS
-{
-    FW_IF_GCQ_INTERRUPT_TRIGGERED = MAX_FW_IF_COMMON_EVENT,
-
-    MAX_FW_IF_GCQ_EVENT
-
-} FW_IF_GCQ_EVENTS;
-
-/**
  * @enum FW_IF_GCQ_ERROR_TYPE
  * @brief Enumeration of sGCQ return values
  */
-typedef enum _FW_IF_GCQ_ERRORS_TYPE
+typedef enum
 {
-    FW_IF_GCQ_ERRORS_NONE = FW_IF_ERRORS_NONE,
+    FW_IF_GCQ_ERRORS_NONE             = FW_IF_ERRORS_NONE,
     FW_IF_GCQ_ERRORS_NO_FREE_PROFILES = MAX_FW_IF_ERROR,
     FW_IF_GCQ_ERRORS_INVALID_PROFILE,
     FW_IF_GCQ_ERRORS_NOT_SUPPORTED,
@@ -91,10 +52,10 @@ typedef enum _FW_IF_GCQ_ERRORS_TYPE
 } FW_IF_GCQ_ERRORS_TYPE;
 
 /**
- * @enum _FW_IF_GCQ_IOCTL_TYPE
+ * @enum FW_IF_GCQ_IOCTL_TYPE
  * @brief ioctrl options for sGCQ interfaces (generic across all sGCQ interfaces)
  */
-typedef enum _FW_IF_GCQ_IOCTL_TYPE
+typedef enum
 {
     FW_IF_GCQ_IOCTRL_SET_OPAQUE_HANDLE = MAX_FW_IF_COMMON_IOCTRL_OPTION,
     FW_IF_GCQ_IOCTRL_GET_OPAQUE_HANDLE,
@@ -109,33 +70,31 @@ typedef enum _FW_IF_GCQ_IOCTL_TYPE
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_GCQ_INIT_CFG
+ * @struct  FW_IF_GCQInitCfg
  * @brief   config options for sGCQ initialisation (generic across all sGCQ interfaces)
  */
-typedef struct _FW_IF_GCQ_INIT_CFG
+typedef struct
 {
-    void                        	*pvIOAccess;
+    void                *pvIOAccess;
 
-} FW_IF_GCQ_INIT_CFG;
+} FW_IF_GCQInitCfg;
 
 /**
- * @struct  FW_IF_GCQ_CFG
+ * @struct  FW_IF_GCQCfg
  * @brief   config options for sGCQ interfaces (generic across all sGCQ interfaces)
  */
-typedef struct _FW_IF_GCQ_CFG
+typedef struct
 {
-    uint64_t                        ullBaseAddress;
-    FW_IF_GCQ_MODE_TYPE             xMode;
-    FW_IF_GCQ_INTERRUPT_MODE_TYPE   xInterruptMode;
-    uint64_t                        ullRingAddress;
-    uint32_t                        ulRingLength;
-    uint32_t                        ulCompletionQueueSlotSize;
-    uint32_t                        ulSubmissionQueueSlotSize;
-    uint8_t                         udid[ FW_IF_GCQ_UDID_LEN ];
+    uint64_t            ullBaseAddress;
+    uint64_t            ullRingAddress;
+    uint32_t            ulRingLength;
+    uint32_t            ulCompletionQueueSlotSize;
+    uint32_t            ulSubmissionQueueSlotSize;
+    uint8_t             udid[FW_IF_GCQ_UDID_LEN];
 
-    void                            *pvProfile;      /* opaque handle to store internal context */
+    void                *pvProfile;      /* opaque handle to store internal context */
 
-} FW_IF_GCQ_CFG;
+} FW_IF_GCQCfg;
 
 
 /*****************************************************************************/
@@ -149,7 +108,7 @@ typedef struct _FW_IF_GCQ_CFG
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_GCQ_Init(FW_IF_GCQ_INIT_CFG *pxInitCfg);
+uint32_t ulFW_IF_GCQ_Init(FW_IF_GCQInitCfg *pxInitCfg);
 
 /**
  * @brief   creates an instance of the sGCQ interface
@@ -159,6 +118,6 @@ uint32_t ulFW_IF_GCQ_Init(FW_IF_GCQ_INIT_CFG *pxInitCfg);
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_GCQ_Create(FW_IF_CFG *pxFwIf, FW_IF_GCQ_CFG *pxGCQCfg);
+uint32_t ulFW_IF_GCQ_Create(FW_IF_CFG *pxFwIf, FW_IF_GCQCfg *pxGCQCfg);
 
 #endif /* _FW_IF_GCQ_H_ */

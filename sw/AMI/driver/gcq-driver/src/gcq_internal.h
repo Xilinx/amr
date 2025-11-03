@@ -11,44 +11,38 @@
 #define _GCQ_INTERNAL_H_
 
 #include "gcq.h"
-#include "gcq_debug.h"
-#include "gcq_regmap.h"
-#include "gcq_hw.h"
-#include "gcq_features.h"
-#include "gcq_version.h"
 #include "gcq_ring.h"
 
 
 /*****************************************************************************/
 /* Defines                                                                   */
 /*****************************************************************************/
+#define GCQ_VER_MAJOR                   (1)
+#define GCQ_VER_MINOR                   (0)
+#define GCQ_VER_PATCH                   (0)
+#define GCQ_VER_DEV_COMMITS             (0)
 
-#define GCQ_VERSION             	((GIT_TAG_VER_MAJOR << 16 ) + GIT_TAG_VER_MINOR)
-#define GET_GCQ_MAJOR(version)		(version >> 16)
-#define GET_GCQ_MINOR(version)  	(version & 0xFFFF)
+#define GET_GCQ_MAJOR(version)          (version >> 16)
+#define GET_GCQ_MINOR(version)          (version & 0xFFFF)
 
-#define GCQ_ALLOC_MAGIC         	(0x5847513F)
-#define GCQ_MIN_NUM_SLOTS       	(2)
+#define GCQ_ALLOC_MAGIC                 (0x5847513F)
+#define GCQ_MIN_NUM_SLOTS               (2)
 
-#define CHECK_REG_IO_ACCESS(f)  	((NULL == f->xGCQReadReg32)  || \
-                                 	 (NULL == f->xGCQWriteReg32) || \
-                                 	 (NULL == f->xGCQReadMem32)  || \
-                                 	 (NULL == f->xGCQWriteMem32) )
+/* Producer address offsets */
+#define GCQ_PRODUCER_SQ_TAIL_POINTER    (0x0000)  /* RW */
+#define GCQ_PRODUCER_SQ_MEM_ADDR_LOW    (0x0008)  /* RW */
+#define GCQ_PRODUCER_SQ_MEM_ADDR_HIGH   (0x0010)  /* RW */
+#define GCQ_PRODUCER_CQ_TAIL_POINTER    (0x0100)  /* RO */
+#define GCQ_PRODUCER_CQ_MEM_ADDR_LOW    (0x0108)  /* RO */
+#define GCQ_PRODUCER_CQ_MEM_ADDR_HIGH   (0x0110)  /* RO */
 
-#define GCQ_MODE_NAME_ENTRY(_s)       	[GCQ_MODE_TYPE_ ## _s] = #_s
-static const char* const pcGCQModeStr[] =
-{
-	GCQ_MODE_NAME_ENTRY(CONSUMER_MODE),
-    GCQ_MODE_NAME_ENTRY(PRODUCER_MODE)
-};
-
-#define GCQ_INTERRUPT_MODE_NAME_ENTRY(_s)	[GCQ_INTERRUPT_MODE_ ## _s ] = #_s
-static const char* const pcGCQInterruptModeStr[] =
-{
-	GCQ_INTERRUPT_MODE_NAME_ENTRY(POLLING),
-    GCQ_INTERRUPT_MODE_NAME_ENTRY(TAIL_POINTER),
-    GCQ_INTERRUPT_MODE_NAME_ENTRY(INTERRUPT_REG)
-};
+/* Consumer address offsets */
+#define GCQ_CONSUMER_CQ_TAIL_POINTER    (0x0100)  /* RW */
+#define GCQ_CONSUMER_CQ_MEM_ADDR_LOW    (0x0108)  /* RW */
+#define GCQ_CONSUMER_CQ_MEM_ADDR_HIGH   (0x0110)  /* RW */
+#define GCQ_CONSUMER_SQ_TAIL_POINTER    (0x0000)  /* RO */
+#define GCQ_CONSUMER_SQ_MEM_ADDR_LOW    (0x0108)  /* RO */
+#define GCQ_CONSUMER_SQ_MEM_ADDR_HIGH   (0x0110)  /* RO */
 
 
 /******************************************************************************/
@@ -56,38 +50,27 @@ static const char* const pcGCQInterruptModeStr[] =
 /******************************************************************************/
 
 /**
- * @struct GCQ_RING_TYPE
- *
- * @brief  Forward declaration of GCQ_RING_TYPE, used to model the ring buffer.
- *
- */
-struct GCQ_RING_TYPE;
-
-/**
  * @struct  GCQ_TYPE
  *
  * @brief   Instance of an GCQ_TYPE, used to model the sGCQ.
  */
-typedef struct GCQ_INSTANCE_TYPE
+typedef struct GCQInstance
 {
     uint32_t ulUpperFirewall;
     bool     iInitialised;
     uint64_t ullBaseAddr;
-    GCQ_MODE_TYPE xMode;
-    GCQ_INTERRUPT_MODE_TYPE xIntMode;
-    const GCQ_IO_ACCESS_TYPE *pxGCQIOAccess;
+    const GCQIOAccess *pxGCQIOAccess;
     uint64_t ullRingAddr;
     uint32_t ulConsumerSlotSize;
     uint32_t ulProducerSlotSize;
     uint64_t ullGCQHeaderAddr;
-    GCQ_FLAGS_TYPE xGCQFlags;
-    struct GCQ_RING_TYPE xGCQSq; ____cacheline_aligned_in_smp
-    struct GCQ_RING_TYPE xGCQCq; ____cacheline_aligned_in_smp
-    struct GCQ_RING_TYPE *pxGCQProducer;
-    struct GCQ_RING_TYPE *pxGCQConsumer;
+    GCQRing  xGCQSq; ____cacheline_aligned_in_smp
+    GCQRing  xGCQCq; ____cacheline_aligned_in_smp
+    GCQRing  *pxGCQProducer;
+    GCQRing  *pxGCQConsumer;
     uint32_t ulLowerFirewall;
 
-} GCQ_INSTANCE_TYPE;
+} GCQInstance;
 
 
 #endif /* _GCQ_INTERNAL_H_ */

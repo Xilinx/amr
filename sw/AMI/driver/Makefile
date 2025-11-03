@@ -22,8 +22,6 @@ $(TARGET_MODULE)-objs += amc_proxy.o
 $(TARGET_MODULE)-objs += ami_log.o
 $(TARGET_MODULE)-objs += fal/gcq/fw_if_gcq_linux.o
 $(TARGET_MODULE)-objs += gcq-driver/src/gcq_driver.o
-$(TARGET_MODULE)-objs += gcq-driver/src/gcq_hw.o
-$(TARGET_MODULE)-objs += gcq-driver/src/gcq_features.o
 
 EXTRA_CFLAGS:=-I$(PWD) -I$(PWD)/fal -I$(PWD)/fal/gcq -I$(PWD)/gcq-driver/src
 
