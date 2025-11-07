@@ -31,6 +31,37 @@
 #define AMI_IOC_PDI_PROGRAM_MAGIC	(0xBBBBBBBB)
 #define AMI_IOC_SENSOR_STATUS_LEN	(40)
 
+/* EEPROM data */
+
+#define EEPROM_TYPE_POS         (0)
+#define EEPROM_TYPE_MASK        (0x01)
+#define EEPROM_OFFSET_POS       (8)
+#define EEPROM_OFFSET_MASK      (0xFF)
+
+#define EEPROM_GET_OFFSET(data) ((data >> EEPROM_OFFSET_POS) & EEPROM_OFFSET_MASK)
+#define EEPROM_GET_TYPE(data)   ((data >> EEPROM_TYPE_POS)   & EEPROM_TYPE_MASK)
+
+#define EEPROM_SET_OFFSET(data) ((data & EEPROM_OFFSET_MASK) << EEPROM_OFFSET_POS)
+#define EEPROM_SET_TYPE(data)   ((data & EEPROM_TYPE_MASK)   << EEPROM_TYPE_POS)
+
+/**
+ * Format of flags:
+ * 0xAABBCCDD where:
+ *   0xAA is the request type (read or write)
+ *   0xBB is the device ID
+ *   0xCC is the page number
+ *   0xDD is the offset
+ */
+#define MK_MODULE_RW_FLAGS(req, dev, page, off) \
+                                        (((uint8_t)req << 24) | \
+                                        ((uint8_t)dev << 16)  | \
+                                        ((uint8_t)page << 8)  | \
+                                        ((uint8_t)off))
+#define MODULE_RW_TYPE(flags)           ((uint8_t)(flags >> 24))
+#define MODULE_RW_DEVICE(flags)         ((uint8_t)((flags & 0x00ff0000) >> 16))
+#define MODULE_RW_PAGE(flags)           ((uint8_t)((flags & 0x0000ff00) >> 8))
+#define MODULE_RW_OFFSET(flags)         ((uint8_t)(flags & 0x000000ff))
+
 /**
  * struct ami_ioc_data_payload - payload struct for dynamically sized ioctl data
  * @size: Size of data buffer.

@@ -30,7 +30,7 @@
 
 
 #ifndef GCQ_MAX_INSTANCES
-#define GCQ_MAX_INSTANCES   (4)   /**< Default value, but can be overridden by build environmental variable */
+#define GCQ_MAX_INSTANCES	(4)   /**< Default value, but can be overridden by build environmental variable  */
 #endif
 
 #define gcq_assert(x)                                                           \
@@ -39,6 +39,7 @@ do {    if (x) break;                                                           
                __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();          \
 } while ( 0 )
 
+#define GCQ_UDID_LEN                  ( 16 )
 
 /******************************************************************************/
 /* Typedefs                                                                   */
@@ -105,22 +106,103 @@ typedef struct
  */
 typedef enum
 {
-    GCQ_ERRORS_NONE                      =  0,
-    GCQ_ERRORS_DRIVER_NOT_INITIALISED    =  1,
-    GCQ_ERRORS_NO_FREE_INSTANCES         =  2,
-    GCQ_ERRORS_INVALID_INSTANCE          =  3,
-    GCQ_ERRORS_INVALID_ARG               =  4,
-    GCQ_ERRORS_INVALID_SLOT_SIZE         =  5,
-    GCQ_ERRORS_INVALID_VERSION           =  6,
-    GCQ_ERRORS_INVALID_NUM_SLOTS         =  7,
-    GCQ_ERRORS_CONSUMER_NOT_ATTACHED     =  8,
-    GCQ_ERRORS_CONSUMER_NOT_AVAILABLE    =  9,
-    GCQ_ERRORS_CONSUMER_NO_DATA_RECEIVED = 10,
-    GCQ_ERRORS_PRODUCER_NO_FREE_SLOTS    = 11,
+    GCQ_ERRORS_NONE = 0,
+    GCQ_ERRORS_DRIVER_NOT_INITIALISED 	= 1,
+    GCQ_ERRORS_DRIVER_IN_USE		= 2,
+    GCQ_ERRORS_NO_FREE_INSTANCES	= 3,
+    GCQ_ERRORS_NO_FREE_PROFILES		= 4,
+    GCQ_ERRORS_INVALID_INSTANCE		= 5,
+    GCQ_ERRORS_INVALID_ARG		= 6,
+    GCQ_ERRORS_INVALID_HANDLE		= 7,
+    GCQ_ERRORS_INVALID_SLOT_SIZE	= 8,
+    GCQ_ERRORS_INVALID_VERSION		= 9,
+    GCQ_ERRORS_INVALID_NUM_SLOTS	= 10,
+    GCQ_ERRORS_INVALID_PROFILE		= 11,
+    GCQ_ERRORS_INVALID_PARAMS		= 12,
+    GCQ_ERRORS_CONSUMER_NOT_ATTACHED	= 13,
+    GCQ_ERRORS_CONSUMER_NOT_AVAILABLE	= 14,
+    GCQ_ERRORS_CONSUMER_NO_DATA_RECEIVED = 15,
+    GCQ_ERRORS_PRODUCER_NO_FREE_SLOTS	= 16,
+    GCQ_ERRORS_NOT_SUPPORTED		= 17,
 
     MAX_GCQ_ERRORS_TYPE
 
 } GCQ_ERRORS_TYPE;
+
+
+/**
+ * @enum    COMMON_IOCTRL_OPTIONS
+ *
+ * @brief   IO ctrl options common
+ */
+typedef enum
+{
+    COMMON_IOCTRL_FLUSH_TX = 0,
+    COMMON_IOCTRL_FLUSH_RX,
+    COMMON_IOCTRL_GET_RX_MODE,
+    COMMON_IOCTRL_ENABLE_DEBUG_PRINT,
+    COMMON_IOCTRL_DISABLE_DEBUG_PRINT,
+
+    MAX_COMMON_IOCTRL_OPTION
+
+} COMMON_IOCTRL_OPTIONS;
+
+/**
+ * @struct  GCQ_STATE
+ * @brief   The internal sGCQ IF state
+ */
+typedef enum
+{
+    GCQ_STATE_CLOSED      = 0,
+    GCQ_STATE_INIT        = 1,
+    GCQ_STATE_OPENED      = 2,
+    GCQ_STATE_ATTACHED    = 3,
+
+    GCQ_STATE_MAX
+
+} GCQ_STATE;
+
+/**
+ * @struct  GCQInitCfg
+ * @brief   config options for sGCQ initialisation (generic across all sGCQ interfaces)
+ */
+typedef struct GCQInitCfg
+{
+    void       *pvIOAccess;
+
+} GCQInitCfg;
+
+
+/**
+ * @struct  GCQProfile
+ * @brief   The definition of a profile, used to store internal
+ *          state & ptr to driver instance
+ */
+typedef struct
+{
+    uint32_t ulIOHandle;
+    GCQ_STATE xState;
+    GCQInstance *pxGCQInstance;
+
+} GCQProfile;
+
+
+/**
+ * @struct  GCQCfg
+ * @brief   config options for sGCQ interfaces (generic across all sGCQ interfaces)
+ */
+typedef struct GCQCfg
+{
+    uint64_t    ullBaseAddress;
+    uint64_t    ullRingAddress;
+    uint32_t    ulRingLength;
+    uint32_t    ulCompletionQueueSlotSize;
+    uint32_t    ulSubmissionQueueSlotSize;
+    uint8_t     udid[ GCQ_UDID_LEN ];
+
+    void        *pvProfile;      /* opaque handle to store internal context */
+
+} GCQCfg;
 
 /******************************************************************************/
 /* Driver External APIs                                                       */
@@ -216,5 +298,42 @@ GCQ_ERRORS_TYPE xGCQProduceData(GCQInstance *pxGCQInstance,
  *           ERROR               Version not set successfully
  */
 int iGCQGetVersion( GCQVersion *pxVersion );
+
+/*****************************************************************************/
+/* Public Functions                                                          */
+/*****************************************************************************/
+
+/**
+ * @brief   initialisation function for sGCQ interfaces (generic across all sGCQ interfaces)
+ *
+ * @param   xInitCfg    pointer to the config to initialise the driver with
+ *
+ * @return  See GCQ_ERRORS
+ */
+uint32_t GCQ_Init(GCQInitCfg *pxInitCfg);
+
+/**
+ * @brief   Local implementation of gcq_open
+ */
+uint32_t gcq_open(void *pvFWIf);
+
+
+/**
+ * @brief   Local implementation of gcq_close
+ */
+uint32_t gcq_close(void *pvFWIf);
+
+/**
+ * @brief   Local implementation of gcq_read
+ */
+uint32_t gcq_read(void *pvFWIf,
+        uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulSize, uint32_t ulTimeoutMs);
+
+/**
+ * @brief   Local implementation of gcq_write
+ */
+uint32_t gcq_write(void *pvFWIf,
+        uint64_t ullDstPort, uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs);
+
 
 #endif /* _GCQ_H_ */

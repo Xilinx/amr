@@ -22,14 +22,15 @@
 #define GCQ_VER_PATCH                   (0)
 #define GCQ_VER_DEV_COMMITS             (0)
 
-#define GET_GCQ_MAJOR(version)          (version >> 16)
-#define GET_GCQ_MINOR(version)          (version & 0xFFFF)
+#define GET_GCQ_MAJOR(version)		(version >> 16)
+#define GET_GCQ_MINOR(version)  	(version & 0xFFFF)
 
-#define GCQ_ALLOC_MAGIC                 (0x5847513F)
-#define GCQ_MIN_NUM_SLOTS               (2)
+#define GCQ_ALLOC_MAGIC         	(0x5847513F)
+#define GCQ_MIN_NUM_SLOTS       	(2)
 
 /* Producer address offsets */
 #define GCQ_PRODUCER_SQ_TAIL_POINTER    (0x0000)  /* RW */
+
 #define GCQ_PRODUCER_SQ_MEM_ADDR_LOW    (0x0008)  /* RW */
 #define GCQ_PRODUCER_SQ_MEM_ADDR_HIGH   (0x0010)  /* RW */
 #define GCQ_PRODUCER_CQ_TAIL_POINTER    (0x0100)  /* RO */

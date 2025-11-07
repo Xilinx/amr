@@ -216,7 +216,7 @@ static inline uint64_t prvullGCQRingGetSlotPtrProduced(const GCQRing *pxRing)
     gcq_assert(pxRing);
     return (pxRing->ullRingSlotAddr +
             (uint64_t)pxRing->ulRingSlotSize *
-            (pxRing->ulRingProduced & (pxRing->ulRingNumSlots - 1)));
+			(pxRing->ulRingProduced & (pxRing->ulRingNumSlots - 1)));
 }
 
 /**
@@ -231,7 +231,7 @@ static inline uint64_t prvullGCQRingGetSlotPtrConsumed(const GCQRing *pxRing)
     gcq_assert(pxRing);
     return (pxRing->ullRingSlotAddr +
            (uint64_t)pxRing->ulRingSlotSize *
-           (pxRing->ulRingConsumed & (pxRing->ulRingNumSlots - 1)));
+		   (pxRing->ulRingConsumed & (pxRing->ulRingNumSlots - 1)));
 }
 
 #endif /* _GCQ_RING_H_ */

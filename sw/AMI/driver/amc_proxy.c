@@ -13,7 +13,7 @@
 
 #include "amc_proxy.h"
 #include "ami_program.h"  /* Need some #defines from here */
-
+#include "gcq.h"
 
 /*****************************************************************************/
 /* Defines                                                                   */
@@ -446,7 +446,7 @@ struct amc_proxy_cmd_response {
 /**
  * struct amc_proxy_instance - internal proxy instance
  *
- * @fw_if_handle: handle to the FW IF
+ * @gcq_handle: handle to the GCQ
  * @proxy_id: unique proxy id
  * @event_cb: the event callback to be invoked when event generated
  * @lock: lock to protect access to internal lists
@@ -456,7 +456,7 @@ struct amc_proxy_cmd_response {
  * @initialised: flag to indicate layer has been init
  */
 struct amc_proxy_instance {
-    FW_IF_CFG                   *fw_if_handle;
+    GCQCfg                     *gcq_handle;
     uint8_t                     proxy_id;
     amc_proxy_event_callback    *event_cb;
     struct mutex                lock;
@@ -742,10 +742,10 @@ static int complete_response_thread(void *data)
     while(1) {
         if (response_failed == false) {
 
-            /* Perform the read from the FW_IF */
-            if (amc_proxy_inst->fw_if_handle->read(amc_proxy_inst->fw_if_handle, 0,
+            /* Perform the read from the gcq_handle */
+            if (gcq_read(amc_proxy_inst->gcq_handle, 0,
                                             (uint8_t*)&ccmd,
-                                            &ccmd_size, 0) == FW_IF_ERRORS_NONE) {
+                                            &ccmd_size, 0) == GCQ_ERRORS_NONE) {
                 /*
                 * Get the entry from submitted_cmds list,
                 * remove and invoke callback
@@ -769,35 +769,36 @@ static int complete_response_thread(void *data)
 }
 
 /**
- * amc_proxy_find_matching_proxy_instance() - Find matching proxy list entry
+ * amc_proxy_find_matching_gcq_proxy_instance() - Find matching proxy list entry
  *
- * @fw_if_gcq: sGCQ consumer configuration
+ * gcq: sGCQ consumer configuration
  *
  * Loop around the global proxy instance list looking for a matching entry
- * based of the FW_IF instance.
+ * based of the gcq instance.
  *
  * Return: the proxy instance if found or NULL is not found
  */
-static struct amc_proxy_list_entry * amc_proxy_find_matching_proxy_instance(const FW_IF_CFG *fw_if_gcq)
+static struct amc_proxy_list_entry * amc_proxy_find_matching_gcq_proxy_instance(const GCQCfg *gcq_cfg)
 {
-    struct amc_proxy_list_entry *amc_proxy = NULL;
-    struct list_head *pos = NULL, *next = NULL;
+	struct amc_proxy_list_entry *amc_proxy = NULL;
+	struct list_head *pos = NULL, *next = NULL;
 
-    if (!fw_if_gcq) {
+	if (!gcq_cfg) {
+            PR_DBG("returning NULL\n");
             return(NULL);
-    }
+	}
 
-    list_for_each_safe(pos, next, &amc_proxy_list_head) {
+	list_for_each_safe(pos, next, &amc_proxy_list_head) {
 
-        amc_proxy = list_entry(pos, struct amc_proxy_list_entry, list);
+	amc_proxy = list_entry(pos, struct amc_proxy_list_entry, list);
+	if (amc_proxy->inst.gcq_handle == gcq_cfg) {
         /* Find the matching list based on handle */
-        if (amc_proxy->inst.fw_if_handle == fw_if_gcq) {
-            return (amc_proxy);
-        }
+        PR_DBG("Found matching entry in list");
+        return (amc_proxy);
+	}
     }
     return (NULL);
 }
-
 
 /*****************************************************************************/
 /* Public functions                                                          */
@@ -805,18 +806,20 @@ static struct amc_proxy_list_entry * amc_proxy_find_matching_proxy_instance(cons
 
 /*
  * Initialise the AMC proxy layer, creating resources and opening
- * a handle to the FW_IF abstraction
+ * a handle to the gcq
  */
-int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
+int amc_proxy_init(uint8_t proxy_id, GCQCfg *gcq_handle)
 {
     int ret = 0;
 
-    if (!fw_if_handle) {
+    if (!gcq_handle) {
         return(-EINVAL);
     }
 
-    ret = fw_if_handle->open(fw_if_handle);
-    if (ret == FW_IF_ERRORS_NONE) {
+    PR_DBG("gcq_open\n");
+    ret = gcq_open(gcq_handle);
+    PR_DBG("gcq_open ret %d\n",ret);
+    if (ret == GCQ_ERRORS_NONE) {
 
         const char *ap_thread_name = "amc proxy";
         struct amc_proxy_list_entry *amc_proxy_entry = NULL;
@@ -826,7 +829,7 @@ int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
             PR_ERR("Unable to allocate memory for amc context");
             return(-EINVAL);
         }
-        amc_proxy_entry->inst.fw_if_handle = fw_if_handle;
+        amc_proxy_entry->inst.gcq_handle = gcq_handle;
         amc_proxy_entry->inst.proxy_id = proxy_id;
         amc_proxy_entry->inst.response_thread_created = false;
 
@@ -834,6 +837,7 @@ int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
         INIT_LIST_HEAD(&(amc_proxy_entry->list));
         INIT_LIST_HEAD(&(amc_proxy_entry->inst.submitted_cmds));
 
+	    PR_DBG("proxy entry created\n");
         /* Create thread to handle command responses */
         amc_proxy_entry->inst.response_thread = kthread_create(complete_response_thread,
                                                                 &amc_proxy_entry->inst,
@@ -847,6 +851,7 @@ int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
         }
 
         if (!ret) {
+	        PR_DBG("list entry update\n");
             /* Add entry onto the global instance list */
             list_add_tail(&amc_proxy_entry->list, &(amc_proxy_list_head));
 
@@ -858,7 +863,7 @@ int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
         }
 
     } else {
-        PR_ERR("FW_IF open request failed: %d", ret);
+        PR_ERR("open request failed: %d", ret);
         ret = -EIO;
     }
     return ret;
@@ -867,41 +872,44 @@ int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle)
 /*
  * Bind in a callback to be invoked when an event occurs
  */
-int amc_proxy_bind_callback(FW_IF_CFG *fw_if_handle, amc_proxy_event_callback *event_cb)
+int amc_proxy_bind_callback(GCQCfg *gcq_handle, amc_proxy_event_callback *event_cb)
 {
     struct amc_proxy_list_entry *amc_ctxt = NULL;
     int ret = -EPERM;
 
-    if (!fw_if_handle || !event_cb) {
-       return(-EINVAL);
+    if (!gcq_handle || !event_cb) {
+        PR_DBG("error in gcq_handle or callback\n");
+	    return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(fw_if_handle);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(gcq_handle);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
+	     PR_DBG("callback attached\n");
         amc_ctxt->inst.event_cb = event_cb;
         ret = 0;
     }
+    PR_DBG("ret = %d\n",ret);
+
     return ret;
 }
 
 /*
  * Close the AMC proxy layer, free any resources used and close
- * the FW_IF handle
+ * the gcq handle
  */
-int amc_proxy_close(const FW_IF_CFG *fw_if_handle)
+int amc_proxy_close(const GCQCfg *gcq_handle)
 {
-    int ret = -EPERM;
-    struct amc_proxy_list_entry *amc_ctxt = NULL;
-    struct list_head *pos = NULL, *next = NULL;
-
-    list_for_each_safe(pos, next, &amc_proxy_list_head) {
+	int ret = -EPERM;
+	struct amc_proxy_list_entry *amc_ctxt = NULL;
+	struct list_head *pos = NULL, *next = NULL;
+	list_for_each_safe(pos, next, &amc_proxy_list_head) {
 
         amc_ctxt = list_entry(pos, struct amc_proxy_list_entry, list);
 
-        /* Find the matching FW_IF */
+        /* Find the matching gcq handle */
         if (amc_ctxt && amc_ctxt->inst.initialised) {
 
-            if (amc_ctxt->inst.fw_if_handle == fw_if_handle) {
+            if (amc_ctxt->inst.gcq_handle == gcq_handle) {
 
                 /*
                  * Drain the submitted command queue before killing
@@ -916,9 +924,9 @@ int amc_proxy_close(const FW_IF_CFG *fw_if_handle)
                 {
                     ret = kthread_stop(amc_ctxt->inst.response_thread);
                     if (!ret) {
-                        ret = amc_ctxt->inst.fw_if_handle->close(amc_ctxt->inst.fw_if_handle);
+                        ret = gcq_close(amc_ctxt->inst.gcq_handle);
                         if(ret) {
-                            PR_ERR("FW_IF close request failed: %d", ret);
+                            PR_ERR("close request failed: %d", ret);
                             ret = -EIO;
                         }
                     } else {
@@ -950,7 +958,7 @@ int amc_proxy_request_abort(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
         /* Remove the command from the submitted queue */
         amc_proxy_remove_submitted_cmd(&amc_ctxt->inst, cmd);
@@ -970,7 +978,7 @@ int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -980,16 +988,16 @@ int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd)
         request_hdr->opcode = AMC_PROXY_CMD_OPCODE_IDENTIFY;
         request_hdr->count = 0; /* No payload for identity request */
         request_hdr->cid = cmd->cmd_cid;
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                        (uint8_t*)&(request_cmd_entry),
-                                                        sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle, 0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
             ret = 0;
         } else {
-            PR_ERR("FW_IF write request failed: %d", ret);
+            PR_ERR("write request failed: %d", ret);
             ret = -EIO;
         }
     }
@@ -1009,7 +1017,7 @@ int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1028,15 +1036,15 @@ int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
         request_cmd_entry.sensor_payload.addr_type = 0;
         request_cmd_entry.sensor_payload.sensor_id = sensor_req->sensor_id;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                        (uint8_t*)&(request_cmd_entry),
-                                                        sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle, 0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-            PR_ERR("FW_IF write request failed; %d", ret);
+            PR_ERR("write request failed; %d", ret);
             ret = -EIO;
         }
     }
@@ -1056,7 +1064,7 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1085,16 +1093,16 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
             request_cmd_entry.pdi_payload.partition_sel = pdi_download->partition;
         }
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
-                                                 0,
-                                                 (uint8_t*)&(request_cmd_entry),
-                                                 sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle,
+                        0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-            PR_ERR("FW_IF write request failed; %d", ret);
+            PR_ERR("write request failed; %d", ret);
             ret = -EIO;
         }
     }
@@ -1114,7 +1122,7 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
         return -EINVAL;
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1128,16 +1136,16 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
         /* Only set the partition */
         request_cmd_entry.pdi_payload.partition_sel = device_boot->partition;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
-                                                0,
-                                                (uint8_t*)&(request_cmd_entry),
-                                                sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle,
+                        0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-            PR_ERR("FW_IF write request failed; %d", ret);
+            PR_ERR("write request failed; %d", ret);
             ret = -EIO;
         }
     }
@@ -1157,7 +1165,7 @@ int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
         return -EINVAL;
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1175,15 +1183,15 @@ int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
         request_cmd_entry.pdi_payload.address = partition_copy->address;
         request_cmd_entry.pdi_payload.size = partition_copy->length;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle, 0,
-                                                (uint8_t*)&(request_cmd_entry),
-                                                sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle, 0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-            PR_ERR("FW_IF write request failed; %d", ret);
+            PR_ERR("write request failed; %d", ret);
             ret = -EIO;
         }
     }
@@ -1202,7 +1210,7 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
     if (!cmd || !heartbeat) {
         return -EINVAL;
     }
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1216,16 +1224,16 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
         /* Only set the count used to identify the heartbeat message id */
         request_cmd_entry.heartbeat_payload.request_id = heartbeat->request_id;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
-                                                 0,
-                                                 (uint8_t*)&(request_cmd_entry),
-                                                 sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle,
+                        0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-            PR_ERR("FW_IF write request failed; %d", ret);
+            PR_ERR("write request failed; %d", ret);
             ret = -EIO;
         }
     }
@@ -1245,7 +1253,7 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
         return -EINVAL;
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1259,16 +1267,16 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
         request_cmd_entry.eeprom_payload.address = eeprom_rw->address;
         request_cmd_entry.eeprom_payload.len= eeprom_rw->length;
         request_cmd_entry.eeprom_payload.offset = eeprom_rw->offset;
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
-                                                0,
-                                                (uint8_t*)&(request_cmd_entry),
-                                                sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle,
+                        0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-            PR_ERR("FW_IF write request failed; %d", ret);
+            PR_ERR("write request failed; %d", ret);
             ret = -EIO;
         }
     }
@@ -1288,7 +1296,7 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
         return -EINVAL;
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1304,16 +1312,16 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
         request_cmd_entry.module_payload.offset = module_rw->offset;
         request_cmd_entry.module_payload.len = module_rw->length;
         request_cmd_entry.module_payload.req_type = module_rw->type;
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
-                                                0,
-                                                (uint8_t*)&(request_cmd_entry),
-                                                sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle,
+                        0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
                 mutex_lock(&(amc_ctxt->inst.lock));
                 list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
                 mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-                PR_ERR("FW_IF write request failed; %d", ret);
+                PR_ERR("write request failed; %d", ret);
                 ret = -EIO;
         }
     }
@@ -1333,7 +1341,7 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
         return -EINVAL;
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
@@ -1347,16 +1355,16 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
         /* Only set the verbosity level as part of the request */
         request_cmd_entry.debug_verbosity_payload = verbosity;
 
-        ret = amc_ctxt->inst.fw_if_handle->write(amc_ctxt->inst.fw_if_handle,
-                                                0,
-                                                (uint8_t*)&(request_cmd_entry),
-                                                sizeof(request_cmd_entry), 0);
-        if (ret == FW_IF_ERRORS_NONE) {
+        ret = gcq_write(amc_ctxt->inst.gcq_handle,
+                        0,
+                        (uint8_t*)&(request_cmd_entry),
+                        sizeof(request_cmd_entry), 0);
+        if (ret == GCQ_ERRORS_NONE) {
             mutex_lock(&(amc_ctxt->inst.lock));
             list_add_tail(&(cmd->cmd_list), &(amc_ctxt->inst.submitted_cmds));
             mutex_unlock(&(amc_ctxt->inst.lock));
         } else {
-            PR_ERR("FW_IF write request failed; %d", ret);
+            PR_ERR("write request failed; %d", ret);
             ret = -EIO;
         }
     }
@@ -1377,7 +1385,7 @@ int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_resp_identify_payload *identity_payload =
@@ -1411,7 +1419,7 @@ int amc_proxy_get_response_sensor(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
 
         struct amc_proxy_cmd_resp_sensor_payload *sensor_payload =
@@ -1433,7 +1441,7 @@ int amc_proxy_get_response_pdi_download(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised) {
         /* Payload is currently unused. */
         // struct amc_proxy_cmd_resp_data_payload *pdi_payload =
@@ -1457,7 +1465,7 @@ int amc_proxy_get_response_device_boot(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised)
         ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
@@ -1476,7 +1484,7 @@ int amc_proxy_get_response_partition_copy(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised)
         ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
@@ -1496,7 +1504,7 @@ int amc_proxy_get_response_heartbeat(struct amc_proxy_cmd_struct *cmd,
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised)
     {
         struct amc_proxy_cmd_resp_heartbeat_payload *heartbeat_payload =
@@ -1520,7 +1528,7 @@ int amc_proxy_get_response_eeprom_read_write(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised)
         ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
@@ -1539,7 +1547,7 @@ int amc_proxy_get_response_module_read_write(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised)
         ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 
@@ -1558,7 +1566,7 @@ int amc_proxy_get_response_debug_verbosity(struct amc_proxy_cmd_struct *cmd)
         return(-EINVAL);
     }
 
-    amc_ctxt = amc_proxy_find_matching_proxy_instance(cmd->cmd_fw_if_gcq);
+    amc_ctxt = amc_proxy_find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
     if (amc_ctxt && amc_ctxt->inst.initialised)
         ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 

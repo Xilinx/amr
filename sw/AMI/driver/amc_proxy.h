@@ -12,9 +12,7 @@
 #include <linux/errno.h>
 
 #include "ami.h"
-#include "fw_if.h"
-#include "fw_if_gcq.h"
-
+#include "gcq.h"
 
 /*****************************************************************************/
 /* Defines                                                                  */
@@ -266,7 +264,7 @@ struct amc_proxy_heartbeat_response {
  * @cmd_response: used to store the command response
  * @cmd_response_code: command status set by AMC
  * @cmd_arg: opaque void ptr
- * @cmd_fw_if_gcq: copy of the fw interface handle
+ * @cmd_gcq_cfg: copy of the fw interface handle
  * @cmd_suppress_dbg: flag to indicate debug suppressed for command
  * @cmd_opcode: opcode associated with the command
  * @timed_out: boolean indicating if this command timed out
@@ -281,7 +279,7 @@ struct amc_proxy_cmd_struct{
 	uint64_t		cmd_response;
 	uint32_t		cmd_response_code;
 	void			*cmd_arg;
-	FW_IF_CFG		*cmd_fw_if_gcq;
+	GCQCfg                  *cmd_gcq_cfg;
 	bool			cmd_suppress_dbg;
 	uint32_t		cmd_opcode;
 	bool			timed_out;
@@ -296,30 +294,30 @@ struct amc_proxy_cmd_struct{
  * amc_proxy_init() - Initialise the amc proxy layer
  *
  * @proxy_id: unique id to the proxy layer
- * @fw_if_handle: handle to the fw interface
+ * @gcq_handle: handle to the fw interface
  *
  * Return: The errno return code
  */
-int amc_proxy_init(uint8_t proxy_id, FW_IF_CFG *fw_if_handle);
+int amc_proxy_init(uint8_t proxy_id, GCQCfg *gcq_handle);
 
 /**
  * amc_proxy_bind_callback() - Bind in the an event callback
  *
- * @fw_if_handle: handle to the fw interface
+ * @gcq_handle: handle to the fw interface
  * @event_cb: callback to be invoked when an event is generated
  *
  * Return: The errno return code
  */
-int amc_proxy_bind_callback(FW_IF_CFG *fw_if_handle, amc_proxy_event_callback *event_cb);
+int amc_proxy_bind_callback(GCQCfg *gcq_handle, amc_proxy_event_callback *event_cb);
 
 /**
  * amc_proxy_close() - Close the amc proxy layer and free up resources
  *
- * @fw_if_handle: handle to the fw interface
+ * @gcq_handle: handle to the fw interface
  *
  * Return: The errno return code
  */
-int amc_proxy_close(const FW_IF_CFG *fw_if_handle);
+int amc_proxy_close(const GCQCfg *gcq_handle);
 
 /**
  * amc_proxy_request_abort() - Abort a request already in progress

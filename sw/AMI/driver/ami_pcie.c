@@ -9,7 +9,6 @@
 
 #include "ami_top.h"
 #include "ami_pcie.h"
-#include "ami_utils.h"
 #include "ami.h"
 #include "ami_pci_dbg.h"
 

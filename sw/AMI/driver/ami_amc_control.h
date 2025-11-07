@@ -35,6 +35,9 @@
 
 #define SENSOR_RSP_LEN                  (4096)
 
+#define AMC_LOG_ENTRY_SIZE   (96)
+#define AMC_LOG_MAX_RECS     (50)
+
 /*
  * Response format:
  * Length byte : Description
@@ -394,6 +397,14 @@ typedef void (*amc_event_callback)(enum amc_event_id id, void *data);
 /******************************************************************************************/
 
 /**
+ * struct amc_msg_payload - AMC log message format.
+ * @buff:               message buffer.
+ */
+struct amc_msg_payload {
+        char buff[AMC_LOG_ENTRY_SIZE];
+};
+
+/**
  * struct sdr_record - A single SDR sensor record.
  * @id: Sensor ID (index)
  * @name_type: Type of name field (ascii or binary)
@@ -655,8 +666,7 @@ struct amc_version {
  * @gcq_payload_base_virt_addr: payload virtual base address
  * @gcq_ring_buf_base_virt_addr: the ring buffer virtual address
  * @amc_shared_mem: the shared memory base address
- * @fw_if_cfg: fal configuration
- * @fw_if_gcq_consumer: handle to the sGCQ consumer
+ * @gcq_consumer: handle to the sGCQ consumer
  * @lock: lock to protect cid creation
  * @gcq_cmd_lock: protect concurrent gcq commands
  * @gcq_halted: block/allow request messages
@@ -680,8 +690,7 @@ struct amc_control_ctxt {
 	void __iomem		*gcq_payload_base_virt_addr;
 	void __iomem		*gcq_ring_buf_base_virt_addr;
 	struct amc_shared_mem	amc_shared_mem;
-	FW_IF_CFG			fw_if_cfg;
-	FW_IF_GCQCfg		fw_if_gcq_consumer;
+	GCQCfg		        gcq_consumer;
 	struct mutex		lock;
 	struct mutex		gcq_cmd_lock;
 	bool				gcq_halted;
@@ -773,5 +782,10 @@ int unset_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt);
  * Return: 0 or negative error code.
  */
 void release_amc_mem(struct amc_control_ctxt **amc_ctrl_ctxt);
+
+/*
+ * Handles and prints incoming AMC logs
+ */
+void dump_amc_log(struct amc_control_ctxt *amc_ctrl_ctxt);
 
 #endif /* AMI_AMC_CONTROL_H */

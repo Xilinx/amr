@@ -8,20 +8,42 @@
  */
 
 #include "gcq_internal.h"
+#include "gcq.h"
+#include <linux/delay.h>
+#include <asm/io.h>
 
 
 /*****************************************************************************/
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define GCQ_INSTANCE_UPPER_FIREWALL    (0xBEEFCAFE)
-#define GCQ_INSTANCE_LOWER_FIREWALL    (0xDEADFACE)
+#define GCQ_INSTANCE_UPPER_FIREWALL	(0xBEEFCAFE)
+#define GCQ_INSTANCE_LOWER_FIREWALL	(0xDEADFACE)
 
-#define CHECK_FIREWALLS(f)  ((f->ulUpperFirewall != GCQ_INSTANCE_UPPER_FIREWALL) && \
-                             (f->ulLowerFirewall != GCQ_INSTANCE_LOWER_FIREWALL))
+#define CHECK_32BIT_ALIGNMENT(x)	(0 == (x & 0x3))
 
-#define CHECK_32BIT_ALIGNMENT(x)    (0 == (x & 0x3))
 
+#define GCQ_NAME                   "GCQ_NAME"
+
+#define CHECK_INVALID_STATE(f)          ((GCQ_STATE_OPENED   != (f)->xState) && \
+                                     (GCQ_STATE_ATTACHED != (f)->xState))
+
+#define GCQ_ATTACH_MAX_ATTEMPTS     (30)  /* Roughly 30 seconds */
+#define GCQ_ATTACH_RETRY_TIMEOUT_MS (1000)
+
+
+/*****************************************************************************/
+/* Local Variables                                                           */
+/*****************************************************************************/
+
+static GCQInitCfg xLocalCfg = { 0 };
+
+static bool iInitialised = false;
+static GCQIOAccess xGCQIOAccess = { 0 };
+/**< Uses the same compile time value as the sGCQ driver  */
+static GCQProfile xGCQProfile[GCQ_MAX_INSTANCES] = { { 0 } };
+
+static uint32_t ulProfilesAllocated = 0;
 
 /******************************************************************************/
 /* Structs                                                                    */
@@ -36,13 +58,13 @@
  */
 typedef struct
 {
-    uint32_t    ulUpperFirewall;
+    uint32_t            ulUpperFirewall;
 
-    bool        ucConsumerAttached;
-    uint8_t     ucInstancesAllocated;
+    bool                ucConsumerAttached;
+    uint8_t             ucInstancesAllocated;
     GCQInstance xGCQInstances[GCQ_MAX_INSTANCES];
 
-    uint32_t    ulLowerFirewall;
+    uint32_t            ulLowerFirewall;
 
 } GCQPrivateData;
 
@@ -53,21 +75,44 @@ typedef struct
 
 static GCQPrivateData xLocalData =
 {
-    GCQ_INSTANCE_UPPER_FIREWALL,    /* ulUpperFirewall */
+    GCQ_INSTANCE_UPPER_FIREWALL,	/* ulUpperFirewall */
 
-    false,                          /* ucConsumerAttached */
-    0,                              /* ucInstancesAllocated */
-    { { 0 } },                      /* xGCQInstances */
+    false,		                   	/* ucConsumerAttached */
+    0,                          	/* ucInstancesAllocated */
+    { { 0 } },                  	/* xGCQInstances */
 
-    GCQ_INSTANCE_LOWER_FIREWALL     /* ulLowerFirewall */
+    GCQ_INSTANCE_LOWER_FIREWALL  	/* ulLowerFirewall */
 };
-
 static GCQPrivateData *pxThis = &xLocalData;
 
 
 /*****************************************************************************/
 /* Private Functions                                                          */
 /*****************************************************************************/
+/**
+ * @brief   Handle memory & register writes in Linux Host/Kernel
+ *
+ * @param   ullDestAddr is the destination address
+ * @param   ulValue is the 32-bit value to write
+ *
+ * @return  N/A
+ */
+static inline void prvvWriteMemReg32(uint64_t ullDestAddr, uint32_t ulValue)
+{
+    iowrite32(ulValue, (void __iomem *)ullDestAddr);
+}
+
+/**
+ * @brief   Handle memory & register reads in Linux Host/Kernel
+ *
+ * @param   ullSrcAddr is the source address
+ *
+ * @return  the 32-bit value read
+ */
+static inline uint32_t prvulReadMemReg32(uint64_t ullSrcAddr)
+{
+    return ioread32((void __iomem *)ullSrcAddr);
+}
 
 /**
  * @brief   Calculate the number of slots that can be allocated based on
@@ -169,7 +214,7 @@ static inline bool prvucGCQCanConsume(const GCQInstance *pxGCQInstance,
             pxGCQInstance->ullBaseAddr + GCQ_PRODUCER_CQ_TAIL_POINTER );
 
         if (unlikely(((uint32_t)-1 == ulSqTailPointer) &&
-            ((uint32_t)-1 == ulCqTailPointer))) {
+			((uint32_t)-1 == ulCqTailPointer))) {
             ulStatus = false;
         } else if (false == likely(prvucGCQRingIsEmpty(pxRing))) {
             ulStatus = true;
@@ -219,7 +264,7 @@ static inline void prvvGCQSoftReset(const GCQInstance *pxGCQInstance,
  * @return  returns true if produced else error
  */
 static inline GCQ_ERRORS_TYPE prvxGCQProduce(GCQInstance *pxGCQInstance,
-    uint64_t *ullSlotAddr)
+	uint64_t *ullSlotAddr)
 {
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
 
@@ -227,6 +272,7 @@ static inline GCQ_ERRORS_TYPE prvxGCQProduce(GCQInstance *pxGCQInstance,
         (NULL == ullSlotAddr)) {
         xStatus = GCQ_ERRORS_INVALID_ARG;
     } else {
+
         /* Bind into the correct ring buffer */
         GCQRing *pxRing = pxGCQInstance->pxGCQProducer;
 
@@ -252,7 +298,7 @@ static inline GCQ_ERRORS_TYPE prvxGCQProduce(GCQInstance *pxGCQInstance,
  * @return  returns true if consumed else error
  */
 static inline GCQ_ERRORS_TYPE prvxGCQConsume(GCQInstance *pxGCQInstance,
-    uint64_t *ullSlotAddr)
+	uint64_t *ullSlotAddr)
 {
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
 
@@ -304,8 +350,248 @@ static inline GCQ_ERRORS_TYPE prviGCQFindNextFreeInstance(
 
 
 /*****************************************************************************/
+/*****************************************************************************/
 /* Public Functions                                                          */
 /*****************************************************************************/
+
+/**
+ * @brief   Attempt to find an unused sGCQ profile
+ *
+ * @param   ppxGCQProfile is a variable to store the free sGCQ profile
+ *
+ * @return  GCQ_ERRORS_NONE if profile found, error otherwise
+ */
+static uint32_t prvFindNextFreeProfile(GCQProfile **ppxGCQProfile)
+{
+        GCQ_ERRORS_TYPE xRet = GCQ_ERRORS_NO_FREE_PROFILES;
+        int iIndex;
+
+        if (NULL == ppxGCQProfile)
+                return GCQ_ERRORS_INVALID_HANDLE;
+
+        if (NULL != *ppxGCQProfile)
+                return GCQ_ERRORS_INVALID_HANDLE;
+
+        if (ulProfilesAllocated > (GCQ_MAX_INSTANCES - 1))
+                return GCQ_ERRORS_NO_FREE_PROFILES;
+
+        for (iIndex = 0; iIndex < GCQ_MAX_INSTANCES; iIndex++) {
+                if (GCQ_STATE_CLOSED == xGCQProfile[ iIndex ].xState) {
+                        *ppxGCQProfile = &xGCQProfile[ iIndex ];
+                        xRet = GCQ_ERRORS_NONE;
+                        break;
+                }
+        }
+
+        return xRet;
+}
+
+/**
+ * @brief   Local implementation of gcq_open
+ */
+uint32_t gcq_open(void *pvFWIf)
+{
+        GCQCfg *pxCfg = (GCQCfg*)pvFWIf;
+        GCQ_ERRORS_TYPE xRet = MAX_GCQ_ERRORS_TYPE;
+        GCQProfile *pxGCQProfile = NULL;
+
+        if (NULL == pxCfg)
+                return GCQ_ERRORS_INVALID_HANDLE;
+
+        if (false == iInitialised)
+                return GCQ_ERRORS_DRIVER_NOT_INITIALISED;
+
+        if (GCQ_ERRORS_NONE != prvFindNextFreeProfile(&pxGCQProfile))
+                return GCQ_ERRORS_NO_FREE_PROFILES;
+
+        if (NULL == pxGCQProfile)
+                return GCQ_ERRORS_INVALID_PROFILE;
+        GCQ_DEBUG("setting profile\n");
+        pxGCQProfile->ulIOHandle = 0;
+        pxGCQProfile->xState = GCQ_STATE_INIT;
+        pxGCQProfile->pxGCQInstance = NULL;
+        GCQ_DEBUG("updating profile\n");
+        pxCfg->pvProfile = pxGCQProfile;
+        ulProfilesAllocated++;
+        GCQ_DEBUG("mode updates\n");
+        /* Initially only interrupt polling mode supported */
+         xRet = xGCQInit(&pxGCQProfile->pxGCQInstance,
+				xLocalCfg.pvIOAccess,
+                                pxCfg->ullBaseAddress,
+                                pxCfg->ullRingAddress,
+                                pxCfg->ulRingLength,
+                                pxCfg->ulSubmissionQueueSlotSize,
+                                pxCfg->ulCompletionQueueSlotSize);
+
+          /* Update state & attach if in consumer mode */
+          if (GCQ_ERRORS_NONE == xRet) {
+		int iAttempts = 0;
+		pxGCQProfile->xState = GCQ_STATE_OPENED;
+		GCQ_DEBUG("GCQ_open (%s)\r\n",pxGCQProfile->xState);
+		/*Consumer Mode:
+		 * Sometimes (very rarely) the consumer is not yet ready when we reach this point.
+		 * This can happen if a hot reset was performed and not enough time was given
+		 * on the host before attempting to perform sGCQ setup. To mitigate this
+		 * we need a retry mechanism here.
+		 */
+                 while (1) {
+		 xRet = xGCQAttachConsumer(pxGCQProfile->pxGCQInstance);
+		 iAttempts++;
+		 if ((GCQ_ATTACH_MAX_ATTEMPTS <= iAttempts) ||
+				 (GCQ_ERRORS_NONE == xRet)) {
+                                        break;
+			}
+			msleep(GCQ_ATTACH_RETRY_TIMEOUT_MS);
+		}
+
+		if (GCQ_ERRORS_NONE == xRet) {
+			pxGCQProfile->xState = GCQ_STATE_ATTACHED;
+			GCQ_DEBUG("Attached ok!\r\n");
+			}
+		}
+
+        return xRet;
+}
+
+/**
+ * @brief   Local implementation of gcq_close
+ */
+uint32_t gcq_close(void *pvFWIf)
+{
+        GCQCfg *pxCfg = (GCQCfg*)pvFWIf;
+        GCQProfile *pxProfile = NULL;
+        GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
+
+        if (NULL == pxCfg)
+                return GCQ_ERRORS_INVALID_HANDLE;
+
+        if (false == iInitialised)
+                return GCQ_ERRORS_DRIVER_NOT_INITIALISED;
+
+        if (NULL == pxCfg->pvProfile)
+                return GCQ_ERRORS_INVALID_PROFILE;
+
+        pxProfile = (GCQProfile*)pxCfg->pvProfile;
+        if (CHECK_INVALID_STATE(pxProfile))
+                return GCQ_ERRORS_NOT_SUPPORTED;
+
+        xStatus = xGCQDeinit(pxProfile->pxGCQInstance);
+        if (GCQ_ERRORS_NONE == xStatus) {
+                pxProfile->xState = GCQ_STATE_CLOSED;
+                ulProfilesAllocated--;
+        }
+
+        return xStatus;
+}
+
+
+/**
+ * @brief   Local implementation of gcq_write
+ */
+
+uint32_t gcq_write(void *pvFWIf, uint64_t ullDstPort,
+                uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs)
+{
+        GCQCfg *pxCfg = (GCQCfg*)pvFWIf;
+        GCQProfile *pxProfile = NULL;
+        GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
+
+        if (NULL == pxCfg)
+        {
+                GCQ_DEBUG("GCQ CFG is null\n");
+                return GCQ_ERRORS_INVALID_HANDLE;
+        }
+        if (false == iInitialised)
+        {
+                GCQ_DEBUG("initialization null\n");
+                return GCQ_ERRORS_DRIVER_NOT_INITIALISED;
+        }
+        if (NULL == pucData)
+        {
+                GCQ_DEBUG("pucData null\n");
+                return GCQ_ERRORS_INVALID_PARAMS;
+        }
+        if (NULL == pxCfg->pvProfile)
+        {
+                GCQ_DEBUG("profile null\n");
+                return GCQ_ERRORS_INVALID_PROFILE;
+        }
+	pxProfile = (GCQProfile*)pxCfg->pvProfile;
+        if (CHECK_INVALID_STATE(pxProfile))
+        {
+                GCQ_DEBUG("invalid state\n");
+                return GCQ_ERRORS_NOT_SUPPORTED;
+        }
+
+        xStatus = xGCQProduceData(pxProfile->pxGCQInstance, pucData, ulSize);
+
+        return xStatus;
+}
+
+
+/**
+ * @brief   Local implementation of gcq_read
+ */
+uint32_t gcq_read(void *pvFWIf,
+        uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulSize, uint32_t ulTimeoutMs)
+{
+        GCQCfg *pxCfg = (GCQCfg*)pvFWIf;
+        GCQProfile *pxProfile = NULL;
+        GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_NONE;
+
+        if (NULL == pxCfg)
+                return GCQ_ERRORS_INVALID_HANDLE;
+
+        if (false == iInitialised)
+                return GCQ_ERRORS_DRIVER_NOT_INITIALISED;
+
+        if (NULL == pulSize)
+                return GCQ_ERRORS_INVALID_PARAMS;
+
+        if (NULL == pucData)
+                return GCQ_ERRORS_INVALID_PARAMS;
+
+        if (NULL == pxCfg->pvProfile)
+                return GCQ_ERRORS_INVALID_PROFILE;
+
+        pxProfile = (GCQProfile*)pxCfg->pvProfile;
+        if (CHECK_INVALID_STATE(pxProfile))
+                return GCQ_ERRORS_NOT_SUPPORTED;
+
+        xStatus = xGCQConsumeData(pxProfile->pxGCQInstance, pucData, *pulSize);
+
+        return xStatus;
+}
+/**
+ * @brief   initialisation function for sGCQ interfaces (generic across all sGCQ interfaces)
+ */
+uint32_t GCQ_Init(GCQInitCfg *pxCfg)
+{
+        GCQ_ERRORS_TYPE xRet = GCQ_ERRORS_NONE;
+
+        if (NULL == pxCfg)
+                return GCQ_ERRORS_INVALID_PARAMS;;
+
+        if (NULL != pxCfg->pvIOAccess)
+                return GCQ_ERRORS_INVALID_PARAMS;
+
+    if (false != iInitialised) {
+        xRet = GCQ_ERRORS_DRIVER_IN_USE;
+        } else {
+                /*
+                * Bind in register and memory R/W function pointers
+                * and assign to the local profile to be used by all
+                * sGCQ instances
+                */
+                xGCQIOAccess.xGCQReadMem32  = prvulReadMemReg32;
+                xGCQIOAccess.xGCQWriteMem32 = prvvWriteMemReg32;
+                xLocalCfg.pvIOAccess = &xGCQIOAccess;
+                iInitialised = true;
+
+                GCQ_DEBUG("GCQ_init\r\n");
+        }
+        return xRet;
+}
 
 /**
  * @brief    Initialise the sGCQ standalone driver
@@ -423,7 +709,7 @@ GCQ_ERRORS_TYPE xGCQDeinit(GCQInstance *pxGCQInstance)
         xStatus = GCQ_ERRORS_NONE;
 
         if ((NULL == pxGCQInstance) ||
-            (false == pxGCQInstance->iInitialised)) {
+			(false == pxGCQInstance->iInitialised)) {
             xStatus = GCQ_ERRORS_INVALID_INSTANCE;
         } else {
             pxGCQInstance->iInitialised = false;
@@ -456,8 +742,8 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer(GCQInstance *pxGCQInstance)
             /* Copy header from the ring buffer */
             prvvGCQCopyFromRing(pxGCQInstance->pxGCQIOAccess,
                 (uint32_t*)&xGCQHeader,
-                pxGCQInstance->ullRingAddr,
-                sizeof(uint32_t));
+				pxGCQInstance->ullRingAddr,
+				sizeof(uint32_t));
 
             /* Magic number must show up to confirm the header is fully initialized */
             if (xGCQHeader.ulHdrMagic != GCQ_ALLOC_MAGIC)
@@ -468,16 +754,16 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer(GCQInstance *pxGCQInstance)
         if (GCQ_ERRORS_NONE == xStatus) {
             prvvGCQCopyFromRing(pxGCQInstance->pxGCQIOAccess,
                 (uint32_t*)&xGCQHeader,
-                pxGCQInstance->ullRingAddr,
+				pxGCQInstance->ullRingAddr,
                 sizeof(GCQHeader));
 
             if (GCQ_VER_MAJOR != GET_GCQ_MAJOR(xGCQHeader.ulHdrVersion)) {
                 GCQ_DEBUG("Error: Unexpected version:0x%lx in magic header!\r\n",
-                    xGCQHeader.ulHdrVersion);
+					xGCQHeader.ulHdrVersion);
                 xStatus = GCQ_ERRORS_INVALID_VERSION;
             } else {
                 GCQ_DEBUG("Version: 0x%lx 0x%lx\n", GET_GCQ_MAJOR(xGCQHeader.ulHdrVersion),
-                    GET_GCQ_MINOR(xGCQHeader.ulHdrVersion));
+					GET_GCQ_MINOR(xGCQHeader.ulHdrVersion));
             }
         }
 
@@ -488,7 +774,7 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer(GCQInstance *pxGCQInstance)
 
             if (ullNumSlots != ullHdrNumSlots) {
                 GCQ_DEBUG("Error: Invalid number of slots:%ld found in magic header, expecting: %ld!!\r\n",
-                    ullHdrNumSlots, ullNumSlots);
+					ullHdrNumSlots, ullNumSlots);
                 xStatus = GCQ_ERRORS_INVALID_NUM_SLOTS;
             }
         }
@@ -499,7 +785,7 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer(GCQInstance *pxGCQInstance)
             uint32_t ulRingSlotSize = pxGCQInstance->xGCQSq.ulRingSlotSize;
             if (ulRingSlotSize != ulHdrSlotSize) {
                 GCQ_DEBUG("Error: Invalid slot size:%ld found in magic header, expecting: %ld!\r\n",
-                    ulHdrSlotSize, ulRingSlotSize);
+					ulHdrSlotSize, ulRingSlotSize);
                 xStatus = GCQ_ERRORS_INVALID_SLOT_SIZE;
             }
         }
@@ -530,7 +816,7 @@ GCQ_ERRORS_TYPE xGCQConsumeData(GCQInstance *pxGCQInstance, uint8_t *pucData, ui
         xStatus = GCQ_ERRORS_NONE;
 
         if ((NULL == pxGCQInstance) ||
-            (false == pxGCQInstance->iInitialised))
+			(false == pxGCQInstance->iInitialised))
             xStatus = GCQ_ERRORS_INVALID_INSTANCE;
 
         if (false == pxThis->ucConsumerAttached)
@@ -557,7 +843,6 @@ GCQ_ERRORS_TYPE xGCQConsumeData(GCQInstance *pxGCQInstance, uint8_t *pucData, ui
         if (GCQ_ERRORS_NONE == xStatus) {
             uint32_t offset;
             GCQRing *pxRing = pxGCQInstance->pxGCQConsumer;
-
             GCQ_DEBUG("Read data from slot addr:0x%llx len:%ld\r\n", ullSlotAddr, ulDataLen);
 
             /* Process the data & populate the return buffer */
@@ -589,7 +874,7 @@ GCQ_ERRORS_TYPE xGCQProduceData(GCQInstance *pxGCQInstance, uint8_t * pucData, u
         xStatus = GCQ_ERRORS_NONE;
 
         if ((NULL == pxGCQInstance) ||
-            (false == pxGCQInstance->iInitialised))
+			(false == pxGCQInstance->iInitialised))
             xStatus = GCQ_ERRORS_INVALID_INSTANCE;
 
         if (NULL == pucData)

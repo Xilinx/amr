@@ -20,12 +20,8 @@
 #include "ami_hwmon.h"
 #include "ami_top.h"
 #include "ami_cdev.h"
-#include "ami_utils.h"
 #include "ami_pcie.h"
 #include "ami_program.h"
-#include "ami_eeprom.h"
-#include "ami_utils.h"
-#include "ami_module.h"
 
 #define ROOT_USER				(0)
 #define READ_WRITE				(0666)
@@ -96,6 +92,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	struct pf_dev_struct *pf_dev = NULL;
 	/* eventfd is used for sending notifications to the user */
 	struct eventfd_ctx *efd_ctx = NULL;
+        uint32_t eeprom_req_data = 0;
 
 	if (!filp)
 		return -EINVAL;
@@ -568,7 +565,17 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			goto done;
 		}
 
-		ret = eeprom_read(pf_dev->amc_ctrl_ctxt, buf, data.len, data.offset);
+		AMI_VDBG(
+			pf_dev->amc_ctrl_ctxt,
+			"Attempting to read EEPROM at offset:%d len:%d",
+			data.offset, data.len
+			);
+
+		eeprom_req_data = EEPROM_SET_TYPE(AMC_PROXY_CMD_RW_REQUEST_READ);
+		eeprom_req_data |= EEPROM_SET_OFFSET(data.offset);
+		ret = submit_gcq_command(pf_dev->amc_ctrl_ctxt, GCQ_SUBMIT_CMD_EEPROM_READ_WRITE, eeprom_req_data, buf,
+								data.len);
+
 		if (!ret) {
 			ret = copy_to_user((uint8_t*)data.addr, buf,
 				data.len * sizeof(uint8_t));
@@ -602,11 +609,18 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Copy payload data. */
-		if (!copy_from_user(buf, (uint8_t*)data.addr, data.len * sizeof(uint8_t)))
-			ret = eeprom_write(pf_dev->amc_ctrl_ctxt, buf, data.len, data.offset);
-		else
-			ret = -EFAULT;
+		if (!copy_from_user(buf, (uint8_t*)data.addr, data.len * sizeof(uint8_t))) {
+			eeprom_req_data = EEPROM_SET_TYPE(AMC_PROXY_CMD_RW_REQUEST_WRITE);
+			eeprom_req_data |= EEPROM_SET_OFFSET(data.offset);
+			ret = submit_gcq_command(pf_dev->amc_ctrl_ctxt,
+					GCQ_SUBMIT_CMD_EEPROM_READ_WRITE, eeprom_req_data, buf,data.len);
+			if (ret)
+				AMI_ERR(pf_dev->amc_ctrl_ctxt, "Failed to write EEPROM");
 
+		}
+		else {
+			ret = -EFAULT;
+		}
 		vfree(buf);
 		break;
 	}
@@ -651,11 +665,16 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			goto done;
 		}
 
-		ret = module_read(
+		AMI_VDBG(
 			pf_dev->amc_ctrl_ctxt,
-			data.device_id,
-			data.page,
-			data.offset,
+			"Attempting to read module %d at offset 0x%02x and page %d",
+			data.device_id, data.offset, data.page
+		);
+
+		ret = submit_gcq_command(
+			pf_dev->amc_ctrl_ctxt,
+			GCQ_SUBMIT_CMD_MODULE_READ_WRITE,
+			MK_MODULE_RW_FLAGS(AMC_PROXY_CMD_RW_REQUEST_READ, data.device_id, data.page, data.offset),
 			buf,
 			data.len
 		);
@@ -693,15 +712,20 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Copy payload data. */
-		if (!copy_from_user(buf, (uint8_t*)data.addr, data.len * sizeof(uint8_t)))
-			ret = module_write(
+		if (!copy_from_user(buf, (uint8_t*)data.addr, data.len * sizeof(uint8_t))) {
+			AMI_VDBG(pf_dev->amc_ctrl_ctxt,
+				"Attempting to write module %d at offset 0x%02x and page %d",
+				data.device_id, data.offset, data.page);
+
+			ret = submit_gcq_command(
 				pf_dev->amc_ctrl_ctxt,
-				data.device_id,
-				data.page,
-				data.offset,
+				GCQ_SUBMIT_CMD_MODULE_READ_WRITE,
+				MK_MODULE_RW_FLAGS(AMC_PROXY_CMD_RW_REQUEST_WRITE, data.device_id, data.page, data.offset),
 				buf,
 				data.len
-			);
+				);
+
+		}
 		else
 			ret = -EFAULT;
 

@@ -30,7 +30,6 @@
 #include "ami_sysfs.h"
 #include "ami_hwmon.h"
 #include "ami_cdev.h"
-#include "ami_utils.h"
 #include "ami_cdev.h"
 #include "ami_pcie.h"
 #include "ami_vsec.h"
@@ -48,7 +47,7 @@
 
 static struct drv_cdev_struct driver_dev = { { 0 } };  /* Global device */
 static unsigned pf_dev_index = DEFAULT_CDEV_BASEMINOR;
-static FW_IF_GCQInitCfg fw_if_gcq_init_cfg = { 0 };
+static GCQInitCfg gcq_init_cfg = { 0 };
 
 /* Declared as extern in ami.h */
 bool ami_debug_enabled = true;
@@ -147,6 +146,69 @@ static void amc_event_cb(enum amc_event_id id, void *data)
 	default:
 		break;
 	}
+}
+
+/* helper functions */
+
+int my_krealloc(void **buf, int old_size, int new_size, gfp_t flags)
+{
+        void *tmp = NULL;
+        int tmp_size = 0;
+
+        if (!buf || (new_size <= 0) || (old_size < 0))
+                return -EINVAL;
+
+        if (!(*buf)) {
+                *buf = kmalloc(new_size, flags);
+                if (!(*buf))
+                        return -ENOMEM;
+                else
+                        return SUCCESS;
+        }
+
+        if (old_size < new_size)
+                tmp_size = old_size;
+        else
+                tmp_size = new_size;
+
+        tmp = kmalloc(tmp_size, flags);
+        if (!tmp)
+                return -ENOMEM;
+
+        memcpy(tmp, *buf, tmp_size);
+
+        kfree(*buf);
+        *buf = NULL;
+
+        *buf = kmalloc(new_size, flags);
+        if (!(*buf))
+                return -ENOMEM;
+
+        memcpy(*buf, tmp, tmp_size);
+
+        kfree(tmp);
+        tmp = NULL;
+
+        return SUCCESS;
+}
+
+int strconcat(char **dst, char src[], int *size)
+{
+        int ret = SUCCESS;
+
+        if (!size || !dst || ((*size) < 0))
+                return -EINVAL;
+
+        ret = my_krealloc((void **)dst, *size, *size + strlen(src), GFP_KERNEL);
+        if (ret)
+                return ret;
+
+        if (!(*dst))
+                return -ENOMEM;
+
+        memcpy(*dst + *size - 1, src, strlen(src) + 1);
+        *size += strlen(src);
+        return SUCCESS;
 }
 
 /*
@@ -876,8 +938,8 @@ static int __init vmc_entry(void)
 	int ret = 0;
 
 	/* Init FAL for sGCQ */
-	ret = ulFW_IF_GCQ_Init(&fw_if_gcq_init_cfg);
-	if (ret != FW_IF_ERRORS_NONE)
+	ret = GCQ_Init(&gcq_init_cfg);
+	if (ret != GCQ_ERRORS_NONE)
 		goto fail;
 
 	PR_DBG("Loading driver to the kernel");

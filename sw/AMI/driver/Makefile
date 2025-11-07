@@ -11,19 +11,14 @@ $(TARGET_MODULE)-objs += ami_pci_dbg.o
 $(TARGET_MODULE)-objs += ami_vsec.o
 $(TARGET_MODULE)-objs += ami_amc_control.o
 $(TARGET_MODULE)-objs += ami_sensor.o
-$(TARGET_MODULE)-objs += ami_utils.o
 $(TARGET_MODULE)-objs += ami_cdev.o
 $(TARGET_MODULE)-objs += ami_hwmon.o
 $(TARGET_MODULE)-objs += ami_sysfs.o
 $(TARGET_MODULE)-objs += ami_program.o
-$(TARGET_MODULE)-objs += ami_eeprom.o
-$(TARGET_MODULE)-objs += ami_module.o
 $(TARGET_MODULE)-objs += amc_proxy.o
-$(TARGET_MODULE)-objs += ami_log.o
-$(TARGET_MODULE)-objs += fal/gcq/fw_if_gcq_linux.o
 $(TARGET_MODULE)-objs += gcq-driver/src/gcq_driver.o
 
-EXTRA_CFLAGS:=-I$(PWD) -I$(PWD)/fal -I$(PWD)/fal/gcq -I$(PWD)/gcq-driver/src
+EXTRA_CFLAGS:=-I$(PWD) -I$(PWD)/gcq-driver/src
 
 KERNEL_DIR = /lib/modules/`uname -r`/build
 

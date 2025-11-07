@@ -202,4 +202,10 @@ struct pf_dev_struct *get_pf_dev_entry(void *cache, enum pf_dev_cache_type cache
  */
 void put_pf_dev_entry(struct pf_dev_struct *pf_dev);
 
+/* helper functions */
+int my_krealloc(void **buf, int old_size, int new_size, gfp_t flags);
+int strconcat(char **dst, char src[], int *size);
+
+
+
 #endif /* AMI_TOP_H */

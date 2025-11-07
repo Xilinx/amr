@@ -11,7 +11,6 @@
 
 #include "ami_top.h"
 #include "ami_sensor.h"
-#include "ami_utils.h"
 
 #define DEFAULT_BDINFO_POWER (0xFF)
 
