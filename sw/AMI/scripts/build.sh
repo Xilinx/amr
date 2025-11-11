@@ -8,8 +8,6 @@ set -e
 # Command line options
 DRIVER_ONLY=0
 APP_ONLY=0
-NO_VER=0
-PROFILE=""
 
 # Output files
 DRIVER_BIN="ami.ko"
@@ -48,8 +46,6 @@ function print_help() {
     echo "-clean        : remove all build files"
     echo "-driver       : only builds the AMI driver (app and API untouched)"
     echo "-app          : only builds the AMI API and ami_tool binary (driver untouched)"
-    echo "-no_ver       : Don't execute the getVersion.sh script (useful for development)"
-    echo "-profile      : Rave"
     echo
     echo "If no options are specified, the default behaviour is to clean and build everything"
     echo
@@ -80,11 +76,7 @@ function build_app() {
     echo "=== Executing application build process ==="
     SECTION_START=$SECONDS
     cd $API_DIR && make
-    if [ -z "${PROFILE}" ]; then
-        cd $APP_DIR && make
-    else
-        cd $APP_DIR && make PROFILE=${PROFILE}
-    fi
+    cd $APP_DIR && make
     cd ..
     # Check if the build succeeded
     if [[ (! -f "$API_DIR/build/$API_BIN") || (! -f "$APP_DIR/build/$APP_BIN") ]]; then
@@ -94,24 +86,6 @@ function build_app() {
         echo "*** App build took $((SECONDS - $SECTION_START)) S ***"
     fi
 }
-
-function fetch_ami_version() {
-    echo "=== Fetching AMI version ==="
-    SECTION_START=$SECONDS
-    cd $ROOT_DIR
-    ./scripts/getVersion.sh ami
-    echo "*** AMI version update took $((SECONDS - $SECTION_START)) S ***"
-}
-
-function fetch_gcq_version() {
-    echo "=== Fetching sGCQ version ==="
-    SECTION_START=$SECONDS
-    cd $DRIVER_DIR/gcq-driver
-    ./getVersion.sh gcq
-    cd $ROOT_DIR
-    echo "*** sGCQ version update took $((SECONDS - $SECTION_START)) S ***"
-}
-
 
 ### Script Starting Point ###
 
@@ -150,13 +124,6 @@ while [ $# -gt 0 ]; do
             exit 1
         fi
         DRIVER_ONLY=1
-        ;;
-    -no_ver)
-        NO_VER=1
-        ;;
-    -profile)
-        # Build profile
-        PROFILE="$2"
         shift
         ;;
     esac
@@ -168,10 +135,6 @@ echo "$(date)"
 
 if [ $DRIVER_ONLY -eq 1 ]; then
     echo "Building ami.ko only"
-    if [ $NO_VER -eq 0 ]; then
-        fetch_ami_version
-        fetch_gcq_version
-    fi
     clean_driver && build_driver
     echo
     echo "Done, built the following files:"
@@ -179,9 +142,6 @@ if [ $DRIVER_ONLY -eq 1 ]; then
     echo
 elif [ $APP_ONLY -eq 1 ]; then
     echo "Building ami_tool only"
-    if [ $NO_VER -eq 0 ]; then
-        fetch_ami_version
-    fi
     clean_app && build_app
     echo
     echo "Done, built the following files:"
@@ -190,10 +150,6 @@ elif [ $APP_ONLY -eq 1 ]; then
     echo
 else
     echo "Building ami.ko and ami_tool"
-    if [ $NO_VER -eq 0 ]; then
-        fetch_ami_version
-        fetch_gcq_version
-    fi
     clean_driver && build_driver
     clean_app && build_app
     echo

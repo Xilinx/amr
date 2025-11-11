@@ -1,12 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0-only
 /*
- * ami_driver_version.h - This file contains AMC control defintions.
+ * ami_api_version.h - This file contains the version information
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
- * SPDX-License-Identifier: GPL-2.0-only
+ * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
 
-#ifndef _AMI_DRIVER_VERSION_H_
-#define _AMI_DRIVER_VERSION_H_
+#ifndef _AMI_VERSION_H_
+#define _AMI_VERSION_H_
 
 #define GIT_TAG                   "1.0.0"
 #define GIT_TAG_VER_MAJOR         (1)
@@ -25,5 +25,4 @@
 #define GIT_BRANCH                ""
 #define GIT_STATUS                (0)
 
-#endif /* _AMI_DRIVER_VERSION_H_ */
-
+#endif /* _AMI_VERSION_H_ */

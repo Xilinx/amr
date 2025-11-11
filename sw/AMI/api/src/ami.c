@@ -21,7 +21,7 @@
 
 /* Private API includes */
 #include "ami_internal.h"
-#include "ami_version.h"
+#include "ami_api_version.h"
 #include "ami_program.h"
 
 /*****************************************************************************/

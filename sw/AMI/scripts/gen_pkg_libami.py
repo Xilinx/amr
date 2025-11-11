@@ -12,7 +12,7 @@ from os import walk
 from os.path import join
 from os.path import abspath
 
-SCRIPT_VERSION = '1.0'
+SCRIPT_VERSION = '1.1'
 SCRIPT_FILE    = os.path.basename(__file__)
 SCRIPT_DIR     = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR    = abspath(join(SCRIPT_DIR, os.pardir))
@@ -22,9 +22,8 @@ sys.path.insert(0, BUILD_DIR)
 from pkg import *
 
 # Get date
-build_date       = get_date_long()
-build_date_short = get_date_short()
-now              = datetime.datetime.now()
+build_date = get_date_str()
+now        = datetime.datetime.now()
 
 class Options(object):
     def PrintVersion(self):
@@ -38,7 +37,6 @@ class Options(object):
         log_info('GPKG-06', '\t--verbose          / -V: Turn on verbosity')
         log_info('GPKG-06', '\t--force            / -f: Override output directory if already existing')
         log_info('GPKG-06', '\t--version          / -v: Display version')
-        log_info('GPKG-06', '\t--no_gen_version   / -g: No genVersion scripts run during gen_package - docker build option only')
         log_info('GPKG-06', '')
 
     def __init__(self):
@@ -48,7 +46,6 @@ class Options(object):
         self.force = False
         self.verbose = False
         self.version = False
-        self.no_gen_version = False
 
     def getOptions(self, argv):
         log_info('GPKG-62', 'Command line provided: $ ' + str(sys.executable) + ' ' + ' '.join(argv))
@@ -62,8 +59,7 @@ class Options(object):
                     'pkg_release=',
                     'verbose',
                     'force',
-                    'version',
-                    'no_gen_version'
+                    'version'
                 ]
             )
         except getopt.GetoptError as e:
@@ -94,8 +90,6 @@ class Options(object):
             elif opt in ('--version', '-v'):
                 self.PrintVersion()
                 self.version = True
-            elif opt in ('--no_gen_version', '-g'):
-                self.no_gen_version = True
             else:
                 exit_error('GPKG-02', 'Command line option not handled: ' + str(opt))
 
@@ -117,10 +111,9 @@ def main(args):
 
     config = {}
 
-    # Driver and API sources - will look for them later, after we run
-    # the getVersion.sh script (will miss the version headers otherwise)
-    driver = []
+    # API sources - will look for them later, after we run
     api_headers = []
+    api_srcs = []
 
     try:
         script_start_time = start('GPKG-07', SCRIPT_FILE)
@@ -136,9 +129,7 @@ def main(args):
             output_dir = abspath(join(CWD, 'output', output_dir))
 
         # Define steps output directories and others
-        tmp_dir        = abspath(join(output_dir, 'tmp'))
-        log_dir        = abspath(join(output_dir, 'log'))
-        bkp_design_dir = abspath(join(output_dir, 'bkp_design'))
+        log_dir = abspath(join(output_dir, 'log'))
 
         # Create output directory
         if os.path.isdir(output_dir):
@@ -155,12 +146,6 @@ def main(args):
             os.makedirs(log_dir)
 
         setup_logfile(abspath(join(log_dir, os.path.splitext(SCRIPT_FILE)[0] + '.log')))
-
-        if not os.path.isdir(tmp_dir):
-            os.makedirs(tmp_dir)
-
-        if not os.path.isdir(bkp_design_dir):
-            os.makedirs(bkp_design_dir)
 
         ##############################
 
@@ -230,22 +215,12 @@ def main(args):
         config['vendor']['full']  = 'Xilinx Inc'
         config['vendor']['email'] = 'support@xilinx.com'
 
-        # for AMI build as part of amr_build flow - do not run genVersion for AMI or GCQ - these are run in advance
-        if not opt.no_gen_version :
-            # Get package version
-            step = 'get AMI version'
-            start_time = start_step('GET_VER', step)
-            get_ver = './scripts/getVersion.sh ami'
-            exec_step_cmd('GEN_VERSION', step, get_ver, shell=True, cwd=PROJECT_DIR)
-            check_file_exists('GET_VER', join(PROJECT_DIR, 'api', 'include', 'ami_version.h.in'))
-            end_step('GET_VER', start_time)
-
         # When building the list of sources, we need a relative path so we split
         # on PROJECT_DIR, then split once more to remove the leading slash, e.g.
-        # PROJECT_DIR/driver/foo.c -> /driver/foo.c -> driver/foo.c
+        # PROJECT_DIR/api/foo.c -> /api/foo.c -> /foo.c
 
         # Build libami.so
-        step = 'build AMR library'
+        step = 'build AMI library'
         start_time = start_step('BUILD_AMI_LIB', step)
 
         build_api = 'cd api && make clean && make'
@@ -254,46 +229,76 @@ def main(args):
 
         end_step('BUILD_AMI_LIB', start_time)
 
+        step = 'clean libami'
+        clean_lib_ami = 'cd api && make clean'
+        exec_step_cmd('CLEAN_LIB_AMI', step, clean_lib_ami, shell=True, cwd=PROJECT_DIR)
+        end_step('CLEAN_LIB_AMI', start_time)
 
-        # Find API sources
+        # Find API sources and includes
         for path, _, files in walk(join(PROJECT_DIR, 'api', 'include')):
             for name in files:
                 api_headers.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
 
+        for path, _, files in walk(join(PROJECT_DIR, 'api', 'src')):
+            for name in files:
+                api_srcs.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
+
+        for path, _, files in walk(join(PROJECT_DIR, 'api')):
+            for name in files:
+                if name.endswith('Makefile'):
+                    api_srcs.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
+
         config['pkg']              =  {}
-        config['pkg']['name']      =  'libami'
-        config['pkg']['release']   =  opt.pkg_release
-        config['pkg']['summary']   =  config['pkg']['name'] + ' package'
-        config['pkg']['changelog'] =  config['pkg']['name'] + ' package. Built on $build_date_short.'
-        config['pkg']['descr']     = [config['pkg']['name'] + ' package', 'Built on ' + build_date_short + '.']
+        config['pkg']['name']      = 'libami'
+        config['pkg']['release']   = opt.pkg_release
+        config['pkg']['summary']   = config['pkg']['name']  + ' libami.package'
+        config['pkg']['changelog'] = config['pkg']['name']  + ' libami.package. Built on $build_date.'
+        config['pkg']['descr']     = [config['pkg']['name'] + ' libami.package', 'Built on ' + build_date + '.']
 
         # Find version from generated header file
-        with open(join(PROJECT_DIR, 'api', 'build', 'ami_version.h'), 'r') as fd:
-                data = fd.read()
+        with open(join(PROJECT_DIR, 'api', 'include', 'ami_api_version.h'), 'r') as fd:
+            data = fd.read()
 
-                v = re.findall(r'GIT_TAG.*?\"(\d+\.\d+\.\d+).*\"$', data, re.M)
-                c = re.findall(r'GIT_TAG_VER_DEV_COMMITS.*?\((\d+)\)$', data, re.M)
-                h = re.findall(r'GIT_HASH.*?\"(.*?)\"$', data, re.M)
+            v = re.findall(r'GIT_TAG.*?\"(\d+\.\d+\.\d+).*\"$', data, re.M)
+            c = re.findall(r'GIT_TAG_VER_DEV_COMMITS.*?\((\d+)\)$', data, re.M)
+            h, git_date = get_git_info('GPKG-05')
 
-                # Set version
-                config['pkg']['version'] = v[0] if v else '0.0.0'
+            # Set version
+            config['pkg']['version'] = v[0] if v else '0.0.0'
 
-                # Set release
-                config['pkg']['release'] = f'{c[0] if c else 0}.{h[0][:8] if h else ""}.{opt.pkg_release}'
+            # Set release
+            config['pkg']['release'] = f'{c[0] if c else 0}.{h[:8] if h else ""}.{opt.pkg_release}'
+
+        # prerm.sh
+        with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'prerm.sh')), 'r') as infile:
+            fdata = infile.read()
+            fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
+            fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
+            config['pkg']['prerm'] = fdata.split('\n')
+            with open(abspath(join(output_dir, 'prerm.sh')), 'w') as outfile:
+                outfile.write('\n'.join(config['pkg']['prerm']))
 
         # preinst.sh
         with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'preinst.sh')), 'r') as infile:
             fdata = infile.read()
-            fdata = fdata.replace('#!/bin/sh',                '')
-            fdata = fdata.replace('MODULE_NAME=$1',           'MODULE_NAME='+ config['pkg']['name'])
-            fdata = fdata.replace('MODULE_VERSION_STRING=$2', 'MODULE_VERSION_STRING='+ config['pkg']['version'])
+            fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
+            fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['preinst'] = fdata.split('\n')
             with open(abspath(join(output_dir, 'preinst.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['preinst']))
 
+        # postinst.sh
+        with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'postinst.sh')), 'r') as infile:
+            fdata = infile.read()
+            fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
+            fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
+            config['pkg']['postinst'] = fdata.split('\n')
+            with open(abspath(join(output_dir, 'postinst.sh')), 'w') as outfile:
+                outfile.write('\n'.join(config['pkg']['postinst']))
+
         config['pkg']['deps'] = {
-            'rpm': ['glibc', 'grep', 'gawk'],
-            'deb': ['libc6', 'grep', 'gawk']
+            'rpm': ['glibc', 'gcc', 'make', 'grep', 'gawk', 'build-essential'],
+            'deb': ['libc6', 'gcc', 'make', 'grep', 'gawk', 'build-essential']
         }
 
         # We want to conflict with XRT, however, we don't want the package manager to automatically
@@ -305,11 +310,11 @@ def main(args):
         config['pkg']['conflicts']['deb'] = []
 
         # Define package content paths
-        config['pkg']['usr_include_dir']   = 'usr/include/' + config['pkg']['name']
-        config['pkg']['usr_include_h']     = [f'{config["pkg"]["usr_include_dir"]}/{os.path.basename(f)}' for f in api_headers]
-
-        config['pkg']['usr_lib_dir']       = 'usr/local/lib/'
-        config['pkg']['usr_lib']           = config['pkg']['usr_lib_dir'] + '/libami.so'
+        config['pkg']['usr_include_dir'] = 'usr/include/' + config['pkg']['name']
+        config['pkg']['usr_include_h']   = [f'{config["pkg"]["usr_include_dir"]}/{os.path.basename(f)}' for f in api_headers]
+        config['pkg']['usr_lib_dir']     = 'usr/local/lib/'
+        config['pkg']['usr_src_dir']     = 'usr/src/' + config['pkg']['name'] + '-' + config['pkg']['version']
+        config['pkg']['usr_src_files']   = [f'{config["pkg"]["usr_src_dir"]}/{f}' for f in api_srcs]
 
 
         if config['system']['dist_id'] in DIST_DEB:
@@ -320,8 +325,8 @@ def main(args):
 
         # Define package description metadata
         config['pkg']['descr']  = [
-            'Xilinx Inc ' + config['pkg']['name'] + ' package.',
-            'Built on '   + str(build_date_short) + '.',
+            'Xilinx Inc ' + config['pkg']['name'] + ' lib.package.',
+            'Built on '   + str(build_date) + '.',
             'Built with ' + config['system']['dist_id'] + ' version ' + config['system']['dist_rel'] + ' and architecture ' + config['system']['arch'] + '.',
         ]
 
@@ -335,6 +340,7 @@ def main(args):
         os.makedirs(debian_dir)
         check_dir_exists('GPKG-05', dest_base)
         check_dir_exists('GPKG-05', debian_dir)
+
         # Create control file
         CONTROL = []
         CONTROL += ['Package: '        + config['pkg']['name']]
@@ -354,19 +360,34 @@ def main(args):
         with open(control_file_name, mode='w') as outfile:
             outfile.write('\n'.join(CONTROL))
         check_file_exists('GPKG-05', control_file_name)
-        
+
+        # Create postinst file
+        POSTINST = config['pkg']['postinst']
+        postinst_file_name = abspath(join(debian_dir, 'postinst'))
+        log_info('GPKG-28', 'Writing postinst file:  ' + postinst_file_name)
+        with open(postinst_file_name, mode='w') as outfile:
+            outfile.write('\n'.join(POSTINST))
+        os.chmod(postinst_file_name, 509); # octal 775
+        check_file_exists('GPKG-05', postinst_file_name)
+
+        # Create prerm file
+        PRERM = config['pkg']['prerm']
+        prerm_file_name = abspath(join(debian_dir, 'prerm'))
+        log_info('GPKG-28', 'Writing prerm file:     ' + prerm_file_name)
+        with open(prerm_file_name, mode='w') as outfile:
+            outfile.write('\n'.join(PRERM))
+        os.chmod(prerm_file_name, 509); # octal 775
+        check_file_exists('GPKG-05', prerm_file_name)
+
         # Create preinst file
-        PREINST = [
-            '#!/bin/bash',
-            'set -e',
-        ]
-        PREINST += config['pkg']['preinst']
+        PREINST = config['pkg']['preinst']
         preinst_file_name = abspath(join(debian_dir, 'preinst'))
         log_info('GPKG-28', 'Writing preinst file:   ' + preinst_file_name)
         with open(preinst_file_name, mode='w') as outfile:
             outfile.write('\n'.join(PREINST))
         os.chmod(preinst_file_name, 509); # octal 775
         check_file_exists('GPKG-05', preinst_file_name)
+
         # Create changelog
         CHANGE_LOG = []
         CHANGE_LOG += ['']
@@ -374,7 +395,7 @@ def main(args):
         CHANGE_LOG += ['']
         CHANGE_LOG += ['  * ' + config['pkg']['changelog']]
         CHANGE_LOG += ['']
-        CHANGE_LOG += ['-- ' + config['vendor']['full']+' <' + config['vendor']['email'] + '> ' + build_date_short + ' 00:00:00 +0000']
+        CHANGE_LOG += ['-- ' + config['vendor']['full']+' <' + config['vendor']['email'] + '> ' + build_date + ' 00:00:00 +0000']
         CHANGE_LOG += ['']
         changelog_dir       = abspath(join(dest_base, 'usr', 'share', 'doc', config['pkg']['name']))
         changelog_file_name = abspath(join(changelog_dir, 'changelog.Debian'))
@@ -388,26 +409,42 @@ def main(args):
         os.remove(changelog_file_name)
         check_file_exists('GPKG-05', changelog_tar_name)
 
-        api_dest = [
+        api_include_dest = [
             {
                 'src': abspath(join(PROJECT_DIR, f)),
-                'dst': join(config['pkg']['usr_include_dir'])
+                'dst': join(config['pkg']['usr_include_dir'],
+                           os.path.dirname(f).replace('api/build', 'api/include'))
             } for f in api_headers
         ]
 
-        # Copying packaged files
-        SRC_DEST_LIST = [
-            {'src': abspath(join(PROJECT_DIR, 'api',  'build', 'libami.so')),'dst': config['pkg']['usr_lib_dir']},
-            *api_dest,
+        api_srcs_dest = [
+            {
+                'src': abspath(join(PROJECT_DIR, f)),
+                'dst': join(config['pkg']['usr_src_dir'], os.path.dirname(f))
+            } for f in api_srcs
         ]
 
-        for src_dest in SRC_DEST_LIST:
+        # Copying packaged include files
+        for src_dest in api_include_dest:
+            src = src_dest['src']
+            dst = dest_base
+            if src_dest['dst'] != '':
+                dst = abspath(join(dst, src_dest['dst']))
+
+            copy_source_file('GPKG-31', src, dst)
+            check_file_exists('GPKG-05', abspath(join(dst, os.path.basename(src))))
+
+
+        # Copying packaged source files
+        for src_dest in api_srcs_dest:
             src = src_dest['src']
             dst = dest_base
             if src_dest['dst'] != '':
                 dst = abspath(join(dst, src_dest['dst']))
             copy_source_file('GPKG-31', src, dst)
             check_file_exists('GPKG-05', abspath(join(dst, os.path.basename(src))))
+            if src.endswith('Makefile'):
+                append_git_to_makefile('GPKG-05', abspath(join(dst, os.path.basename(src))))
 
         # Create module PC file
         MODULE_PC = [

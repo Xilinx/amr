@@ -36,11 +36,8 @@ described below (this is roughly the same procedure as that performed by the bui
 ### 1. Driver
 
 ```
-./scripts/getVersion.sh ami
-cd driver/gcq-driver
-./getVersion.sh gcq
-cd ..
-make
+cd driver
+make clean && make
 ```
 
 After running the above commands, you should see a file **ami.ko** in the driver directory. This is the AMI kernel module.
@@ -48,14 +45,12 @@ After running the above commands, you should see a file **ami.ko** in the driver
 ### 2. API
 
 ```
-./scripts/getVersion.sh ami
 cd api
 make clean && make
 ```
 
 This creates a build directory and generates a **libami.so** file which you can link your applications against to use the
-AMI API. The public header files are located in **api/include**. Note, if you already ran the 'getVersion.sh' script as
-part of the driver build steps, you do not need to run it again here.
+AMI API. The public header files are located in **api/include**.
 
 ### 3. CLI App
 

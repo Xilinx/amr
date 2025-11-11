@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 
-PROFILE :=
-TARGET := ami_tool
+TARGET    := ami_tool
 BUILD_DIR := ./build
-SRC_DIRS := ./
+SRC_DIRS  := ./
 
 # Find all C source files.
 SRCS := $(shell find $(SRC_DIRS) -not -path "./test/*" -name '*.c')
@@ -15,17 +14,15 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 # Replace .o with .d for dependencies.
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := ../api/build ../api/include ./cmd_handlers .
+INC_DIRS  := /usr/include/libami/api/include ../api/build ../api/include ./cmd_handlers .
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-AMI_LIB_DIR := ../api/build
-AMI_LIB := ami
+LIB_DIRS  := ../api/build /usr/local/lib/libami
+LIB_FLAGS := $(addprefix -L,$(LIB_DIRS))
+AMI_LIB   := ami
 
-CFLAGS := $(INC_FLAGS) -Wall -Werror
-ifneq ($(PROFILE), )
-	CFLAGS := $(CFLAGS) -D`echo $(PROFILE) | tr a-z A-Z`
-endif
-LDFLAGS := -L$(AMI_LIB_DIR) -l$(AMI_LIB) -lm -lpthread
+CFLAGS    := $(INC_FLAGS) -Wall -Werror
+LDFLAGS   := $(LIB_FLAGS) -l$(AMI_LIB) -lm -lpthread
 
 #
 # Default make
@@ -52,6 +49,7 @@ banner:
 	@echo "  - CFLAGS      : $(CFLAGS)"
 	@echo "  - LDFLAGS     : $(LDFLAGS)"
 	@echo "  - INC_DIRS    : $(INC_DIRS)"
+	@echo "  - LIB_DIRS    : $(LIB_DIRS)"
 	@echo "  - BUILD_DIR   : $(BUILD_DIR)\n"
 	@$(MAKE) -s newline
 

@@ -12,7 +12,7 @@ from os import walk
 from os.path import join
 from os.path import abspath
 
-SCRIPT_VERSION = '1.0'
+SCRIPT_VERSION = '1.1'
 SCRIPT_FILE    = os.path.basename(__file__)
 SCRIPT_DIR     = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR    = abspath(join(SCRIPT_DIR, os.pardir))
@@ -22,9 +22,8 @@ sys.path.insert(0, BUILD_DIR)
 from pkg import *
 
 # Get date
-build_date       = get_date_long()
-build_date_short = get_date_short()
-now              = datetime.datetime.now()
+build_date = get_date_str()
+now        = datetime.datetime.now()
 
 class Options(object):
     def PrintVersion(self):
@@ -38,8 +37,6 @@ class Options(object):
         log_info('GPKG-06', '\t--verbose          / -V: Turn on verbosity')
         log_info('GPKG-06', '\t--force            / -f: Override output directory if already existing')
         log_info('GPKG-06', '\t--version          / -v: Display version')
-        log_info('GPKG-06', '\t--no_driver        / -n: No driver built during gen_package - docker build option only')
-        log_info('GPKG-06', '\t--no_gen_version   / -g: No genVersion scripts run during gen_package - docker build option only')
         log_info('GPKG-06', '')
 
     def __init__(self):
@@ -49,8 +46,6 @@ class Options(object):
         self.force = False
         self.verbose = False
         self.version = False
-        self.no_driver = False
-        self.no_gen_version = False
 
     def getOptions(self, argv):
         log_info('GPKG-62', 'Command line provided: $ ' + str(sys.executable) + ' ' + ' '.join(argv))
@@ -64,9 +59,7 @@ class Options(object):
                     'pkg_release=',
                     'verbose',
                     'force',
-                    'version',
-                    'no_driver',
-                    'no_gen_version'
+                    'version'
                 ]
             )
         except getopt.GetoptError as e:
@@ -97,10 +90,6 @@ class Options(object):
             elif opt in ('--version', '-v'):
                 self.PrintVersion()
                 self.version = True
-            elif opt in ('--no_driver', '-n'):
-                self.no_driver = True
-            elif opt in ('--no_gen_version', '-g'):
-                self.no_gen_version = True
             else:
                 exit_error('GPKG-02', 'Command line option not handled: ' + str(opt))
 
@@ -115,24 +104,6 @@ class Options(object):
             self.pkg_release = str(now.year) + str(now.month).zfill(2) + str(now.day).zfill(2)
 
 
-def find_longest_filter(path, filters):
-    """
-    find_longest_filter - find the longest matching filter for a pathname.
-
-    :param path:    Full path for which to find a matching filter
-    :param filters: Dictionary of the format {'path': [files...]}
-    :return:        Matched filter or an empty string
-    """
-    longest_filter = ''
-
-    for k in filters.keys():
-        if path.startswith(k):
-            if (len(k) > len(longest_filter)):
-                longest_filter = k
-
-    return longest_filter
-
-
 def main(args):
     # Parse command line options
     opt = Options()
@@ -140,10 +111,8 @@ def main(args):
 
     config = {}
 
-    # Driver and API sources - will look for them later, after we run
-    # the getVersion.sh script (will miss the version headers otherwise)
+    # Driver sources - will look for them later, after we run
     driver = []
-    api_headers = []
 
     try:
         script_start_time = start('GPKG-07', SCRIPT_FILE)
@@ -159,9 +128,7 @@ def main(args):
             output_dir = abspath(join(CWD, 'output', output_dir))
 
         # Define steps output directories and others
-        tmp_dir        = abspath(join(output_dir, 'tmp'))
-        log_dir        = abspath(join(output_dir, 'log'))
-        bkp_design_dir = abspath(join(output_dir, 'bkp_design'))
+        log_dir = abspath(join(output_dir, 'log'))
 
         # Create output directory
         if os.path.isdir(output_dir):
@@ -178,12 +145,6 @@ def main(args):
             os.makedirs(log_dir)
 
         setup_logfile(abspath(join(log_dir, os.path.splitext(SCRIPT_FILE)[0] + '.log')))
-
-        if not os.path.isdir(tmp_dir):
-            os.makedirs(tmp_dir)
-
-        if not os.path.isdir(bkp_design_dir):
-            os.makedirs(bkp_design_dir)
 
         ##############################
 
@@ -253,89 +214,75 @@ def main(args):
         config['vendor']['full']  = 'Xilinx Inc'
         config['vendor']['email'] = 'support@xilinx.com'
 
-        # for AMI build as part of amr_build flow - do not run genVersion for AMI or GCQ - these are run in advance
-        if not opt.no_gen_version :
-            # Get package version
-            step = 'get AMI version'
-            start_time = start_step('GET_VER', step)
-            get_ver = './scripts/getVersion.sh ami'
-            exec_step_cmd('GEN_VERSION', step, get_ver, shell=True, cwd=PROJECT_DIR)
-            check_file_exists('GET_VER', join(PROJECT_DIR, 'api', 'include', 'ami_version.h.in'))
-            end_step('GET_VER', start_time)
-
         # When building the list of sources, we need a relative path so we split
         # on PROJECT_DIR, then split once more to remove the leading slash, e.g.
         # PROJECT_DIR/driver/foo.c -> /driver/foo.c -> driver/foo.c
 
+        # for AMI build as part of aved_build flow - do not run driver generation within docker flow
+        # Check that the driver will build
+        step = 'driver compilation confidence check'
+        start_time = start_step('BUILD_DRIVER', step)
+
+        build_driver = 'cd driver && make clean && make'
+        exec_step_cmd('BUILD_CHECK_DRIVER', step, build_driver, shell=True, cwd=PROJECT_DIR)
+        check_file_exists('BUILD_CHECK_DRIVER', join(PROJECT_DIR, 'driver', 'ami.ko'))
+
+        step = 'clean driver'
+        clean_driver = 'cd driver && make clean'
+        exec_step_cmd('CLEAN_DRIVER', step, clean_driver, shell=True, cwd=PROJECT_DIR)
+
+        end_step('BUILD_DRIVER', start_time)
         # Find driver sources
         for path, _, files in walk(join(PROJECT_DIR, 'driver')):
 
             for name in files:
-                if name.endswith(('.c', '.h')):
+                if name.endswith(('.c', '.h', 'Makefile')):
 	                driver.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
 
-        # Find API sources
-        for path, _, files in walk(join(PROJECT_DIR, 'api', 'include')):
-            for name in files:
-                api_headers.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
-
-        config['pkg']                =  {}
-        config['pkg']['name']        =  'ami'
-        config['pkg']['release']     =  opt.pkg_release
-        config['pkg']['summary']     =  config['pkg']['name'] + ' driver package'
-        config['pkg']['changelog']   =  config['pkg']['name'] + ' driver package. Built on $build_date_short.'
-        config['pkg']['descr'] = [config['pkg']['name'] + ' driver package', 'Built on ' + build_date_short + '.']
-
-        # Build libami.so
-        step = 'build AMR library'
-        start_time = start_step('BUILD_AMI_LIB', step)
-
-        build_api = 'cd api && make clean && make'
-        exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
-        check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
-
-        end_step('BUILD_AMI_LIB', start_time)
+        config['pkg']              =  {}
+        config['pkg']['name']      =  'ami'
+        config['pkg']['release']   =  opt.pkg_release
+        config['pkg']['summary']   =  config['pkg']['name'] + ' driver package'
+        config['pkg']['changelog'] =  config['pkg']['name'] + ' driver package. Built on $build_date.'
+        config['pkg']['descr']     = [config['pkg']['name'] + ' driver package', 'Built on ' + build_date + '.']
 
         # Find version from generated header file
-        with open(join(PROJECT_DIR, 'api', 'build', 'ami_version.h'), 'r') as fd:
-                data = fd.read()
+        with open(join(PROJECT_DIR, 'driver', 'ami_driver_version.h'), 'r') as fd:
+            data = fd.read()
 
-                v = re.findall(r'GIT_TAG.*?\"(\d+\.\d+\.\d+).*\"$', data, re.M)
-                c = re.findall(r'GIT_TAG_VER_DEV_COMMITS.*?\((\d+)\)$', data, re.M)
-                h = re.findall(r'GIT_HASH.*?\"(.*?)\"$', data, re.M)
+            v = re.findall(r'GIT_TAG.*?\"(\d+\.\d+\.\d+).*\"$', data, re.M)
+            c = re.findall(r'GIT_TAG_VER_DEV_COMMITS.*?\((\d+)\)$', data, re.M)
+            h, git_date = get_git_info('GPKG-05')
 
-                # Set version
-                config['pkg']['version'] = v[0] if v else '0.0.0'
+            # Set version
+            config['pkg']['version'] = v[0] if v else '0.0.0'
 
-                # Set release
-                config['pkg']['release'] = f'{c[0] if c else 0}.{h[0][:8] if h else ""}.{opt.pkg_release}'
+            # Set release
+            config['pkg']['release'] = f'{c[0] if c else 0}.{h[:8] if h else ""}.{opt.pkg_release}'
 
-		# prerm.sh
+        # prerm.sh
         with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'prerm.sh')), 'r') as infile:
             fdata = infile.read()
-            fdata = fdata.replace('#!/bin/sh',                '')
-            fdata = fdata.replace('MODULE_NAME=$1',           'MODULE_NAME='+ config['pkg']['name'])
-            fdata = fdata.replace('MODULE_VERSION_STRING=$2', 'MODULE_VERSION_STRING='+ config['pkg']['version'])
+            fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
+            fdata = fdata.replace('MOD_VER_STR=$2', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['prerm'] = fdata.split('\n')
             with open(abspath(join(output_dir, 'prerm.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['prerm']))
 
-		# preinst.sh
+        # preinst.sh
         with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'preinst.sh')), 'r') as infile:
             fdata = infile.read()
-            fdata = fdata.replace('#!/bin/sh',                '')
-            fdata = fdata.replace('MODULE_NAME=$1',           'MODULE_NAME='+ config['pkg']['name'])
-            fdata = fdata.replace('MODULE_VERSION_STRING=$2', 'MODULE_VERSION_STRING='+ config['pkg']['version'])
+            fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
+            fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['preinst'] = fdata.split('\n')
             with open(abspath(join(output_dir, 'preinst.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['preinst']))
 
-		# postinst.sh
+        # postinst.sh
         with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'postinst.sh')), 'r') as infile:
             fdata = infile.read()
-            fdata = fdata.replace('#!/bin/sh',                '')
-            fdata = fdata.replace('MODULE_NAME=$1',           'MODULE_NAME='+ config['pkg']['name'])
-            fdata = fdata.replace('MODULE_VERSION_STRING=$2', 'MODULE_VERSION_STRING='+ config['pkg']['version'])
+            fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
+            fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['postinst'] = fdata.split('\n')
             with open(abspath(join(output_dir, 'postinst.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['postinst']))
@@ -353,37 +300,6 @@ def main(args):
         config['pkg']['conflicts']['rpm'] = ['xrt']
         config['pkg']['conflicts']['deb'] = []
 
-        # for AMI build as part of aved_build flow - do not run driver generation within docker flow
-        if not opt.no_driver:
-            # Check that the driver will build
-            step = 'driver compilation confidence check'
-            start_time = start_step('BUILD_DRIVER', step)
-
-            build_driver = 'cd driver && make clean && make'
-            exec_step_cmd('BUILD_CHECK_DRIVER', step, build_driver, shell=True, cwd=PROJECT_DIR)
-            check_file_exists('BUILD_CHECK_DRIVER', join(PROJECT_DIR, 'driver', 'ami.ko'))
-
-            step = 'clean driver'
-            clean_driver = 'cd driver && make clean'
-            exec_step_cmd('CLEAN_DRIVER', step, clean_driver, shell=True, cwd=PROJECT_DIR)
-
-            end_step('BUILD_DRIVER', start_time)
-
-        # Build libami.so and ami_tool
-        '''
-        step = 'build AMR library and ami tool'
-        start_time = start_step('BUILD_AMI', step)
-
-        build_api = 'cd api && make clean && make'
-        exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
-        check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
-
-        build_ami_tool = 'cd app && make clean && make'
-        exec_step_cmd('BUILD_AMI_TOOL', step, build_ami_tool, shell=True, cwd=PROJECT_DIR)
-        check_file_exists('BUILD_AMI_TOOL', join(PROJECT_DIR, 'app', 'build', 'ami_tool'))
-        end_step('BUILD_AMI', start_time)
-		'''
-
         # Define package content paths
         config['pkg']['usr_src_dir']       = 'usr/src/' + config['pkg']['name'] + '-' + config['pkg']['version']
         config['pkg']['usr_src_Makefile']  = config['pkg']['usr_src_dir'] + '/driver/Makefile'
@@ -391,12 +307,6 @@ def main(args):
         config['pkg']['usr_src_dkms_conf'] = config['pkg']['usr_src_dir'] + '/dkms.conf'
 
         config['pkg']['usr_include_dir']   = 'usr/include/' + config['pkg']['name']
-        config['pkg']['usr_include_h']     = [f'{config["pkg"]["usr_include_dir"]}/{os.path.basename(f)}' for f in api_headers]
-
-        #config['pkg']['usr_bin_dir']       = 'usr/local/bin/'
-        #config['pkg']['usr_lib_dir']       = 'usr/local/lib/'
-        #config['pkg']['usr_bin']           = config['pkg']['usr_bin_dir'] + '/ami_tool'
-        #config['pkg']['usr_lib']           = config['pkg']['usr_lib_dir'] + '/libami.so'
 
         config['pkg']['opt_dir']           = 'opt/amd/amr/amd_rave_gen3x4_25.1'
 
@@ -410,12 +320,11 @@ def main(args):
         # Define package description metadata
         config['pkg']['descr']  = [
             'Xilinx Inc ' + config['pkg']['name'] + ' driver package.',
-            'Built on '   + str(build_date_short) + '.',
+            'Built on '   + str(build_date) + '.',
             'Built with ' + config['system']['dist_id'] + ' version ' + config['system']['dist_rel'] + ' and architecture ' + config['system']['arch'] + '.',
         ]
 
         # Create the file necessary to generate the packages
-
         config['pkg']['descr'] = '\n '.join(config['pkg']['descr']); # DEB package format requires \n+SPACE
         deb_name = config['pkg']['name'] + '_' + config['pkg']['version'] + '-' + config['pkg']['release'] + '_' + config['system']['arch']
         dest_base  = abspath(join(output_dir, deb_name))
@@ -425,6 +334,7 @@ def main(args):
         os.makedirs(debian_dir)
         check_dir_exists('GPKG-05', dest_base)
         check_dir_exists('GPKG-05', debian_dir)
+
         # Create control file
         CONTROL = []
         CONTROL += ['Package: '        + config['pkg']['name']]
@@ -444,42 +354,34 @@ def main(args):
         with open(control_file_name, mode='w') as outfile:
             outfile.write('\n'.join(CONTROL))
         check_file_exists('GPKG-05', control_file_name)
-        # Creating postinst file
-        POSTINST = [
-            '#!/bin/bash',
-            'set -e',
-        ]
-        POSTINST += config['pkg']['postinst']
+
+        # Create postinst file
+        POSTINST = config['pkg']['postinst']
         postinst_file_name = abspath(join(debian_dir, 'postinst'))
         log_info('GPKG-28', 'Writing postinst file:  ' + postinst_file_name)
         with open(postinst_file_name, mode='w') as outfile:
             outfile.write('\n'.join(POSTINST))
         os.chmod(postinst_file_name, 509); # octal 775
         check_file_exists('GPKG-05', postinst_file_name)
+
         # Create prerm file
-        PRERM = [
-            '#!/bin/bash',
-            'set -e',
-        ]
-        PRERM += config['pkg']['prerm']
+        PRERM = config['pkg']['prerm']
         prerm_file_name = abspath(join(debian_dir, 'prerm'))
         log_info('GPKG-28', 'Writing prerm file:     ' + prerm_file_name)
         with open(prerm_file_name, mode='w') as outfile:
             outfile.write('\n'.join(PRERM))
         os.chmod(prerm_file_name, 509); # octal 775
         check_file_exists('GPKG-05', prerm_file_name)
-         # Create preinst file
-        PREINST = [
-            '#!/bin/bash',
-            'set -e',
-        ]
-        PREINST += config['pkg']['preinst']
+
+        # Create preinst file
+        PREINST = config['pkg']['preinst']
         preinst_file_name = abspath(join(debian_dir, 'preinst'))
         log_info('GPKG-28', 'Writing preinst file:   ' + preinst_file_name)
         with open(preinst_file_name, mode='w') as outfile:
             outfile.write('\n'.join(PREINST))
         os.chmod(preinst_file_name, 509); # octal 775
         check_file_exists('GPKG-05', preinst_file_name)
+
         # Create changelog
         CHANGE_LOG = []
         CHANGE_LOG += ['']
@@ -487,7 +389,7 @@ def main(args):
         CHANGE_LOG += ['']
         CHANGE_LOG += ['  * ' + config['pkg']['changelog']]
         CHANGE_LOG += ['']
-        CHANGE_LOG += ['-- ' + config['vendor']['full']+' <' + config['vendor']['email'] + '> ' + build_date_short + ' 00:00:00 +0000']
+        CHANGE_LOG += ['-- ' + config['vendor']['full']+' <' + config['vendor']['email'] + '> ' + build_date + ' 00:00:00 +0000']
         CHANGE_LOG += ['']
         changelog_dir       = abspath(join(dest_base, 'usr', 'share', 'doc', config['pkg']['name']))
         changelog_file_name = abspath(join(changelog_dir, 'changelog.Debian'))
@@ -500,6 +402,7 @@ def main(args):
             tar.add(changelog_file_name)
         os.remove(changelog_file_name)
         check_file_exists('GPKG-05', changelog_tar_name)
+
         driver_dest = [
             {
                 'src': abspath(join(PROJECT_DIR, f)),
@@ -507,20 +410,10 @@ def main(args):
             } for f in driver
         ]
 
-        api_dest = [
-            {
-                'src': abspath(join(PROJECT_DIR, f)),
-                'dst': join(config['pkg']['usr_include_dir'])
-            } for f in api_headers
-        ]
-
         # Copying packaged files
         SRC_DEST_LIST = [
-            {'src': abspath(join(PROJECT_DIR, 'driver',        'Makefile' )),'dst': join(config['pkg']['usr_src_dir'], 'driver')},
-            {'src': abspath(join(SCRIPT_DIR,  'pkg_data',  	   'dkms.conf')),'dst': config['pkg']['usr_src_dir']},
-            #{'src': abspath(join(PROJECT_DIR, 'api',  'build', 'libami.so')),'dst': config['pkg']['usr_lib_dir']},
-            #{'src': abspath(join(PROJECT_DIR, 'app',  'build', 'ami_tool' )),'dst': config['pkg']['usr_bin_dir']},
-            *api_dest,
+            {'src': abspath(join(PROJECT_DIR, 'driver',   'Makefile' )),'dst': join(config['pkg']['usr_src_dir'], 'driver')},
+            {'src': abspath(join(SCRIPT_DIR,  'pkg_data', 'dkms.conf')),'dst': config['pkg']['usr_src_dir']},
             *driver_dest
         ]
 
@@ -531,6 +424,8 @@ def main(args):
                 dst = abspath(join(dst, src_dest['dst']))
             copy_source_file('GPKG-31', src, dst)
             check_file_exists('GPKG-05', abspath(join(dst, os.path.basename(src))))
+            if src.endswith('Makefile'):
+                append_git_to_makefile('GPKG-05', abspath(join(dst, os.path.basename(src))))
 
             # Replace version in dkms.conf
             if src.endswith('dkms.conf'):
@@ -542,14 +437,11 @@ def main(args):
 
         # Create module PC file
         MODULE_PC = [
-            #'bindir=/'      + config['pkg']['usr_bin_dir'],
-            #'libdir=/'      + config['pkg']['usr_lib_dir'],
             'includedir=/'  + config['pkg']['usr_include_dir'],
             '',
             'Name: '        + config['pkg']['name'],
             'Description: ' + config['pkg']['summary'],
             'Version: '     + config['pkg']['version'],
-            #'Libs: -L${libdir} -lami',
             'Cflags: -I${includedir}'
         ]
         os.makedirs(abspath(join(dest_base, config['pkg']['pkg_config_dir'])))

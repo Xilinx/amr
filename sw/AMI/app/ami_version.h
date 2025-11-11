@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * ami_version.h- This file contains the public interface for sensor logic
+ * ami_version.h - This file contains the version information
  *
  * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
  */
@@ -14,8 +14,14 @@
 #define GIT_TAG_VER_PATCH         (0)
 #define GIT_TAG_VER_DEV_COMMITS   (0)
 
-#define GIT_HASH                  "3944a1e8674722115a4263d0ac47b8e45108dfa1"
-#define GIT_DATE                  "20250722"
+#ifndef GIT_HASH
+#define GIT_HASH                  "9c620a16b1fe3d54041f10e4053e43642872050b"
+#endif
+
+#ifndef GIT_DATE
+#define GIT_DATE                  "20251110"
+#endif
+
 #define GIT_BRANCH                ""
 #define GIT_STATUS                (0)
 

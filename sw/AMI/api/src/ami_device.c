@@ -22,7 +22,7 @@
 #include "ami_device_internal.h"
 #include "ami_sensor_internal.h"
 #include "ami_ioctl.h"
-#include "ami_version.h"
+#include "ami_api_version.h"
 #include "ami_mem_access.h"
 
 /*****************************************************************************/

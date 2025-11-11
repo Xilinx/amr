@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 
-MODULE_NAME=$1
-MODULE_VERSION_STRING=$2
+MOD_NAME="$1"
+MOD_VER_STR="$2"
 
 OS_RELEASE=$(cat /etc/os-release)
 

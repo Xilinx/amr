@@ -1,13 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
-# Makefile based on https://makefiletutorial.com/
-
 AR := ar -rc
 
-TARGET := libami.so
+TARGET    := libami.so
 BUILD_DIR := ./build
-SRC_DIRS := ./src  # Private source/headers
+SRC_DIRS  := ./src  # Private source/headers
 
 # Find all C source files.
 SRCS := $(shell find $(SRC_DIRS) -name '*.c')
@@ -18,7 +16,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 # Replace .o with .d for dependencies.
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := ./include ./build# Public headers only
+INC_DIRS  := ./include /usr/include/libami/api/include
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us.
@@ -31,8 +29,6 @@ LDFLAGS := -shared
 #
 all:
 	@$(MAKE) -s banner
-	mkdir -p "./build"
-	../scripts/getVersion.sh ami
 	@$(MAKE) -s $(BUILD_DIR)/$(TARGET)
 
 #
