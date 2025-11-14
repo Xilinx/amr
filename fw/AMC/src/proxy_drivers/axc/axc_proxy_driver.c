@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the implementation for the Alveo External Device Control (AXC)
+ * This file contains the implementation for the AMR External Device Control (AXC)
  * proxy driver.
  *
  * @file axc_proxy_driver.c

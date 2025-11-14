@@ -93,8 +93,31 @@ else()
     message("Output Dir: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
     #Running prerequisite script
-    execute_process(COMMAND ./scripts/getVersion.sh amc WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    execute_process(COMMAND ./getVersion.sh smbus WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/device_drivers/smbus_driver)
+    file(READ "${CMAKE_SOURCE_DIR}/src/device_drivers/smbus_driver/src/smbus_version.h" FILE_CONTENTS)
+    message(STATUS "${FILE_CONTENTS}")
+
+    file(READ "${CMAKE_SOURCE_DIR}/src/common/include/amc_version.h" FILE_CONTENTS)
+    message(STATUS "${FILE_CONTENTS}")
+
+    execute_process(
+        COMMAND git rev-parse HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE CMAKE_GIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+
+    execute_process(
+        COMMAND git log -1 --pretty=format:%cd --date=format:%Y%m%d
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE CMAKE_GIT_DATE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+
+    # Also provide as definitions (useful for conditional compilation)
+    add_definitions(-DGIT_HASH="${CMAKE_GIT_HASH}")
+    add_definitions(-DGIT_DATE="${CMAKE_GIT_DATE}")
 
     #adding static libraries
     set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH};amc_bsp/amc_bsp/lib)
@@ -109,7 +132,6 @@ else()
     #Include directories
     include_directories(amc_bsp/amc_bsp/include)
     include_directories(${CMAKE_LIBRARY_PATH})
-    include_directories(build)
     include_directories(src/common/include)
     include_directories(src/common/core_libs/pll)
     include_directories(src/common/core_libs/evl)
@@ -213,7 +235,7 @@ else()
         src/device_drivers/smbus_driver/src/smbus_driver.c
         src/device_drivers/smbus_driver/src/smbus_event_buffer.c
         src/device_drivers/smbus_driver/src/smbus_event.c
-        src/device_drivers/smbus_driver/src/smbus_hardware_access.c
+        src/device_drivers/smbus_driver/src/smbus_hw_access.c
         src/device_drivers/smbus_driver/src/smbus_interrupt_handler.c
         src/device_drivers/smbus_driver/src/smbus_state.c
         ${FW_SYS_MON_PATH}

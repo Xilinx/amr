@@ -16,189 +16,157 @@
 #define SMBUS_LOG_IS_OCCUPIED               ( 0xAAABACAD )
 #define SMBUS_LOG_IS_NOT_OCCUPIED           ( 0 )
 
-/********************** Static function declarations ***************************/
 
-/******************************************************************************
-*
-* @brief    Is a conversion function from the state machine event to character string
-*           to be used by logging functions
-*
-* @param    xEvent is any event handled by the state machine
-*
-* @return   A character string
-*
-* @note     None.
-*
-*****************************************************************************/
-static char* prvpcConvertEventTypeToText( SMBUS_LOG_EVENT_TYPE xEvent );
-
-/******************************************************************************
-*
-* @brief    This function formats a log entry as a text string ready to be displayed
-*           The format of the string depends on the type of event that was logged
-*
-* @param    pxSMBusProfile is a pointer to the SMBus profile structure
-* @param    entry is the index of the log entry in the buffer
-* @param    pcLogBuffer is a char buffer containing the complete log to display
-* @param    pslLineSize is pointer to the size of the log string being added
-*
-* @return   None
-*
-* @note     None.
-*
-*****************************************************************************/
-static void prvvFormatLine( SMBUS_PROFILE_TYPE* pxSMBusProfile, int entry, char* pcLogBuffer,
-                                int* pslLineSize );
-
-/*******************************************************************************/
 
 /**
-*
-* @brief    This function formats a log entry as a text string ready to be displayed
-*           The format of the string depends on the type of event that was logged
-*
-*/
-static char* prvpcConvertEventTypeToText( SMBUS_LOG_EVENT_TYPE xEvent )
+ * @brief    Is a conversion function from the state machine event to character string
+ *           to be used by logging functions
+ *
+ * @param    xEvent is any event handled by the state machine
+ *
+ * @return   A character string
+ */
+static char* prvpcConvertEventTypeToText( SMBUS_LOG_EVENT xEvent )
 {
     char* pcReturnText = "         ";
 
-    if( SMBUS_LOG_EVENT_INTERRUPT_EVENT == xEvent )
+    switch (xEvent)
     {
-        pcReturnText = "INTERRUPT";
-    }
-    else if( SMBUS_LOG_EVENT_FSM_EVENT == xEvent )
-    {
-        pcReturnText = "FSM      ";
-    }
-    else if( SMBUS_LOG_EVENT_ERROR == xEvent )
-    {
-        pcReturnText = "ERROR    ";
-    }
-    else if( SMBUS_LOG_EVENT_HW_READ == xEvent )
-    {
-        pcReturnText = "HW_READ  ";
-    }
-    else if( SMBUS_LOG_EVENT_HW_WRITE == xEvent )
-    {
-        pcReturnText = "HW_WRITE ";
-    }
-    else if( SMBUS_LOG_EVENT_PROTOCOL == xEvent )
-    {
-        pcReturnText = "PROTOCOL ";
-    }
-    else if( SMBUS_LOG_EVENT_DEBUG == xEvent )
-    {
-        pcReturnText = "DEBUG    ";
-    }
-    else if( SMBUS_LOG_EVENT_TRYREAD == xEvent )
-    {
-        pcReturnText = "TRYREAD  ";
-    }
-    else if( SMBUS_LOG_EVENT_TRYWRITE == xEvent )
-    {
-        pcReturnText = "TRYWRITE ";
+        case SMBUS_LOG_EVENT_INTERRUPT_EVENT:
+            pcReturnText = "INTERRUPT";
+            break;
+        case SMBUS_LOG_EVENT_FSM_EVENT:
+            pcReturnText = "FSM      ";
+            break;
+        case SMBUS_LOG_EVENT_ERROR:
+            pcReturnText = "ERROR    ";
+            break;
+        case SMBUS_LOG_EVENT_HW_READ:
+            pcReturnText = "HW_READ  ";
+            break;
+        case SMBUS_LOG_EVENT_HW_WRITE:
+            pcReturnText = "HW_WRITE ";
+            break;
+        case SMBUS_LOG_EVENT_PROTOCOL:
+            pcReturnText = "PROTOCOL ";
+            break;
+        case SMBUS_LOG_EVENT_DEBUG:
+            pcReturnText = "DEBUG    ";
+            break;
+        case SMBUS_LOG_EVENT_TRYREAD:
+            pcReturnText = "TRYREAD  ";
+            break;
+        case SMBUS_LOG_EVENT_TRYWRITE:
+            pcReturnText = "TRYWRITE ";
+            break;
+        default:
+            break;
     }
 
     return pcReturnText;
 }
 
 /**
-* @brief    This function formats a log entry as a text string ready to be displayed
-*           The format of the string depends on the type of event that was logged
-*
-*/
-static void prvvFormatLine( SMBUS_PROFILE_TYPE* pxSMBusProfile, int entry, char* pcLogBuffer,
-                                int* pslLineSize )
+ * @brief    This function formats a log entry as a text string ready to be displayed
+ *           The format of the string depends on the type of event that was logged
+ *
+ * @param    pxSMBusProfile is a pointer to the SMBus profile structure
+ * @param    entry is the index of the log entry in the buffer
+ * @param    pcLogBuffer is a char buffer containing the complete log to display
+ * @param    pslLineSize is pointer to the size of the log string being added
+ *
+ * @return   None
+ */
+static void prvvFormatLine( SMBus_Profile* pxSMBusProfile, int entry, char* pcLogBuffer,
+                            int* pslLineSize )
 {
-    char* pcState       = NULL;
-    char* pcEvent       = NULL;
-    char* pcProtocol    = NULL;
+    char* pcState    = NULL;
+    char* pcEvent    = NULL;
+    char* pcProtocol = NULL;
 
-    if( ( NULL != pxSMBusProfile ) &&
+    if ( ( NULL != pxSMBusProfile ) &&
         ( NULL != pcLogBuffer )    &&
         ( NULL != pslLineSize ) )
     {
-        switch( pxSMBusProfile->xCircularBuffer[entry].xEvent )
+        switch ( pxSMBusProfile->xCircularBuf[entry].xEvent )
         {
-        case SMBUS_LOG_EVENT_TRYWRITE:          /* Fall through deliberate */
-        case SMBUS_LOG_EVENT_TRYREAD:           /* Fall through deliberate */
-        case SMBUS_LOG_EVENT_DEBUG:
-            *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d 0x%08x line %d\r\n", entry,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulTicks,
-            prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuffer[entry].xEvent ),
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulInstance,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulEntry1,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulEntry2 );
-            break;
+            case SMBUS_LOG_EVENT_TRYWRITE:          /* Fall through deliberate */
+            case SMBUS_LOG_EVENT_TRYREAD:           /* Fall through deliberate */
+            case SMBUS_LOG_EVENT_DEBUG:
+                *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d 0x%08x line %d\r\n", entry,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulTicks,
+                    prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuf[entry].xEvent ),
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulInstance,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulEntry1,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulEntry2 );
+                break;
 
-        case SMBUS_LOG_EVENT_PROTOCOL:
-            pcProtocol = pcProtocolToString( pxSMBusProfile->xCircularBuffer[entry].ulEntry2 );
-            *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d 0x%08x %s\r\n", entry,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulTicks,
-            prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuffer[entry].xEvent ),
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulInstance,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulEntry1,
-            pcProtocol );
-            break;
+            case SMBUS_LOG_EVENT_PROTOCOL:
+                pcProtocol = pcProtocolToString( pxSMBusProfile->xCircularBuf[entry].ulEntry2 );
+                *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d 0x%08x %s\r\n", entry,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulTicks,
+                    prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuf[entry].xEvent ),
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulInstance,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulEntry1,
+                    pcProtocol );
+                break;
 
-        case SMBUS_LOG_EVENT_HW_WRITE:          /* Fall through deliberate */
-        case SMBUS_LOG_EVENT_HW_READ:           /* Fall through deliberate */
-        case SMBUS_LOG_EVENT_INTERRUPT_EVENT:
-            *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d 0x%08x 0x%08x\r\n", entry,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulTicks,
-            prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuffer[entry].xEvent ),
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulInstance,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulEntry1,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulEntry2 );
-            break;
+            case SMBUS_LOG_EVENT_HW_WRITE:          /* Fall through deliberate */
+            case SMBUS_LOG_EVENT_HW_READ:           /* Fall through deliberate */
+            case SMBUS_LOG_EVENT_INTERRUPT_EVENT:
+                *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d 0x%08x 0x%08x\r\n", entry,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulTicks,
+                    prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuf[entry].xEvent ),
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulInstance,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulEntry1,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulEntry2 );
+                break;
 
-        case SMBUS_LOG_EVENT_ERROR:         /* Fall through deliberate */
-        case SMBUS_LOG_EVENT_FSM_EVENT:
-            pcState = ( char* )pcStateToString( pxSMBusProfile->xCircularBuffer[entry].ulEntry1 );
-            pcEvent = ( char* )pcEventToString( pxSMBusProfile->xCircularBuffer[entry].ulEntry2 );
-            *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d %s %s\r\n", entry,
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulTicks,
-            prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuffer[entry].xEvent ),
-            ( unsigned int )pxSMBusProfile->xCircularBuffer[entry].ulInstance, pcState, pcEvent );
-            break;
+            case SMBUS_LOG_EVENT_ERROR:         /* Fall through deliberate */
+            case SMBUS_LOG_EVENT_FSM_EVENT:
+                pcState = ( char* )pcStateToString( pxSMBusProfile->xCircularBuf[entry].ulEntry1 );
+                pcEvent = ( char* )pcEventToString( pxSMBusProfile->xCircularBuf[entry].ulEntry2 );
+                *pslLineSize = sprintf( pcLogBuffer, "%04d %07d %s %2d %s %s\r\n", entry,
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulTicks,
+                    prvpcConvertEventTypeToText( pxSMBusProfile->xCircularBuf[entry].xEvent ),
+                    ( unsigned int )pxSMBusProfile->xCircularBuf[entry].ulInstance, pcState, pcEvent );
+                break;
 
-        default:
-            *pslLineSize = 0;
-            break;
+            default:
+                *pslLineSize = 0;
+                break;
         }
     }
 }
 
 /**
-*
-* @brief    Will retreive the log as a character string
-*
-*/
-void vLogDisplayLog( SMBUS_PROFILE_TYPE* pxSMBusProfile, char* pcLogBuffer, uint32_t* usLogSizeBytes )
+ * @brief    Will retreive the log as a character string
+ */
+void vLogDisplayLog( SMBus_Profile* pxSMBusProfile, char* pcLogBuffer, uint32_t* usLogSizeBytes )
 {
-    int slStart         = 0;
-    int i               = 0;
-    int slLineSize      = 0;
-    uint32_t usLogSize  = 0;
+    int slStart        = 0;
+    int i              = 0;
+    int slLineSize     = 0;
+    uint32_t usLogSize = 0;
 
-    if( ( NULL != pxSMBusProfile ) &&
-        ( NULL != pcLogBuffer )    &&
-        ( NULL != usLogSizeBytes ) )
+    if ( ( NULL != pxSMBusProfile ) &&
+         ( NULL != pcLogBuffer )    &&
+         ( NULL != usLogSizeBytes ) )
     {
-        slStart = pxSMBusProfile->xLogCircularBuffer.ulWrite;
+        slStart = pxSMBusProfile->xLogCircularBuf.ulWrite;
 
-        for( i = slStart; i < SMBUS_MAX_CIRCULAR_LOG_ENTRIES; i++ )
+        for ( i = slStart; i < SMBUS_MAX_CIRCULAR_LOG_ENTRIES; i++ )
         {
-            if( SMBUS_LOG_IS_OCCUPIED == pxSMBusProfile->xCircularBuffer[i].ulIsOccupied )
+            if ( SMBUS_LOG_IS_OCCUPIED == pxSMBusProfile->xCircularBuf[i].ulIsOccupied )
             {
                 prvvFormatLine( pxSMBusProfile, i, (pcLogBuffer + usLogSize), &slLineSize );
                 usLogSize += ( uint32_t )slLineSize;
             }
         }
 
-        for( i = 0; i < slStart; i++ )
+        for ( i = 0; i < slStart; i++ )
         {
-            if( SMBUS_LOG_IS_OCCUPIED == pxSMBusProfile->xCircularBuffer[i].ulIsOccupied )
+            if ( SMBUS_LOG_IS_OCCUPIED == pxSMBusProfile->xCircularBuf[i].ulIsOccupied )
             {
                 prvvFormatLine( pxSMBusProfile, i, ( pcLogBuffer + usLogSize ), &slLineSize );
                 usLogSize += ( uint32_t )slLineSize;
@@ -210,65 +178,59 @@ void vLogDisplayLog( SMBUS_PROFILE_TYPE* pxSMBusProfile, char* pcLogBuffer, uint
 }
 
 /**
-*
-* @brief    Initializes the debug log. Setting its pointer to zero
-*
-*/
-void vLogInitialize( SMBUS_PROFILE_TYPE* pxSMBusProfile )
+ * @brief    Initializes the debug log. Setting its pointer to zero
+ */
+void vLogInitialize( SMBus_Profile* pxSMBusProfile )
 {
     uint32_t i = 0;
 
-    if( NULL != pxSMBusProfile )
+    if ( NULL != pxSMBusProfile )
     {
-        for( i = 0; i < ( SMBUS_MAX_CIRCULAR_LOG_ENTRIES ); i++ )
+        for ( i = 0; i < ( SMBUS_MAX_CIRCULAR_LOG_ENTRIES ); i++ )
         {
-            pxSMBusProfile->xCircularBuffer[i].ulIsOccupied = SMBUS_LOG_IS_NOT_OCCUPIED;
-            pxSMBusProfile->xCircularBuffer[i].ulEntry1 = 0x00;
-            pxSMBusProfile->xCircularBuffer[i].ulEntry2 = 0x00;
-            pxSMBusProfile->xCircularBuffer[i].ulTicks = 0x00;
+            pxSMBusProfile->xCircularBuf[i].ulIsOccupied = SMBUS_LOG_IS_NOT_OCCUPIED;
+            pxSMBusProfile->xCircularBuf[i].ulEntry1 = 0x00;
+            pxSMBusProfile->xCircularBuf[i].ulEntry2 = 0x00;
+            pxSMBusProfile->xCircularBuf[i].ulTicks = 0x00;
         }
 
-        pxSMBusProfile->xLogCircularBuffer.ulWrite = 0;
-        pxSMBusProfile->xLogCircularBuffer.ulRead = 0;
+        pxSMBusProfile->xLogCircularBuf.ulWrite = 0;
+        pxSMBusProfile->xLogCircularBuf.ulRead = 0;
     }
 }
 
 /**
-*
-* @brief    Will add a log entry into the debug log
-*
-*/
-void vLogAddEntry( SMBUS_PROFILE_TYPE* pxSMBusProfile, SMBUS_LOG_LEVEL_TYPE xLogLevel, uint32_t ulInstance,
-                    SMBUS_LOG_EVENT_TYPE  Log_Event, uint32_t ulEntry1, uint32_t ulEntry2 )
+ * @brief    Will add a log entry into the debug log
+ */
+void vLogAddEntry( SMBus_Profile* pxSMBusProfile, SMBUS_LOG_LEVEL xLogLevel, uint32_t ulInstance,
+                   SMBUS_LOG_EVENT  Log_Event, uint32_t ulEntry1, uint32_t ulEntry2 )
 {
-    uint32_t ulTicks  = 0;
+    uint32_t ulTicks = 0;
 
-    if( NULL != pxSMBusProfile )
+    if ( ( NULL != pxSMBusProfile ) &&
+     ( xLogLevel <= pxSMBusProfile->xLogLevel ) )
     {
-        if( xLogLevel <= pxSMBusProfile->xLogLevel )
+        if ( NULL != pxSMBusProfile->pFnReadTicks )
         {
-            if( NULL != pxSMBusProfile->pFnReadTicks )
-            {
-                pxSMBusProfile->pFnReadTicks( &ulTicks );
-            }
+            pxSMBusProfile->pFnReadTicks( &ulTicks );
+        }
 
-            pxSMBusProfile->xCircularBuffer[pxSMBusProfile->xLogCircularBuffer.ulWrite].ulTicks = ulTicks;
-            pxSMBusProfile->xCircularBuffer[pxSMBusProfile->xLogCircularBuffer.ulWrite].xEvent = Log_Event;
-            pxSMBusProfile->xCircularBuffer[pxSMBusProfile->xLogCircularBuffer.ulWrite].ulInstance = ulInstance;
-            pxSMBusProfile->xCircularBuffer[pxSMBusProfile->xLogCircularBuffer.ulWrite].ulEntry1 = ulEntry1;
-            pxSMBusProfile->xCircularBuffer[pxSMBusProfile->xLogCircularBuffer.ulWrite].ulEntry2 = ulEntry2;
-            pxSMBusProfile->xCircularBuffer[pxSMBusProfile->xLogCircularBuffer.ulWrite].ulIsOccupied = SMBUS_LOG_IS_OCCUPIED;
+        pxSMBusProfile->xCircularBuf[pxSMBusProfile->xLogCircularBuf.ulWrite].ulTicks = ulTicks;
+        pxSMBusProfile->xCircularBuf[pxSMBusProfile->xLogCircularBuf.ulWrite].xEvent = Log_Event;
+        pxSMBusProfile->xCircularBuf[pxSMBusProfile->xLogCircularBuf.ulWrite].ulInstance = ulInstance;
+        pxSMBusProfile->xCircularBuf[pxSMBusProfile->xLogCircularBuf.ulWrite].ulEntry1 = ulEntry1;
+        pxSMBusProfile->xCircularBuf[pxSMBusProfile->xLogCircularBuf.ulWrite].ulEntry2 = ulEntry2;
+        pxSMBusProfile->xCircularBuf[pxSMBusProfile->xLogCircularBuf.ulWrite].ulIsOccupied = SMBUS_LOG_IS_OCCUPIED;
 
-            if( (SMBUS_MAX_CIRCULAR_LOG_ENTRIES - 1)  <= pxSMBusProfile->xLogCircularBuffer.ulWrite )
-            {
-                /* For debug Just write over last log */
-                pxSMBusProfile->xLogCircularBuffer.ulWrite = ( SMBUS_MAX_CIRCULAR_LOG_ENTRIES - 1 );
-                /* pxSMBusProfile->xLogCircularBuffer.ulWrite = 0; */
-            }
-            else
-            {
-                pxSMBusProfile->xLogCircularBuffer.ulWrite++;
-            }
+        if ( (SMBUS_MAX_CIRCULAR_LOG_ENTRIES - 1)  <= pxSMBusProfile->xLogCircularBuf.ulWrite )
+        {
+            /* For debug Just write over last log */
+            pxSMBusProfile->xLogCircularBuf.ulWrite = SMBUS_MAX_CIRCULAR_LOG_ENTRIES - 1;
+            /* pxSMBusProfile->xLogCircularBuf.ulWrite = 0; */
+        }
+        else
+        {
+            pxSMBusProfile->xLogCircularBuf.ulWrite++;
         }
     }
 }

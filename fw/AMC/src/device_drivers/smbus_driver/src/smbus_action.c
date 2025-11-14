@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the action functions to either generate new events, determine a protocol
@@ -14,14 +14,12 @@
 #include "smbus_internal.h"
 #include "smbus_action.h"
 #include "smbus_event.h"
-#include "smbus_hardware_access.h"
+#include "smbus_hw_access.h"
 
-/******************************************************************************
-*
-* @brief    Clears all actions that have been raised against the specified instance.
-*
-*****************************************************************************/
-void vSMBusClearAction( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Clears all actions that have been raised against the specified instance.
+ */
+void vSMBusClearAction( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -29,12 +27,10 @@ void vSMBusClearAction( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
     }
 }
 
-/******************************************************************************
-*
-* @brief    Sets a specific actions against the specified instance
-*
-*****************************************************************************/
-void vSMBusAction( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint32_t ulAnyAction )
+/**
+ * @brief    Sets a specific actions against the specified instance
+ */
+void vSMBusAction( SMBus_Instance* pxSMBusInstance, uint32_t ulAnyAction )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -42,37 +38,35 @@ void vSMBusAction( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint32_t ulAnyAction )
     }
 }
 
-/******************************************************************************
-*
-* @brief    Resets all variables used during an SMBus message transaction back
-*           to their default values
-*           Resets the IP's Descriptor and RX FIFOs
-*
-*****************************************************************************/
-void vSMBusHandleActionResetAllData( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Resets all variables used during an SMBus message transaction back
+ *           to their default values
+ *           Resets the IP's Descriptor and RX FIFOs
+ */
+void vSMBusHandleActionResetAllData( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
-        pxSMBusInstance->ucCommand                      = SMBUS_COMMAND_INVALID;
-        pxSMBusInstance->xProtocol                      = SMBUS_PROTOCOL_NONE;
-        pxSMBusInstance->usSendDataSize                 = 0;
-        pxSMBusInstance->usSendIndex                    = 0;
-        pxSMBusInstance->usReceiveIndex                 = 0;
-        pxSMBusInstance->usExpectedByteCount            = 0;
-        pxSMBusInstance->ucNewDeviceSlaveAddress        = 0;
-        pxSMBusInstance->ucNackSent                     = SMBUS_FALSE;
-        pxSMBusInstance->usDescriptorsSent              = 0;
-        pxSMBusInstance->ucPECSent                      = SMBUS_FALSE;
-        pxSMBusInstance->ucFifoEmptyWhileInDoneCount    = 0;
-        pxSMBusInstance->ucUDIDMatchedInstance          = SMBUS_INVALID_INSTANCE;
+        pxSMBusInstance->ucCommand                   = SMBUS_COMMAND_INVALID;
+        pxSMBusInstance->xProtocol                   = SMBUS_PROTOCOL_NONE;
+        pxSMBusInstance->usSendDataSize              = 0;
+        pxSMBusInstance->usSendIndex                 = 0;
+        pxSMBusInstance->usReceiveIndex              = 0;
+        pxSMBusInstance->usExpectedByteCount         = 0;
+        pxSMBusInstance->ucNewDeviceSlaveAddr        = 0;
+        pxSMBusInstance->ucNackSent                  = SMBUS_FALSE;
+        pxSMBusInstance->usDescriptorsSent           = 0;
+        pxSMBusInstance->ucPECSent                   = SMBUS_FALSE;
+        pxSMBusInstance->ucFifoEmptyWhileInDoneCount = 0;
+        pxSMBusInstance->ucUDIDMatchedInstance       = SMBUS_INVALID_INSTANCE;
 
-        SMBUS_PROFILE_TYPE* pxSMBusProfile = pxSMBusInstance->pxSMBusProfile;
+        SMBus_Profile* pxSMBusProfile = pxSMBusInstance->pxSMBusProfile;
 
         vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_DEBUG,
-                        pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_DEBUG,
-                        ( uint32_t )pxSMBusInstance->ucThisInstanceNumber, __LINE__ );
+                        pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_DEBUG,
+                        ( uint32_t )pxSMBusInstance->ucThisInstanceNum, __LINE__ );
 
-        if( pxSMBusInstance->ucThisInstanceNumber == pxSMBusProfile->ucInstanceInPlay ) /* This is controller */
+        if( pxSMBusInstance->ucThisInstanceNum == pxSMBusProfile->ucInstanceInPlay ) /* This is controller */
         {
             pxSMBusProfile->ucInstanceInPlay = SMBUS_INVALID_INSTANCE;
 
@@ -99,12 +93,10 @@ void vSMBusHandleActionResetAllData( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
     }
 }
 
-/******************************************************************************
-*
-* @brief    Generates an E_IS_PEC_REQUIRED event against the specified instance
-*
-*****************************************************************************/
-void vSMBusHandleActionCreateEventIsPECRequired( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Generates an E_IS_PEC_REQUIRED event against the specified instance
+ */
+void vSMBusHandleActionCreateEventIsPECRequired( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -112,12 +104,10 @@ void vSMBusHandleActionCreateEventIsPECRequired( SMBUS_INSTANCE_TYPE* pxSMBusIns
     }
 }
 
-/******************************************************************************
-*
-* @brief    Generates an E_SEND_NEXT_BYTE event against the specified instance
-*
-*****************************************************************************/
-void vSMBusHandleActionCreateEventSendNextByte( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Generates an E_SEND_NEXT_BYTE event against the specified instance
+ */
+void vSMBusHandleActionCreateEventSendNextByte( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -125,16 +115,14 @@ void vSMBusHandleActionCreateEventSendNextByte( SMBUS_INSTANCE_TYPE* pxSMBusInst
     }
 }
 
-/******************************************************************************
-*
-* @brief    Reads the command byte from the Target RX FIFO, calls the callback function
-*           for the specified instance to get the SMBus protocol associated with the
-*           command byte and stores that protocol in the instance structure
-*
-*****************************************************************************/
-void vSMBusHandleActionGetProtocol( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Reads the command byte from the Target RX FIFO, calls the callback function
+ *           for the specified instance to get the SMBus protocol associated with the
+ *           command byte and stores that protocol in the instance structure
+ */
+void vSMBusHandleActionGetProtocol( SMBus_Instance* pxSMBusInstance )
 {
-    SMBus_Command_Protocol_Type xTempProtocol = SMBUS_PROTOCOL_NONE;
+    SMBUS_COMMAND_PROTOCOL xTempProtocol = SMBUS_PROTOCOL_NONE;
 
     if( ( NULL != pxSMBusInstance ) &&
         ( NULL != pxSMBusInstance->pFnGetProtocol ) )
@@ -146,25 +134,23 @@ void vSMBusHandleActionGetProtocol( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
             pxSMBusInstance->pFnGetProtocol( ucCommand, &xTempProtocol );
             pxSMBusInstance->xProtocol = xTempProtocol;
             vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_INFO,
-                            pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_PROTOCOL,
+                            pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_PROTOCOL,
                             ( uint32_t )ucCommand, ( uint32_t )pxSMBusInstance->xProtocol );
         }
         else
         {
             vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_ERROR,
-                            pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
+                            pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
         }
     }
 }
 
-/******************************************************************************
-*
-* @brief    Reads the command byte from the Target RX FIFO for the ARP instance,
-*           determines the ARP protocol associated with the command byte,
-*           stores that protocol in the instance structure
-*
-*****************************************************************************/
-uint8_t ucSMBusHandleActionGetARPProtocol( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Reads the command byte from the Target RX FIFO for the ARP instance,
+ *           determines the ARP protocol associated with the command byte,
+ *           stores that protocol in the instance structure
+ */
+uint8_t ucSMBusHandleActionGetARPProtocol( SMBus_Instance* pxSMBusInstance )
 {
     uint8_t ucReturnCode = SMBUS_ACTION_ARP_PROTOCOL_DETERMINED;
     uint8_t ucARPCommand = 0;
@@ -179,73 +165,73 @@ uint8_t ucSMBusHandleActionGetARPProtocol( SMBUS_INSTANCE_TYPE* pxSMBusInstance 
 
             switch( ucARPCommand )
             {
-            case 0x01:
-                pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_PREPARE_TO_ARP;
-                break;
+                case 0x01:
+                    pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_PREPARE_TO_ARP;
+                    break;
 
-            case 0x02:
-                pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_RESET_DEVICE;
-                break;
+                case 0x02:
+                    pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_RESET_DEVICE;
+                    break;
 
-            case 0x03:
-                pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_GET_UDID;
-                break;
+                case 0x03:
+                    pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_GET_UDID;
+                    break;
 
-            case 0x04:
-                pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_ASSIGN_ADDRESS;
-                break;
+                case 0x04:
+                    pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_ASSIGN_ADDRESS;
+                    break;
 
-            case 0x00:
-            case 0x05:
-            case 0x06:
-            case 0x07:
-            case 0x08:
-            case 0x09:
-            case 0x0a:
-            case 0x0b:
-            case 0x0c:
-            case 0x0d:
-            case 0x0e:
-            case 0x0f:
-            case 0x10:
-            case 0x11:
-            case 0x12:
-            case 0x13:
-            case 0x14:
-            case 0x15:
-            case 0x16:
-            case 0x17:
-            case 0x18:
-            case 0x19:
-            case 0x1a:
-            case 0x1b:
-            case 0x1c:
-            case 0x1d:
-            case 0x1e:
-            case 0x1f:
-                /* Reserved */
-                ucReturnCode = SMBUS_ACTION_ARP_PROTOCOL_UNDETERMINED;
-                break;
+                case 0x00:
+                case 0x05:
+                case 0x06:
+                case 0x07:
+                case 0x08:
+                case 0x09:
+                case 0x0a:
+                case 0x0b:
+                case 0x0c:
+                case 0x0d:
+                case 0x0e:
+                case 0x0f:
+                case 0x10:
+                case 0x11:
+                case 0x12:
+                case 0x13:
+                case 0x14:
+                case 0x15:
+                case 0x16:
+                case 0x17:
+                case 0x18:
+                case 0x19:
+                case 0x1a:
+                case 0x1b:
+                case 0x1c:
+                case 0x1d:
+                case 0x1e:
+                case 0x1f:
+                    /* Reserved */
+                    ucReturnCode = SMBUS_ACTION_ARP_PROTOCOL_UNDETERMINED;
+                    break;
 
-            default:
-                /* Anything else is a directed ARP command */
-                if( SMBUS_ARP_UDID_DIRECTED_COMMAND == ( ucARPCommand & SMBUS_ARP_DIRECTED_COMMAND_MASK ) )
-                {
-                    pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_GET_UDID_DIRECTED;
-                }
-                else
-                {
-                    pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_RESET_DEVICE_DIRECTED;
-                }
+                default:
+                    /* Anything else is a directed ARP command */
+                    if( SMBUS_ARP_UDID_DIRECTED_COMMAND == ( ucARPCommand & SMBUS_ARP_DIRECTED_COMMAND_MASK ) )
+                    {
+                        pxSMBusInstance->xProtocol = SMBUS_ARP_PROTOCOL_GET_UDID_DIRECTED;
+                    }
+                    else
+                    {
+                        pxSMBusInstance->xProtocol = SMBUS_ARP_PROTO_RESET_DEVICE_DIRECTED;
+                    }
 
-                pxSMBusInstance->ucMatchedSMBusAddress = ( ucARPCommand & SMBUS_ARP_DIRECTED_COMMAND_ADDRESS_MASK ) >> 1;
-                break;
+                    pxSMBusInstance->ucMatchedSMBusAddr = ( ucARPCommand & SMBUS_ARP_DIRECTED_COMMAND_ADDRESS_MASK ) >> 1;
+                    break;
             }
         }
         else
         {
             vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_ERROR,
-                            pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
+                            pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
             ucReturnCode = SMBUS_ACTION_ARP_PROTOCOL_UNDETERMINED;
         }
     }
@@ -254,18 +240,16 @@ uint8_t ucSMBusHandleActionGetARPProtocol( SMBUS_INSTANCE_TYPE* pxSMBusInstance 
         ucReturnCode = SMBUS_ACTION_ARP_PROTOCOL_UNDETERMINED;
     }
 
-    return( ucReturnCode );
+    return ucReturnCode;
 }
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to read data from the application software
-*           for the specified instance is present.
-*           If present it is called for the current SMBus command.
-*           The callback function must return the data and size of data for the command.
-*
-*****************************************************************************/
-void vSMBusHandleActionGetDataFromApplication( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Checks if a callback function to read data from the application software
+ *           for the specified instance is present.
+ *           If present it is called for the current SMBus command.
+ *           The callback function must return the data and size of data for the command.
+ */
+void vSMBusHandleActionGetDataFromApplication( SMBus_Instance* pxSMBusInstance )
 {
     uint8_t     ucTempSendData[SMBUS_DATA_SIZE_MAX] = { 0 };
     uint16_t    usTempSendDataSize                  = 0;
@@ -281,48 +265,46 @@ void vSMBusHandleActionGetDataFromApplication( SMBUS_INSTANCE_TYPE* pxSMBusInsta
 
             switch( pxSMBusInstance->xProtocol )
             {
-            case SMBUS_PROTOCOL_READ_64:
-                pxSMBusInstance->usSendDataSize = 8;
-                break;
-            case SMBUS_PROTOCOL_READ_32:
-                pxSMBusInstance->usSendDataSize = 4;
-                break;
-            case SMBUS_PROTOCOL_READ_WORD:
-                pxSMBusInstance->usSendDataSize = 2;
-                break;
-            case SMBUS_PROTOCOL_READ_BYTE:
-                pxSMBusInstance->usSendDataSize = 1;
-                break;
-            case SMBUS_PROTOCOL_PROCESS_CALL:
-                pxSMBusInstance->usSendDataSize = 2;
-                break;
-            case SMBUS_PROTOCOL_RECEIVE_BYTE:
-                pxSMBusInstance->usSendDataSize = 1;
-                break;
-            default:
-                pxSMBusInstance->usSendDataSize = usTempSendDataSize;
-                break;
+                case SMBUS_PROTOCOL_READ_64:
+                    pxSMBusInstance->usSendDataSize = 8;
+                    break;
+                case SMBUS_PROTOCOL_READ_32:
+                    pxSMBusInstance->usSendDataSize = 4;
+                    break;
+                case SMBUS_PROTOCOL_READ_WORD:
+                    pxSMBusInstance->usSendDataSize = 2;
+                    break;
+                case SMBUS_PROTOCOL_READ_BYTE:
+                    pxSMBusInstance->usSendDataSize = 1;
+                    break;
+                case SMBUS_PROTOCOL_PROCESS_CALL:
+                    pxSMBusInstance->usSendDataSize = 2;
+                    break;
+                case SMBUS_PROTOCOL_RECEIVE_BYTE:
+                    pxSMBusInstance->usSendDataSize = 1;
+                    break;
+                default:
+                    pxSMBusInstance->usSendDataSize = usTempSendDataSize;
+                    break;
             }
         }
         else
         {
             vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_ERROR,
-                            pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
+                          pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
         }
     }
 }
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to write data to the application software
-*           for the specified instance is present.
-*           If present it is called for the current SMBus command.
-*           The callback function write the command, data and size of data and transaction ID.
-*
-*****************************************************************************/
-void vSMBusHandleActionWriteDataToApplication( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucTransactionID )
+/**
+ * @brief    Checks if a callback function to write data to the application software
+ *           for the specified instance is present.
+ *           If present it is called for the current SMBus command.
+ *           The callback function write the command, data and size of data and transaction ID.
+ */
+void vSMBusHandleActionWriteDataToApplication( SMBus_Instance* pxSMBusInstance, uint8_t ucTransactionID )
 {
-    SMBUS_PROFILE_TYPE* pxSMBusProfile = NULL;
+    SMBus_Profile* pxSMBusProfile = NULL;
 	uint8_t	ucTempReceivedData[SMBUS_DATA_SIZE_MAX] = { 0 };
 
     if( ( NULL != pxSMBusInstance ) &&
@@ -331,7 +313,7 @@ void vSMBusHandleActionWriteDataToApplication( SMBUS_INSTANCE_TYPE* pxSMBusInsta
         pxSMBusProfile = pxSMBusInstance->pxSMBusProfile;
 
         /* Only return the tranaction ID for Controller */
-        if( pxSMBusInstance->ucThisInstanceNumber != pxSMBusProfile->ucInstanceInPlay )
+        if( pxSMBusInstance->ucThisInstanceNum != pxSMBusProfile->ucInstanceInPlay )
         {
             ucTransactionID = 0;
         }
@@ -339,22 +321,20 @@ void vSMBusHandleActionWriteDataToApplication( SMBUS_INSTANCE_TYPE* pxSMBusInsta
         memcpy( ucTempReceivedData, pxSMBusInstance->ucReceivedData, pxSMBusInstance->usExpectedByteCount );
 
         pxSMBusInstance->pFnWriteData( pxSMBusInstance->ucCommand, ucTempReceivedData,
-                                        pxSMBusInstance->usExpectedByteCount, ucTransactionID );
+                                       pxSMBusInstance->usExpectedByteCount, ucTransactionID );
     }
 }
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to announce the result of the SMBus transaction
-*           for the specified instance is present.
-*           If present the callback is called.
-*           The callback function will include the command, transaction ID and the result
-*
-*****************************************************************************/
-void vSMBusHandleActionAnnounceResultToApplication( SMBUS_INSTANCE_TYPE* pxSMBusInstance,
-                                                        uint8_t ucTransactionID, uint32_t ulStatus )
+/**
+ * @brief    Checks if a callback function to announce the result of the SMBus transaction
+ *           for the specified instance is present.
+ *           If present the callback is called.
+ *           The callback function will include the command, transaction ID and the result
+ */
+void vSMBusHandleActionAnnounceResultToApplication( SMBus_Instance* pxSMBusInstance,
+                                                    uint8_t ucTransactionID, uint32_t ulStatus )
 {
-    SMBUS_PROFILE_TYPE* pxSMBusProfile = NULL;
+    SMBus_Profile* pxSMBusProfile = NULL;
 
     if( ( NULL != pxSMBusInstance ) &&
         ( NULL != pxSMBusInstance->pFnAnnounceResult ) )
@@ -362,7 +342,7 @@ void vSMBusHandleActionAnnounceResultToApplication( SMBUS_INSTANCE_TYPE* pxSMBus
         pxSMBusProfile = pxSMBusInstance->pxSMBusProfile;
 
         /* Only return the tranaction ID for Controller */
-        if( pxSMBusInstance->ucThisInstanceNumber != pxSMBusProfile->ucInstanceInPlay )
+        if( pxSMBusInstance->ucThisInstanceNum != pxSMBusProfile->ucInstanceInPlay )
         {
             ucTransactionID = 0;
         }
@@ -370,33 +350,29 @@ void vSMBusHandleActionAnnounceResultToApplication( SMBUS_INSTANCE_TYPE* pxSMBus
     }
 }
 
-/******************************************************************************
-*
+/**
 * @brief    Checks if a callback function to announce that an ARP Assign Address
 *           for the specified instance is present.
 *           If present the callback is called.
 *           The callback function will include the newly assigned address
-*
-*****************************************************************************/
-void vSMBusHandleActionNotifyAddressChangeToApplication( SMBUS_INSTANCE_TYPE* pxSMBusInstance,
-                                                                uint8_t ucTransactionID )
+*/
+void vSMBusHandleActionNotifyAddressChangeToApplication( SMBus_Instance* pxSMBusInstance,
+                                                         uint8_t ucTransactionID )
 {
     if( ( NULL != pxSMBusInstance ) &&
-        ( NULL != pxSMBusInstance->pFnArpAddressChange ) )
+        ( NULL != pxSMBusInstance->pFnArpAddrChange ) )
     {
-        pxSMBusInstance->pFnArpAddressChange( pxSMBusInstance->ucSMBusAddress );
+        pxSMBusInstance->pFnArpAddrChange( pxSMBusInstance->ucSMBusAddr );
     }
 }
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to announce an SMBuss Error
-*           for the specified instance is present.
-*           If present the callback is called.
-*           The callback function will include the error type
-*
-*****************************************************************************/
-void vSMBusHandleActionBusError( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucError )
+/**
+ * @brief    Checks if a callback function to announce an SMBuss Error
+ *           for the specified instance is present.
+ *           If present the callback is called.
+ *           The callback function will include the error type
+ */
+void vSMBusHandleActionBusError( SMBus_Instance* pxSMBusInstance, uint8_t ucError )
 {
     if( ( NULL != pxSMBusInstance ) &&
         ( NULL != pxSMBusInstance->pFnBusError ) )
@@ -405,15 +381,13 @@ void vSMBusHandleActionBusError( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t u
     }
 }
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to announce an SMBuss Warning
-*           for the specified instance is present.
-*           If present the callback is called.
-*           The callback function will include the warning type
-*
-*****************************************************************************/
-void vSMBusHandleActionBusWarning( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucWarning )
+/**
+ * @brief    Checks if a callback function to announce an SMBuss Warning
+ *           for the specified instance is present.
+ *           If present the callback is called.
+ *           The callback function will include the warning type
+ */
+void vSMBusHandleActionBusWarning( SMBus_Instance* pxSMBusInstance, uint8_t ucWarning )
 {
     if( ( NULL != pxSMBusInstance ) &&
         ( NULL != pxSMBusInstance->pFnBusWarning ) )
@@ -422,15 +396,13 @@ void vSMBusHandleActionBusWarning( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t
     }
 }
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to read data from the application software
-*           for the specified instance is present.
-*           If present it is called for the current I2C transaction.
-*           The callback function must return the data and size of data for the transaction.
-*
-*****************************************************************************/
-void vSMBusHandleActionGetI2CDataFromApplication( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Checks if a callback function to read data from the application software
+ *           for the specified instance is present.
+ *           If present it is called for the current I2C transaction.
+ *           The callback function must return the data and size of data for the transaction.
+ */
+void vSMBusHandleActionGetI2CDataFromApplication( SMBus_Instance* pxSMBusInstance )
 {
     uint8_t     ucTempSendData[SMBUS_DATA_SIZE_MAX] = { 0 };
     uint16_t    usTempSendDataSize                  = 0;
@@ -448,20 +420,18 @@ void vSMBusHandleActionGetI2CDataFromApplication( SMBUS_INSTANCE_TYPE* pxSMBusIn
         else
         {
             vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_ERROR,
-                            pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
+                            pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_ERROR, 0, __LINE__ );
         }
     }
 }
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to write data to the application software
-*           for the specified instance is present.
-*           If present it is called for the current I2C transaction.
-*           The callback function write the data and size of data and transaction ID.
-*
-*****************************************************************************/
-void vSMBusHandleActionWriteI2CDataToApplication( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    Checks if a callback function to write data to the application software
+ *           for the specified instance is present.
+ *           If present it is called for the current I2C transaction.
+ *           The callback function write the data and size of data and transaction ID.
+ */
+void vSMBusHandleActionWriteI2CDataToApplication( SMBus_Instance* pxSMBusInstance )
 {
 	uint8_t	ucTempReceivedData[SMBUS_DATA_SIZE_MAX] = { 0 };
 
@@ -476,15 +446,13 @@ void vSMBusHandleActionWriteI2CDataToApplication( SMBUS_INSTANCE_TYPE* pxSMBusIn
 }
 
 
-/******************************************************************************
-*
-* @brief    Checks if a callback function to write data to the application software
-*           for the specified instance is present.
-*           If present it is called for the current I2C transaction.
-*           The callback function write the data and size of data and transaction ID.
-*
-*****************************************************************************/
-void vSMBusHandleActionAnnounceI2CResultToApplication( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint32_t ulStatus )
+/**
+ * @brief    Checks if a callback function to write data to the application software
+ *           for the specified instance is present.
+ *           If present it is called for the current I2C transaction.
+ *           The callback function write the data and size of data and transaction ID.
+ */
+void vSMBusHandleActionAnnounceI2CResultToApplication( SMBus_Instance* pxSMBusInstance, uint32_t ulStatus )
 {
     if( ( NULL != pxSMBusInstance ) &&
         ( NULL != pxSMBusInstance->pFnI2CAnnounceResult ) )

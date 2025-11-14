@@ -2,7 +2,7 @@
  * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the ASDM (Alveo Data Store Model) implementation details
+ * This file contains the ASDM (AMR Data Store Model) implementation details
  *
  * @file asdm.c
  *

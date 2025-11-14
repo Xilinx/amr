@@ -15,7 +15,7 @@ SPDX-License-Identifier: MIT
 ## Typedefs
 ```sh
 /*
- * @typedef I2C_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE
+ * @typedef I2C_USER_ENV_GET_DATA_TYPE
  * @brief   This callback updates the initialiser with new data
  *
  * @param   pucData     pointer to the new data read
@@ -23,10 +23,10 @@ SPDX-License-Identifier: MIT
  *
  * @return  void
  */
-typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE )( uint8_t* pucData, uint16_t* pusDataSize );
+typedef void ( *I2C_USER_ENV_GET_DATA_TYPE )( uint8_t* pucData, uint16_t* pusDataSize );
 
 /*
- * @typedef I2C_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE
+ * @typedef I2C_USER_ENV_WRITE_DATA_TYPE
  * @brief   This callback retrieves data from the initialiser to write
  *
  * @param   pucData     pointer to the new data to write
@@ -34,30 +34,30 @@ typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE )( uint8_t* pucData,
  *
  * @return  void
  */
-typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE )( uint8_t* pucData, uint16_t usDataSize );
+typedef void ( *I2C_USER_ENV_WRITE_DATA_TYPE )( uint8_t* pucData, uint16_t usDataSize );
 
 /*
- * @typedef I2C_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE
+ * @typedef I2C_USER_ENV_COMMAND_COMPLETE
  * @brief   This callback updates the initialiser when a command is complete
  *
  * @param   ulStatus is the status of the command
  *
  * @return  void
  */
-typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE )( uint32_t ulStatus );
+typedef void ( *I2C_USER_ENV_COMMAND_COMPLETE )( uint32_t ulStatus );
 
 /*
- * @typedef I2C_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR
+ * @typedef I2C_USER_SUPPLIED_ENV_BUS_ERROR
  * @brief   This callback updates the initialiser when there is an i2 Error
  *
  * @param   ucError is the error that was raised
  *
  * @return  void
  */
-typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR )( uint8_t ucError );
+typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_ERROR )( uint8_t ucError );
 
 /*
- * @typedef I2C_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING
+ * @typedef I2C_USER_SUPPLIED_ENV_BUS_WARNING
  *
  * @brief   This callback updates the initialiser when there is an i2c Warning
  *
@@ -65,7 +65,7 @@ typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR )( uint8_t ucError );
  *
  * @return  void
  */
-typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING )( uint8_t ucWarning );
+typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_WARNING )( uint8_t ucWarning );
 ```
 
 ## Driver External APIs
@@ -91,13 +91,13 @@ typedef void ( *I2C_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING )( uint8_t ucWarning )
  *              xInitSMBus() must have been successfully called before this.
  */
 /******************************************************************************/
-uint8_t ucI2CCreateDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
-                            uint8_t ucAddr,
-                            I2C_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE     pFnGetData,
-                            I2C_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE   pFnWriteData,
-                            I2C_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE  pFnAnnounceResult,
-                            I2C_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR         pFnBusError,
-                            I2C_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING       pFnBusWarning );
+uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
+                           uint8_t ucAddr,
+                           I2C_USER_ENV_GET_DATA_TYPE     pFnGetData,
+                           I2C_USER_ENV_WRITE_DATA_TYPE   pFnWriteData,
+                           I2C_USER_ENV_COMMAND_COMPLETE  pFnAnnounceResult,
+                           I2C_USER_SUPPLIED_ENV_BUS_ERROR         pFnBusError,
+                           I2C_USER_SUPPLIED_ENV_BUS_WARNING       pFnBusWarning );
 
 
 /******************************************************************************/
@@ -113,7 +113,7 @@ uint8_t ucI2CCreateDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
  *  @note   None
  */
 /******************************************************************************/
-uint8_t ucI2CDestroyDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
+uint8_t ucI2CDestroyDevice( I2C_Profile* pxI2cProfile,
                             uint8_t ucDeviceId );
 ```
 ### Initiate an I2C Write command
@@ -133,7 +133,7 @@ uint8_t ucI2CDestroyDevice( struct I2C_PROFILE_TYPE* pxI2cProfile,
  *
  */
 /******************************************************************************/
-uint8_t ucI2CWriteData( struct I2C_PROFILE_TYPE* pxI2cProfile,
+uint8_t ucI2CWriteData( I2C_Profile* pxI2cProfile,
                         uint8_t  ucDeviceId,
                         uint8_t  ucAddr,
                         uint8_t* pucData,
@@ -156,10 +156,10 @@ uint8_t ucI2CWriteData( struct I2C_PROFILE_TYPE* pxI2cProfile,
  *
  */
 /******************************************************************************/
-uint8_t ucI2CReadData( struct I2C_PROFILE_TYPE* pxI2cProfile,
-                        uint8_t   ucDeviceId,
-                        uint8_t   ucAddr,
-                        uint16_t  usNumBytes );
+uint8_t ucI2CReadData( I2C_Profile* pxI2cProfile,
+                       uint8_t   ucDeviceId,
+                       uint8_t   ucAddr,
+                       uint16_t  usNumBytes );
 ```
 ### Initiate an I2C Write-Read command
 ```sh
@@ -179,7 +179,7 @@ uint8_t ucI2CReadData( struct I2C_PROFILE_TYPE* pxI2cProfile,
  *
  */
 /******************************************************************************/
-uint8_t ucI2CWriteReadData( struct I2C_PROFILE_TYPE* pxI2cProfile,
+uint8_t ucI2CWriteReadData( I2C_Profile* pxI2cProfile,
                             uint8_t   ucDeviceId,
                             uint8_t   ucAddr,
                             uint8_t*  pucWriteData,

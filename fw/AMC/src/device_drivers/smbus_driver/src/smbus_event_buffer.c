@@ -10,45 +10,51 @@
 #include "smbus_internal.h"
 #include "smbus_event_buffer.h"
 
-/********************** Static function declarations ***************************/
-
-/******************************************************************************
-*
-* @brief    This function increments the event buffer index until it hits the
-*           max value at which point it sets it to 0.
-*
-* @param    pxContext is a pointer to the event buffer structure.
-* @param    ulAnyIndex is the current index position
-*
-* @return   uint32_t new index position
-*
-* @note     None.
-*
-*****************************************************************************/
-static uint32_t ulEventBufferInc( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint32_t ulAnyIndex );
-
-/*******************************************************************************/
 
 /**
-*
-* @brief    Walks through all elements of the event buffer. It sets all the elements to unoccupied
-*           and sets the event value to 0.
-*
-*/
-void vEventBufferInitialize( SMBUS_EVENT_BUFFER_TYPE* pxContext, SMBUS_EVENT_BUFFER_ELEMENT_TYPE* pxEventBuffer, uint32_t ulMaxElements )
+ * @brief    This function increments the event buffer index until it hits the
+ *           max value at which point it sets it to 0.
+ *
+ * @param    pxContext is a pointer to the event buffer structure.
+ * @param    ulAnyIndex is the current index position
+ *
+ * @return   uint32_t new index position
+ */
+ static uint32_t ulEventBufferInc( SMBus_EventBuf* pxContext, uint32_t ulAnyIndex )
+ {
+     uint32_t ulResult = ulAnyIndex;
+
+     if ( NULL != pxContext )
+     {
+         ulResult++;
+
+         if ( pxContext->ulMaxElements <= ulResult )
+         {
+             ulResult = 0;
+         }
+     }
+     return ulResult;
+ }
+
+
+/**
+ * @brief    Walks through all elements of the event buffer. It sets all the elements to unoccupied
+ *           and sets the event value to 0.
+ */
+void vEventBufferInitialize( SMBus_EventBuf* pxContext, SMBus_EventBufElement* pxEventBuf, uint32_t ulMaxElements )
 {
     uint32_t i = 0;
 
-    if( ( NULL != pxContext ) &&
-        ( NULL != pxEventBuffer ) )
+    if ( ( NULL != pxContext ) &&
+        ( NULL != pxEventBuf ) )
     {
         pxContext->ulMaxElements = ulMaxElements;
-        pxContext->pxEventBuffer = pxEventBuffer;
+        pxContext->pxEventBuf = pxEventBuf;
 
-        for( i = 0; i < ( pxContext->ulMaxElements ); i++ )
+        for ( i = 0; i < pxContext->ulMaxElements; i++ )
         {
-            pxContext->pxEventBuffer[i].ucIsOccupied = SMBUS_FALSE;
-            pxContext->pxEventBuffer[i].ucOctet = 0x00;
+            pxContext->pxEventBuf[i].ucIsOccupied = SMBUS_FALSE;
+            pxContext->pxEventBuf[i].ucOctet = 0x00;
         }
 
         pxContext->ulWrite = 0;
@@ -56,47 +62,24 @@ void vEventBufferInitialize( SMBUS_EVENT_BUFFER_TYPE* pxContext, SMBUS_EVENT_BUF
     }
 }
 
-/**
-*
-* @brief    This function increments the event buffer index until it hits the
-*           max value at which point it sets it to 0.
-*
-*/
-static uint32_t ulEventBufferInc( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint32_t ulAnyIndex )
-{
-    uint32_t ulResult = ulAnyIndex;
-
-    if( NULL != pxContext )
-    {
-        ulResult++;
-
-        if( ( pxContext->ulMaxElements ) <= ulResult )
-        {
-            ulResult = 0;
-        }
-    }
-    return ulResult;
-}
 
 /**
-*
-* @brief    If the write location is not occupied the event is written to that
-*           location. The location is marked as occupied and the write location
-*           is incremented
-*
-*/
-uint8_t ucEventBufferTryWrite( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint8_t ucAnyCharacter, uint32_t* pulWrite_Position )
+ * @brief    If the write location is not occupied the event is written to that
+ *           location. The location is marked as occupied and the write location
+ *           is incremented
+ */
+uint8_t ucEventBufferTryWrite( SMBus_EventBuf* pxContext, uint8_t ucAnyCharacter, uint32_t* pulWrite_Position )
 {
     uint8_t ucResult = SMBUS_EVENT_BUFFER_FAIL;
 
-    if( ( NULL != pxContext ) &&
+    if ( ( NULL != pxContext ) &&
         ( NULL != pulWrite_Position ) )
     {
-        if( SMBUS_FALSE == pxContext->pxEventBuffer[pxContext->ulWrite].ucIsOccupied )
+        if ( SMBUS_FALSE == pxContext->pxEventBuf[pxContext->ulWrite].ucIsOccupied )
         {
             *pulWrite_Position = pxContext->ulWrite;
-            pxContext->pxEventBuffer[pxContext->ulWrite].ucOctet = ucAnyCharacter;
-            pxContext->pxEventBuffer[pxContext->ulWrite].ucIsOccupied = SMBUS_TRUE;
+            pxContext->pxEventBuf[pxContext->ulWrite].ucOctet = ucAnyCharacter;
+            pxContext->pxEventBuf[pxContext->ulWrite].ucIsOccupied = SMBUS_TRUE;
             pxContext->ulWrite = ulEventBufferInc( pxContext, pxContext->ulWrite );
             ucResult = SMBUS_EVENT_BUFFER_SUCCESS;
         }
@@ -105,26 +88,24 @@ uint8_t ucEventBufferTryWrite( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint8_t ucAny
 }
 
 /**
-*
-* @brief    If the read location is occupied the event at the location is read
-*           The read location is then marked as empty and the read location incremented
-*
-*/
-uint8_t ucEventBufferTryRead( SMBUS_EVENT_BUFFER_TYPE* pxContext, uint8_t* pucAnyCharacter, uint32_t* pulRead_Position )
+ * @brief    If the read location is occupied the event at the location is read
+ *           The read location is then marked as empty and the read location incremented
+ */
+uint8_t ucEventBufferTryRead( SMBus_EventBuf* pxContext, uint8_t* pucAnyCharacter, uint32_t* pulRead_Position )
 {
     uint8_t ucResult = SMBUS_FALSE;
 
-    if( ( NULL != pxContext ) &&
+    if ( ( NULL != pxContext ) &&
         ( NULL != pucAnyCharacter ) &&
         ( NULL != pulRead_Position ) )
     {
         *pucAnyCharacter = 0xCC;
 
-        if( SMBUS_TRUE == pxContext->pxEventBuffer[pxContext->ulRead].ucIsOccupied )
+        if ( SMBUS_TRUE == pxContext->pxEventBuf[pxContext->ulRead].ucIsOccupied )
         {
             *pulRead_Position = pxContext->ulRead;
-            *pucAnyCharacter = pxContext->pxEventBuffer[pxContext->ulRead].ucOctet;
-            pxContext->pxEventBuffer[pxContext->ulRead].ucIsOccupied = SMBUS_FALSE;
+            *pucAnyCharacter = pxContext->pxEventBuf[pxContext->ulRead].ucOctet;
+            pxContext->pxEventBuf[pxContext->ulRead].ucIsOccupied = SMBUS_FALSE;
             pxContext->ulRead = ulEventBufferInc( pxContext, pxContext->ulRead );
             ucResult = SMBUS_TRUE;
         }

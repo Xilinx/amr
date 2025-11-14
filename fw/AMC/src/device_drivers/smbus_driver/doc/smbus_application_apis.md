@@ -6,14 +6,14 @@ SPDX-License-Identifier: MIT
 ## Defines
 
 ```sh
-#define SMBUS_DATA_SIZE_MIN                     ( 0 )
-#define SMBUS_DATA_SIZE_MAX                     ( 256 )         /* 255 bytes of data + 1 byte block size */
-#define SMBUS_UDID_LENGTH                       ( 16 )
-#define SMBUS_MAX_CIRCULAR_LOG_ENTRIES          ( 5000 )
-#define SMBUS_NUMBER_OF_SMBUS_INSTANCES         ( 8 )
-#define SMBUS_NUMBER_OF_SMBUS_NON_ARP_INSTANCES ( 7 )
-#define SMBUS_INVALID_INSTANCE                  ( 99 )
-#define SMBUS_MAX_EVENT_ELEMENTS                ( 300 )
+#define SMBUS_DATA_SIZE_MIN             ( 0 )
+#define SMBUS_DATA_SIZE_MAX             ( 256 )         /* 255 bytes of data + 1 byte block size */
+#define SMBUS_UDID_LENGTH               ( 16 )
+#define SMBUS_MAX_CIRCULAR_LOG_ENTRIES  ( 5000 )
+#define SMBUS_NUM_INSTANCES             ( 8 )
+#define SMBUS_NUM_NON_ARP_INSTANCES     ( 7 )
+#define SMBUS_INVALID_INSTANCE          ( 99 )
+#define SMBUS_MAX_EVENT_ELEMENTS        ( 300 )
 ```
 
 
@@ -21,34 +21,34 @@ SPDX-License-Identifier: MIT
 ## Enums
 ```sh
 /*
- * @enum SMBus_Freq_Class_Type
+ * @enum SMBUS_FREQ_CLASS
  * @brief Enumeration of SMBUS frequency values
  */
-typedef enum SMBus_Freq_Class_Type
+typedef enum
 {
     SMBUS_FREQ_100KHZ = 0,
     SMBUS_FREQ_400KHZ,
     SMBUS_FREQ_1MHZ,
     SMBUS_FREQ_MAX
 
-} SMBus_Freq_Class_Type;
+} SMBUS_FREQ_CLASS;
 
 /*
- * @enum SMBus_Error_Type
+ * @enum SMBUS_ERROR_TYPE
  * @brief Enumeration of SMBUS return values
  */
-typedef enum SMBus_Error_Type
+typedef enum
 {
     SMBUS_SUCCESS = 0,
     SMBUS_ERROR
 
-} SMBus_Error_Type;
+} SMBUS_ERROR_TYPE;
 
 /*
- * @enum SMBus_ARP_Capability
+ * @enum SMBUS_ARP_CAPABILITY
  * @brief Enumeration of SMBUS ARP settings
  */
-typedef enum SMBus_ARP_Capability
+typedef enum
 {
     SMBUS_ARP_CAPABILITY_UNKNOWN = 0,
     SMBUS_ARP_CAPABLE,
@@ -56,16 +56,16 @@ typedef enum SMBus_ARP_Capability
     SMBUS_ARP_FIXED_NOT_DISCOVERABLE,
     SMBUS_ARP_NON_ARP_CAPABLE
 
-} SMBus_ARP_Capability;
+} SMBUS_ARP_CAPABILITY;
 
 /*
- * @enum SMBus_Command_Protocol_Type
+ * @enum SMBUS_COMMAND_PROTOCOL
  * @brief Enumeration of SMBUS command protocols
  */
-typedef enum SMBus_Command_Protocol_Type
+typedef enum
 {
-    SMBUS_PROTOCOL_QUICK_COMMAND_LO = 0,
-    SMBUS_PROTOCOL_QUICK_COMMAND_HI,
+    SMBUS_PROTOCOL_QUICK_CMD_LO = 0,
+    SMBUS_PROTOCOL_QUICK_CMD_HI,
     SMBUS_PROTOCOL_SEND_BYTE,
     SMBUS_PROTOCOL_RECEIVE_BYTE,
     SMBUS_PROTOCOL_WRITE_BYTE,
@@ -75,7 +75,7 @@ typedef enum SMBus_Command_Protocol_Type
     SMBUS_PROTOCOL_PROCESS_CALL,
     SMBUS_PROTOCOL_BLOCK_WRITE,
     SMBUS_PROTOCOL_BLOCK_READ,
-    SMBUS_PROTOCOL_BLOCK_WRITE_BLOCK_READ_PROCESS_CALL,
+    SMBUS_PROTOCOL_BLK_WRITE_BLK_RD_PROCESS_CALL,
     SMBUS_PROTOCOL_HOST_NOTIFY,
     SMBUS_PROTOCOL_WRITE_32,
     SMBUS_PROTOCOL_READ_32,
@@ -86,16 +86,16 @@ typedef enum SMBus_Command_Protocol_Type
     SMBUS_ARP_PROTOCOL_GET_UDID,
     SMBUS_ARP_PROTOCOL_ASSIGN_ADDRESS,
     SMBUS_ARP_PROTOCOL_GET_UDID_DIRECTED,
-    SMBUS_ARP_PROTOCOL_RESET_DEVICE_DIRECTED,
+    SMBUS_ARP_PROTO_RESET_DEVICE_DIRECTED,
     SMBUS_PROTOCOL_NONE
 
-} SMBus_Command_Protocol_Type;
+} SMBUS_COMMAND_PROTOCOL;
 
 /*
- * @enum SMBUS_LOG_EVENT_TYPE
+ * @enum SMBUS_LOG_EVENT
  * @brief Enumeration of SMBus logging types
  */
-typedef enum SMBUS_LOG_EVENT_TYPE
+typedef enum
 {
     SMBUS_LOG_EVENT_INTERRUPT_EVENT = 1,
     SMBUS_LOG_EVENT_FSM_EVENT,
@@ -107,13 +107,13 @@ typedef enum SMBUS_LOG_EVENT_TYPE
     SMBUS_LOG_EVENT_TRYREAD,
     SMBUS_LOG_EVENT_TRYWRITE
 
-} SMBUS_LOG_EVENT_TYPE;
+} SMBUS_LOG_EVENT;
 
 /*
- * @enum SMBUS_LOG_LEVEL_TYPE
+ * @enum SMBUS_LOG_LEVEL
  * @brief Enumeration of SMBUS logging levels
  */
-typedef enum SMBUS_LOG_LEVEL_TYPE
+typedef enum SMBUS_LOG_LEVEL
 {
     SMBUS_LOG_LEVEL_NONE = 0,
     SMBUS_LOG_LEVEL_ERROR,
@@ -122,12 +122,12 @@ typedef enum SMBUS_LOG_LEVEL_TYPE
     SMBUS_LOG_LEVEL_DEBUG,
     SMBUS_LOG_LEVEL_MAX
 
-} SMBUS_LOG_LEVEL_TYPE;
+} SMBUS_LOG_LEVEL;
 ```
 ## Typedefs
 ```sh
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_PROTOCOL_TYPE
+ * @typedef SMBUS_USER_ENV_GET_PROTOCOL_TYPE
  *
  * @brief   This callback retrieves the protocol for a command
  * @param   ucCommand is the command under inspection
@@ -135,11 +135,11 @@ typedef enum SMBUS_LOG_LEVEL_TYPE
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_PROTOCOL_TYPE )( uint8_t ucCommand, 
-                SMBus_Command_Protocol_Type* xProtocol );
+typedef void ( *SMBUS_USER_ENV_GET_PROTOCOL_TYPE )( uint8_t ucCommand, 
+                SMBUS_COMMAND_PROTOCOL* xProtocol );
                
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE
+ * @typedef SMBUS_USER_ENV_GET_DATA_TYPE
  *
  * @brief   This callback updates the initialiser with new data
  * @param   ucCommand is the SMBus command
@@ -148,11 +148,11 @@ typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_PROTOCOL_TYPE )( uint8_t ucC
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE )( uint8_t ucCommand, uint8_t* pucData, 
+typedef void ( *SMBUS_USER_ENV_GET_DATA_TYPE )( uint8_t ucCommand, uint8_t* pucData, 
                 uint16_t* Data_Size );
                
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE
+ * @typedef SMBUS_USER_ENV_WRITE_DATA_TYPE
  *
  * @brief   This callback retrieves data from the initialiser to write
  * @param   ucCommand is the SMBus command
@@ -162,11 +162,11 @@ typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE )( uint8_t ucComma
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE )( uint8_t ucCommand, uint8_t* pucData, 
+typedef void ( *SMBUS_USER_ENV_WRITE_DATA_TYPE )( uint8_t ucCommand, uint8_t* pucData, 
                 uint16_t Data_Size, uint32_t ulTransactionID );
                
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE
+ * @typedef SMBUS_USER_ENV_CMD_COMPLETE
  *
  * @brief   This callback updates the initialiser when a command is complete
  * @param   ucCommand is the SMBus command
@@ -175,66 +175,66 @@ typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE )( uint8_t ucCom
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE )( uint8_t ucCommand, uint32_t ulTransactionID, 
+typedef void ( *SMBUS_USER_ENV_CMD_COMPLETE )( uint8_t ucCommand, uint32_t ulTransactionID, 
                 uint32_t Status );
                
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_ARP_ADDRESS_CHANGE
+ * @typedef SMBUS_USER_ENV_ARP_ADDR_CHANGE
  *
  * @brief   This callback updates the initialiser when an address is changed
- * @param   ucNewAddress is the next SMBus address
+ * @param   ucNewAddr is the next SMBus address
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_ARP_ADRRESS_CHANGE )( uint8_t ucNewAddress );
+typedef void ( *SMBUS_USER_ENV_ARP_ADDR_CHANGE )( uint8_t ucNewAddr );
 
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR
+ * @typedef SMBUS_USER_ENV_BUS_ERROR
  *
  * @brief   This callback updates the initialiser when there is an SMBus Error
  * @param   ucError is the error that was raised
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR )( uint8_t ucError );
+typedef void ( *SMBUS_USER_ENV_BUS_ERROR )( uint8_t ucError );
 
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING
+ * @typedef SMBUS_USER_ENV_BUS_WARNING
  *
  * @brief   This callback updates the initialiser when there is an SMBus Warning
  * @param   ucWarning is the warning that was raised
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING )( uint8_t ucWarning );
+typedef void ( *SMBUS_USER_ENV_BUS_WARNING )( uint8_t ucWarning );
 
 /*
- * @typedef SMBUS_USER_SUPPLIED_ENVIRONMENT_READ_TICKS
+ * @typedef SMBUS_USER_ENV_READ_TICKS
  *
  * @brief   This callback retrieves the current tick count from the initialiser
  * @param   pulTicks is a a pointer to store the tick count
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_SUPPLIED_ENVIRONMENT_READ_TICKS )( uint32_t* pulTicks );
+typedef void ( *SMBUS_USER_ENV_READ_TICKS )( uint32_t* pulTicks );
 ```
 ## Structs
 ```sh
 /*
- * @struct SMBUS_LOG_TYPE
+ * @struct SMBus_Log
  * @brief  Structure to hold SMBus message logging information
  */
-typedef struct SMBUS_LOG_TYPE
+typedef struct
 {
     uint32_t    ulMessagesComplete[SMBUS_PROTOCOL_NONE];
     uint32_t    ulMessagesInitiated[SMBUS_PROTOCOL_NONE];
-} SMBUS_LOG_TYPE;
+} SMBus_Log;
 
 /*
- * @struct SMBUS_VERSION_TYPE
+ * @struct SMBus_Version
  * @brief  Structure to hold the SMBus driver version information
  */
-typedef struct SMBUS_VERSION_TYPE
+typedef struct
 {
     uint16_t    usIpVerMajor;
     uint16_t    usIpVerMinor;
@@ -243,7 +243,7 @@ typedef struct SMBUS_VERSION_TYPE
     uint8_t     ucSwVerPatch;
     uint8_t     ucSwDevBuild;
     uint8_t     ucSwTestBuild;
-} SMBUS_VERSION_TYPE;
+} SMBus_Version;
 ```
 ## Driver External APIs
 ### Initialise the SMBus
@@ -257,7 +257,7 @@ typedef struct SMBUS_VERSION_TYPE
 * @param    ppxSMBusProfile is a pointer to the SMBus profile structure handle.
 * @param    xFrequencyClass is an enum of type Freq_Class_Type which can be
 *           100KHz, 400KHz or 1MHz.
-* @param    pvBaseAddress is the address of the SMBus IP block
+* @param    pvBaseAddr is the address of the SMBus IP block
 * @param    xLogLevel is the level of logging detail required
 * @param    pFnReadTicks is an optional function pointer that supplies a tick count for logging purposes
 *
@@ -267,11 +267,11 @@ typedef struct SMBUS_VERSION_TYPE
 * @note     None.
 *
 *****************************************************************************/
-SMBus_Error_Type xInitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile,
-                              SMBus_Freq_Class_Type xFrequencyClass,
-                              void * pvBaseAddress,
-                              SMBUS_LOG_LEVEL_TYPE xLogLevel,
-                              SMBUS_USER_SUPPLIED_ENVIRONMENT_READ_TICKS pFnReadTicks );
+SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile,
+                             SMBUS_FREQ_CLASS xFrequencyClass,
+                             void * pvBaseAddr,
+                             SMBUS_LOG_LEVEL xLogLevel,
+                             SMBUS_USER_ENV_READ_TICKS pFnReadTicks );
 ```
 ### Deinitialise the SMBus
 ```sh
@@ -288,7 +288,7 @@ SMBus_Error_Type xInitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile,
 * @note     None.
 *
 *****************************************************************************/
-SMBus_Error_Type xDeinitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile );
+SMBUS_ERROR_TYPE xDeinitSMBus( SMBus_Profile** ppxSMBusProfile );
 ```
 
 ### Create / Destroy an SMBus instance
@@ -300,14 +300,14 @@ SMBus_Error_Type xDeinitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile );
 *           to send or receive SMBus messages for the supplied instance
 *
 * @param    pxSMBusProfile is a pointer to the SMBus profile structure.
-* @param    ucSMBusAddress is the 7-bit SMBUs address to asscociate with this instance
+* @param    ucSMBusAddr is the 7-bit SMBUs address to asscociate with this instance
 * @param    ucUDID is the 16 byte UDID to asscociate with this instance
 * @param    xARPCapability is the ARP capabaility of the instance
 * @param    pFnGetProtocol ia a pointer to a function to convert coammand byte to an SMBus protocol
 * @param    pFnGetData ia a pointer to a function to get data to be returned
 * @param    pFnWriteData ia a pointer to a function to write data received
 * @param    pFnAnnounceResult ia a pointer to a function to announce the result of a transaction
-* @param    pFnArpAddressChange ia a pointer to a function to call if the address is changed
+* @param    pFnArpAddrChange ia a pointer to a function to call if the address is changed
 * @param    pFnBusError ia a pointer to a function to report SMBus errors
 * @param    pFnBusWarning ia a pointer to a function to report SMBus warnings
 * @param    ucSimpleDevice is a flag to allow instance to understand only simple
@@ -319,17 +319,17 @@ SMBus_Error_Type xDeinitSMBus( struct SMBUS_PROFILE_TYPE** ppxSMBusProfile );
 * @note     None.
 *
 *******************************************************************************/
-uint8_t ucCreateSMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
-                               uint8_t ucSMBusAddress,
+uint8_t ucCreateSMBusInstance( SMBus_Profile* pxSMBusProfile,
+                               uint8_t ucSMBusAddr,
                                uint8_t ucUDID[SMBUS_UDID_LENGTH],
-                               SMBus_ARP_Capability xARPCapability,
-                               SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_PROTOCOL_TYPE pFnGetProtocol,
-                               SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE pFnGetData,
-                               SMBUS_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE pFnWriteData,
-                               SMBUS_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE pFnAnnounceResult,
-                               SMBUS_USER_SUPPLIED_ENVIRONMENT_ARP_ADRRESS_CHANGE pFnArpAddressChange,
-                               SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR pFnBusError,
-                               SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING pFnBusWarning,
+                               SMBUS_ARP_CAPABILITY xARPCapability,
+                               SMBUS_USER_ENV_GET_PROTOCOL_TYPE pFnGetProtocol,
+                               SMBUS_USER_ENV_GET_DATA_TYPE pFnGetData,
+                               SMBUS_USER_ENV_WRITE_DATA_TYPE pFnWriteData,
+                               SMBUS_USER_ENV_CMD_COMPLETE pFnAnnounceResult,
+                               SMBUS_USER_ENV_ARP_ADDR_CHANGE pFnArpAddrChange,
+                               SMBUS_USER_ENV_BUS_ERROR pFnBusError,
+                               SMBUS_USER_ENV_BUS_WARNING pFnBusWarning,
                                uint8_t  ucSimpleDevice );
 
 
@@ -351,7 +351,7 @@ uint8_t ucCreateSMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
 * @note     None.
 *
 *****************************************************************************/
-SMBus_Error_Type xDestroySMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
+SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBus_Profile* pxSMBusProfile,
                                          uint8_t ucSMBusInstanceID );
 ```
 ### Initiate an SMBus command
@@ -362,7 +362,7 @@ SMBus_Error_Type xDestroySMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfil
 *
 * @param    pxSMBusProfile is a pointer to the SMBus profile structure.
 * @param    ucSMBusInstanceID is the SMBus instance ID of the instance to use as the controller
-* @param    ucSMBusDestinationAddress is the address of the target SMBUs device
+* @param    ucSMBusDestAddr is the address of the target SMBUs device
 * @param    ucCommand is the Command byte of the message
 * @param    xProtocol is the SMBUs Protocol type of the message being sent
 * @param    usDataSize is the Size of data being sent ( if tranaction protocol is a send type )
@@ -376,11 +376,11 @@ SMBus_Error_Type xDestroySMBusInstance( struct SMBUS_PROFILE_TYPE* pxSMBusProfil
 * @note     None.
 *
 *******************************************************************************/
-SMBus_Error_Type xSMBusControllerInitiateCommand( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
+SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile,
                                                    uint8_t ucSMBusInstance,
-                                                   uint8_t ucSMBusDestinationAddress,
+                                                   uint8_t ucSMBusDestAddr,
                                                    uint8_t ucCommand,
-                                                   SMBus_Command_Protocol_Type xProtocol,
+                                                   SMBUS_COMMAND_PROTOCOL xProtocol,
                                                    uint16_t usDataSize,
                                                    uint8_t* pucData,
                                                    uint8_t ucPecRequiredForTransaction,
@@ -393,7 +393,7 @@ SMBus_Error_Type xSMBusControllerInitiateCommand( struct SMBUS_PROFILE_TYPE* pxS
 * @brief    Retrieves SMBus log that is stored as a circular buffer in profile struct
 *           as ASCII char array
 *
-* @param    SMBUS_PROFILE_TYPE is the context to poll log on
+* @param    SMBus_Profile is the context to poll log on
 * @param    pcLogBuffer is the array to put log data must be more than TBD driver events string
 *           separated by '\n'
 * @param    pusLogSizeBytes is a pointer to the number of bytes that are in the log
@@ -405,7 +405,7 @@ SMBus_Error_Type xSMBusControllerInitiateCommand( struct SMBUS_PROFILE_TYPE* pxS
 * @note     None.
 *
 *******************************************************************************/
-SMBus_Error_Type xSMBusGetLog( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
+SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile,
                                char* pcLogBuffer,
                                uint32_t* pulLogSizeBytes );
 
@@ -416,7 +416,7 @@ SMBus_Error_Type xSMBusGetLog( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
 *
 * @brief    Resets SMBus Driver Log
 *
-* @param    SMBUS_PROFILE_TYPE is the context with log to clear
+* @param    SMBus_Profile is the context with log to clear
 *
 * @return   - SMBUS_ERROR if error
 *           - SMBUS_SUCCESS if successful
@@ -424,7 +424,7 @@ SMBus_Error_Type xSMBusGetLog( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
 * @note     None.
 *
 *******************************************************************************/
-SMBus_Error_Type xSMBusLogReset( struct SMBUS_PROFILE_TYPE* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusLogReset( SMBus_Profile* pxSMBusProfile );
 ```
 ### Disable / Enable Interrupts
 ```sh
@@ -440,7 +440,7 @@ SMBus_Error_Type xSMBusLogReset( struct SMBUS_PROFILE_TYPE* pxSMBusProfile );
 * @note     None.
 *
 *******************************************************************************/
-SMBus_Error_Type xSMBusInterruptDisableAndClearInterrupts( struct SMBUS_PROFILE_TYPE* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBus_Profile* pxSMBusProfile );
 
 /*******************************************************************************
 *
@@ -454,7 +454,7 @@ SMBus_Error_Type xSMBusInterruptDisableAndClearInterrupts( struct SMBUS_PROFILE_
 * @note     None.
 *
 *******************************************************************************/
-SMBus_Error_Type xSMBusInterruptEnableInterrupts( struct SMBUS_PROFILE_TYPE* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBus_Profile* pxSMBusProfile );
 ```
 ### Interrupt Handler
 ```sh
@@ -490,6 +490,6 @@ void vSMBusInterruptHandler( void* pvCallBackRef );
 * @note     None.
 *
 *******************************************************************************/
-SMBus_Error_Type xSMBusGetVersion( struct SMBUS_PROFILE_TYPE* pxSMBusProfile,
-                       SMBUS_VERSION_TYPE* pxSMBusVersion );
+SMBUS_ERROR_TYPE xSMBusGetVersion( SMBus_Profile* pxSMBusProfile,
+                       SMBus_Version* pxSMBusVersion );
 ```

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the API for the Alveo Management Interface (AMI) proxy driver
+ * This file contains the API for the AMR Management Interface (AMI) proxy driver
  *
  * @file ami_proxy_driver.h
  */

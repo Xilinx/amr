@@ -23,7 +23,7 @@ Application will be required to store the pointer for accessing further SMBus AP
 
 ```sh
 /* Application code will be passed a pointer to the SMBus profile from xInitSMBus() */
-struct  SMBUS_PROFILE_TYPE* pxSMBusProfile = NULL;
+struct  SMBus_Profile* pxSMBusProfile = NULL;
 ```
 
 
@@ -98,7 +98,7 @@ the command uses.
 ```sh
 /* This callback function must be created. It will map a received command byte to an SMBus Protocol
      This allows the driver to understand how to interpret the SMBus message */
-void  GivenCommandGetProtocolCallback( uint8_t ucCommand, SMBus_Command_Protocol_Type* pxProtocol )
+void  GivenCommandGetProtocolCallback( uint8_t ucCommand, SMBUS_COMMAND_PROTOCOL* pxProtocol )
 {
     if( NULL != pxProtocol )
     {
@@ -126,7 +126,7 @@ void  GivenCommandGetProtocolCallback( uint8_t ucCommand, SMBus_Command_Protoco
             *pxProtocol = SMBUS_PROTOCOL_BLOCK_READ;
             break;
         case 12:
-            *pxProtocol = SMBUS_PROTOCOL_BLOCK_WRITE_BLOCK_READ_PROCESS_CALL;
+            *pxProtocol = SMBUS_PROTOCOL_BLK_WRITE_BLK_RD_PROCESS_CALL;
             break;
         case 13:
             *pxProtocol = SMBUS_PROTOCOL_HOST_NOTIFY;
@@ -293,9 +293,9 @@ void AnnounceResultCallback(uint8_t ucCommand, uint32_t ulTransactionID, uint32_
 ```sh
 /* This callback function must be created for all ARP capable instances.
 It will be called when an ARP Assign Address message has been sent to the instance   */
-void AnnounceARPAddressChangeCallback(uint8_t ucNewAddress)
+void AnnounceARPAddressChangeCallback(uint8_t ucNewAddr)
 {
-    StoreInstaneAddress(ucNewAddress );
+    StoreInstaneAddress(ucNewAddr );
     ucArpAddressChangeCallback = SMBUS_TRUE;
 
 }
@@ -332,18 +332,18 @@ uint8_t ucTargetUDID0[16]       = { 0x10, 0xFF, 0xFF, 0xFF, 0xF0, 0x0F, 0x0F, 0x
 
 int main( void )
 {
-    SMBus_Error_Type                                    xReturnCode                 = SMBUS_ERROR;
-    uint8_t                                             ucSMBusAddress              = 0;
-    uint8_t                                             ucUDID[SMBUS_UDID_LENGTH]   = { 0 };
-    SMBus_ARP_Capability                                xARPCapability              = SMBUS_ARP_CAPABILITY_UNKNOWN;
-    SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_PROTOCOL_TYPE   pFnGetProtocol              = NULL;
-    SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE       pFnGetData                  = NULL;
-    SMBUS_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE     pFnWriteData                = NULL;
-    SMBUS_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE    pFnAnnounceResult           = NULL;
-    SMBUS_USER_SUPPLIED_ENVIRONMENT_ARP_ADRRESS_CHANGE  pFnArpAddressChange         = NULL;
-    SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR           pFnBusError                 = NULL;
-    SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING         pFnBusWarning               = NULL;
-    uint8_t                                             ucSimpleDevice              = 0;
+    SMBUS_ERROR_TYPE                          xReturnCode                 = SMBUS_ERROR;
+    uint8_t                                   ucSMBusAddr              = 0;
+    uint8_t                                   ucUDID[SMBUS_UDID_LENGTH]   = { 0 };
+    SMBUS_ARP_CAPABILITY                      xARPCapability              = SMBUS_ARP_CAPABILITY_UNKNOWN;
+    SMBUS_USER_ENV_GET_PROTOCOL_TYPE pFnGetProtocol              = NULL;
+    SMBUS_USER_ENV_GET_DATA_TYPE     pFnGetData                  = NULL;
+    SMBUS_USER_ENV_WRITE_DATA_TYPE   pFnWriteData                = NULL;
+    SMBUS_USER_ENV_CMD_COMPLETE      pFnAnnounceResult           = NULL;
+    SMBUS_USER_ENV_ARP_ADDR_CHANGE   pFnArpAddrChange            = NULL;
+    SMBUS_USER_ENV_BUS_ERROR         pFnBusError                 = NULL;
+    SMBUS_USER_ENV_BUS_WARNING       pFnBusWarning               = NULL;
+    uint8_t                                   ucSimpleDevice              = 0;
 
    /*   Initialize the SMBus Driver passing in:
         a pointer to it's memory profile,
@@ -353,7 +353,7 @@ int main( void )
         <OPTIONAL> a pointer to a get tick count function for logs */
 
     xReturnCode = xInitSMBus( &pxSMBusProfile, SMBUS_FREQ_1MHZ,( void* )XPAR_SMBUS_0_BASEADDR, SMBUS_LOG_LEVEL_DEBUG,
-                                    ( SMBUS_USER_SUPPLIED_ENVIRONMENT_READ_TICKS )&vGetTicksFromApplication );
+                                    ( SMBUS_USER_ENV_READ_TICKS )&vGetTicksFromApplication );
 
     if( SMBUS_SUCCESS == xReturnCode )
     {
@@ -370,7 +370,7 @@ int main( void )
 
         /* SMBus Address:   If the Instance is to be ARP capable then no address is required otherwise
                                            a fixed address must be set */
-        ucSMBusAddress = 0x2A;
+        ucSMBusAddr = 0x2A;
 
         /* SMBus UDID:  A 16 byte UDID is required for the SMBus Instance and must be set on creation
                         THe UDID will also determine if this SMBus instance can accept PEC */
@@ -382,22 +382,22 @@ int main( void )
         /* SMBus Callback Functions:    Separate callback functions for each instance must be created in the application software and
                                         attached to the instance on creation
                                         See above for examples of these callback functions */
-        pFnGetProtocol           =( SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_PROTOCOL_TYPE )&GivenCommandGetProtocolCallback;
-        pFnGetData               =( SMBUS_USER_SUPPLIED_ENVIRONMENT_GET_DATA_TYPE )&ReadDataCallback;
-        pFnWriteData             =( SMBUS_USER_SUPPLIED_ENVIRONMENT_WRITE_DATA_TYPE )&WriteDataCallback;
-        pFnAnnounceResult        =( SMBUS_USER_SUPPLIED_ENVIRONMENT_COMMAND_COMPLETE )&AnnounceResultCallback;
-        pFnArpAddressChange      =( SMBUS_USER_SUPPLIED_ENVIRONMENT_ARP_ADRRESS_CHANGE )&AnnounceARPAddressChangeCallback;
-        pFnBusError              =( SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_ERROR )&AnnounceErrorCallback;
-        pFnBusWarning            =( SMBUS_USER_SUPPLIED_ENVIRONMENT_BUS_WARNING )&AnnounceWarningCallback;
+        pFnGetProtocol           =( SMBUS_USER_ENV_GET_PROTOCOL_TYPE )&GivenCommandGetProtocolCallback;
+        pFnGetData               =( SMBUS_USER_ENV_GET_DATA_TYPE )&ReadDataCallback;
+        pFnWriteData             =( SMBUS_USER_ENV_WRITE_DATA_TYPE )&WriteDataCallback;
+        pFnAnnounceResult        =( SMBUS_USER_ENV_CMD_COMPLETE )&AnnounceResultCallback;
+        pFnArpAddrChange         =( SMBUS_USER_ENV_ARP_ADDR_CHANGE )&AnnounceARPAddressChangeCallback;
+        pFnBusError              =( SMBUS_USER_ENV_BUS_ERROR )&AnnounceErrorCallback;
+        pFnBusWarning            =( SMBUS_USER_ENV_BUS_WARNING )&AnnounceWarningCallback;
 
         /* SMBus Simple Device:     An instance can be created as a Simple Device.
                                     If ucSimpleDevice = 1 the instance will ONLY accept SEND BYTE and RECEIVE BYTE protocols */
         ucSimpleDevice = 0;
 
         /* Now create the instance, the instance number 0 - 6 will be returned */
-        uint8_t ucInstanceId            = ucCreateSMBusInstance( pxSMBusProfile, ucSMBusAddress, ucUDID, xARPCapability,
+        uint8_t ucInstanceId            = ucCreateSMBusInstance( pxSMBusProfile, ucSMBusAddr, ucUDID, xARPCapability,
                                                                     pFnGetProtocol, pFnGetData, pFnWriteData, pFnAnnounceResult,
-                                                                    pFnArpAddressChange, pFnBusError, pFnBusWarning, ucSimpleDevice );
+                                                                    pFnArpAddrChange, pFnBusError, pFnBusWarning, ucSimpleDevice );
 
         /*  NOTE: The ucCreateSMBusInstance() function can be called to create up to 7 unique SMBus Instances
             each with a different ARP capabilities, SMBUs Address and UDID by repeating the steps in lines 25 - 63 above */
@@ -426,16 +426,16 @@ The application software needs simply to call the xSMBusControllerInitiateComman
 
 An example of a Write64 is shown below
 ```sh
-    uint8_t                     ucSMBusInstance                     = 0;
-    uint8_t                     ucTargetAddress                     = 0;
-    uint8_t                     ucCommand                           = 0;
-    SMBus_Command_Protocol_Type xProtocol                           = SMBUS_PROTOCOL_NONE;
-    uint8_t                     ucPECRequired                       = SMBUS_FALSE;
-    uint32_t                    ulTransactionID                     = 0;
-    uint8_t                     ucControllerDataToSend[MAX_DATA]    = { 0 };
-    uint16_t                    usControllerDataToSendSize          = 0;
-    uint8_t                     ucBlockSize                         = 0;
-    uint8_t                     ucInitialValue                      = 0;
+    uint8_t                ucSMBusInstance                  = 0;
+    uint8_t                ucTargetAddress                  = 0;
+    uint8_t                ucCommand                        = 0;
+    SMBUS_COMMAND_PROTOCOL xProtocol                        = SMBUS_PROTOCOL_NONE;
+    uint8_t                ucPECRequired                    = FALSE;
+    uint32_t               ulTransactionID                  = 0;
+    uint8_t                ucControllerDataToSend[MAX_DATA] = { 0 };
+    uint16_t               usControllerDataToSendSize       = 0;
+    uint8_t                ucBlockSize                      = 0;
+    uint8_t                ucInitialValue                   = 0;
 
     /* Assign values to all the parameters */
     ucSMBusInstance             = 0;                                    /* This will be a value 0 - 6 which will have been returned by ucCreateSMBusInstance() function */
@@ -457,7 +457,7 @@ An example of a Write64 is shown below
     ucControllerDataToSendSize  = 8;
 
     if( SMBUS_SUCCESS == xSMBusControllerInitiateCommand( pxSMBusProfile,  ucSMBusInstance, ucTargetAddress, ucCommand, xProtocol,
-                                                            ucControllerDataToSendSize, ucControllerDataToSend, ucPECRequired, &ulTransactionID ) )
+                                                          ucControllerDataToSendSize, ucControllerDataToSend, ucPECRequired, &ulTransactionID ) )
     {
         /* Write 64 Initiated */
         /* This function may return before the asynchronous transaction has completed */
@@ -469,23 +469,23 @@ An example of a Write64 is shown below
 
 An example of a Block Write - Block Read Process Call is shown below
 ```sh
-    uint8_t                     ucSMBusInstance                     = 0;
-    uint8_t                     ucTargetAddress                     = 0;
-    uint8_t                     ucCommand                           = 0;
-    SMBus_Command_Protocol_Type xProtocol                           = SMBUS_PROTOCOL_NONE;
-    uint8_t                     ucPECRequired                       = SMBUS_FALSE;
-    uint32_t                    ulTransactionID                     = 0;
-    int                         i                                   = 0;
-    uint8_t                     ucControllerDataToSend[MAX_DATA]    = { 0 };
-    uint16_t                    usControllerDataToSendSize          = 0;
-    uint8_t                     ucBlockSize                         = 0;
-    uint8_t                     ucInitialValue                      = 0;
+    uint8_t                ucSMBusInstance                  = 0;
+    uint8_t                ucTargetAddress                  = 0;
+    uint8_t                ucCommand                        = 0;
+    SMBUS_COMMAND_PROTOCOL xProtocol                        = SMBUS_PROTOCOL_NONE;
+    uint8_t                ucPECRequired                    = SMBUS_FALSE;
+    uint32_t               ulTransactionID                  = 0;
+    int                    i                                = 0;
+    uint8_t                ucControllerDataToSend[MAX_DATA] = { 0 };
+    uint16_t               usControllerDataToSendSize       = 0;
+    uint8_t                ucBlockSize                      = 0;
+    uint8_t                ucInitialValue                   = 0;
 
     /* Assign values to all the parameters */
     ucSMBusInstance = 0;                                                        /* This will be a value 0 - 6 which will have been returned by ucCreateSMBusInstance() function */
     ucTargetAddress = 0x6A;                                                     /* The address of the the SMBus Target the message is to be sent to */
     ucCommand       = 12;                                                       /* The command byte to be sent. The SMBus Target must know what protocol this command maps to */
-    xProtocol       = SMBUS_PROTOCOL_BLOCK_WRITE_BLOCK_READ_PROCESS_CALL;       /* The protocol to be used for this SMBus message */
+    xProtocol       = SMBUS_PROTOCOL_BLK_WRITE_BLK_RD_PROCESS_CALL;       /* The protocol to be used for this SMBus message */
     ucPECRequired   = false;                                                    /* Is the SMBus Target expecting a PEC byte to be sent */
 
 
@@ -734,7 +734,7 @@ When this is done the instance will ONLY accept SEND BYTE and RECEIVE BYTE proto
 
 
 ## SMBus Address
-The SMBus Address is a 7-bit value. When using the ucCreateSMBusInstance(), the value set in the ucSMBusAddress field of the Instance parameter should occupy the 7 least significant bits (bits 6 - 0).
+The SMBus Address is a 7-bit value. When using the ucCreateSMBusInstance(), the value set in the ucSMBusAddr field of the Instance parameter should occupy the 7 least significant bits (bits 6 - 0).
 When this address is transmitted on the SMBus it may be seen bit shifted to the left by a single bit. The 7 bits of the address now become the 7 most significant bits (bits 7 - 1) and bit 0 is used as the READ/WRITE bit.
 
 When an ARP Controller assigns a new address via the ARP ASSIGN ADDRESS command, the new 7-bit assigned address must be added to the payload already pre-shifted to the 7 most significant bits (bits 7 - 1) and bit 0 is ignored.
@@ -749,7 +749,7 @@ ucCreateSMBusInstance() could be creating the instance with an invalid temporary
 or
  ucCreateSMBusInstance() could be creating the instance with an address it had previously been assigned (ie a Persistent Address)
 
-In order to determine which, the ucCreateSMBusInstance() function will check bit 7 of the ucSMBusAddress field in the Instance parameter.
+In order to determine which, the ucCreateSMBusInstance() function will check bit 7 of the ucSMBusAddr field in the Instance parameter.
 
  - If this is set it will treat the address as an invalid temporary address, will clear the AR flag and wait on a new address to be assigned by ARP Assign Address.
  - If the bit is clear,  it will treat the address as a dynamic and persistent address, will set the AR flag and allow add the address onto the bus.

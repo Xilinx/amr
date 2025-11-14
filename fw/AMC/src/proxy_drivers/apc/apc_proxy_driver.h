@@ -2,7 +2,7 @@
  * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the API for the Alveo Programming Control (APC) proxy driver
+ * This file contains the API for the AMR Programming Control (APC) proxy driver
  *
  * @file apc_proxy_driver.h
  */

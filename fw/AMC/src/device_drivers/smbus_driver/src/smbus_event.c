@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the functions for raising events and adding them to the circular event buffer
@@ -73,33 +73,29 @@ char* pEvent_E_IS_PEC_REQUIRED              = "E_IS_PEC_REQUIRED";
 char* pEvent_E_DESC_FIFO_ALMOST_EMPTY_IRQ   = "E_DESC_FIFO_ALMOST_EMPTY_IRQ";
 char* pEvent_UNKNOWN                        = "UNKNOWN";
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will attempt to write the event
-*           into the instance's event log
-*
-*******************************************************************************/
-void vSMBusCreateEvent( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent )
+/**
+ * @brief    If the instance is valid, this function will attempt to write the event
+ *           into the instance's event log
+ */
+void vSMBusCreateEvent( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     uint32_t ulWrite_Position = 0;
 
     if( NULL != pxSMBusInstance )
     {
-        if( SMBUS_EVENT_BUFFER_FAIL == ucEventBufferTryWrite( &( pxSMBusInstance->xEventSourceCircularBuffer ), ucAnyEvent, &ulWrite_Position ) )
+        if( SMBUS_EVENT_BUFFER_FAIL == ucEventBufferTryWrite( &( pxSMBusInstance->xEventSrcCircularBuf ), ucAnyEvent, &ulWrite_Position ) )
         {
             vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_ERROR,
-                            pxSMBusInstance->ucThisInstanceNumber, SMBUS_LOG_EVENT_ERROR, ucAnyEvent, __LINE__ );
+                            pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_ERROR, ucAnyEvent, __LINE__ );
         }
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_IS_PEC_REQUIRED
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_IS_PEC_REQUIRED( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_IS_PEC_REQUIRED
+ */
+void vSMBusGenerateEvent_E_IS_PEC_REQUIRED( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -109,13 +105,11 @@ void vSMBusGenerateEvent_E_IS_PEC_REQUIRED( SMBUS_INSTANCE_TYPE* pxSMBusInstance
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_SEND_NEXT_BYTE
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_SEND_NEXT_BYTE( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_SEND_NEXT_BYTE
+ */
+void vSMBusGenerateEvent_E_SEND_NEXT_BYTE( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -125,13 +119,11 @@ void vSMBusGenerateEvent_E_SEND_NEXT_BYTE( SMBUS_INSTANCE_TYPE* pxSMBusInstance 
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_WRITE_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_WRITE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_WRITE_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_WRITE_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -139,13 +131,11 @@ void vSMBusGenerateEvent_E_TARGET_WRITE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstanc
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DATA_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DATA_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_DATA_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -153,13 +143,11 @@ void vSMBusGenerateEvent_E_TARGET_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DATA_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DATA_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DATA_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -167,13 +155,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInst
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_READ_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_READ_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_READ_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_READ_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -181,13 +167,11 @@ void vSMBusGenerateEvent_E_TARGET_READ_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DONE_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DONE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DONE_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_DONE_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -195,13 +179,11 @@ void vSMBusGenerateEvent_E_TARGET_DONE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DONE_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DONE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DONE_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DONE_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -209,13 +191,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_DONE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInst
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_LOA_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_LOA_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_LOA_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_LOA_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -223,13 +203,11 @@ void vSMBusGenerateEvent_E_TARGET_LOA_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusIns
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PEC_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PEC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PEC_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_PEC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -237,13 +215,11 @@ void vSMBusGenerateEvent_E_TARGET_PEC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusIns
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -251,13 +227,11 @@ void vSMBusGenerateEvent_E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYP
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_RX_FIFO_ERROR_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_RX_FIFO_ERROR_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_RX_FIFO_ERROR_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_RX_FIFO_ERROR_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -265,13 +239,11 @@ void vSMBusGenerateEvent_E_TARGET_RX_FIFO_ERROR_ERROR_IRQ( SMBUS_INSTANCE_TYPE* 
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -279,13 +251,11 @@ void vSMBusGenerateEvent_E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYP
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -293,13 +263,11 @@ void vSMBusGenerateEvent_E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TY
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_FIFO_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_FIFO_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -307,13 +275,11 @@ void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSM
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -321,13 +287,11 @@ void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_T
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -335,13 +299,11 @@ void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -349,13 +311,11 @@ void vSMBusGenerateEvent_E_TARGET_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusIn
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -363,13 +323,11 @@ void vSMBusGenerateEvent_E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ( SMBUS_INSTANCE
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -377,13 +335,11 @@ void vSMBusGenerateEvent_E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ( SMBUS_I
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -391,13 +347,11 @@ void vSMBusGenerateEvent_E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ( SMBUS_INSTAN
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_LOA_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_LOA_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_LOA_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_LOA_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -405,13 +359,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_LOA_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBu
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_NACK_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_NACK_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_NACK_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_NACK_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -419,13 +371,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_NACK_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMB
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_PEC_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_PEC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_PEC_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_PEC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -433,13 +383,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_PEC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBu
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -447,13 +395,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ( SMBUS_INS
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -461,13 +407,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ( SMBUS_INS
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_RX_FIFO_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_RX_FIFO_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -475,13 +419,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* px
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -489,13 +431,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -503,13 +443,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANC
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_FIFO_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_FIFO_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -517,13 +455,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* 
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -531,13 +467,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTAN
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -545,13 +479,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTA
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_ERROR_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_ERROR_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -559,13 +491,11 @@ void vSMBusGenerateEvent_E_CONTROLLER_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMB
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_DESC_FIFO_ALMOST_EMPTY_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_DESC_FIFO_ALMOST_EMPTY_IRQ
+ */
+void vSMBusGenerateEvent_E_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -573,13 +503,11 @@ void vSMBusGenerateEvent_E_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBUS_INSTANCE_TYPE* pxSM
     }
 }
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance )
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBus_Instance* pxSMBusInstance )
 {
     if( NULL != pxSMBusInstance )
     {
@@ -587,11 +515,9 @@ void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBUS_INSTANCE
     }
 }
 
-/*******************************************************************************
-*
-* @brief    Converts an event enum value to a text string for logging
-*
-*******************************************************************************/
+/**
+ * @brief    Converts an event enum value to a text string for logging
+ */
 /* Event helper functions */
 char* pcEventToString( uint8_t ucEvent )
 {

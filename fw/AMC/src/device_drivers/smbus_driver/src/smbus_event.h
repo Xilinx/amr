@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the defintions of the SMBus state machine events and
@@ -58,522 +58,372 @@ extern "C"
 #define E_IS_PEC_REQUIRED                               ( 0x25 )
 #define E_DESC_FIFO_ALMOST_EMPTY_IRQ                    ( 0x26 )
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will attempt to write the event
-*           into the instance's event log
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-* @param    ucAnyEvent is any SMBus state machine event
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusCreateEvent( SMBUS_INSTANCE_TYPE* pxSMBusInstance, uint8_t ucAnyEvent );
+/**
+ * @brief    If the instance is valid, this function will attempt to write the event
+ *           into the instance's event log
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ * @param    ucAnyEvent is any SMBus state machine event
+ *
+ * @return   None
+ */
+void vSMBusCreateEvent( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-* with event E_IS_PEC_REQUIRED
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_IS_PEC_REQUIRED( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ * with event E_IS_PEC_REQUIRED
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_IS_PEC_REQUIRED( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_SEND_NEXT_BYTE
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_SEND_NEXT_BYTE( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_SEND_NEXT_BYTE
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_SEND_NEXT_BYTE( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_WRITE_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_WRITE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_WRITE_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_WRITE_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DATA_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DATA_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_DATA_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_READ_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_READ_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_READ_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_READ_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DONE_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DONE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DONE_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_DONE_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_LOA_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_LOA_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_LOA_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_LOA_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PEC_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PEC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PEC_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_PEC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_TEXT_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_RX_FIFO_ERROR_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_RX_FIFO_ERROR_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_RX_FIFO_ERROR_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_RX_FIFO_ERROR_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_FIFO_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_FIFO_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_DESC_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_DESC_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_DESC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_UNEXPTD_BUS_IDLE_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_SMBDAT_LOW_TIMEOUT_DESC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_TARGET_PHY_SMBCLK_LOW_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DONE_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DONE_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DONE_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DONE_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_LOA_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_LOA_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_LOA_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_LOA_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_NACK_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_NACK_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_NACK_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_NACK_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_PEC_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_PEC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_PEC_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_PEC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_TEXT_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_PHY_CTLR_CEXT_TIMEOUT_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_RX_FIFO_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_RX_FIFO_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
+/**
 * @brief    If the instance is valid, this function will call vSMBusCreateEvent
 *           with event E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ
 *
 * @param    pxSMBusInstance is a pointer to the SMBus instance data
 *
 * @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+*/
+void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_RX_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
+/**
 * @brief    If the instance is valid, this function will call vSMBusCreateEvent
 *           with event E_CONTROLLER_DESC_FIFO_ERROR_IRQ
 *
 * @param    pxSMBusInstance is a pointer to the SMBus instance data
 *
 * @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+*/
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_OVERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_UNDERFLOW_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_ERROR_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_ERROR_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_ERROR_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_ERROR_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DATA_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DATA_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DATA_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DATA_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_DESC_FIFO_ALMOST_EMPTY_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_DESC_FIFO_ALMOST_EMPTY_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    If the instance is valid, this function will call vSMBusCreateEvent
-*           with event E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ
-*
-* @param    pxSMBusInstance is a pointer to the SMBus instance data
-*
-* @return   None
-*
-* @note     None.
-*
-*******************************************************************************/
-void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBUS_INSTANCE_TYPE* pxSMBusInstance );
+/**
+ * @brief    If the instance is valid, this function will call vSMBusCreateEvent
+ *           with event E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ
+ *
+ * @param    pxSMBusInstance is a pointer to the SMBus instance data
+ *
+ * @return   None
+ */
+void vSMBusGenerateEvent_E_CONTROLLER_DESC_FIFO_ALMOST_EMPTY_IRQ( SMBus_Instance* pxSMBusInstance );
 
-/*******************************************************************************
-*
-* @brief    Converts an event enum value to a text string for logging
-*
-* @param    ucEvent is any state machine event enum value
-*
-* @return   A text string of the event
-*
-* @note     None.
-*
-*******************************************************************************/
+/**
+ * @brief    Converts an event enum value to a text string for logging
+ * @param    ucEvent is any state machine event enum value
+ * @return   A text string of the event
+ */
 char* pcEventToString( uint8_t ucEvent );
 
 #ifdef __cplusplus
