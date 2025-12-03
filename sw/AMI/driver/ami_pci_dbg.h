@@ -15,7 +15,6 @@
 
 /* PCIe DEBUG */
 
-char *pcie_vendor_id_to_str(uint16_t id);
 void print_pcie_vendor_id(struct pci_dev *dev, uint16_t id);
 
 char *pcie_device_id_to_str(uint16_t id);
@@ -38,7 +37,8 @@ void print_pcie_cap_pm_cntrl_bridge_ext(struct pci_dev *dev, uint16_t pm_cntrl_b
 
 void print_pcie_cap_pm_data(struct pci_dev *dev, uint16_t pm_data);
 
-void print_pcie_cap_msi(struct pci_dev *dev, uint16_t msi_config_status, uint16_t msi_msg_addr, uint16_t msi_msg_data, uint32_t msi_msg_uppr_addr);
+void print_pcie_cap_msi(struct pci_dev *dev, uint16_t msi_config_status,
+    uint16_t msi_msg_addr, uint16_t msi_msg_data, uint32_t msi_msg_uppr_addr);
 
 void print_pcie_cap_cap(struct pci_dev *dev, uint16_t cap);
 
@@ -77,12 +77,10 @@ void print_pcie_cap_link_ctrl_2(struct pci_dev *dev, uint16_t link_ctrl);
 void print_pcie_cap_link_status_2(struct pci_dev *dev, uint16_t link_stat);
 
 #ifdef VERBOSE_DEBUG
-void find_pci_ext_capability(struct pci_dev *dev, char *cap_name, int cap);
 void pcie_find_supported_ext_caps(struct pci_dev *dev);
 #endif
 
 #ifdef VERBOSE_DEBUG
-void find_pci_capability(struct pci_dev *dev, char *cap_name, int cap);
 void pcie_find_supported_cap(struct pci_dev *dev);
 #endif
 

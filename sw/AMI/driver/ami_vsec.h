@@ -15,12 +15,12 @@
 #include "ami_pcie.h"
 
 /* PCIe BAR OFFSETS and Lengths */
-#define XILINX_ENDPOINT_BAR_SGCQ_RAVE_OFFSET    0x800000       /* 8M */
-#define XILINX_ENDPOINT_BAR_PL_RAVE_OFFSET      0x000000       /* 0M */
-#define XILINX_ENDPOINT_BAR_SGCQ_V80_OFFSET     0x8000000      /* 128M */
-#define XILINX_ENDPOINT_BAR_PL_V80_OFFSET       0x8000000      /* 128M */
-#define XILINX_ENDPOINT_BAR_SGCQ_LEN            0x800000       /* 8M   */
-#define XILINX_ENDPOINT_BAR_PL_LEN              0x800000       /* 8M   */
+#define XILINX_ENDPOINT_BAR_SGCQ_RAVE_OFFSET	0x800000  /* 8M */
+#define XILINX_ENDPOINT_BAR_PL_RAVE_OFFSET		0x000000  /* 0M */
+#define XILINX_ENDPOINT_BAR_SGCQ_V80_OFFSET		0x8000000 /* 128M */
+#define XILINX_ENDPOINT_BAR_PL_V80_OFFSET		0x8000000 /* 128M */
+#define XILINX_ENDPOINT_BAR_SGCQ_LEN			0x800000  /* 8M   */
+#define XILINX_ENDPOINT_BAR_PL_LEN				0x800000  /* 8M   */
 
 /* CG TODO: Get this from hw design metadata */
 #define XILINX_ENDPOINT_NAME_SGCQ			"ep_gcq_mgmt_00"
@@ -37,7 +37,6 @@ typedef struct {
 	char     logic_uuid_str[XILINX_LOGIC_UUID_SIZE_BYTES*2+1];
 } endpoints_struct;
 
-int read_logic_uuid(struct pci_dev *dev, endpoints_struct **endpoints);
 int read_vsec(struct pci_dev *dev, endpoints_struct **endpoints);
 
 void release_endpoints(endpoints_struct **endpoints);

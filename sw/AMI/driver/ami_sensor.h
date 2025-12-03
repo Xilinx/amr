@@ -20,16 +20,6 @@
  */
 #define SENSOR_REFRESH_TIMEOUT_MS 1000
 
-/**
- * struct sensor_status_name_map_t - map of status to human readable representation.
- * @status: Numeric status
- * @name: Human readable string for this status
- */
-struct sensor_status_name_map_t{
-	int  status;
-	char *name;
-};
-
 /* Forward declaration of pf_dev_struct */
 struct pf_dev_struct;
 
@@ -46,13 +36,6 @@ enum ami_amc_boot_devices {
 
 	AMI_AMC_BOOT_DEVICE_MAX
 };
-
-/* enum sensor_status defined in ami_amc_control.h */
-
-#define SENSOR_STATUS_NAME_NOT_PRESENT "Sensor Not Present"
-#define SENSOR_STATUS_NAME_PRESENT     "Sensor Present and Valid"
-#define SENSOR_STATUS_NAME_UNAVAIL     "Data Not Available"
-#define SENSOR_STATUS_NAME_NA          "Not Applicable or Default Value"
 
 int discover_sensors(struct pf_dev_struct *pf_dev, int *empty_sdr_count);
 void delete_sensors(struct pf_dev_struct *pf_dev);

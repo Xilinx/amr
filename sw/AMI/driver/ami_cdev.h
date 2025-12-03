@@ -18,11 +18,11 @@
 
 #include "ami.h"
 
-#define DEFAULT_CDEV_COUNT	1
-#define DEV_NAME_SIZE		50
-#define CLS_STR_SIZE		30
-#define DEFAULT_CLS_NAME	KBUILD_MODNAME
-#define DEFAULT_DEVICE_NAME	KBUILD_MODNAME
+#define DEFAULT_CDEV_COUNT		1
+#define DEV_NAME_SIZE			50
+#define CLS_STR_SIZE			30
+#define DEFAULT_CLS_NAME		KBUILD_MODNAME
+#define DEFAULT_DEVICE_NAME		KBUILD_MODNAME
 #define DEFAULT_CDEV_BASEMINOR	(unsigned)(0)
 
 /* IOCTL data. Shared with userspace code. */
@@ -53,14 +53,14 @@
  *   0xDD is the offset
  */
 #define MK_MODULE_RW_FLAGS(req, dev, page, off) \
-                                        (((uint8_t)req << 24) | \
-                                        ((uint8_t)dev << 16)  | \
-                                        ((uint8_t)page << 8)  | \
-                                        ((uint8_t)off))
-#define MODULE_RW_TYPE(flags)           ((uint8_t)(flags >> 24))
-#define MODULE_RW_DEVICE(flags)         ((uint8_t)((flags & 0x00ff0000) >> 16))
-#define MODULE_RW_PAGE(flags)           ((uint8_t)((flags & 0x0000ff00) >> 8))
-#define MODULE_RW_OFFSET(flags)         ((uint8_t)(flags & 0x000000ff))
+                                    (((uint8_t)req << 24) | \
+                                    ((uint8_t)dev  << 16) | \
+                                    ((uint8_t)page <<  8) | \
+                                    ((uint8_t)off))
+#define MODULE_RW_TYPE(flags)       ((uint8_t)(flags >> 24))
+#define MODULE_RW_DEVICE(flags)     ((uint8_t)((flags & 0x00ff0000) >> 16))
+#define MODULE_RW_PAGE(flags)       ((uint8_t)((flags & 0x0000ff00) >>  8))
+#define MODULE_RW_OFFSET(flags)     ((uint8_t)((flags & 0x000000ff) >>  0))
 
 /**
  * struct ami_ioc_data_payload - payload struct for dynamically sized ioctl data

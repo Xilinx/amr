@@ -628,7 +628,7 @@ static int convert_milli_units(enum ami_sensor_unit_mod unit_mod, long val, long
 	if (!mapped_val)
 		return -EINVAL;
 
-	switch((int)(signed char)unit_mod)
+	switch ((int)(signed char)unit_mod)
 	{
 	case SENSOR_UNIT_MOD_MEGA:
 		*mapped_val = MEGA_TO_MILLI_UNIT(val);
@@ -672,7 +672,7 @@ static int convert_micro_units(enum ami_sensor_unit_mod unit_mod, long val, long
 	if (!mapped_val)
 		return -EINVAL;
 
-	switch((int)(signed char)unit_mod)
+	switch ((int)(signed char)unit_mod)
 	{
 	case SENSOR_UNIT_MOD_MEGA:
 		*mapped_val = MEGA_TO_MICRO_UNIT(val);
@@ -752,7 +752,7 @@ static umode_t is_visible_extra(struct kobject *kobj, struct attribute *attr, in
 	struct sensor_device_attribute_2 *sensor_da = NULL;
 	enum ami_sensor_type sensor_type = SENSOR_TYPE_INVALID;
 
-	if(!kobj || !attr)
+	if (!kobj || !attr)
 		return 0;
 
 	dev = container_of(kobj, struct device, kobj);
@@ -1214,7 +1214,7 @@ int read_sensor_val(struct pf_dev_struct *pf_dev, enum hwmon_sensor_types type,
 	enum ami_sensor_attribute ami_attr = SENSOR_ATTR_INVALID;
 	enum ami_sensor_unit_mod unit_mod  = SENSOR_UNIT_MOD_NONE;
 
-	if(!pf_dev || !val)
+	if (!pf_dev || !val)
 		return -EINVAL;
 
 	/* Handle chip config */
@@ -1327,13 +1327,13 @@ int read_sensor_val(struct pf_dev_struct *pf_dev, enum hwmon_sensor_types type,
 			case hwmon_curr:
 			case hwmon_in:
 				ret = convert_milli_units(unit_mod, value, &mapped_value);
-				if(!ret)
+				if (!ret)
 					*val = mapped_value;
 				break;
 
 			case hwmon_power:
 				ret = convert_micro_units(unit_mod, value, &mapped_value);
-				if(!ret)
+				if (!ret)
 					*val = mapped_value;
 				break;
 
@@ -1404,7 +1404,7 @@ int register_hwmon(struct device *dev, struct pf_dev_struct *pf_dev)
 	hwmon_dev = devm_hwmon_device_register_with_info(
 		dev, "Alveo", pf_dev, &amc_hwmon_info, extra_groups);
 
-	if(IS_ERR(hwmon_dev))
+	if (IS_ERR(hwmon_dev))
 		return PTR_ERR(hwmon_dev);
 
 	pf_dev->hwmon_dev = hwmon_dev;

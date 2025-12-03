@@ -10,12 +10,12 @@
 #include <linux/device.h>
 #include <linux/types.h>
 
-#include "gcq.h"
+#include "ami_gcq.h"
 #include "ami_top.h"
 #include "ami_amc_control.h"
 #include "amc_proxy.h"
 #include "ami_program.h"
-#include "ami_driver_version.h"
+
 
 /*****************************************************************************/
 /* Local Varaiables                                                          */
@@ -62,49 +62,49 @@ static DEFINE_XARRAY_ALLOC(cid_xarray);
  */
 void dump_amc_log(struct amc_control_ctxt *amc_ctrl_ctxt)
 {
-        int i = 0;
-        uintptr_t msg_idx_addr = 0;
-        uint32_t current_log_idx = 0;
+	int i = 0;
+	uintptr_t msg_idx_addr = 0;
+	uint32_t current_log_idx = 0;
 
-        if (!amc_ctrl_ctxt) {
-                return;
-        }
-        msg_idx_addr = (uintptr_t)amc_ctrl_ctxt->gcq_payload_base_virt_addr +
-                offsetof(struct amc_shared_mem, log_msg.log_msg_index);
+	if (!amc_ctrl_ctxt) {
+		return;
+	}
+	msg_idx_addr = (uintptr_t)amc_ctrl_ctxt->gcq_payload_base_virt_addr +
+			offsetof(struct amc_shared_mem, log_msg.log_msg_index);
 
-        current_log_idx = ioread32((void *)msg_idx_addr);
+	current_log_idx = ioread32((void *)msg_idx_addr);
 
-        /*
-         * When PCI memory is corrupted (e.g. by doing an 'rst -sys' or attempting
-         * a HW manager flash while AMI is loaded), the data read back is 0xFF,
-         * which causes the logging thread to loop forever.
-         */
-        if (AMC_LOG_MAX_RECS < current_log_idx) {
-                AMI_ERR_ONCE(
-                        amc_ctrl_ctxt,
-                        "Logging thread error - invalid PCI data read!"
-                );
-                return;
-        }
+	/*
+	 * When PCI memory is corrupted (e.g. by doing an 'rst -sys' or attempting
+	 * a HW manager flash while AMI is loaded), the data read back is 0xFF,
+	 * which causes the logging thread to loop forever.
+	 */
+	if (AMC_LOG_MAX_RECS < current_log_idx) {
+		AMI_ERR_ONCE(
+			amc_ctrl_ctxt,
+			"Logging thread error - invalid PCI data read!"
+		);
+		return;
+	}
 
-        i = amc_ctrl_ctxt->last_printed_msg_index;
+	i = amc_ctrl_ctxt->last_printed_msg_index;
 
-        while (i != current_log_idx) {
-                struct amc_msg_payload msg = { 0 };
+	while (i != current_log_idx) {
+		struct amc_msg_payload msg = { 0 };
 
-                /* Calculate the address of the log message for the current index */
-                uintptr_t log_msg_addr = (uintptr_t)amc_ctrl_ctxt->gcq_payload_base_virt_addr +
-                        amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_buf_off + (i * sizeof(struct amc_msg_payload));
+		/* Calculate the address of the log message for the current index */
+		uintptr_t log_msg_addr = (uintptr_t)amc_ctrl_ctxt->gcq_payload_base_virt_addr +
+			amc_ctrl_ctxt->amc_shared_mem.log_msg.log_msg_buf_off + (i * sizeof(struct amc_msg_payload));
 
-                memcpy_fromio(&msg, (void*)log_msg_addr, sizeof(struct amc_msg_payload));
+		memcpy_fromio(&msg, (void*)log_msg_addr, sizeof(struct amc_msg_payload));
 
-                if(strnchr(msg.buff, sizeof(struct amc_msg_payload), '\0') && strlen(msg.buff))
-                        AMI_AMC_LOG(amc_ctrl_ctxt, "%s", msg.buff);
+		if (strnchr(msg.buff, sizeof(struct amc_msg_payload), '\0') && strlen(msg.buff))
+			AMI_AMC_LOG(amc_ctrl_ctxt, "%s", msg.buff);
 
-                i = (i + 1) % AMC_LOG_MAX_RECS;
-        }
+		i = (i + 1) % AMC_LOG_MAX_RECS;
+	}
 
-        amc_ctrl_ctxt->last_printed_msg_index = current_log_idx;
+	amc_ctrl_ctxt->last_printed_msg_index = current_log_idx;
 }
 
 
@@ -261,7 +261,7 @@ static bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 
 	for (i = 0; i < retry; i++) {
 		msleep(interval);
-		memcpy_fromio(&(amc_ctrl_ctxt->amc_shared_mem),
+		memcpy_fromio(&amc_ctrl_ctxt->amc_shared_mem,
 			      amc_ctrl_ctxt->gcq_payload_base_virt_addr,
 			      sizeof(amc_ctrl_ctxt->amc_shared_mem));
 
@@ -275,11 +275,11 @@ static bool gcq_device_is_ready(struct amc_control_ctxt *amc_ctrl_ctxt)
 
 		AMI_VDBG(amc_ctrl_ctxt,
 			 "sGCQ server initiated gcq ring buffer offset   : 0x%x",
-			 amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off);
+			 amc_ctrl_ctxt->amc_shared_mem.ring_buf.ring_buf_off);
 
 		AMI_VDBG(amc_ctrl_ctxt,
 			 "sGCQ server initiated gcq ring buffer length   : 0x%x",
-			 amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_len);
+			 amc_ctrl_ctxt->amc_shared_mem.ring_buf.ring_buf_len);
 
 		AMI_VDBG(amc_ctrl_ctxt,
 			 "AMC device status offset                       : 0x%x",
@@ -371,7 +371,7 @@ static int start_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt)
 
 	amc_ctrl_ctxt->gcq_ring_buf_base_virt_addr =
 		amc_ctrl_ctxt->gcq_payload_base_virt_addr +
-		amc_ctrl_ctxt->amc_shared_mem.ring_buffer.ring_buffer_off;
+		amc_ctrl_ctxt->amc_shared_mem.ring_buf.ring_buf_off;
 
 	AMI_VDBG(amc_ctrl_ctxt,
 		 "\t- sGCQ ring buffer virtual addr : 0x%p",
@@ -736,7 +736,7 @@ static int check_gcq_supported_version(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	if (!amc_ctrl_ctxt)
 		return -EINVAL;
 
-	if (iGCQGetVersion(&ver) == SUCCESS) {
+	if (gcq_get_version(&ver) == SUCCESS) {
 		if ((ver.ucVerMajor == major) && (ver.ucVerMinor == minor)) {
 			AMI_INFO(amc_ctrl_ctxt, "sGCQ Supported Version: %d.%d", major, minor);
 			return SUCCESS;
@@ -770,7 +770,7 @@ static int check_amc_supported_version(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	if (!amc_ctrl_ctxt)
 		return -EINVAL;
 
-	if ((GIT_TAG_VER_MAJOR == major) && (GIT_TAG_VER_MINOR == minor)) {
+	if ((AMI_VER_MAJOR == major) && (AMI_VER_MINOR == minor)) {
 		AMI_INFO(amc_ctrl_ctxt, "AMC Supported Version : %d.%d", major, minor);
 		return SUCCESS;
 	}
@@ -778,8 +778,8 @@ static int check_amc_supported_version(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	AMI_WARN(
 		amc_ctrl_ctxt,
 		"Potentially incompatible AMC version detected (expected %d.%d but got %d.%d)",
-		GIT_TAG_VER_MAJOR,
-		GIT_TAG_VER_MINOR,
+		AMI_VER_MAJOR,
+		AMI_VER_MINOR,
 		major,
 		minor
 	);
@@ -1755,6 +1755,7 @@ int setup_amc(struct pci_dev		*dev,
 	char *version_buf = NULL;
 	const char *amc_hb_thread_name = "amc heartbeat";
 	const char *amc_log_thread_name = "amc logging";
+	struct amc_control_ctxt *amc_ctxt = NULL;
 
 	if (!dev || !amc_ctrl_ctxt)
 		return -EINVAL;
@@ -1768,64 +1769,65 @@ int setup_amc(struct pci_dev		*dev,
 		goto fail;
 	}
 
-	(*amc_ctrl_ctxt)->pcie_dev = dev;
-	(*amc_ctrl_ctxt)->gcq_halted = true;
-	(*amc_ctrl_ctxt)->gcq_base_virt_addr = NULL;
-	(*amc_ctrl_ctxt)->gcq_payload_base_virt_addr = NULL;
-	(*amc_ctrl_ctxt)->heartbeat_thread_created = false;
-	(*amc_ctrl_ctxt)->logging_thread_created = false;
+	amc_ctxt = *amc_ctrl_ctxt;
+	amc_ctxt->pcie_dev = dev;
+	amc_ctxt->gcq_halted = true;
+	amc_ctxt->gcq_base_virt_addr = NULL;
+	amc_ctxt->gcq_payload_base_virt_addr = NULL;
+	amc_ctxt->heartbeat_thread_created = false;
+	amc_ctxt->logging_thread_created = false;
 
-	mutex_init(&((*amc_ctrl_ctxt)->lock));
-	mutex_init(&((*amc_ctrl_ctxt)->gcq_cmd_lock));
-	sema_init(&((*amc_ctrl_ctxt)->gcq_log_page_sema), 1);
-	sema_init(&((*amc_ctrl_ctxt)->gcq_data_sema), 1);
+	mutex_init(&amc_ctxt->lock);
+	mutex_init(&amc_ctxt->gcq_cmd_lock);
+	sema_init(&amc_ctxt->gcq_log_page_sema, 1);
+	sema_init(&amc_ctxt->gcq_data_sema, 1);
 
 	/* Map Endpoints */
-	ret = map_amc_endpoints(dev, *amc_ctrl_ctxt, ep_gcq);
+	ret = map_amc_endpoints(dev, amc_ctxt, ep_gcq);
 	if (ret)
 		goto fail;
 
 	/* Start Service */
-	ret = start_gcq_services(*amc_ctrl_ctxt);
+	ret = start_gcq_services(amc_ctxt);
 	if (ret)
 		goto fail;
 
 	/* Create sGCQ instance */
-	(*amc_ctrl_ctxt)->gcq_consumer.ullBaseAddress = (uint64_t)(*amc_ctrl_ctxt)->gcq_base_virt_addr;
-	(*amc_ctrl_ctxt)->gcq_consumer.ullRingAddress = (uint64_t)(*amc_ctrl_ctxt)->gcq_ring_buf_base_virt_addr;
-	(*amc_ctrl_ctxt)->gcq_consumer.ulRingLength =
-		(uint64_t)(*amc_ctrl_ctxt)->amc_shared_mem.ring_buffer.ring_buffer_len;
-	(*amc_ctrl_ctxt)->gcq_consumer.ulSubmissionQueueSlotSize = AMC_PROXY_REQUEST_SIZE;
-	(*amc_ctrl_ctxt)->gcq_consumer.ulCompletionQueueSlotSize = AMC_PROXY_RESPONSE_SIZE;
+	amc_ctxt->gcq_consumer.ullBaseAddr  = (uint64_t)amc_ctxt->gcq_base_virt_addr;
+	amc_ctxt->gcq_consumer.ullRingAddr  = (uint64_t)amc_ctxt->gcq_ring_buf_base_virt_addr;
+	amc_ctxt->gcq_consumer.ulRingLength =
+		(uint64_t)amc_ctxt->amc_shared_mem.ring_buf.ring_buf_len;
+	amc_ctxt->gcq_consumer.ulSQSlotSize = AMC_PROXY_REQUEST_SIZE;
+	amc_ctxt->gcq_consumer.ulCQSlotSize = AMC_PROXY_RESPONSE_SIZE;
 
 	/* Init proxy and bind in callback */
-	ret = amc_proxy_init(0, &(*amc_ctrl_ctxt)->gcq_consumer);
+	ret = amc_proxy_init(0, &amc_ctxt->gcq_consumer);
 	if (ret) {
 		DEV_ERR(dev, "amc_proxy_init() failed %d", ret);
 		goto fail;
 	}
 
-	ret = amc_proxy_bind_callback(&(*amc_ctrl_ctxt)->gcq_consumer, amc_proxy_callback);
+	ret = amc_proxy_bind_callback(&amc_ctxt->gcq_consumer, amc_proxy_callback);
 	if (ret) {
 		DEV_ERR(dev, "amc_proxy_bind_callback() failed %d", ret);
 		goto fail;
 	}
 
 	/* Spawn logging thread. */
-	(*amc_ctrl_ctxt)->logging_thread = kthread_create(
+	amc_ctxt->logging_thread = kthread_create(
 		logging_thread,
-		*amc_ctrl_ctxt,
+		amc_ctxt,
 		amc_log_thread_name
 	);
 
-	if (IS_ERR((*amc_ctrl_ctxt)->logging_thread)) {
+	if (IS_ERR(amc_ctxt->logging_thread)) {
 		DEV_ERR(dev, "Unable to create the %s thread", amc_log_thread_name);
-		ret = PTR_ERR((*amc_ctrl_ctxt)->logging_thread);
+		ret = PTR_ERR(amc_ctxt->logging_thread);
 		goto fail;
 	} else {
 		DEV_VDBG(dev, "Successfully created %s thread", amc_log_thread_name);
-		(*amc_ctrl_ctxt)->logging_thread_created = true;
-		wake_up_process((*amc_ctrl_ctxt)->logging_thread);
+		amc_ctxt->logging_thread_created = true;
+		wake_up_process(amc_ctxt->logging_thread);
 	}
 
 	/* Getting sGCQ Version, Check the sGCQ Version so that we don't
@@ -1837,54 +1839,54 @@ int setup_amc(struct pci_dev		*dev,
 		goto fail;
 	}
 
-	ret = get_gcq_version(*amc_ctrl_ctxt, version_buf);
+	ret = get_gcq_version(amc_ctxt, version_buf);
 	if (ret) {
 		ret = -EIO;
 		goto fail;
 	}
 
-	(*amc_ctrl_ctxt)->version.ver_major = (uint8_t)version_buf[0];
-	(*amc_ctrl_ctxt)->version.ver_minor = (uint8_t)version_buf[1];
-	(*amc_ctrl_ctxt)->version.ver_patch = (uint8_t)version_buf[2];
-	(*amc_ctrl_ctxt)->version.local_changes = (uint8_t)version_buf[3];
-	(*amc_ctrl_ctxt)->version.dev_commits = (uint16_t)(version_buf[4] & 0x00FF) |
+	amc_ctxt->version.ver_major = (uint8_t)version_buf[0];
+	amc_ctxt->version.ver_minor = (uint8_t)version_buf[1];
+	amc_ctxt->version.ver_patch = (uint8_t)version_buf[2];
+	amc_ctxt->version.local_changes = (uint8_t)version_buf[3];
+	amc_ctxt->version.dev_commits = (uint16_t)(version_buf[4] & 0x00FF) |
 						(uint16_t)((version_buf[5] << 8) & 0xFF00);
 
 	DEV_VDBG(dev,
-		 "amc version = %d.%d.%d-%d gcq version = %d.%d",
-		 (*amc_ctrl_ctxt)->version.ver_major,
-		 (*amc_ctrl_ctxt)->version.ver_minor,
-		 (*amc_ctrl_ctxt)->version.ver_patch,
-		 (*amc_ctrl_ctxt)->version.dev_commits,
-		 (uint8_t)version_buf[6],
-		 (uint8_t)version_buf[7]
+		"amc version = %d.%d.%d-%d gcq version = %d.%d",
+		amc_ctxt->version.ver_major,
+		amc_ctxt->version.ver_minor,
+		amc_ctxt->version.ver_patch,
+		amc_ctxt->version.dev_commits,
+		(uint8_t)version_buf[6],
+		(uint8_t)version_buf[7]
 	);
 
-	ret = check_gcq_supported_version(*amc_ctrl_ctxt, version_buf[6], version_buf[7]);
+	ret = check_gcq_supported_version(amc_ctxt, version_buf[6], version_buf[7]);
 	if (ret)
 		goto fail;
 
 	/* Check AMC version */
-	if (check_amc_supported_version(*amc_ctrl_ctxt,
-					(*amc_ctrl_ctxt)->version.ver_major,
-					(*amc_ctrl_ctxt)->version.ver_minor)) {
-		(*amc_ctrl_ctxt)->compat_mode = true;
+	if (check_amc_supported_version(amc_ctxt,
+					amc_ctxt->version.ver_major,
+					amc_ctxt->version.ver_minor)) {
+		amc_ctxt->compat_mode = true;
 		DEV_WARN(
 			dev,
 			"Running in compatibility mode - most features will be unavailable!"
 			" Update your AMC to version %d.%d.",
-			GIT_TAG_VER_MAJOR,
-			GIT_TAG_VER_MINOR
+			AMI_VER_MAJOR,
+			AMI_VER_MINOR
 		);
 
 		/* Stop the logging thread if it's been created */
-		if ((*amc_ctrl_ctxt)->logging_thread_created == true) {
-			ret = kthread_stop((*amc_ctrl_ctxt)->logging_thread);
+		if (amc_ctxt->logging_thread_created == true) {
+			ret = kthread_stop(amc_ctxt->logging_thread);
 			if (ret)
 				DEV_ERR(dev, "kthread_stop() failed for logging thread: %d", ret);
 			else
 				/* Prevents thread being stopped again via unset_amc */
-				(*amc_ctrl_ctxt)->logging_thread_created = false;
+				amc_ctxt->logging_thread_created = false;
 		}
 	}
 
@@ -1894,24 +1896,24 @@ int setup_amc(struct pci_dev		*dev,
 	 * in compatibility mode - this disables most driver features,
 	 * including the heartbeat and logging threads.
 	 */
-	if (!(*amc_ctrl_ctxt)->compat_mode) {
+	if (!amc_ctxt->compat_mode) {
 		/* Spawn the heartbeat thread once version is verified */
-		(*amc_ctrl_ctxt)->event_cb = event_cb;
-		(*amc_ctrl_ctxt)->event_cb_data = event_cb_data;
-		(*amc_ctrl_ctxt)->heartbeat_thread = kthread_create(
+		amc_ctxt->event_cb = event_cb;
+		amc_ctxt->event_cb_data = event_cb_data;
+		amc_ctxt->heartbeat_thread = kthread_create(
 			heartbeat_health_thread,
 			*amc_ctrl_ctxt,
 			amc_hb_thread_name
 		);
 
-		if (IS_ERR((*amc_ctrl_ctxt)->heartbeat_thread)) {
+		if (IS_ERR(amc_ctxt->heartbeat_thread)) {
 			DEV_ERR(dev, "Unable to create the %s thread", amc_hb_thread_name);
-			ret = PTR_ERR((*amc_ctrl_ctxt)->heartbeat_thread);
+			ret = PTR_ERR(amc_ctxt->heartbeat_thread);
 			goto fail;
 		} else {
 			DEV_VDBG(dev, "Successfully created %s hearbeat thread", amc_hb_thread_name);
-			(*amc_ctrl_ctxt)->heartbeat_thread_created = true;
-			wake_up_process((*amc_ctrl_ctxt)->heartbeat_thread);
+			amc_ctxt->heartbeat_thread_created = true;
+			wake_up_process(amc_ctxt->heartbeat_thread);
 		}
 	}
 
@@ -1925,7 +1927,7 @@ fail:
 	if (version_buf)
 		vfree(version_buf);
 
-	unset_amc(dev, amc_ctrl_ctxt);
+	unset_amc(dev, *amc_ctrl_ctxt);
 	release_amc_mem(amc_ctrl_ctxt);
 	DEV_ERR(dev, "Failed to setup AMC sGCQ");
 
@@ -1935,7 +1937,7 @@ fail:
 /*
  * Stop the service, close proxy and tidy up PCI
  */
-int unset_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt)
+int unset_amc(struct pci_dev *dev, struct amc_control_ctxt *amc_ctrl_ctxt)
 {
 	int ret = SUCCESS;
 	struct pf_dev_struct *pf_dev = NULL;
@@ -1948,30 +1950,30 @@ int unset_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt)
 	if (!pf_dev)
 		return -EINVAL;
 
-	if (*amc_ctrl_ctxt) {
+	if (amc_ctrl_ctxt) {
 		/* Stop the heartbeat thread if it's been created */
-		if ((*amc_ctrl_ctxt)->heartbeat_thread_created == true) {
-			ret = kthread_stop((*amc_ctrl_ctxt)->heartbeat_thread);
+		if (amc_ctrl_ctxt->heartbeat_thread_created == true) {
+			ret = kthread_stop(amc_ctrl_ctxt->heartbeat_thread);
 			if (ret)
 				DEV_ERR(dev, "kthread_stop() failed for heartbeat thread: %d", ret);
 		}
 
 		/* Stop the logging thread if it's been created */
-		if ((*amc_ctrl_ctxt)->logging_thread_created == true) {
-			ret = kthread_stop((*amc_ctrl_ctxt)->logging_thread);
+		if (amc_ctrl_ctxt->logging_thread_created == true) {
+			ret = kthread_stop(amc_ctrl_ctxt->logging_thread);
 			if (ret)
 				DEV_ERR(dev, "kthread_stop() failed for logging thread: %d", ret);
 		}
 
 		/* Stop the Services */
-		stop_gcq_services(*amc_ctrl_ctxt);
+		stop_gcq_services(amc_ctrl_ctxt);
 
 		/* Close the proxy */
-		ret = amc_proxy_close(&((*amc_ctrl_ctxt)->gcq_consumer));
+		ret = amc_proxy_close(&amc_ctrl_ctxt->gcq_consumer);
 		if (ret)
 			DEV_ERR(dev, "Failed to close the amc proxy %d", ret);
 
-		unmap_pci_io(dev, &((*amc_ctrl_ctxt)->gcq_base_virt_addr));
+		unmap_pci_io(dev, &amc_ctrl_ctxt->gcq_base_virt_addr);
 	}
 
 	pci_release_region(dev, PCIE_BAR0);

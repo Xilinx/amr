@@ -16,12 +16,11 @@ $(TARGET_MODULE)-objs += ami_hwmon.o
 $(TARGET_MODULE)-objs += ami_sysfs.o
 $(TARGET_MODULE)-objs += ami_program.o
 $(TARGET_MODULE)-objs += amc_proxy.o
-$(TARGET_MODULE)-objs += gcq-driver/src/gcq_driver.o
+$(TARGET_MODULE)-objs += ami_gcq.o
 
 CFLAGS       :=
 DRIVER_DIR   := $(PWD)
-INCLUDE_DIRS := $(DRIVER_DIR) \
-                $(DRIVER_DIR)/gcq-driver/src
+INCLUDE_DIRS := $(DRIVER_DIR)
 KERNEL_DIR   := /lib/modules/`uname -r`/build
 
 #CFLAGS_file_name will apply the macros to those files
@@ -29,7 +28,7 @@ KERNEL_DIR   := /lib/modules/`uname -r`/build
 
 #To apply the macro to all the source files compiled with this makefile
 # ccflags-y:=-DDEBUG
-ccflags-y :=-DDEBUG -DVERBOSE_DEBUG -DGCQ_MAX_INSTANCES=16
+ccflags-y :=-DDEBUG -DVERBOSE_DEBUG
 ccflags-y += $(addprefix -I,$(INCLUDE_DIRS)) $(CFLAGS)
 
 all: clean

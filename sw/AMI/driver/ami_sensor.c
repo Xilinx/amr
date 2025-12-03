@@ -15,21 +15,27 @@
 #define DEFAULT_BDINFO_POWER (0xFF)
 
 
-static struct sensor_status_name_map_t sensor_status_name_map[] = {
-	{ SENSOR_NOT_PRESENT,	       SENSOR_STATUS_NAME_NOT_PRESENT	       },
-	{ SENSOR_PRESENT_AND_VALID,    SENSOR_STATUS_NAME_PRESENT	       },
-	{ DATA_NOT_AVAILABLE,	       SENSOR_STATUS_NAME_UNAVAIL	       },
-	{ SENSOR_STATUS_NOT_AVAILABLE, SENSOR_STATUS_NAME_NA		       },
-};
-
 char *convert_sensor_status_name_map(int status)
 {
-	int i = 0;
+	char *name = "";
 
-	for (i = 0; i < ARRAY_SIZE(sensor_status_name_map); i++)
-		if (sensor_status_name_map[i].status == status)
-			return sensor_status_name_map[i].name;
-	return "";
+	switch (status) {
+		case SENSOR_NOT_PRESENT:
+			name = "Sensor Not Present";
+			break;
+		case SENSOR_PRESENT_AND_VALID:
+			name = "Sensor Present and Valid";
+			break;
+		case DATA_NOT_AVAILABLE:
+			name = "Data Not Available";
+			break;
+		case SENSOR_STATUS_NOT_AVAILABLE:
+			name = "Not Applicable or Default Value";
+			break;
+		default:
+			break;
+	}
+	return name;
 }
 
 /**

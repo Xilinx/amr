@@ -14,32 +14,13 @@
 #include "ami_pci_dbg.h"
 #include "ami_sensor.h"
 
-#define FPGA_CONFIG_MODE_QSPIX4         (7)
-#define FPGA_CONFIG_MODE_OSPI           (8)
-#define MAX_POWER_MODE_75W              (0)
-#define MAX_POWER_MODE_150W             (1)
-#define MAX_POWER_MODE_225W             (2)
-#define MAX_POWER_MODE_350W             (3)
+#define FPGA_CONFIG_MODE_QSPIX4	(7)
+#define FPGA_CONFIG_MODE_OSPI	(8)
+#define MAX_POWER_MODE_75W		(0)
+#define MAX_POWER_MODE_150W		(1)
+#define MAX_POWER_MODE_225W		(2)
+#define MAX_POWER_MODE_350W		(3)
 
-/**
- * struct dev_state_map - Map of device state to human readable string.
- * @state: Device state.
- * @name: String representation of device state.
- */
-struct dev_state_map {
-	enum pf_dev_state state;
-	const char *name;
-};
-
-static const struct dev_state_map state_names[] = {
-	{ PF_DEV_STATE_INIT,	     STATE_NAME_INIT	     },
-	{ PF_DEV_STATE_READY,	     STATE_NAME_READY	     },
-	{ PF_DEV_STATE_MISSING_INFO, STATE_NAME_MISSING_INFO },
-	{ PF_DEV_STATE_NO_AMC,	     STATE_NAME_NO_AMC	     },
-	{ PF_DEV_STATE_INIT_ERROR,   STATE_NAME_INIT_ERROR   },
-	{ PF_DEV_STATE_SHUTDOWN,     STATE_NAME_SHUTDOWN     },
-	{ PF_DEV_STATE_COMPAT,	     STATE_NAME_COMPAT	     },
-};
 
 /**
  * get_state_name() - Get the string representation of a device state.
@@ -49,12 +30,34 @@ static const struct dev_state_map state_names[] = {
  */
 static const char *get_state_name(enum pf_dev_state state)
 {
-	int i = 0;
+	const char *state_name = "";
 
-	for (i = 0; i < ARRAY_SIZE(state_names); i++)
-		if (state_names[i].state == state)
-			return state_names[i].name;
-	return "";
+	switch (state) {
+		case PF_DEV_STATE_INIT:
+			state_name = "INIT";
+			break;
+		case PF_DEV_STATE_READY:
+			state_name = "READY";
+			break;
+		case PF_DEV_STATE_MISSING_INFO:
+			state_name = "MISSING_INFO";
+			break;
+		case PF_DEV_STATE_NO_AMC:
+			state_name = "NO_AMC";
+			break;
+		case PF_DEV_STATE_INIT_ERROR:
+			state_name = "INIT_ERROR";
+			break;
+		case PF_DEV_STATE_SHUTDOWN:
+			state_name = "SHUTDOWN";
+			break;
+		case PF_DEV_STATE_COMPAT:
+			state_name = "COMPAT";
+			break;
+		default:
+			break;
+	}
+	return state_name;
 }
 
 /**

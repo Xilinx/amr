@@ -34,7 +34,6 @@
 #include "ami_pcie.h"
 #include "ami_vsec.h"
 #include "ami_amc_control.h"
-#include "ami_driver_version.h"
 
 /* RHEL fix */
 #ifndef fallthrough
@@ -47,7 +46,6 @@
 
 static struct drv_cdev_struct driver_dev = { { 0 } };  /* Global device */
 static unsigned pf_dev_index = DEFAULT_CDEV_BASEMINOR;
-static GCQInitCfg gcq_init_cfg = { 0 };
 
 /* Declared as extern in ami.h */
 bool ami_debug_enabled = true;
@@ -152,63 +150,63 @@ static void amc_event_cb(enum amc_event_id id, void *data)
 
 int my_krealloc(void **buf, int old_size, int new_size, gfp_t flags)
 {
-        void *tmp = NULL;
-        int tmp_size = 0;
+	void *tmp = NULL;
+	int tmp_size = 0;
 
-        if (!buf || (new_size <= 0) || (old_size < 0))
-                return -EINVAL;
+	if (!buf || (new_size <= 0) || (old_size < 0))
+		return -EINVAL;
 
-        if (!(*buf)) {
-                *buf = kmalloc(new_size, flags);
-                if (!(*buf))
-                        return -ENOMEM;
-                else
-                        return SUCCESS;
-        }
+	if (!(*buf)) {
+		*buf = kmalloc(new_size, flags);
+		if (!(*buf))
+			return -ENOMEM;
+		else
+			return SUCCESS;
+	}
 
-        if (old_size < new_size)
-                tmp_size = old_size;
-        else
-                tmp_size = new_size;
+	if (old_size < new_size)
+		tmp_size = old_size;
+	else
+		tmp_size = new_size;
 
-        tmp = kmalloc(tmp_size, flags);
-        if (!tmp)
-                return -ENOMEM;
+	tmp = kmalloc(tmp_size, flags);
+	if (!tmp)
+		return -ENOMEM;
 
-        memcpy(tmp, *buf, tmp_size);
+	memcpy(tmp, *buf, tmp_size);
 
-        kfree(*buf);
-        *buf = NULL;
+	kfree(*buf);
+	*buf = NULL;
 
-        *buf = kmalloc(new_size, flags);
-        if (!(*buf))
-                return -ENOMEM;
+	*buf = kmalloc(new_size, flags);
+	if (!(*buf))
+		return -ENOMEM;
 
-        memcpy(*buf, tmp, tmp_size);
+	memcpy(*buf, tmp, tmp_size);
 
-        kfree(tmp);
-        tmp = NULL;
+	kfree(tmp);
+	tmp = NULL;
 
-        return SUCCESS;
+	return SUCCESS;
 }
 
 int strconcat(char **dst, char src[], int *size)
 {
-        int ret = SUCCESS;
+	int ret = SUCCESS;
 
-        if (!size || !dst || ((*size) < 0))
-                return -EINVAL;
+	if (!size || !dst || ((*size) < 0))
+		return -EINVAL;
 
-        ret = my_krealloc((void **)dst, *size, *size + strlen(src), GFP_KERNEL);
-        if (ret)
-                return ret;
+	ret = my_krealloc((void **)dst, *size, *size + strlen(src), GFP_KERNEL);
+	if (ret)
+		return ret;
 
-        if (!(*dst))
-                return -ENOMEM;
+	if (!(*dst))
+		return -ENOMEM;
 
-        memcpy(*dst + *size - 1, src, strlen(src) + 1);
-        *size += strlen(src);
-        return SUCCESS;
+	memcpy(*dst + *size - 1, src, strlen(src) + 1);
+	*size += strlen(src);
+	return SUCCESS;
 }
 
 /*
@@ -385,7 +383,7 @@ remove_pf_dev:
 	pf_dev->cdev.count = 0;
 
 	if (pf_dev->amc_ctrl_ctxt) {
-		unset_amc(dev, &pf_dev->amc_ctrl_ctxt);
+		unset_amc(dev, pf_dev->amc_ctrl_ctxt);
 		release_amc_mem(&pf_dev->amc_ctrl_ctxt);
 	}
 
@@ -458,7 +456,7 @@ void shutdown_pf_dev_services(struct pf_dev_struct *pf_dev)
 
 	/* Shutdown AMC. */
 	if (pf_dev->amc_ctrl_ctxt) {
-		unset_amc(pf_dev->pci, &pf_dev->amc_ctrl_ctxt);
+		unset_amc(pf_dev->pci, pf_dev->amc_ctrl_ctxt);
 		release_amc_mem(&pf_dev->amc_ctrl_ctxt);  /* NOTE: This sets the pointer to NULL. */
 	}
 
@@ -885,11 +883,11 @@ static ssize_t version_show(struct device_driver *drv, char *buf)
 	return sprintf(
 		buf,
 		"%hhd.%hhd.%hhd +%hhd *%hhd\n",
-		GIT_TAG_VER_MAJOR,
-		GIT_TAG_VER_MINOR,
-		GIT_TAG_VER_PATCH,
-		GIT_TAG_VER_DEV_COMMITS,
-		GIT_STATUS
+		AMI_VER_MAJOR,
+		AMI_VER_MINOR,
+		AMI_VER_PATCH,
+		0,
+		0
 	);
 }
 static DRIVER_ATTR_RO(version);
@@ -938,7 +936,7 @@ static int __init vmc_entry(void)
 	int ret = 0;
 
 	/* Init FAL for sGCQ */
-	ret = GCQ_Init(&gcq_init_cfg);
+	ret = gcq_init();
 	if (ret != GCQ_ERRORS_NONE)
 		goto fail;
 

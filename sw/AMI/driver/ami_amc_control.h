@@ -20,23 +20,23 @@
 /* Defines                                                                                */
 /******************************************************************************************/
 
-#define AMI_ERR(amc_ctrl_ctxt, fmt, arg ...)      DEV_ERR(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
+#define AMI_ERR(amc_ctrl_ctxt, fmt, arg ...)      DEV_ERR(amc_ctrl_ctxt->pcie_dev,      fmt, ## arg)
 #define AMI_ERR_ONCE(amc_ctrl_ctxt, fmt, arg ...) DEV_ERR_ONCE(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
-#define AMI_INFO(amc_ctrl_ctxt, fmt, arg ...)     DEV_INFO(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
-#define AMI_WARN(amc_ctrl_ctxt, fmt, arg ...)     DEV_WARN(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
-#define AMI_DBG(amc_ctrl_ctxt, fmt, arg ...)      DEV_DBG(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
-#define AMI_VDBG(amc_ctrl_ctxt, fmt, arg ...)     DEV_VDBG(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
-#define AMI_AMC_LOG(amc_ctrl_ctxt, fmt, arg ...)  DEV_AMC_LOG(amc_ctrl_ctxt->pcie_dev, fmt, ## arg)
+#define AMI_INFO(amc_ctrl_ctxt, fmt, arg ...)     DEV_INFO(amc_ctrl_ctxt->pcie_dev,     fmt, ## arg)
+#define AMI_WARN(amc_ctrl_ctxt, fmt, arg ...)     DEV_WARN(amc_ctrl_ctxt->pcie_dev,     fmt, ## arg)
+#define AMI_DBG(amc_ctrl_ctxt, fmt, arg ...)      DEV_DBG(amc_ctrl_ctxt->pcie_dev,      fmt, ## arg)
+#define AMI_VDBG(amc_ctrl_ctxt, fmt, arg ...)     DEV_VDBG(amc_ctrl_ctxt->pcie_dev,     fmt, ## arg)
+#define AMI_AMC_LOG(amc_ctrl_ctxt, fmt, arg ...)  DEV_AMC_LOG(amc_ctrl_ctxt->pcie_dev,  fmt, ## arg)
 
-#define AMC_LOG_PAGE_SIZE               (1024 * 1024)
-#define AMC_LOG_PAGE_NUM                (1)
-#define AMC_LOG_ADDR_OFF                (0)
-#define AMC_DATA_ADDR_OFF               (AMC_LOG_PAGE_SIZE * AMC_LOG_PAGE_NUM)
+#define AMC_LOG_PAGE_SIZE	(1024 * 1024)
+#define AMC_LOG_PAGE_NUM	(1)
+#define AMC_LOG_ADDR_OFF	(0)
+#define AMC_DATA_ADDR_OFF	(AMC_LOG_PAGE_SIZE * AMC_LOG_PAGE_NUM)
 
-#define SENSOR_RSP_LEN                  (4096)
+#define SENSOR_RSP_LEN		(4096)
 
-#define AMC_LOG_ENTRY_SIZE   (96)
-#define AMC_LOG_MAX_RECS     (50)
+#define AMC_LOG_ENTRY_SIZE	(96)
+#define AMC_LOG_MAX_RECS	(50)
 
 /*
  * Response format:
@@ -182,7 +182,7 @@ enum gcq_submit_cmd_req {
  * @SDR_TYPE_MAX: Max enum value
  */
 enum gcq_sdr_repo_type {
-	SDR_TYPE_GET_SIZE	= 0x00,
+	SDR_TYPE_GET_SIZE	  = 0x00,
 	SDR_TYPE_BDINFO		  = 0xC0,
 	SDR_TYPE_TEMP		  = 0xC1,
 	SDR_TYPE_VOLTAGE	  = 0xC2,
@@ -401,7 +401,7 @@ typedef void (*amc_event_callback)(enum amc_event_id id, void *data);
  * @buff:               message buffer.
  */
 struct amc_msg_payload {
-        char buff[AMC_LOG_ENTRY_SIZE];
+	char buff[AMC_LOG_ENTRY_SIZE];
 };
 
 /**
@@ -572,12 +572,12 @@ struct sdr_repo {
 
 /**
  * struct amc_ring_buffer - Stores ring buffer information - part of the partition table.
- * @ring_buffer_off:    the offset of gcq ring buffer initialized by gcq server
- * @ring_buffer_len:    the length of gcq ring buffer initialized by gcq server
+ * @ring_buf_off:    the offset of gcq ring buffer initialized by gcq server
+ * @ring_buf_len:    the length of gcq ring buffer initialized by gcq server
  */
 struct amc_ring_buffer {
-	uint32_t	ring_buffer_off;
-	uint32_t	ring_buffer_len;
+	uint32_t	ring_buf_off;
+	uint32_t	ring_buf_len;
 };
 
 /**
@@ -628,7 +628,7 @@ struct amc_data {
  * We use the memory partition table for sharing info between host and RPU.
  * Including:
  * @amc_magic_no:       magic number.
- * @amc_ring_buffer:    ring buffer struct.
+ * @amc_ring_buf:       ring buffer struct.
  * @amc_status:         amc status struct.
  * @amc_uuid:           amc uuid struct.
  * @amc_log_msg:        amc log struct.
@@ -636,7 +636,7 @@ struct amc_data {
  */
 struct amc_shared_mem {
 	uint32_t		amc_magic_no;
-	struct amc_ring_buffer	ring_buffer;
+	struct amc_ring_buffer	ring_buf;
 	struct amc_status	status;
 	struct amc_uuid		uuid;
 	struct amc_log_msg	log_msg;
@@ -739,8 +739,9 @@ int get_rid(int repo_type);
  *
  * Return: 0 or negative error code.
  */
-int submit_gcq_command(struct amc_control_ctxt *amc_ctrl_ctxt, enum gcq_submit_cmd_req cmd_req, uint32_t flags,
-		       uint8_t *data_buf, uint32_t data_size);
+int submit_gcq_command(struct amc_control_ctxt *amc_ctrl_ctxt,
+	enum gcq_submit_cmd_req cmd_req, uint32_t flags,
+	uint8_t *data_buf, uint32_t data_size);
 
 /**
  * stop_gcq_services() - stop the service running.
@@ -763,8 +764,8 @@ void stop_gcq_services(struct amc_control_ctxt *amc_ctrl_ctxt);
  * Return: 0 or negative error code.
  */
 int setup_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt,
-			endpoint_info_struct ep_gcq,
-			amc_event_callback event_cb, void *event_cb_data);
+	endpoint_info_struct ep_gcq,
+	amc_event_callback event_cb, void *event_cb_data);
 
 /**
  * unset_amc() - Stop the service, close proxy and tidy up PCI
@@ -773,7 +774,7 @@ int setup_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt,
  *
  * Return: 0 or negative error code.
  */
-int unset_amc(struct pci_dev *dev, struct amc_control_ctxt **amc_ctrl_ctxt);
+int unset_amc(struct pci_dev *dev, struct amc_control_ctxt *amc_ctrl_ctxt);
 
 /**
  * release_amc_mem() - Free resources.

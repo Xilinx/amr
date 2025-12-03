@@ -247,24 +247,23 @@ def main(args):
         config['pkg']['descr']     = [config['pkg']['name'] + ' driver package', 'Built on ' + build_date + '.']
 
         # Find version from generated header file
-        with open(join(PROJECT_DIR, 'driver', 'ami_driver_version.h'), 'r') as fd:
+        with open(join(PROJECT_DIR, 'driver', 'ami_top.h'), 'r') as fd:
             data = fd.read()
 
-            v = re.findall(r'GIT_TAG.*?\"(\d+\.\d+\.\d+).*\"$', data, re.M)
-            c = re.findall(r'GIT_TAG_VER_DEV_COMMITS.*?\((\d+)\)$', data, re.M)
+            v = re.findall(r'AMI_VER.*?\"(\d+\.\d+\.\d+).*\"$', data, re.M)
             h, git_date = get_git_info('GPKG-05')
 
             # Set version
             config['pkg']['version'] = v[0] if v else '0.0.0'
 
             # Set release
-            config['pkg']['release'] = f'{c[0] if c else 0}.{h[:8] if h else ""}.{opt.pkg_release}'
+            config['pkg']['release'] = f'{0}.{h[:8] if h else ""}.{opt.pkg_release}'
 
         # prerm.sh
         with open(abspath(join(SCRIPT_DIR, 'pkg_data', 'prerm.sh')), 'r') as infile:
             fdata = infile.read()
             fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
-            fdata = fdata.replace('MOD_VER_STR=$2', 'MOD_VER_STR='+ config['pkg']['version'])
+            fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['prerm'] = fdata.split('\n')
             with open(abspath(join(output_dir, 'prerm.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['prerm']))

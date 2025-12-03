@@ -22,7 +22,7 @@
  *
  * Return: The vendor name or "UNKOWN".
  */
-char *pcie_vendor_id_to_str(uint16_t id)
+static char *pcie_vendor_id_to_str(uint16_t id)
 {
 	char *ret = "UNKNOWN";
 	if (id == PCIE_VENDOR_ID_XILINX)
@@ -32,8 +32,10 @@ char *pcie_vendor_id_to_str(uint16_t id)
 
 void print_pcie_vendor_id(struct pci_dev *dev, uint16_t id)
 {
-	if (dev)
-		DEV_VDBG(dev, "PCI_VENDOR_ID : %s", pcie_vendor_id_to_str(id));
+	if (!dev)
+		return;
+
+	DEV_VDBG(dev, "PCI_VENDOR_ID : %s", pcie_vendor_id_to_str(id));
 }
 
 /**
@@ -74,8 +76,10 @@ char *pcie_device_id_to_str(uint16_t id)
 
 void print_pcie_device_id(struct pci_dev *dev, uint16_t id)
 {
-	if (dev)
-		DEV_VDBG(dev, "PCI_DEVICE_ID : %s", pcie_device_id_to_str(id));
+	if (!dev)
+		return;
+
+	DEV_VDBG(dev, "PCI_DEVICE_ID : %s", pcie_device_id_to_str(id));
 }
 
 void print_pcie_command(struct pci_dev *dev, uint16_t command)
@@ -192,7 +196,7 @@ void print_pcie_bar_info( struct pci_dev *dev, int bar_idx, struct bar_header_st
 }
 
 #ifdef VERBOSE_DEBUG
-void find_pci_capability(struct pci_dev *dev, char *cap_name, int cap)
+static void find_pci_capability(struct pci_dev *dev, char *cap_name, int cap)
 {
 	int ret = 0;
 
@@ -329,8 +333,10 @@ void print_pcie_cap_pm_cntrl_bridge_ext(struct pci_dev *dev, uint16_t pm_cntrl_b
 
 void print_pcie_cap_pm_data(struct pci_dev *dev, uint16_t pm_data)
 {
-	if (dev)
-		DEV_VDBG(dev, "PCIE_CAP_PM_DATA: 0x%X", pm_data);
+	if (!dev)
+		return;
+
+	DEV_VDBG(dev, "PCIE_CAP_PM_DATA: 0x%X", pm_data);
 }
 
 void print_pcie_cap_msi( struct pci_dev *dev, uint16_t msi_config_status,
@@ -719,9 +725,11 @@ void print_pcie_cap_root_ctrl(struct pci_dev *dev, uint16_t root_ctrl)
 
 void print_pcie_cap_root_cap(struct pci_dev *dev, uint16_t root_cap)
 {
-	if (dev)
-		DEV_VDBG(dev, "\t- CAPABILITIES_CRS_SOFT_VIS: 0x%X",
-			get_pcie_cap_root_cap_crs_soft_vis(root_cap));
+	if (!dev)
+		return;
+
+	DEV_VDBG(dev, "\t- CAPABILITIES_CRS_SOFT_VIS: 0x%X",
+		get_pcie_cap_root_cap_crs_soft_vis(root_cap));
 }
 
 void print_pcie_cap_root_status(struct pci_dev *dev, uint32_t root_stat)
@@ -891,7 +899,7 @@ void print_pcie_cap_link_status_2(struct pci_dev *dev, uint16_t link_stat)
 }
 
 #ifdef VERBOSE_DEBUG
-void find_pci_ext_capability(struct pci_dev *dev, char *cap_name, int cap)
+static void find_pci_ext_capability(struct pci_dev *dev, char *cap_name, int cap)
 {
 	int ret = 0;
 

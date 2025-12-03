@@ -12,7 +12,7 @@
 #include <linux/errno.h>
 
 #include "ami.h"
-#include "gcq.h"
+#include "ami_gcq.h"
 
 /*****************************************************************************/
 /* Defines                                                                  */
@@ -269,7 +269,7 @@ struct amc_proxy_heartbeat_response {
  * @cmd_opcode: opcode associated with the command
  * @timed_out: boolean indicating if this command timed out
  */
-struct amc_proxy_cmd_struct{
+struct amc_proxy_cmd_struct {
 	struct list_head	cmd_list;
 	struct completion	cmd_complete;
 	struct completion	cmd_complete_heartbeat;
@@ -346,7 +346,8 @@ int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd);
  * Return: The errno return code
  *
  */
-int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd, struct amc_proxy_sensor_request *sensor);
+int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
+	struct amc_proxy_sensor_request *sensor);
 
 /**
  * amc_proxy_request_pdi_download() - Request PDI download based on the populated structure
@@ -358,7 +359,7 @@ int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd, struct amc_proxy_
  *
  */
 int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
-                                   struct amc_proxy_pdi_download_request *pdi_download);
+    struct amc_proxy_pdi_download_request *pdi_download);
 
 /**
  * amc_proxy_request_device_boot() - Select device boot partition
@@ -371,7 +372,7 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
  * Return: The errno return code
  */
 int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
-                                   struct amc_proxy_pdi_download_request *device_boot);
+	struct amc_proxy_pdi_download_request *device_boot);
 
 /**
  * amc_proxy_request_partition_copy() - Copy one partition to another
@@ -382,7 +383,7 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
  * Return: The errno return code
  */
 int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
-                                struct amc_proxy_partition_copy_request *partition_copy);
+	struct amc_proxy_partition_copy_request *partition_copy);
 
 /**
  * amc_proxy_request_heartbeat() - heartbeat request
@@ -393,7 +394,7 @@ int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
  * Return: The errno return code
  */
 int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
-                                struct amc_proxy_hearbeat_request *heartbeat);
+	struct amc_proxy_hearbeat_request *heartbeat);
 
 /**
  * amc_proxy_request_eeprom_read_write() - eeprom read/write request
@@ -404,7 +405,7 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
  * Return: The errno return code
  */
 int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
-                                        struct amc_proxy_eeprom_rw_request *eeprom_rw);
+	struct amc_proxy_eeprom_rw_request *eeprom_rw);
 
 /**
  * amc_proxy_request_module_read_write() - module read/write request
@@ -415,7 +416,7 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
  * Return: The errno return code
  */
 int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
-                                        struct amc_proxy_module_rw_request *module_rw);
+	struct amc_proxy_module_rw_request *module_rw);
 
 /**
  * amc_proxy_request_debug_verbosity() - debug verbosity request
@@ -425,7 +426,8 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
  *
  * Return: The errno return code
  */
-int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t verbosity);
+int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd,
+	uint8_t verbosity);
 
 /**
  * amc_proxy_get_response_identity() - retrieve the identity response
@@ -436,7 +438,7 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
  * Return: The errno return code
  */
 int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
-                                    struct amc_proxy_identify_response *identity);
+	struct amc_proxy_identify_response *identity);
 
 /**
  * amc_proxy_get_response_sensor() - check if a valid sensor response has been received
@@ -490,7 +492,7 @@ int amc_proxy_get_response_partition_copy(struct amc_proxy_cmd_struct *cmd);
  * Return: The errno return code
  */
 int amc_proxy_get_response_heartbeat(struct amc_proxy_cmd_struct *cmd,
-                                     struct amc_proxy_heartbeat_response *heartbeat);
+	struct amc_proxy_heartbeat_response *heartbeat);
 
 /**
  * amc_proxy_get_response_eeprom_read_write() - retrieve the eeprom read/write response

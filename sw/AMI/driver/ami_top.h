@@ -21,14 +21,12 @@
 #include "ami_cdev.h"
 #include "ami_amc_control.h"
 
-/* Device state strings. */
-#define STATE_NAME_INIT			"INIT"
-#define STATE_NAME_READY		"READY"
-#define STATE_NAME_MISSING_INFO	"MISSING_INFO"
-#define STATE_NAME_NO_AMC		"NO_AMC"
-#define STATE_NAME_INIT_ERROR	"INIT_ERROR"
-#define STATE_NAME_SHUTDOWN		"SHUTDOWN"
-#define STATE_NAME_COMPAT		"COMPAT"
+
+/* Driver version numbers */
+#define AMI_VER			"1.0.0"
+#define AMI_VER_MAJOR	(1)
+#define AMI_VER_MINOR	(0)
+#define AMI_VER_PATCH	(0)
 
 /**
  * enum pf_dev_state - List of possible device states.
@@ -205,7 +203,5 @@ void put_pf_dev_entry(struct pf_dev_struct *pf_dev);
 /* helper functions */
 int my_krealloc(void **buf, int old_size, int new_size, gfp_t flags);
 int strconcat(char **dst, char src[], int *size);
-
-
 
 #endif /* AMI_TOP_H */

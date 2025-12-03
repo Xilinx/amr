@@ -23,11 +23,11 @@
 #include "ami_pcie.h"
 #include "ami_program.h"
 
-#define ROOT_USER				(0)
-#define READ_WRITE				(0666)
+#define ROOT_USER		(0)
+#define READ_WRITE		(0666)
 #define IS_ROOT_USER(uid, euid)	(capable(CAP_DAC_OVERRIDE) || \
-										 (uid == ROOT_USER) || \
-										 (euid == ROOT_USER))
+					(uid == ROOT_USER) || \
+					(euid == ROOT_USER))
 
 
 static int dev_major = 0;  /* This will be overriden. */
@@ -42,6 +42,8 @@ static int dev_major = 0;  /* This will be overriden. */
  */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,8,0)
 static char *devnode(const struct device *dev, umode_t *mode)
+#elif defined(RHEL_RELEASE_VERSION) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
+    static char *devnode(const struct device *dev, umode_t *mode)
 #else
 static char *devnode(struct device *dev, umode_t *mode)
 #endif
@@ -92,7 +94,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	struct pf_dev_struct *pf_dev = NULL;
 	/* eventfd is used for sending notifications to the user */
 	struct eventfd_ctx *efd_ctx = NULL;
-        uint32_t eeprom_req_data = 0;
+	uint32_t eeprom_req_data = 0;
 
 	if (!filp)
 		return -EINVAL;
@@ -242,7 +244,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			efd_ctx = eventfd_ctx_fdget(data.efd);
 
 		/* Read actual data buffer. `addr` is a pointer to uint8_t */
-		if(!copy_from_user(buf, (uint8_t*)data.addr, data.size)) {
+		if (!copy_from_user(buf, (uint8_t*)data.addr, data.size)) {
 			if (data.partition == AMI_IOC_FPT_UPDATE_MAGIC)
 				ret = update_fpt(
 					pf_dev,
@@ -773,7 +775,7 @@ int create_cdev(unsigned baseminor, struct drv_cdev_struct *drv_cdev,
 
 	/* Allocate chrdev region */
 	drv_cdev->count = DEFAULT_CDEV_COUNT;
-	if(dev_major) {
+	if (dev_major) {
 		drv_cdev->cdev_num = MKDEV(dev_major, baseminor);
 		ret = register_chrdev_region(drv_cdev->cdev_num,
 			DEFAULT_CDEV_COUNT,
@@ -787,15 +789,17 @@ int create_cdev(unsigned baseminor, struct drv_cdev_struct *drv_cdev,
 		dev_major = MAJOR(drv_cdev->cdev_num);
 	}
 
-	if(ret)
+	if (ret)
 		goto fail;
 
 	/* If first device, create class. */
 	strncpy(drv_cdev->drv_cls_str, (const char*)DEFAULT_CLS_NAME, CLS_STR_SIZE);
 
-	if(!drv_cdev->dev_class) {
+	if (!drv_cdev->dev_class) {
 		cls_created = true;
-		#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+		#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 0)
+			drv_cdev->dev_class = class_create(drv_cdev->drv_cls_str);
+		#elif defined(RHEL_RELEASE_VERSION) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
 			drv_cdev->dev_class = class_create(drv_cdev->drv_cls_str);
 		#else
 			drv_cdev->dev_class = class_create(THIS_MODULE, drv_cdev->drv_cls_str);
