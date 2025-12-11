@@ -16,7 +16,7 @@ if [ "${MOD_NAME}" = "ami" ]; then
         echo "Module ${MOD_NAME} not loaded. Skipping 'rmmod'."
     fi
 
-    # Remove old DKMS versions
+    # Remove old Dynamic Kernel Module Support(DKMS) installed versions
     # DKMS status output differs with different versions, so parse accordingly
     dkms_major=$(dkms --version | tr -d " "[a-z-:] | awk -F. '{print $1}')
     if [ "${dkms_major}" -ge 3 ]; then
@@ -98,4 +98,3 @@ echo ""
 echo "Done! If you are not running in bash you may need to refresh your environment before using AMI in the current shell."
 echo "If using csh, run 'rehash'. Otherwise, refer to the manual for your shell or start a new session."
 
-exit 0

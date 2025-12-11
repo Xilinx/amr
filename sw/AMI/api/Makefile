@@ -16,7 +16,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 # Replace .o with .d for dependencies.
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS  := ./include /usr/include/libami/api/include
+INC_DIRS  := ./include /usr/include/libami/api
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us.

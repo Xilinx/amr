@@ -7,6 +7,7 @@ import re
 import os
 import sys
 import tarfile
+import platform
 
 from os import walk
 from os.path import join
@@ -31,17 +32,17 @@ class Options(object):
 
     def printHelp(self):
         log_info('GPKG-06', 'Usage: $ python3 ' + SCRIPT_FILE + ' [options]')
-        log_info('GPKG-06', '\t--help             / -h: Display this message')
-        log_info('GPKG-06', '\t--output_dir       / -o: Path to the output directory. Default: ./output/<date>_<time>')
-        log_info('GPKG-06', '\t--pkg_release      / -r: Package release. Default <date>')
-        log_info('GPKG-06', '\t--verbose          / -V: Turn on verbosity')
-        log_info('GPKG-06', '\t--force            / -f: Override output directory if already existing')
-        log_info('GPKG-06', '\t--version          / -v: Display version')
+        log_info('GPKG-06', '\t--help           / -h: Display this message')
+        log_info('GPKG-06', '\t--out_dir        / -o: Path to the output directory. Default: ./output/<date>_<time>')
+        log_info('GPKG-06', '\t--pkg_release    / -r: Package release. Default <date>')
+        log_info('GPKG-06', '\t--verbose        / -V: Turn on verbosity')
+        log_info('GPKG-06', '\t--force          / -f: Override output directory if already existing')
+        log_info('GPKG-06', '\t--version        / -v: Display version')
         log_info('GPKG-06', '')
 
     def __init__(self):
         self.help = False
-        self.output_dir = None
+        self.out_dir = None
         self.pkg_release = None
         self.force = False
         self.verbose = False
@@ -52,10 +53,10 @@ class Options(object):
         try:
             options, remainder = getopt.gnu_getopt(
                 argv[1:],
-                'ho:r:Vfvng',
+                'ho:r:Vfv',
                 [
                     'help',
-                    'output_dir=',
+                    'out_dir=',
                     'pkg_release=',
                     'verbose',
                     'force',
@@ -77,9 +78,9 @@ class Options(object):
             if opt in ('--help', '-h'):
                 self.printHelp()
                 self.help = True
-            elif opt in ('--output_dir', '-o'):
-                self.output_dir = str(arg)
-                self.output_dir = abspath(self.output_dir)
+            elif opt in ('--out_dir', '-o'):
+                self.out_dir = str(arg)
+                self.out_dir = abspath(self.out_dir)
             elif opt in ('--pkg_release', '-r'):
                 self.pkg_release = str(arg)
             elif opt in ('--verbose', '-V'):
@@ -121,26 +122,26 @@ def main(args):
         ##############################
 
         # Get/define output directory
-        if opt.output_dir is not None:
-            output_dir = opt.output_dir
+        if opt.out_dir is not None:
+            out_dir = opt.out_dir
         else:
-            output_dir =        str(now.year)          + '-' + str(now.month).zfill(2)  + '-' + str(now.day).zfill(2)
-            output_dir += '_' + str(now.hour).zfill(2) + '-' + str(now.minute).zfill(2) + '-' + str(now.second).zfill(2)
-            output_dir = abspath(join(CWD, 'output', output_dir))
+            out_dir =        str(now.year)          + '-' + str(now.month).zfill(2)  + '-' + str(now.day).zfill(2)
+            out_dir += '_' + str(now.hour).zfill(2) + '-' + str(now.minute).zfill(2) + '-' + str(now.second).zfill(2)
+            out_dir = abspath(join(CWD, 'output', out_dir))
 
         # Define steps output directories and others
-        log_dir = abspath(join(output_dir, 'log'))
+        log_dir = abspath(join(out_dir, 'log'))
 
         # Create output directory
-        if os.path.isdir(output_dir):
+        if os.path.isdir(out_dir):
            if not opt.force:
-               exit_error('GPKG-17', 'Output directory already exists (see --force to override): ' + output_dir)
+               exit_error('GPKG-17', 'Output directory already exists (see --force to override): ' + out_dir)
            else:
-               log_info('GPKG-60', 'Removing output directory already existing as --force option is provided: ' + output_dir)
-               force_remove_dir('GPKG-61', output_dir)
+               log_info('GPKG-60', 'Removing output directory already existing as --force option is provided: ' + out_dir)
+               force_remove_dir('GPKG-61', out_dir)
 
-        log_info('GPKG-18', 'Creating output directory: ' + output_dir + '\n')
-        os.makedirs(output_dir)
+        log_info('GPKG-18', 'Creating output directory: ' + out_dir + '\n')
+        os.makedirs(out_dir)
 
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir)
@@ -155,9 +156,9 @@ def main(args):
         # Get System info
         config['system'] = {}
 
-        # Get config['system']['distribution_id']
+        # Get config['system']['dist_id']
         cmd = ['lsb_release', '-is']
-        log_file_name = abspath(join(output_dir, 'lsb_release_is.log'))
+        log_file_name = abspath(join(out_dir, 'lsb_release_is.log'))
         log_info('GPKG-05', 'Get distribution ID')
         exec_step_cmd('GPKG-15', step, cmd, log_file_name)
         check_file_exists('GPKG-05', log_file_name)
@@ -173,9 +174,9 @@ def main(args):
 
         log_info('GPKG-16', 'Current distribution ID: ' + config['system']['dist_id'])
 
-        # Get config['system']['distribution_release']
+        # Get config['system']['dist_rel']
         cmd = ['lsb_release', '-rs']
-        log_file_name = abspath(join(output_dir, 'lsb_release_rs.log'))
+        log_file_name = abspath(join(out_dir, 'lsb_release_rs.log'))
         exec_step_cmd('GPKG-15', step, cmd, log_file_name)
         log_file = open(log_file_name, mode='r')
         for line in log_file:
@@ -183,10 +184,15 @@ def main(args):
             break
         log_file.close()
 
+        # Only use the major release number of CentOS and RedHat
+        if config['system']['dist_id'].lower() in [d.lower() for d in  [DIST_ID_CENTOS, DIST_ID_REDHAT, DIST_ID_REDHAT2, DIST_ID_RHEL]]:
+            dist_rel_split = config['system']['dist_rel'].split('.')
+            config['system']['dist_rel'] = dist_rel_split[0] + '.x'
+
         # architecture
         if config['system']['dist_id'] in DIST_DEB:
             cmd = ['dpkg', '--print-architecture']
-            log_file_name = abspath(join(output_dir, 'dpkg_print_arch.log'))
+            log_file_name = abspath(join(out_dir, 'dpkg_print_arch.log'))
             exec_step_cmd('GPKG-15', step, cmd, log_file_name)
             log_file = open(log_file_name, mode='r')
 
@@ -275,7 +281,7 @@ def main(args):
             fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
             fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['prerm'] = fdata.split('\n')
-            with open(abspath(join(output_dir, 'prerm.sh')), 'w') as outfile:
+            with open(abspath(join(out_dir, 'prerm.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['prerm']))
 
         # preinst.sh
@@ -284,7 +290,7 @@ def main(args):
             fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
             fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['preinst'] = fdata.split('\n')
-            with open(abspath(join(output_dir, 'preinst.sh')), 'w') as outfile:
+            with open(abspath(join(out_dir, 'preinst.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['preinst']))
 
         # postinst.sh
@@ -293,11 +299,11 @@ def main(args):
             fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
             fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
             config['pkg']['postinst'] = fdata.split('\n')
-            with open(abspath(join(output_dir, 'postinst.sh')), 'w') as outfile:
+            with open(abspath(join(out_dir, 'postinst.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['postinst']))
 
         config['pkg']['deps'] = {
-            'rpm': ['glibc', 'gcc', 'make', 'grep', 'gawk', 'build-essential'],
+            'rpm': ['glibc', 'gcc', 'make', 'grep', 'gawk'],
             'deb': ['libc6', 'gcc', 'make', 'grep', 'gawk', 'build-essential']
         }
 
@@ -310,7 +316,7 @@ def main(args):
         config['pkg']['conflicts']['deb'] = []
 
         # Define package content paths
-        config['pkg']['usr_include_dir'] = 'usr/include/' + config['pkg']['name']
+        config['pkg']['usr_include_dir'] = 'usr/include/' + config['pkg']['name'] + '/api'
         config['pkg']['usr_include_h']   = [f'{config["pkg"]["usr_include_dir"]}/{os.path.basename(f)}' for f in api_headers]
         config['pkg']['usr_lib_dir']     = 'usr/local/lib/'
         config['pkg']['usr_src_dir']     = 'usr/src/' + config['pkg']['name'] + '-' + config['pkg']['version']
@@ -318,10 +324,10 @@ def main(args):
 
 
         if config['system']['dist_id'] in DIST_DEB:
-            config['pkg']['pkg_config_dir'] = 'usr/lib/pkgconfig'
+            config['pkg']['pkg_cfg_dir'] = 'usr/lib/pkgconfig'
         else:
-            config['pkg']['pkg_config_dir'] = 'usr/share/pkgconfig'
-        config['pkg']['pkg_config_pc']  = config['pkg']['pkg_config_dir'] + '/libami.pc'
+            config['pkg']['pkg_cfg_dir'] = 'usr/share/pkgconfig'
+        config['pkg']['pkg_cfg_pc']  = config['pkg']['pkg_cfg_dir'] + '/libami.pc'
 
         # Define package description metadata
         config['pkg']['descr']  = [
@@ -331,89 +337,167 @@ def main(args):
         ]
 
         # Create the file necessary to generate the packages
-        config['pkg']['descr'] = '\n '.join(config['pkg']['descr']); # DEB package format requires \n+SPACE
-        deb_name = config['pkg']['name'] + '_' + config['pkg']['version'] + '-' + config['pkg']['release'] + '_' + config['system']['arch']
-        dest_base  = abspath(join(output_dir, deb_name))
-        debian_dir = abspath(join(dest_base, 'DEBIAN'))
-        os.makedirs(dest_base)
-        os.chmod(dest_base, 493); # octal 0755
-        os.makedirs(debian_dir)
-        check_dir_exists('GPKG-05', dest_base)
-        check_dir_exists('GPKG-05', debian_dir)
+        if config['system']['dist_id'].lower() in [d.lower() for d in DIST_RPM]:
+            for dirname in ['BUILDROOT', 'RPMS', 'SOURCES', 'SPECS', 'SRPMS', 'BUILD']:
+                dir = os.path.abspath(os.path.join(out_dir, dirname))
+                os.makedirs(dir)
+                os.chmod(dir, 493); # octal 0755
+                check_dir_exists('GPKG-5', dir)
 
-        # Create control file
-        CONTROL = []
-        CONTROL += ['Package: '        + config['pkg']['name']]
-        CONTROL += ['Architecture: '   + config['system']['arch']]
-        CONTROL += ['Version: '        + config['pkg']['version'] + '-' + config['pkg']['release']]
-        CONTROL += ['Priority: optional']
-        CONTROL += ['Description: '    + config['pkg']['descr']]
-        CONTROL += ['Maintainer: '     + config['vendor']['full']]
-        CONTROL += ['Section: devel']
-        if len(config['pkg']['deps']['deb']) > 0:
-            CONTROL += ['Depends: ' + ', '.join(config['pkg']['deps']['deb'])]
-        if len(config['pkg']['conflicts']['deb']) > 0:
-            CONTROL += ['Conflicts: ' + ', '.join(config['pkg']['conflicts']['deb'])]
-        CONTROL += ['']
-        control_file_name = abspath(join(debian_dir, 'control'))
-        log_info('GPKG-26', 'Writing control file:   ' + control_file_name)
-        with open(control_file_name, mode='w') as outfile:
-            outfile.write('\n'.join(CONTROL))
-        check_file_exists('GPKG-05', control_file_name)
+            dest_base = os.path.abspath(os.path.join(out_dir, 'BUILD'))
 
-        # Create postinst file
-        POSTINST = config['pkg']['postinst']
-        postinst_file_name = abspath(join(debian_dir, 'postinst'))
-        log_info('GPKG-28', 'Writing postinst file:  ' + postinst_file_name)
-        with open(postinst_file_name, mode='w') as outfile:
-            outfile.write('\n'.join(POSTINST))
-        os.chmod(postinst_file_name, 509); # octal 775
-        check_file_exists('GPKG-05', postinst_file_name)
+            # Create specfile
+            SPEC_FILE =  []
+            SPEC_FILE += ['# Turn off the brp-python-bytecompile script']
+            SPEC_FILE += ["%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*\$!!g')"]
+            SPEC_FILE += ['']
+            SPEC_FILE += ['Name: '                 + config['pkg']['name']]
+            SPEC_FILE += ['Version: '              + config['pkg']['version']]
+            SPEC_FILE += ['Release: '              + config['pkg']['release']]
+            SPEC_FILE += ['Vendor: '               + config['vendor']['full']]
+            SPEC_FILE += ['License: '              + config['vendor']['name']]
+            SPEC_FILE += ['Summary: '              + config['pkg']['summary']]
+            SPEC_FILE += ['BuildArchitectures: '   + config['system']['arch']]
+            SPEC_FILE += ['Buildroot: %{_topdir}' ]
+            for dep in config['pkg']['deps']['rpm']:
+                SPEC_FILE += ['Requires: ' + dep]
+            SPEC_FILE += ['']
 
-        # Create prerm file
-        PRERM = config['pkg']['prerm']
-        prerm_file_name = abspath(join(debian_dir, 'prerm'))
-        log_info('GPKG-28', 'Writing prerm file:     ' + prerm_file_name)
-        with open(prerm_file_name, mode='w') as outfile:
-            outfile.write('\n'.join(PRERM))
-        os.chmod(prerm_file_name, 509); # octal 775
-        check_file_exists('GPKG-05', prerm_file_name)
+            for conflict in config['pkg']['conflicts']['rpm']:
+                SPEC_FILE += ['Conflicts: ' + conflict]
+            SPEC_FILE += ['' ]
 
-        # Create preinst file
-        PREINST = config['pkg']['preinst']
-        preinst_file_name = abspath(join(debian_dir, 'preinst'))
-        log_info('GPKG-28', 'Writing preinst file:   ' + preinst_file_name)
-        with open(preinst_file_name, mode='w') as outfile:
-            outfile.write('\n'.join(PREINST))
-        os.chmod(preinst_file_name, 509); # octal 775
-        check_file_exists('GPKG-05', preinst_file_name)
+            SPEC_FILE += ['%description']
+            SPEC_FILE += config['pkg']['descr']
+            SPEC_FILE += ['']
 
-        # Create changelog
-        CHANGE_LOG = []
-        CHANGE_LOG += ['']
-        CHANGE_LOG += [config['pkg']['name'] + ' (' + config['pkg']['version'] + '-' + config['pkg']['release'] + ') xilinx; urgency=medium']
-        CHANGE_LOG += ['']
-        CHANGE_LOG += ['  * ' + config['pkg']['changelog']]
-        CHANGE_LOG += ['']
-        CHANGE_LOG += ['-- ' + config['vendor']['full']+' <' + config['vendor']['email'] + '> ' + build_date + ' 00:00:00 +0000']
-        CHANGE_LOG += ['']
-        changelog_dir       = abspath(join(dest_base, 'usr', 'share', 'doc', config['pkg']['name']))
-        changelog_file_name = abspath(join(changelog_dir, 'changelog.Debian'))
-        changelog_tar_name  = abspath(join(changelog_dir, 'changelog.Debian.gz'))
-        os.makedirs(changelog_dir)
-        log_info('GPKG-29', 'Writing changelog file: ' + changelog_file_name)
-        with open(changelog_file_name, mode='w') as outfile:
-            outfile.write('\n'.join(CHANGE_LOG))
-        with tarfile.open(changelog_tar_name, "w:gz") as tar:
-            tar.add(changelog_file_name)
-        os.remove(changelog_file_name)
-        check_file_exists('GPKG-05', changelog_tar_name)
+            SPEC_FILE += ['%pre']
+            SPEC_FILE += config['pkg']['prerm']
+            SPEC_FILE += ['']
+
+            SPEC_FILE += ['%install']
+
+            dirs_done = []
+            for file in config['pkg']['usr_src_files']:
+                d = os.path.dirname(file)
+                if d not in dirs_done:
+                    SPEC_FILE += ['mkdir -p %{buildroot}/' + d]
+                    dirs_done.append(d)
+
+                SPEC_FILE += ['install -m 0644 ' + file + ' %{buildroot}/' + file]
+
+            SPEC_FILE += ['mkdir -p %{buildroot}/' + config['pkg']['usr_include_dir']]
+
+            for file in config['pkg']['usr_include_h']:
+                SPEC_FILE += ['install -m 0644 ' + file  + ' %{buildroot}/' + file]
+
+            SPEC_FILE += ['mkdir -p %{buildroot}/' + config['pkg']['pkg_cfg_dir']]
+            SPEC_FILE += ['install -m 0644 ' + config['pkg']['pkg_cfg_pc'] + ' %{buildroot}/' + config['pkg']['pkg_cfg_pc']]
+            SPEC_FILE += ['']
+
+            SPEC_FILE += ['%post']
+            SPEC_FILE += config['pkg']['postinst']
+            SPEC_FILE += ['']
+
+            SPEC_FILE += ['%files']
+            SPEC_FILE += ['%defattr(-,root,root)']
+            SPEC_FILE += ['/' + config['pkg']['usr_src_dir']]
+            SPEC_FILE += ['/' + config['pkg']['usr_include_dir']]
+            SPEC_FILE += ['/' + config['pkg']['pkg_cfg_pc']]
+            SPEC_FILE += ['']
+            SPEC_FILE += ['%changelog' ]
+            SPEC_FILE += ['* ' + build_date + ' ' + config['vendor']['full'] + ' ' + config['vendor']['email'] + '> - ' + config['pkg']['version'] + '-' + config['pkg']['release']]
+            SPEC_FILE += ['- ' + config['pkg']['changelog']]
+
+            spec_file_name = os.path.abspath(os.path.join(out_dir, 'SPECS', 'specfile.spec'))
+            log_info('GPKG-25', 'Writing spec file: ' + spec_file_name)
+            with open(spec_file_name, mode='w') as outfile:
+                outfile.write('\n'.join(SPEC_FILE))
+            check_file_exists('GPKG-5', spec_file_name)
+
+        else:
+            config['pkg']['descr'] = '\n '.join(config['pkg']['descr']); # DEB package format requires \n+SPACE
+            deb_name = config['pkg']['name'] + '_' + config['pkg']['version'] + '-' + config['pkg']['release'] + '_' + config['system']['arch']
+            dest_base  = abspath(join(out_dir, deb_name))
+            debian_dir = abspath(join(dest_base, 'DEBIAN'))
+            os.makedirs(dest_base)
+            os.chmod(dest_base, 493); # octal 0755
+            os.makedirs(debian_dir)
+            check_dir_exists('GPKG-05', dest_base)
+            check_dir_exists('GPKG-05', debian_dir)
+
+            # Create control file
+            CONTROL = []
+            CONTROL += ['Package: '        + config['pkg']['name']]
+            CONTROL += ['Architecture: '   + config['system']['arch']]
+            CONTROL += ['Version: '        + config['pkg']['version'] + '-' + config['pkg']['release']]
+            CONTROL += ['Priority: optional']
+            CONTROL += ['Description: '    + config['pkg']['descr']]
+            CONTROL += ['Maintainer: '     + config['vendor']['full']]
+            CONTROL += ['Section: devel']
+            if len(config['pkg']['deps']['deb']) > 0:
+                CONTROL += ['Depends: ' + ', '.join(config['pkg']['deps']['deb'])]
+            if len(config['pkg']['conflicts']['deb']) > 0:
+                CONTROL += ['Conflicts: ' + ', '.join(config['pkg']['conflicts']['deb'])]
+            CONTROL += ['']
+            control_file_name = abspath(join(debian_dir, 'control'))
+            log_info('GPKG-26', 'Writing control file:   ' + control_file_name)
+            with open(control_file_name, mode='w') as outfile:
+                outfile.write('\n'.join(CONTROL))
+            check_file_exists('GPKG-05', control_file_name)
+
+            # Create postinst file
+            POSTINST = config['pkg']['postinst']
+            postinst_file_name = abspath(join(debian_dir, 'postinst'))
+            log_info('GPKG-28', 'Writing postinst file:  ' + postinst_file_name)
+            with open(postinst_file_name, mode='w') as outfile:
+                outfile.write('\n'.join(POSTINST))
+            os.chmod(postinst_file_name, 509); # octal 775
+            check_file_exists('GPKG-05', postinst_file_name)
+
+            # Create prerm file
+            PRERM = config['pkg']['prerm']
+            prerm_file_name = abspath(join(debian_dir, 'prerm'))
+            log_info('GPKG-28', 'Writing prerm file:     ' + prerm_file_name)
+            with open(prerm_file_name, mode='w') as outfile:
+                outfile.write('\n'.join(PRERM))
+            os.chmod(prerm_file_name, 509); # octal 775
+            check_file_exists('GPKG-05', prerm_file_name)
+
+            # Create preinst file
+            PREINST = config['pkg']['preinst']
+            preinst_file_name = abspath(join(debian_dir, 'preinst'))
+            log_info('GPKG-28', 'Writing preinst file:   ' + preinst_file_name)
+            with open(preinst_file_name, mode='w') as outfile:
+                outfile.write('\n'.join(PREINST))
+            os.chmod(preinst_file_name, 509); # octal 775
+            check_file_exists('GPKG-05', preinst_file_name)
+
+            # Create changelog
+            CHANGE_LOG = []
+            CHANGE_LOG += ['']
+            CHANGE_LOG += [config['pkg']['name'] + ' (' + config['pkg']['version'] + '-' + config['pkg']['release'] + ') xilinx; urgency=medium']
+            CHANGE_LOG += ['']
+            CHANGE_LOG += ['  * ' + config['pkg']['changelog']]
+            CHANGE_LOG += ['']
+            CHANGE_LOG += ['-- ' + config['vendor']['full']+' <' + config['vendor']['email'] + '> ' + build_date + ' 00:00:00 +0000']
+            CHANGE_LOG += ['']
+            changelog_dir       = abspath(join(dest_base, 'usr', 'share', 'doc', config['pkg']['name']))
+            changelog_file_name = abspath(join(changelog_dir, 'changelog.Debian'))
+            changelog_tar_name  = abspath(join(changelog_dir, 'changelog.Debian.gz'))
+            os.makedirs(changelog_dir)
+            log_info('GPKG-29', 'Writing changelog file: ' + changelog_file_name)
+            with open(changelog_file_name, mode='w') as outfile:
+                outfile.write('\n'.join(CHANGE_LOG))
+            with tarfile.open(changelog_tar_name, "w:gz") as tar:
+                tar.add(changelog_file_name)
+            os.remove(changelog_file_name)
+            check_file_exists('GPKG-05', changelog_tar_name)
 
         api_include_dest = [
             {
                 'src': abspath(join(PROJECT_DIR, f)),
-                'dst': join(config['pkg']['usr_include_dir'],
-                           os.path.dirname(f).replace('api/build', 'api/include'))
+                'dst': config['pkg']['usr_include_dir']
             } for f in api_headers
         ]
 
@@ -429,8 +513,7 @@ def main(args):
             src = src_dest['src']
             dst = dest_base
             if src_dest['dst'] != '':
-                dst = abspath(join(dst, src_dest['dst']))
-
+                dst = abspath(join(dst, src_dest['dst']).replace('api/api', 'api'))
             copy_source_file('GPKG-31', src, dst)
             check_file_exists('GPKG-05', abspath(join(dst, os.path.basename(src))))
 
@@ -441,6 +524,7 @@ def main(args):
             dst = dest_base
             if src_dest['dst'] != '':
                 dst = abspath(join(dst, src_dest['dst']))
+
             copy_source_file('GPKG-31', src, dst)
             check_file_exists('GPKG-05', abspath(join(dst, os.path.basename(src))))
             if src.endswith('Makefile'):
@@ -455,27 +539,34 @@ def main(args):
             'Description: ' + config['pkg']['summary'],
             'Version: '     + config['pkg']['version'],
         ]
-        os.makedirs(abspath(join(dest_base, config['pkg']['pkg_config_dir'])))
-        module_pc_file_name = abspath(join(dest_base, config['pkg']['pkg_config_pc']))
-        log_info('GPKG-28', 'Writing module PC file: ' + module_pc_file_name)
-        with open(module_pc_file_name, mode='w') as outfile:
+        os.makedirs(abspath(join(dest_base, config['pkg']['pkg_cfg_dir'])))
+        mod_pc_file_name = abspath(join(dest_base, config['pkg']['pkg_cfg_pc']))
+        log_info('GPKG-28', 'Writing module PC file: ' + mod_pc_file_name)
+        with open(mod_pc_file_name, mode='w') as outfile:
             outfile.write('\n'.join(MODULE_PC))
-        check_file_exists('GPKG-05', module_pc_file_name)
+        check_file_exists('GPKG-05', mod_pc_file_name)
 
         # Generate package
-        cmd = ['dpkg-deb', '--build', '--root-owner-group', join(output_dir, deb_name)]
-        log_file_name = abspath(join(log_dir, 'dpkg-deb.log'))
+        if config['system']['dist_id'].lower() in [d.lower() for d in DIST_RPM]:
+            cmd = ['rpmbuild', '--verbose', '--define', '_topdir ' + out_dir, '-bb', spec_file_name]
+            log_file_name = os.path.abspath(os.path.join(log_dir, 'rpmbuild.log'))
 
-        pkg_name = config['pkg']['name'] + '_' + config['pkg']['version'] + '-' + config['pkg']['release'] + '_' + config['system']['arch']
-        pkg     = abspath(join(output_dir, pkg_name + '.deb'))
-        pkg_cpy = abspath(join(output_dir, pkg_name + '_' + config['system']['dist_rel'] + '.deb'))
+            pkg_name = config['pkg']['name'] + '-' + config['pkg']['version'] + '-' + config['pkg']['release'] + '.' + config['system']['arch']
+            pkg      = os.path.abspath(os.path.join(out_dir, 'RPMS', config['system']['arch'], pkg_name + '.rpm'))
+            pkg_cpy  = os.path.abspath(os.path.join(out_dir, pkg_name + '.rpm'))
+        else:
+            cmd = ['dpkg-deb', '--build', '--root-owner-group', join(out_dir, deb_name)]
+            log_file_name = abspath(join(log_dir, 'dpkg-deb.log'))
+
+            pkg_name = config['pkg']['name'] + '_' + config['pkg']['version'] + '-' + config['pkg']['release'] + '_' + config['system']['arch']
+            pkg      = abspath(join(out_dir, pkg_name + '.deb'))
+            pkg_cpy  = abspath(join(out_dir, pkg_name + '.deb'))
 
         log_newline()
         log_info('GPKG-37', 'Building package...')
         exec_step_cmd('GPKG-37', step, cmd, log_file_name)
         check_file_exists('GPKG-05', pkg)
-        shutil.copyfile(pkg, pkg_cpy)
-        os.remove(pkg)
+        shutil.move(pkg, pkg_cpy)
         check_file_exists('GPKG-05', pkg_cpy)
 
         end_step('GPKG-38', start_time)

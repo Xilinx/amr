@@ -52,4 +52,3 @@ else
     rm -rf "/usr/src/${MOD_NAME}-${MOD_VER_STR}"
 fi
 
-exit 0

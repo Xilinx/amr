@@ -14,7 +14,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 # Replace .o with .d for dependencies.
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS  := /usr/include/libami/api/include ../api/build ../api/include ./cmd_handlers .
+INC_DIRS  := /usr/include/libami/api ../api/build ../api/include ./cmd_handlers .
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 LIB_DIRS  := ../api/build /usr/local/lib/libami
