@@ -16,7 +16,7 @@
 #define HAL_PROFILE_RAVE                ( TRUE )
 
 #define HAL_EMMC_FEATURE                ( 0 )
-#define HAL_EMMC_BASE_ADDR              ( 0 )           /* XPAR_XSDPS_0_BASEADDR */
+#define HAL_EMMC_BASE_ADDR              ( 0 )
 #define HAL_EMMC_BLOCK_SIZE             ( 512 )
 #define HAL_EMMC_MAX_BLOCKS             ( 0x7690000 )   /* 64 GBytes / 512 Bytes */
 #define HAL_SMBUS_FEATURE               ( 0 )
@@ -30,19 +30,6 @@
 #define HAL_EEPROM_DEVICE_ID            ( 0x0A01 )
 #define HAL_EEPROM_DEVICE_ID_ADDRESS    ( 0x1A )
 #define HAL_EEPROM_DEVICE_ID_REGISTER   ( 0x07 )
-
-/* Apps */
-/* AMC */
-#define HAL_SHARED_MEM_TABLE_SIZE       ( 0x1000 )
-#define HAL_SHARED_MEM_TABLE_MAGIC_NO   ( 0x564D5230 )
-#define HAL_ENABLE_AMI_COMMS            ( 0x1 )
-#define HAL_RPU_RING_BUFFER_LEN         ( 0x1000 )
-#define HAL_GCQ_SHARED_BASEADDR         ( 0x10000000 )
-#define HAL_RPU_SHARED_MEMORY_BASEADDR  ( HAL_GCQ_SHARED_BASEADDR + 0x1000 )
-#define HAL_RPU_SHARED_MEMORY_ENDADDR   ( 0x107FF000 )
-#define HAL_RPU_SHARED_MEMORY_SIZE      ( HAL_RPU_SHARED_MEMORY_ENDADDR  - HAL_RPU_SHARED_MEMORY_BASEADDR )
-#define HAL_RPU_RING_BUFFER_BASE        ( HAL_RPU_SHARED_MEMORY_BASEADDR + HAL_SHARED_MEM_TABLE_SIZE )
-#define HAL_RPU_MEMORY_BUFFER_BASE      ( 0x2000000 ) /* 32MB - 128MB RPU Memory (0-32MB RPU code/data) */
 
 /* Definitions for peripheral CIPS_PSPMC_0_PSV_I2C_0 */
 #define HAL_I2C_BUS_0_DEVICE_ID         ( 0 )

@@ -30,47 +30,47 @@
 #define ASC_NAME "ASC"
 
 /* Stat & Error definitions */
-#define ASC_PROXY_STATS( DO )                                  \
-        DO( ASC_PROXY_STATS_INIT_OVERALL_COMPLETE )            \
-        DO( ASC_PROXY_STATS_CREATE_MUTEX )                     \
-        DO( ASC_PROXY_STATS_TAKE_MUTEX )                       \
-        DO( ASC_PROXY_STATS_RELEASE_MUTEX )                    \
-        DO( ASC_PROXY_STATS_GET_ALL_SENSOR_DATA )              \
-        DO( ASC_PROXY_STATS_GET_SINGLE_SENSOR_DATA_BY_ID )     \
-        DO( ASC_PROXY_STATS_GET_SINGLE_SENSOR_DATA_BY_NAME )   \
-        DO( ASC_PROXY_STATS_RESET_ALL_SENSOR_DATA )            \
-        DO( ASC_PROXY_STATS_RESET_SINGLE_SENSOR_DATA_BY_ID )   \
-        DO( ASC_PROXY_STATS_RESET_SINGLE_SENSOR_DATA_BY_NAME ) \
-        DO( ASC_PROXY_STATS_TASK_TIME_MS )                     \
-        DO( ASC_PROXY_STATS_STATUS_RETRIEVAL )                 \
-        DO( ASC_PROXY_STATS_SET_SENSOR_THRESHOLD_BY_ID )       \
-        DO( ASC_PROXY_GET_OPERATIONAL_STATE )                  \
-        DO( ASC_PROXY_STATS_SET_OPERATIONAL_STATE_BY_ID )      \
-        DO( ASC_PROXY_STATS_GET_OPERATIONAL_STATE_BY_ID )      \
-        DO( ASC_PROXY_STATS_MAX )
+#define ASC_PROXY_STATS( DO )                              \
+    DO( ASC_PROXY_STATS_INIT_OVERALL_COMPLETE )            \
+    DO( ASC_PROXY_STATS_CREATE_MUTEX )                     \
+    DO( ASC_PROXY_STATS_TAKE_MUTEX )                       \
+    DO( ASC_PROXY_STATS_RELEASE_MUTEX )                    \
+    DO( ASC_PROXY_STATS_GET_ALL_SENSOR_DATA )              \
+    DO( ASC_PROXY_STATS_GET_SINGLE_SENSOR_DATA_BY_ID )     \
+    DO( ASC_PROXY_STATS_GET_SINGLE_SENSOR_DATA_BY_NAME )   \
+    DO( ASC_PROXY_STATS_RESET_ALL_SENSOR_DATA )            \
+    DO( ASC_PROXY_STATS_RESET_SINGLE_SENSOR_DATA_BY_ID )   \
+    DO( ASC_PROXY_STATS_RESET_SINGLE_SENSOR_DATA_BY_NAME ) \
+    DO( ASC_PROXY_STATS_TASK_TIME_MS )                     \
+    DO( ASC_PROXY_STATS_STATUS_RETRIEVAL )                 \
+    DO( ASC_PROXY_STATS_SET_SENSOR_THRESHOLD_BY_ID )       \
+    DO( ASC_PROXY_GET_OPERATIONAL_STATE )                  \
+    DO( ASC_PROXY_STATS_SET_OPERATIONAL_STATE_BY_ID )      \
+    DO( ASC_PROXY_STATS_GET_OPERATIONAL_STATE_BY_ID )      \
+    DO( ASC_PROXY_STATS_MAX )
 
-#define ASC_PROXY_ERRORS( DO )                                  \
-        DO( ASC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )             \
-        DO( ASC_PROXY_ERRORS_MUTEX_TAKE_FAILED )                \
-        DO( ASC_PROXY_ERRORS_MEM_ALLOC_FAILED )                 \
-        DO( ASC_PROXY_ERRORS_GET_ALL_SENSOR_DATA )              \
-        DO( ASC_PROXY_ERRORS_GET_SINGLE_SENSOR_DATA_BY_ID )     \
-        DO( ASC_PROXY_ERRORS_GET_SINGLE_SENSOR_DATA_BY_NAME )   \
-        DO( ASC_PROXY_ERRORS_RESET_ALL_SENSOR_DATA )            \
-        DO( ASC_PROXY_ERRORS_RESET_SINGLE_SENSOR_DATA_BY_ID )   \
-        DO( ASC_PROXY_ERRORS_RESET_SINGLE_SENSOR_DATA_BY_NAME ) \
-        DO( ASC_PROXY_ERRORS_RAISE_EVENT_FAILED )               \
-        DO( ASC_PROXY_ERRORS_INIT_FW_IF_OPEN_FAILED )           \
-        DO( ASC_PROXY_ERRORS_INIT_MUTEX_CREATE_FAILED )         \
-        DO( ASC_PROXY_ERRORS_INIT_TASK_CREATE_FAILED )          \
-        DO( ASC_PROXY_ERRORS_VALIDATION_FAILED )                \
-        DO( ASC_PROXY_ERRORS_UNKNOWN_RETURN_CODE )              \
-        DO( ASC_PROXY_ERRORS_BIND_CB_FAILED )                   \
-        DO( ASC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED )           \
-        DO( ASC_PROXY_ERRORS_SET_SENSOR_THRESHOLD_BY_ID )       \
-        DO( ASC_PROXY_ERRORS_GET_OPERATIONAL_STATE_BY_ID )      \
-        DO( ASC_PROXY_ERRORS_SET_OPERATIONAL_STATE_BY_ID )      \
-        DO( ASC_PROXY_ERRORS_MAX )
+#define ASC_PROXY_ERRORS( DO )                              \
+    DO( ASC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )             \
+    DO( ASC_PROXY_ERRORS_MUTEX_TAKE_FAILED )                \
+    DO( ASC_PROXY_ERRORS_MEM_ALLOC_FAILED )                 \
+    DO( ASC_PROXY_ERRORS_GET_ALL_SENSOR_DATA )              \
+    DO( ASC_PROXY_ERRORS_GET_SINGLE_SENSOR_DATA_BY_ID )     \
+    DO( ASC_PROXY_ERRORS_GET_SINGLE_SENSOR_DATA_BY_NAME )   \
+    DO( ASC_PROXY_ERRORS_RESET_ALL_SENSOR_DATA )            \
+    DO( ASC_PROXY_ERRORS_RESET_SINGLE_SENSOR_DATA_BY_ID )   \
+    DO( ASC_PROXY_ERRORS_RESET_SINGLE_SENSOR_DATA_BY_NAME ) \
+    DO( ASC_PROXY_ERRORS_RAISE_EVENT_FAILED )               \
+    DO( ASC_PROXY_ERRORS_INIT_FW_IF_OPEN_FAILED )           \
+    DO( ASC_PROXY_ERRORS_INIT_MUTEX_CREATE_FAILED )         \
+    DO( ASC_PROXY_ERRORS_INIT_TASK_CREATE_FAILED )          \
+    DO( ASC_PROXY_ERRORS_VALIDATION_FAILED )                \
+    DO( ASC_PROXY_ERRORS_UNKNOWN_RETURN_CODE )              \
+    DO( ASC_PROXY_ERRORS_BIND_CB_FAILED )                   \
+    DO( ASC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED )           \
+    DO( ASC_PROXY_ERRORS_SET_SENSOR_THRESHOLD_BY_ID )       \
+    DO( ASC_PROXY_ERRORS_GET_OPERATIONAL_STATE_BY_ID )      \
+    DO( ASC_PROXY_ERRORS_SET_OPERATIONAL_STATE_BY_ID )      \
+    DO( ASC_PROXY_ERRORS_MAX )
 
 #define PRINT_STAT_COUNTER( x )  PLL_INF( ASC_NAME,                 \
                                           "%50s . . . . %d\r\n",    \
@@ -85,7 +85,7 @@
 #define INC_ERROR_COUNTER( x )            { if( x < ASC_PROXY_ERRORS_MAX ) pxThis->pulErrorCounters[ x ]++; }
 #define INC_ERROR_COUNTER_WITH_STATE( x ) { pxThis->xState = MODULE_STATE_ERROR; INC_ERROR_COUNTER( x ) }
 #define SET_STAT_COUNTER( x, y )          { if( x < ASC_PROXY_ERRORS_MAX ) pxThis->pulStatCounters[ x ] = y; }
-#define ASC_ELAPSED_TIME_MS( x, y )       ( ( x - y ) / 10 );
+#define ASC_ELAPSED_TIME_MS( x, y )       ( ( x - y ) / 10 )
 
 
 /******************************************************************************/
@@ -141,23 +141,24 @@ typedef struct ASC_PRIVATE_DATA
 
 static ASC_PRIVATE_DATA xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    FALSE,                                                                     /* iInitialised */
-    0,                                                                         /* ucMyId */
-    NULL,                                                                      /* pxEvlRecord */
-    NULL,                                                                      /* pvOsalMutexHdl */
-    NULL,                                                                      /* pvOsalTaskHdl */
-    NULL,                                                                      /* pxSensorData */
-    0,                                                                         /* ucNumSensors */
+    UPPER_FIREWALL,             /* ulUpperFirewall */
+    FALSE,                      /* iInitialised */
+    0,                          /* ucMyId */
+    NULL,                       /* pxEvlRecord */
+    NULL,                       /* pvOsalMutexHdl */
+    NULL,                       /* pvOsalTaskHdl */
+    NULL,                       /* pxSensorData */
+    0,                          /* ucNumSensors */
     {
         0
-    },                                                                         /* pulStatCounters */
+    },                          /* pulStatCounters */
     {
         0
-    },                                                                         /* pulErrorCounters */
-    MODULE_STATE_UNINITIALISED,                                                /* xState */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall */
+    },                          /* pulErrorCounters */
+    MODULE_STATE_UNINITIALISED, /* xState */
+    LOWER_FIREWALL              /* ulLowerFirewall */
 };
+
 static ASC_PRIVATE_DATA *pxThis = &xLocalData;
 
 
@@ -221,7 +222,7 @@ int iASC_Initialise( uint8_t ucProxyId,
                 INC_STAT_COUNTER( ASC_PROXY_STATS_CREATE_MUTEX )
                 INC_STAT_COUNTER( ASC_PROXY_STATS_INIT_OVERALL_COMPLETE )
                 pxThis->pxSensorData =
-                    ( ASC_PROXY_DRIVER_SENSOR_DATA * )pvOSAL_MemAlloc( sizeof ( ASC_PROXY_DRIVER_SENSOR_DATA ) *
+                    ( ASC_PROXY_DRIVER_SENSOR_DATA * )pvOSAL_MemAlloc( sizeof(ASC_PROXY_DRIVER_SENSOR_DATA) *
                                                                        ucNumSensors );
 
                 if( NULL != pxThis->pxSensorData )
@@ -1118,8 +1119,8 @@ static void vProxyDriverTask( void *pvArgs )
         {
             INC_ERROR_COUNTER_WITH_STATE( ASC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
         }
-        pxThis->pulStatCounters[ ASC_PROXY_STATS_TASK_TIME_MS ] = ASC_ELAPSED_TIME_MS( ulOSAL_GetUptimeTicks(),
-                                                                                       ulStartMs )
-                                                                  iOSAL_Task_SleepMs( ASC_TASK_SLEEP_MS );
+        pxThis->pulStatCounters[ ASC_PROXY_STATS_TASK_TIME_MS ] =
+            ASC_ELAPSED_TIME_MS( ulOSAL_GetUptimeTicks(), ulStartMs );
+        iOSAL_Task_SleepMs( ASC_TASK_SLEEP_MS );
     }
 }

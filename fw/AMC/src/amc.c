@@ -70,18 +70,18 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define PL_NODE_ID			(0x18700000) /** PL Node ID to configure */
-#define AMC_OUTPUT_LEVEL	( PLL_OUTPUT_LEVEL_WARNING )
-#define AMC_LOGGING_LEVEL	( PLL_OUTPUT_LEVEL_LOGGING )
+#define PL_NODE_ID              (0x18700000) /** PL Node ID to configure */
+#define AMC_OUTPUT_LEVEL        ( PLL_OUTPUT_LEVEL_WARNING )
+#define AMC_LOGGING_LEVEL       ( PLL_OUTPUT_LEVEL_LOGGING )
 
-#define AMC_NAME 			"AMC"
+#define AMC_NAME                "AMC"
 
-#define AMC_HASH_LEN 		( 7 )
-#define AMC_DATE_LEN 		( 8 )
+#define AMC_HASH_LEN            ( 7 )
+#define AMC_DATE_LEN            ( 8 )
 
-#define AMC_TASK_DEFAULT_STACK 			( 0x1000 )
-#define AMC_TASK_SLEEP_MS             	( 100 )
-#define AMC_GET_PROJECT_INFO_SLEEP_MS	( 1000 )
+#define AMC_TASK_DEFAULT_STACK        ( 0x1000 )
+#define AMC_TASK_SLEEP_MS             ( 100 )
+#define AMC_GET_PROJECT_INFO_SLEEP_MS ( 1500 )
 
 
 /******************************************************************************/
@@ -92,9 +92,9 @@
  * @enum    AMC_TASK_PRIOS
  * @brief   AMC Task priorities
  */
-typedef enum AMC_TASK_PRIOS
+typedef enum
 {
-    AMC_TASK_PRIO_RSVD = 5,                                                    /* TODO: get actual value from osal.h */
+    AMC_TASK_PRIO_RSVD = 5,     /* TODO: get actual value from osal.h */
 
     AMC_TASK_PRIO_DEFAULT,
     MAX_AMC_TASK_PRIO
@@ -240,18 +240,22 @@ AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice1 =
 {
     &xQsfpIf1, 0
 };
+
 AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice2 =
 {
     &xQsfpIf2, 1
 };
+
 AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice3 =
 {
     &xQsfpIf3, 2
 };
+
 AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice4 =
 {
     &xQsfpIf4, 3
 };
+
 AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xDimmDevice =
 {
     &xDimmIf, 4
@@ -533,7 +537,7 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
                 iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
                 break;
 
-			case APC_PROXY_DRIVER_E_PROGRAM_COMPLETE:
+            case APC_PROXY_DRIVER_E_PROGRAM_COMPLETE:
                 iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
                 break;
 
@@ -840,7 +844,7 @@ static int iInitProxies( void )
     }
 
     #if HAL_I2C_MUXED_DEVICE
-    if ( AMC_CFG_ASC_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASC_MUX_PREREQUISITES ) )
+    if ( AMC_CFG_ASC_MUX_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASC_MUX_PREREQUISITES ) )
     #else
     if ( AMC_CFG_ASC_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_ASC_PREREQUISITES ) )
     #endif
@@ -890,10 +894,7 @@ static int iInitProxies( void )
     {
         /* Get the UUID */
         uint8_t ucUuidSize               = 0;
-        uint8_t pucUuid[ HAL_UUID_SIZE ] =
-        {
-            0
-        };
+        uint8_t pucUuid[ HAL_UUID_SIZE ] = { 0 };
 
         if( AMC_CFG_I2C_INITIALISED == ( ullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
         {

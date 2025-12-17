@@ -1411,10 +1411,7 @@ static int iLoadFpt( APC_BOOT_DEVICES xBootDevice )
 
 	if( MAX_APC_BOOT_DEVICES > xBootDevice )
 	{
-		APC_PROXY_DRIVER_FPT_HEADER xFptHeader =
-		{
-			0
-		};
+		APC_PROXY_DRIVER_FPT_HEADER xFptHeader = { 0 };
 		uint32_t ulFptLen = sizeof( xFptHeader );
 
 		if( ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->read( pxThis->ppxFwIf[ xBootDevice ],

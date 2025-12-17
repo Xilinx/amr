@@ -15,19 +15,17 @@
 #include "ami_pcie.h"
 
 /* PCIe BAR OFFSETS and Lengths */
-#define XILINX_ENDPOINT_BAR_SGCQ_RAVE_OFFSET	0x800000  /* 8M */
-#define XILINX_ENDPOINT_BAR_PL_RAVE_OFFSET		0x000000  /* 0M */
-#define XILINX_ENDPOINT_BAR_SGCQ_V80_OFFSET		0x8000000 /* 128M */
-#define XILINX_ENDPOINT_BAR_PL_V80_OFFSET		0x8000000 /* 128M */
-#define XILINX_ENDPOINT_BAR_SGCQ_LEN			0x800000  /* 8M   */
-#define XILINX_ENDPOINT_BAR_PL_LEN				0x800000  /* 8M   */
+#define XILINX_ENDPOINT_BAR_SGCQ_OFFSET	0x800000  /* 8MB */
+#define XILINX_ENDPOINT_BAR_PL_OFFSET	0x000000  /* 0MB */
+#define XILINX_ENDPOINT_BAR_SGCQ_LEN	0x800000  /* 8MB */
+#define XILINX_ENDPOINT_BAR_PL_LEN	0x800000  /* 8MB */
 
 /* CG TODO: Get this from hw design metadata */
-#define XILINX_ENDPOINT_NAME_SGCQ			"ep_gcq_mgmt_00"
-#define XILINX_ENDPOINT_NAME_PL_PF0			"ep_pl_mgmt_00"
+#define XILINX_ENDPOINT_NAME_SGCQ	"ep_gcq_mgmt_00"
+#define XILINX_ENDPOINT_NAME_PL_PF0	"ep_pl_mgmt_00"
 
-#define XILINX_LOGIC_UUID_SIZE_BYTES		16
-#define XILINX_SGCQ_SIZE_BYTES				0x1000		/* sGCQ size */
+#define XILINX_LOGIC_UUID_SIZE_BYTES	16
+#define XILINX_SGCQ_SIZE_BYTES		0x1000	/* sGCQ size */
 
 typedef struct {
 	endpoint_info_struct gcq;

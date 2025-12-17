@@ -18,7 +18,6 @@
 
 /* Apps */
 /* AMC */
-#if 0
 #define HAL_SHARED_MEM_TABLE_SIZE       ( 0x1000 )
 #define HAL_SHARED_MEM_TABLE_MAGIC_NO   ( 0x564D5230 )
 #define HAL_ENABLE_AMI_COMMS            ( 0x1 )
@@ -29,7 +28,7 @@
 #define HAL_RPU_SHARED_MEMORY_SIZE      ( HAL_RPU_SHARED_MEMORY_ENDADDR  - HAL_RPU_SHARED_MEMORY_BASEADDR )
 #define HAL_RPU_RING_BUFFER_BASE        ( HAL_RPU_SHARED_MEMORY_BASEADDR + HAL_SHARED_MEM_TABLE_SIZE )
 #define HAL_RPU_MEMORY_BUFFER_BASE      ( 0x2000000 ) /* 32MB - 128MB RPU Memory (0-32MB RPU code/data) */
-#endif
+
 
 /* FAL */
 #define HAL_FLUSH_CACHE_DATA( addr, size ) Xil_DCacheFlushRange( addr, size )
