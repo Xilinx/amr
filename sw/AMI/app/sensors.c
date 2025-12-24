@@ -37,6 +37,7 @@
 #define UNIT_MOD_BASE		(10)
 #define UNIT_STR_SIZE		(2 + 1)
 #define LIMIT_STR_SIZE		(7 + 1)  /* xxx.xxx + NULL */
+#define AUX_CABLE_CONNECTED_THRESHOLD_MV	(10.0)
 
 /*****************************************************************************/
 /* Structs                                                                   */
@@ -704,6 +705,77 @@ static int construct_sensor_json(ami_device *dev, JsonNode *parent,
 }
 
 /**
+ * count_connected_aux_cables() - Count how many 12V_AUX cables are connected and determine status.
+ * @dev: Device handle.
+ * @sensors: Sensor list to iterate through.
+ * @status_str: Output buffer to store the status string ("valid", "valid*", or "invalid").
+ * @status_str_size: Size of the status_str buffer.
+ *
+ * This helper function checks 12V_AUX1 and 12V_AUX2 sensors to determine
+ * how many cables are connected by validating voltage > 10V and their status.
+ *
+ * Status logic:
+ * - If any cable status is invalid -> display "invalid"
+ * - If any cable status is valid -> display "valid"
+ * - If both cables status are valid* -> display "valid*"
+ *
+ * Return: Number of connected AUX cables (0, 1, or 2).
+ */
+static int count_connected_aux_cables(ami_device *dev, struct ami_sensor *sensors,
+	char *status_str, size_t status_str_size)
+{
+	int aux_count = 0;
+	bool status_valid = false;
+	bool status_valid_cached = false;
+	bool status_invalid = false;
+
+	if (!dev || !status_str || !sensors) {
+		if (status_str)
+			snprintf(status_str, status_str_size, "invalid");
+		return 0;
+	}
+
+	while (sensors) {
+		if (strstr(sensors->name, "12V_AUX1") || strstr(sensors->name, "12V_AUX2")) {
+			long voltage = 0;
+			enum ami_sensor_status status = AMI_SENSOR_STATUS_INVALID;
+
+			if (ami_sensor_get_voltage_value(dev, sensors->name, &voltage, &status) == AMI_STATUS_OK) {
+				double voltage_v = (double)voltage / 1000.0;
+
+				if (voltage_v > AUX_CABLE_CONNECTED_THRESHOLD_MV && ((status == AMI_SENSOR_STATUS_OK) ||
+										     (status == AMI_SENSOR_STATUS_OK_CACHED))) {
+					aux_count++;
+
+					if (status == AMI_SENSOR_STATUS_OK)
+						status_valid = true;
+					else if (status == AMI_SENSOR_STATUS_OK_CACHED)
+						status_valid_cached = true;
+				} else {
+					status_invalid = true;
+				}
+			} else {
+				status_invalid = true;
+			}
+		}
+		sensors = sensors->next;
+	}
+
+	/* Determine final status string */
+	if (status_invalid) {
+		snprintf(status_str, status_str_size, "invalid");
+	} else if (status_valid) {
+		snprintf(status_str, status_str_size, "valid");
+	} else if (status_valid_cached) {
+		snprintf(status_str, status_str_size, "valid*");
+	} else {
+		snprintf(status_str, status_str_size, "invalid");
+	}
+
+	return aux_count;
+}
+
+/**
  * populate_sensor_values() - Populate an arbitrary data structure with sensor
  *                            data for printing.
  * @dev: Device handle.
@@ -750,6 +822,26 @@ static int populate_sensor_values(ami_device *dev, void *values,
 	current_sensor = sensors;
 
 	while (current_sensor && (j < *n_rows)) {
+		/* Insert AUX cable count before 12V_AUX1 sensor (when querying all sensors) */
+		if (!sensor_data->sensor && (strcmp(current_sensor->name, "12V_AUX1") == 0)) {
+			char aux_status[16] = { 0 };
+			int aux_count = count_connected_aux_cables(dev, sensors, aux_status, sizeof(aux_status));
+
+			if (fmt == APP_OUT_FORMAT_TABLE) {
+				char ***table_rows = (char***)values;
+				/* Insert count row into table */
+				if (j < *n_rows && table_rows[j]) {
+					snprintf(table_rows[j][0], TABLE_FIELD_MAX, "# of 12V_AUX cables connected");
+					snprintf(table_rows[j][1], TABLE_FIELD_MAX, "%d", aux_count);
+					snprintf(table_rows[j][2], TABLE_FIELD_MAX, "%s", aux_status);
+					j++;
+				}
+			} else if (fmt == APP_OUT_FORMAT_JSON) {
+				JsonNode *parent = (JsonNode*)values;
+				json_append_member(parent, "aux_cable_count", json_mknumber(aux_count));
+			}
+		}
+
 		switch (fmt) {
 			case APP_OUT_FORMAT_JSON:
 				ret = construct_sensor_json(
@@ -833,6 +925,11 @@ static int print_sensor_data(ami_device *dev, int extra_fields,
 			return EXIT_FAILURE;
 
 		n_rows = num;
+
+		/* Add extra row for AUX cable count (table format only) */
+		if (fmt == APP_OUT_FORMAT_TABLE) {
+			n_rows++;
+		}
 	}
 
 	if (n_rows == 0)

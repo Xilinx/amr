@@ -25,8 +25,10 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define  APP_HEXDUMP_GROUPS_32 (4)
-#define  APP_HEXDUMP_GROUPS_8  (16)
+#define APP_HEXDUMP_GROUPS_32	(4)
+#define APP_HEXDUMP_GROUPS_8	(16)
+#define TABLE_FIELD_MAX		(64)
+#define TABLE_HEADING_MAX	(32)
 
 /*****************************************************************************/
 /* Enums                                                                     */
