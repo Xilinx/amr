@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the API for the AMR Programming Control (APC) proxy driver
@@ -9,10 +9,6 @@
 
 #ifndef _APC_PROXY_DRIVER_H_
 #define _APC_PROXY_DRIVER_H_
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 #include "evl.h"
@@ -28,7 +24,7 @@
  * @enum    APC_PROXY_DRIVER_EVENTS
  * @brief   Events raised by this proxy driver
  */
-typedef enum APC_PROXY_DRIVER_EVENTS
+typedef enum
 {
     APC_PROXY_DRIVER_E_DOWNLOAD_STARTED = 0,
     APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE,
@@ -68,10 +64,10 @@ typedef enum
 /******************************************************************************/
 
 /**
- * @struct  APC_PROXY_DRIVER_FPT_HEADER
+ * @struct  APCProxyDriverFptHeader
  * @brief   Structure to hold the FPT Header
  */
-typedef struct APC_PROXY_DRIVER_FPT_HEADER
+typedef struct
 {
     uint32_t    ulMagicNum;
     uint8_t     ucFptVersion;
@@ -79,19 +75,20 @@ typedef struct APC_PROXY_DRIVER_FPT_HEADER
     uint8_t     ucEntrySize;
     uint8_t     ucNumEntries;
 
-} APC_PROXY_DRIVER_FPT_HEADER;
+} APCProxyDriverFptHeader;
 
 /**
- * @struct  APC_PROXY_DRIVER_FPT_PARTITION
+ * @struct  APCProxyDriverFptPartition
  * @brief   Structure to hold a single FPT partition
  */
-typedef struct APC_PROXY_DRIVER_FPT_PARTITION
+typedef struct
 {
     uint32_t    ulPartitionType;
     uint32_t    ulPartitionBaseAddr;
     uint32_t    ulPartitionSize;
+    uint32_t    ulPartitionFlags;
 
-} APC_PROXY_DRIVER_FPT_PARTITION;
+} APCProxyDriverFptPartition;
 
 
 /******************************************************************************/
@@ -116,9 +113,9 @@ typedef struct APC_PROXY_DRIVER_FPT_PARTITION
  *          and can be set to NULL.
  */
 int iAPC_Initialise( uint8_t ucProxyId,
-					 FW_IF_CFG *pxPrimaryFwIf,
-					 FW_IF_CFG *pxSecondaryFwIf,
-					 XLoader_ClientInstance *pXLoaderInst,
+                     FW_IF_CFG *pxPrimaryFwIf,
+                     FW_IF_CFG *pxSecondaryFwIf,
+                     XLoader_ClientInstance *pXLoaderInst,
                      uint32_t ulTaskPrio, uint32_t ulTaskStack );
 
 /**
@@ -146,12 +143,12 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
  *          ERROR Image not downloaded successfully
  */
 int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
-						APC_BOOT_DEVICES xBootDevice,
-						int iPartition,
-						uint32_t ulSrcAddr,
-						uint32_t ulImageSize,
-						uint16_t usPacketNum,
-						uint32_t ulPacketSize );
+                        APC_BOOT_DEVICES xBootDevice,
+                        int iPartition,
+                        uint32_t ulSrcAddr,
+                        uint32_t ulImageSize,
+                        uint16_t usPacketNum,
+                        uint32_t ulPacketSize );
 
 /**
  * iAPC_UpdateFpt() - Download an image with an FPT to a location in NV memory
@@ -168,12 +165,12 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
  *          ERROR Image not downloaded successfully
  */
 int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
-					APC_BOOT_DEVICES xBootDevice,
-					uint32_t ulSrcAddr,
-					uint32_t ulImageSize,
-					uint16_t usPacketNum,
-					uint32_t ulPacketSize,
-					int iLastPacket );
+                    APC_BOOT_DEVICES xBootDevice,
+                    uint32_t ulSrcAddr,
+                    uint32_t ulImageSize,
+                    uint16_t usPacketNum,
+                    uint32_t ulPacketSize,
+                    int iLastPacket );
 
 /**
  * iAPC_CopyImage() - Copy an image from one partition to another
@@ -190,12 +187,12 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
  *          ERROR    Image not copied successfully
  */
 int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
-					APC_BOOT_DEVICES xSrcBootDevice,
-					int iSrcPartition,
-					APC_BOOT_DEVICES xDestBootDevice,
-					int iDestPartition,
-					uint32_t ulCpyAddr,
-					uint32_t ulAllocatedSize );
+                    APC_BOOT_DEVICES xSrcBootDevice,
+                    int iSrcPartition,
+                    APC_BOOT_DEVICES xDestBootDevice,
+                    int iDestPartition,
+                    uint32_t ulCpyAddr,
+                    uint32_t ulAllocatedSize );
 
 /**
  * iAPC_PdiProgram() - Program PDI image to a location in memory
@@ -213,13 +210,13 @@ int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
  *          ERROR Image not copied successfully
  */
 int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
-					APC_BOOT_DEVICES xBootDevice,
-					int iPartition,
-					uint32_t ulSrcAddr,
-					uint32_t ulImageSize,
-					 uint32_t ulLastPacket,
-					uint16_t usPacketNum,
-					uint32_t ulPacketSize );
+                     APC_BOOT_DEVICES xBootDevice,
+                     int iPartition,
+                     uint32_t ulSrcAddr,
+                     uint32_t ulImageSize,
+                     uint32_t ulLastPacket,
+                     uint16_t usPacketNum,
+                     uint32_t ulPacketSize );
 /**
  * iAPC_SetNextPartition() - Select which partition (from primary boot device) to boot from
  *
@@ -252,7 +249,7 @@ int iAPC_EnableHotReset( EVL_SIGNAL *pxSignal );
  *
  */
 int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice,
-					APC_PROXY_DRIVER_FPT_HEADER *pxFptHeader );
+    APCProxyDriverFptHeader *pxFptHeader );
 
 /**
  * iAPC_GetFptPartition() - Get a Flash Partition Table (FPT) Partition
@@ -265,7 +262,7 @@ int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice,
  *          ERROR   FPT partition not retrieved successfully
  */
 int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
-						APC_PROXY_DRIVER_FPT_PARTITION *pxFptPartition );
+    APCProxyDriverFptPartition *pxFptPartition );
 
 /**
  * iAPC_PrintStatistics() - Print all the stats gathered by the proxy driver

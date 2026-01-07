@@ -2,7 +2,7 @@
 /*
  * ami_sensor.c - This file contains sensor-related functionality.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/kthread.h>
@@ -176,19 +176,24 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				for (i = 0; i < repo->fpt.hdr_primary.num_entries; i++) {
 					/* type */
 					memcpy(&repo->fpt.partition_primary[i].type,
-					       &sdr_buf[buf_index],
-					       sizeof(repo->fpt.partition_primary[i].type));
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_primary[i].type));
 					buf_index += sizeof(repo->fpt.partition_primary[i].type);
 					/* base address */
 					memcpy(&repo->fpt.partition_primary[i].base_addr,
-					       &sdr_buf[buf_index],
-					       sizeof(repo->fpt.partition_primary[i].base_addr));
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_primary[i].base_addr));
 					buf_index += sizeof(repo->fpt.partition_primary[i].base_addr);
 					/* partition size */
-					memcpy(&repo->fpt.partition_primary[i].partition_size,
-					       &sdr_buf[buf_index],
-					       sizeof(repo->fpt.partition_primary[i].partition_size));
-					buf_index += sizeof(repo->fpt.partition_primary[i].partition_size);
+					memcpy(&repo->fpt.partition_primary[i].size,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_primary[i].size));
+					buf_index += sizeof(repo->fpt.partition_primary[i].size);
+					/* flags */
+					memcpy(&repo->fpt.partition_primary[i].flags,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_primary[i].flags));
+					buf_index += sizeof(repo->fpt.partition_primary[i].flags);
 				}
 			}
 
@@ -207,19 +212,24 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				for (i = 0; i < repo->fpt.hdr_secondary.num_entries; i++) {
 					/* type */
 					memcpy(&repo->fpt.partition_secondary[i].type,
-					       &sdr_buf[buf_index],
-					       sizeof(repo->fpt.partition_secondary[i].type));
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_secondary[i].type));
 					buf_index += sizeof(repo->fpt.partition_secondary[i].type);
 					/* base address */
 					memcpy(&repo->fpt.partition_secondary[i].base_addr,
-					       &sdr_buf[buf_index],
-					       sizeof(repo->fpt.partition_secondary[i].base_addr));
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_secondary[i].base_addr));
 					buf_index += sizeof(repo->fpt.partition_secondary[i].base_addr);
 					/* partition size */
-					memcpy(&repo->fpt.partition_secondary[i].partition_size,
-					       &sdr_buf[buf_index],
-					       sizeof(repo->fpt.partition_secondary[i].partition_size));
-					buf_index += sizeof(repo->fpt.partition_secondary[i].partition_size);
+					memcpy(&repo->fpt.partition_secondary[i].size,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_secondary[i].size));
+					buf_index += sizeof(repo->fpt.partition_secondary[i].size);
+					/* flags */
+					memcpy(&repo->fpt.partition_secondary[i].flags,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_secondary[i].flags));
+					buf_index += sizeof(repo->fpt.partition_secondary[i].flags);
 				}
 			}
 
@@ -491,8 +501,8 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
  * Return: 0 or negative error code.
  */
 static int get_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
-	    enum gcq_sdr_repo_type	repo_type,
-	    struct sdr_repo		*repo)
+		enum gcq_sdr_repo_type	repo_type,
+		struct sdr_repo		*repo)
 {
 	int ret = 0;
 	int buf_index = 0;
@@ -542,7 +552,6 @@ static int get_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 		ret = -EINVAL;
 		goto done;
 	}
-	buf_index++;
 
 	/* Parse records */
 	ret = parse_sdr(amc_ctrl_ctxt, sdr_raw_buf + 1, repo);  /* +1 to omit completion code */
@@ -639,12 +648,12 @@ int discover_sensors(struct pf_dev_struct *pf_dev, int *empty_sdr_count)
 
 	for (i = 0; i < NUM_SENSOR_REPOS; i++) {
 		ret = get_sdr(pf_dev->amc_ctrl_ctxt, discovery_repos[i],
-				&(pf_dev->sensor_repos[i]));
+				&pf_dev->sensor_repos[i]);
 
-		if (ret == -ENODATA) {
-			*empty_sdr_count = *empty_sdr_count + 1;
+        if (ret == -ENODATA) {
+			*empty_sdr_count += 1;
 			ret = SUCCESS;
-		} else if (ret) {
+        } else if (ret) {
 			break;
 		}
 
@@ -1192,7 +1201,7 @@ int read_fpt_partition(struct pf_dev_struct	*pf_dev,
 	if (!repo)
 		return -EINVAL;
 
-	if (!(repo->num_records))
+	if (!repo->num_records)
 		return -ENODATA;
 
 	switch (boot_device) {

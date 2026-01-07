@@ -2,7 +2,7 @@
 /*
  * meta.c - This file contains utilities for printing AMI info/metadata
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -76,11 +76,12 @@
 #define FPT_HEADER_ROW_NUM_ENTRIES	(3)
 
 /* FPT partition information */
-#define NUM_PARTITION_COLS			(4)
+#define NUM_PARTITION_COLS			(5)
 #define PARTITION_COL_ID			(0)
 #define PARTITION_COL_TYPE			(1)
 #define PARTITION_COL_ADDR			(2)
 #define PARTITION_COL_SIZE			(3)
+#define PARTITION_COL_FLAGS			(4)
 
 /* Manufacturing info */
 #define NUM_MFG_INFO_ROWS			(17)
@@ -536,6 +537,10 @@ static int populate_partition_header(ami_device *dev, char **header,
 				sprintf(header[i], "%s", "Size");
 				break;
 
+			case PARTITION_COL_FLAGS:
+				sprintf(header[i], "%s", "Flags");
+				break;
+
 			default:
 				break;
 		}
@@ -578,6 +583,10 @@ static int construct_partition_row(struct ami_fpt_partition *part, int part_num,
 
 			case PARTITION_COL_SIZE:
 				sprintf(row[col], "0x%08x", part->size);
+				break;
+
+			case PARTITION_COL_FLAGS:
+				sprintf(row[col], "0x%08x", part->flags);
 				break;
 
 			default:
@@ -635,6 +644,13 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 				);
 				break;
 
+			case PARTITION_COL_FLAGS:
+				json_append_member(
+					row,
+					"flags",
+					json_mknumber(part->flags)
+				);
+				break;
 			default:
 				break;
 		}

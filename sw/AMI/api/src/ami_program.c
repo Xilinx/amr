@@ -2,7 +2,7 @@
 /*
  * ami_program.c - This file contains the implementation of device programming logic.
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -344,7 +344,8 @@ int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device,
 		ret = AMI_STATUS_OK;
 		partition->type = (enum ami_fpt_type)data.type;
 		partition->base_addr = data.base_addr;
-		partition->size = data.partition_size;
+		partition->size = data.size;
+		partition->flags = data.flags;
 	}
 
 	return ret;

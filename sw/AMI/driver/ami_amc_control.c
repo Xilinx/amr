@@ -2,7 +2,7 @@
 /*
  * ami_amc_control.c - This file contains AMC control implementation.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/kthread.h>
@@ -1046,7 +1046,7 @@ static int heartbeat_health_thread(void *data)
 			}
 		}
 
-		msleep(HEARTBEAT_REQUEST_INTERVAL);
+		msleep_interruptible(HEARTBEAT_REQUEST_INTERVAL);
 
 		/* only exit from the thread is within the unset_amc context */
 		if (kthread_should_stop())
@@ -1093,7 +1093,7 @@ static int logging_thread(void *data)
 		if (logging_failed == false) {
 			dump_amc_log(amc_ctxt);
 		}
-		msleep(LOGGING_SLEEP_INTERVAL);
+		msleep_interruptible(LOGGING_SLEEP_INTERVAL);
 
 		/* only exit from the thread is within the unset_amc context */
 		if (kthread_should_stop())

@@ -2,7 +2,7 @@
 /*
  * ami_ioctl.h - This file contains definitions for the AMI IOCTL interface
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_IOCTL_H
@@ -147,14 +147,16 @@ struct ami_ioc_fpt_hdr_value {
  * @partition: This is passed in from userspace.
  * @type: The partition type. Populated by the driver.
  * @base_addr: The partition base address. Populated by the driver.
- * @partition_size: The partition size. Populated by the driver.
+ * @size: The partition size. Populated by the driver.
+ * @flags: The partition flags. Populated by the driver.
  */
 struct ami_ioc_fpt_partition_value {
 	uint8_t  boot_device;
 	uint32_t partition;
 	uint32_t type;
 	uint32_t base_addr;
-	uint32_t partition_size;
+	uint32_t size;
+	uint32_t flags;
 };
 
 /**
@@ -164,7 +166,7 @@ struct ami_ioc_fpt_partition_value {
  * @offset: Offset from the EEPROM base address.
  */
 struct ami_ioc_eeprom_payload {
-        unsigned long  addr;
+	unsigned long  addr;
 	uint8_t        len;
 	uint8_t        offset;
 };
@@ -195,22 +197,22 @@ enum ami_ioc_app_setup {
 	IOC_APP_SETUP_DEREGISTER,
 };
 
-#define AMI_IOC_MAGIC				'a'
+#define AMI_IOC_MAGIC			'a'
 #define AMI_IOC_DOWNLOAD_PDI		_IOW(AMI_IOC_MAGIC,  0, struct ami_ioc_data_payload*)
-#define AMI_IOC_READ_BAR			_IOWR(AMI_IOC_MAGIC, 1, struct ami_ioc_bar_data*)
-#define AMI_IOC_WRITE_BAR			_IOW(AMI_IOC_MAGIC,  2, struct ami_ioc_bar_data*)
+#define AMI_IOC_READ_BAR		_IOWR(AMI_IOC_MAGIC, 1, struct ami_ioc_bar_data*)
+#define AMI_IOC_WRITE_BAR		_IOW(AMI_IOC_MAGIC,  2, struct ami_ioc_bar_data*)
 #define AMI_IOC_GET_SENSOR_VALUE	_IOWR(AMI_IOC_MAGIC, 3, struct ami_ioc_sensor_value*)
-#define AMI_IOC_DEVICE_BOOT			_IOW(AMI_IOC_MAGIC,  4, struct ami_ioc_data_payload*)
+#define AMI_IOC_DEVICE_BOOT		_IOW(AMI_IOC_MAGIC,  4, struct ami_ioc_data_payload*)
 #define AMI_IOC_COPY_PARTITION		_IOW(AMI_IOC_MAGIC,  5, struct ami_ioc_data_payload*)
 #define AMI_IOC_SET_SENSOR_REFRESH	_IOW(AMI_IOC_MAGIC,  6, uint16_t)
-#define AMI_IOC_GET_FPT_HDR			_IOR(AMI_IOC_MAGIC,  7, struct ami_ioc_fpt_hdr_value*)
+#define AMI_IOC_GET_FPT_HDR		_IOR(AMI_IOC_MAGIC,  7, struct ami_ioc_fpt_hdr_value*)
 #define AMI_IOC_GET_FPT_PARTITION	_IOWR(AMI_IOC_MAGIC, 8, struct ami_ioc_fpt_partition_value*)
-#define AMI_IOC_READ_EEPROM			_IOWR(AMI_IOC_MAGIC, 9, struct ami_ioc_eeprom_payload*)
+#define AMI_IOC_READ_EEPROM		_IOWR(AMI_IOC_MAGIC, 9, struct ami_ioc_eeprom_payload*)
 #define AMI_IOC_WRITE_EEPROM		_IOW(AMI_IOC_MAGIC, 10, struct ami_ioc_eeprom_payload*)
-#define AMI_IOC_APP_SETUP			_IOW(AMI_IOC_MAGIC, 11, enum ami_ioc_app_setup)
-#define AMI_IOC_READ_MODULE			_IOW(AMI_IOC_MAGIC, 12, struct ami_ioc_module_payload*)
+#define AMI_IOC_APP_SETUP		_IOW(AMI_IOC_MAGIC, 11, enum ami_ioc_app_setup)
+#define AMI_IOC_READ_MODULE		_IOW(AMI_IOC_MAGIC, 12, struct ami_ioc_module_payload*)
 #define AMI_IOC_WRITE_MODULE		_IOW(AMI_IOC_MAGIC, 13, struct ami_ioc_module_payload*)
 #define AMI_IOC_DEBUG_VERBOSITY		_IOW(AMI_IOC_MAGIC, 14, uint8_t)
-#define AMI_IOC_MAX					(15)
+#define AMI_IOC_MAX			(15)
 
 #endif  /* AMI_IOCTL_H */

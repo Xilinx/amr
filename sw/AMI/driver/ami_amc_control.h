@@ -2,7 +2,7 @@
 /*
  * ami_amc_control.h - This file contains AMC control defintions.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_AMC_CONTROL_H
@@ -472,12 +472,14 @@ struct fpt_header {
  * struct fpt_partition - A single flash partition.
  * @type: Partition type
  * @base_addr: Partition base address
- * @partition_size: Partition size
+ * @size: Partition size
+ * @flags: Partition flags
  */
 struct fpt_partition {
 	uint32_t type;
 	uint32_t base_addr;
-	uint32_t partition_size;
+	uint32_t size;
+	uint32_t flags;
 };
 
 /**
@@ -690,21 +692,21 @@ struct amc_control_ctxt {
 	void __iomem		*gcq_payload_base_virt_addr;
 	void __iomem		*gcq_ring_buf_base_virt_addr;
 	struct amc_shared_mem	amc_shared_mem;
-	GCQCfg		        gcq_consumer;
+	GCQCfg			gcq_consumer;
 	struct mutex		lock;
 	struct mutex		gcq_cmd_lock;
-	bool				gcq_halted;
+	bool			gcq_halted;
 	struct semaphore	gcq_log_page_sema;
 	struct semaphore	gcq_data_sema;
 	struct amc_version	version;
 	struct task_struct	*heartbeat_thread;
-	bool				heartbeat_thread_created;
+	bool			heartbeat_thread_created;
 	amc_event_callback	event_cb;
-	void				*event_cb_data;
+	void			*event_cb_data;
 	struct task_struct	*logging_thread;
-	bool				logging_thread_created;
-	int					last_printed_msg_index;
-	bool				compat_mode;
+	bool			logging_thread_created;
+	int			last_printed_msg_index;
+	bool			compat_mode;
 };
 
 

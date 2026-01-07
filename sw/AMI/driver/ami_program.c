@@ -2,7 +2,7 @@
 /*
  * ami_program.c - This file contains functions to program (flash) devices.
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/types.h>
@@ -277,7 +277,7 @@ int copy_partition(struct pf_dev_struct *pf_dev,
 	}
 
 	/* Sanity check partition size */
-	if (dest_partition.partition_size < src_partition.partition_size) {
+	if (dest_partition.size < src_partition.size) {
 		AMI_ERR(pf_dev->amc_ctrl_ctxt, "Destination partition is too small for copy");
 		return -EINVAL;
 	}
@@ -286,8 +286,11 @@ int copy_partition(struct pf_dev_struct *pf_dev,
 	 * Using `flags` to pass in source and destination partitions.
 	 * No data buffer is given and length is set to the size of the source partition.
 	 */
-	ret = submit_gcq_command(pf_dev->amc_ctrl_ctxt, GCQ_SUBMIT_CMD_COPY_PARTITION,
-		MK_PARTITION_FLAGS(src_device, src_part, dest_device, dest_part), NULL, src_partition.partition_size);
+	ret = submit_gcq_command(pf_dev->amc_ctrl_ctxt,
+		GCQ_SUBMIT_CMD_COPY_PARTITION,
+		MK_PARTITION_FLAGS(src_device, src_part, dest_device, dest_part),
+		NULL,
+		src_partition.size);
 
 	if (ret)
 		AMI_ERR(pf_dev->amc_ctrl_ctxt, "Failed to copy partition");

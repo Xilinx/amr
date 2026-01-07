@@ -2,7 +2,7 @@
 /*
  * ami_program.h- This file contains the public interface for device programming logic
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_PROGRAM_H
@@ -77,11 +77,13 @@ enum ami_fpt_type {
  * @type: Partition type.
  * @base_addr: Partition base address.
  * @size: Partition size.
+ * @flags: Partition flags.
  */
 struct ami_fpt_partition {
 	enum ami_fpt_type type;
 	uint32_t base_addr;
 	uint32_t size;
+	uint32_t flags;
 };
 
 /**

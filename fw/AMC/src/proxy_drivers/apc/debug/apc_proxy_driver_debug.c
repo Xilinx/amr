@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the AVED Programming Control (APC) debug implementation
@@ -389,7 +389,7 @@ static void vGetFptHeader( void )
     }
     else
     {
-        APC_PROXY_DRIVER_FPT_HEADER xFptHeader = { 0 };
+        APCProxyDriverFptHeader xFptHeader = { 0 };
 
         if( OK != iAPC_GetFptHeader( ( APC_BOOT_DEVICES )xBootDevice, &xFptHeader ) )
         {
@@ -427,7 +427,7 @@ static void vGetFptPartition( void )
     }
     else
     {
-        APC_PROXY_DRIVER_FPT_PARTITION xFptPartition = { 0 };
+        APCProxyDriverFptPartition xFptPartition = { 0 };
 
         if( OK != iAPC_GetFptPartition( ( APC_BOOT_DEVICES )xBootDevice, iPartition, &xFptPartition ) )
         {
@@ -440,6 +440,7 @@ static void vGetFptPartition( void )
             PLL_DAL( APC_DBG_NAME, "\tPartition type . . . . : 0x%08X\r\n", xFptPartition.ulPartitionType );
             PLL_DAL( APC_DBG_NAME, "\tPartition base address : 0x%08X\r\n", xFptPartition.ulPartitionBaseAddr );
             PLL_DAL( APC_DBG_NAME, "\tPartition size . . . . : 0x%08X\r\n", xFptPartition.ulPartitionSize );
+            PLL_DAL( APC_DBG_NAME, "\tPartition flags . . .  : 0x%08X\r\n", xFptPartition.ulPartitionFlags );
             PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
         }
     }

@@ -2,7 +2,7 @@
 /*
  * ami_cdev.c - This file contains logic related to AMI character device files.
  *
- * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/pci.h>     /* pci_dev */
@@ -534,7 +534,8 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		if (!ret) {
 			data.type = partition.type;
 			data.base_addr = partition.base_addr;
-			data.partition_size = partition.partition_size;
+			data.size = partition.size;
+			data.flags = partition.flags;
 			ret = copy_to_user((
 				struct ami_ioc_fpt_partition_value*)arg,
 				&data, sizeof(data)
