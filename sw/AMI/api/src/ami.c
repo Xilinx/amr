@@ -101,7 +101,7 @@ static void *ami_event_thread(void *data)
 	p = d->callback_data;
 
 	/* callback is necessary */
-	if (!(d->callback))
+	if (!d->callback)
 		return NULL;
 
 	mypoll.fd = d->efd;
@@ -120,7 +120,7 @@ static void *ami_event_thread(void *data)
 		if (kernel_version_cmp("6.8.0") >= 0) {
 			d->callback(
 				status,
-				p->bytes_to_write > chunk_size ? chunk_size : p->bytes_to_write,
+				p ? (p->bytes_to_write > chunk_size ? chunk_size : p->bytes_to_write):1,
 				d->callback_data
 			);
 		} else {

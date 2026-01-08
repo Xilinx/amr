@@ -170,7 +170,7 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 	source = find_app_option('i', options);
 	dest = find_app_option('p', options);
 
-	if (!device || !source | !dest) {
+	if (!device || !source || !dest) {
 		APP_USER_ERROR("not enough arguments", help_msg);
 		return AMI_STATUS_ERROR;
 	}
@@ -236,12 +236,13 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 
 	if (ret == AMI_STATUS_ERROR) {
 		APP_API_ERROR("could not get source fpt partition");
-	} else {
-		est_dur_seconds = calc_est_time(part.size);
-		printf("Estimated time to copy partition: %d (seconds) "
+		ami_dev_delete(&dev);
+		return ret;
+	}
+	est_dur_seconds = calc_est_time(part.size);
+	printf("Estimated time to copy partition: %d (seconds) "
 			"(NOTE: Changing logging levels may increase copy time)\r\n",
 			est_dur_seconds);
-	}
 
 	ret = ami_prog_copy_partition(
 			dev,
