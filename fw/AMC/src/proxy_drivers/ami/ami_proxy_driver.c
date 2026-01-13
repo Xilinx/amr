@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation for the AMR Management Interface (AMI)
@@ -7,10 +7,6 @@
  *
  * @file ami_proxy_driver.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <string.h>
 
@@ -103,6 +99,7 @@
     DO( AMI_PROXY_ERRORS_GET_EEPROM_RW_REQUEST )       \
     DO( AMI_PROXY_ERRORS_GET_MODULE_RW_REQUEST )       \
     DO( AMI_PROXY_ERRORS_GET_DEBUG_VERBOSITY_REQUEST ) \
+    DO( AMI_PROXY_ERRORS_SET_FPT_FLAGS_REQUEST )       \
     DO( AMI_PROXY_RAISE_EVENT_PDI_DOWNLOAD_FAILED )    \
     DO( AMI_PROXY_RAISE_EVENT_PDI_COPY_FAILED )        \
     DO( AMI_PROXY_RAISE_EVENT_GET_IDENTIFY_FAILED )    \
@@ -111,6 +108,7 @@
     DO( AMI_PROXY_RAISE_EVENT_HEARTBEAT_FAILED )       \
     DO( AMI_PROXY_RAISE_EVENT_EEPROM_RW_FAILED )       \
     DO( AMI_PROXY_RAISE_EVENT_MODULE_RW_FAILED )       \
+    DO( AMI_PROXY_RAISE_EVENT_FPT_FLAGS_FAILED )       \
     DO( AMI_PROXY_RAISE_EVENT_DEBUG_VERBOSITY_FAILED ) \
     DO( AMI_PROXY_INIT_FW_IF_OPEN_FAILED )             \
     DO( AMI_PROXY_INIT_MUTEX_CREATE_FAILED )           \
@@ -147,18 +145,19 @@
  * @enum    AMI_MSG_TYPES
  * @brief   Enumeration of mbox message types for this proxy
  */
-typedef enum AMI_MSG_TYPES
+typedef enum
 {
-    AMI_MSG_TYPE_PDI_DOWNLOAD_COMPLETE = 0,
-    AMI_MSG_TYPE_PDI_COPY_COMPLETE,
-    AMI_MSG_TYPE_PDI_PROGRAM_COMPLETE,
-    AMI_MSG_TYPE_SENSOR_COMPLETE,
-    AMI_MSG_TYPE_IDENTITY_COMPLETE,
-    AMI_MSG_TYPE_BOOT_SELECT_COMPLETE,
-    AMI_MSG_TYPE_HEARTBEAT_COMPLETE,
-    AMI_MSG_TYPE_EEPROM_RW_COMPLETE,
-    AMI_MSG_TYPE_MODULE_RW_COMPLETE,
-    AMI_MSG_TYPE_DEBUG_VERBOSITY_COMPLETE,
+    AMI_MSG_TYPE_PDI_DOWNLOAD_COMPLETE    = 0,
+    AMI_MSG_TYPE_PDI_COPY_COMPLETE        = 1,
+    AMI_MSG_TYPE_PDI_PROGRAM_COMPLETE     = 2,
+    AMI_MSG_TYPE_SENSOR_COMPLETE          = 3,
+    AMI_MSG_TYPE_IDENTITY_COMPLETE        = 4,
+    AMI_MSG_TYPE_BOOT_SELECT_COMPLETE     = 5,
+    AMI_MSG_TYPE_HEARTBEAT_COMPLETE       = 6,
+    AMI_MSG_TYPE_EEPROM_RW_COMPLETE       = 7,
+    AMI_MSG_TYPE_MODULE_RW_COMPLETE       = 8,
+    AMI_MSG_TYPE_DEBUG_VERBOSITY_COMPLETE = 9,
+    AMI_MSG_TYPE_FPT_FLAGS_COMPLETE       = 10,
 
     MAX_AMI_MSG_TYPE
 
@@ -168,13 +167,14 @@ typedef enum AMI_MSG_TYPES
  * @enum    AMI_CMD_OPCODE_REQ
  * @brief   Internal message opcode
  */
-typedef enum AMI_CMD_OPCODE_REQ
+typedef enum
 {
     AMI_CMD_OPCODE_BOOT_SEL_REQ        = 0x0,
     AMI_CMD_OPCODE_HEARTBEAT_REQ       = 0x2,
     AMI_CMD_OPCODE_EEPROM_RW_REQ       = 0x3,
     AMI_CMD_OPCODE_MODULE_RW_REQ       = 0x4,
     AMI_CMD_OPCODE_DEBUG_VERBOSITY_REQ = 0x5,
+    AMI_CMD_OPCODE_FPT_FLAGS_REQ       = 0x6,
     AMI_CMD_OPCODE_PDI_DOWNLOAD_REQ    = 0xA,
     AMI_CMD_OPCODE_PDI_PROGRAM_REQ     = 0xB,
     AMI_CMD_OPCODE_SENSOR_REQ          = 0xC,
@@ -189,7 +189,7 @@ typedef enum AMI_CMD_OPCODE_REQ
  * @enum    AMI_CMD_STATE
  * @brief   Internal command state
  */
-typedef enum AMI_CMD_STATE
+typedef enum
 {
     AMI_CMD_STATE_COMPLETED = 0,
     AMI_CMD_STATE_ABORTED,
@@ -222,21 +222,22 @@ UTIL_MAKE_ENUM_AND_STRINGS( AMI_PROXY_ERRORS, AMI_PROXY_ERRORS, AMI_PROXY_ERRORS
  * @struct  AMI_RX_DATA
  * @brief   Structure to hold rx'd data received from FW_IF
  */
-typedef struct AMI_RX_DATA
+typedef struct
 {
     uint8_t 			ucInUse;
     AMI_CMD_OPCODE_REQ	xOpCode;
     uint16_t			usCid;
     union
     {
-        AMI_PROXY_PDI_DOWNLOAD_REQUEST	xDownloadRequest;
-        AMI_PROXY_PDI_COPY_REQUEST		xCopyRequest;
-        AMI_PROXY_PDI_PROGRAM_REQUEST	xProgramRequest;
-        AMI_PROXY_SENSOR_REQUEST		xSensorRequest;
-        AMI_PROXY_BOOT_SELECT_REQUEST	xBootSelectRequest;
-        AMI_PROXY_EEPROM_RW_REQUEST		xEepromReadWriteRequest;
-        AMI_PROXY_MODULE_RW_REQUEST		xModuleReadWriteRequest;
-        uint8_t							ucDebugVerbosityRequest;
+        AMI_PROXY_PDI_DOWNLOAD_REQUEST xDownloadRequest;
+        AMI_PROXY_PDI_COPY_REQUEST     xCopyRequest;
+        AMI_PROXY_PDI_PROGRAM_REQUEST  xProgramRequest;
+        AMI_PROXY_SENSOR_REQUEST       xSensorRequest;
+        AMI_PROXY_BOOT_SELECT_REQUEST  xBootSelectRequest;
+        AMI_PROXY_EEPROM_RW_REQUEST    xEepromReadWriteRequest;
+        AMI_PROXY_MODULE_RW_REQUEST    xModuleReadWriteRequest;
+        AMI_PROXY_FPT_FLAGS_REQUEST    xFptFlagsRequest;
+        uint8_t                        ucDebugVerbosityRequest;
     };
 
 } AMI_RX_DATA;
@@ -245,21 +246,21 @@ typedef struct AMI_RX_DATA
  * @struct  AMI_PRIVATE_DATA
  * @brief   Structure to hold ths proxy driver's private data
  */
-typedef struct AMI_PRIVATE_DATA
+typedef struct
 {
     uint32_t        ulUpperFirewall;
 
     int             iInitialised;
     uint8_t         ucMyId;
 
-    FW_IF_CFG *     pxFwIf;
+    FW_IF_CFG       *pxFwIf;
     uint32_t        ulFwIfPort;
 
     EVL_RECORD      *pxEvlRecord;
 
-    void *          pvOsalMutexHdl;
-    void *          pvOsalMBoxHdl;
-    void *          pvOsalTaskHdl;
+    void            *pvOsalMutexHdl;
+    void            *pvOsalMBoxHdl;
+    void            *pvOsalTaskHdl;
 
     AMI_RX_DATA     xRxData[ AMI_RXDATA_SIZE ];
 
@@ -276,7 +277,7 @@ typedef struct AMI_PRIVATE_DATA
  * @struct  AMI_MBOX_MSG
  * @brief   Data posted via the AMI Proxy driver mailbox
  */
-typedef struct AMI_MBOX_MSG
+typedef struct
 {
     AMI_MSG_TYPES eMsgType;
     uint8_t ucRxDataIndex;
@@ -285,6 +286,7 @@ typedef struct AMI_MBOX_MSG
     {
         AMI_PROXY_IDENTITY_RESPONSE  xIdentity;
         AMI_PROXY_HEARTBEAT_RESPONSE xHeartbeat;
+        uint32_t                     ulFptFlags;
     };
 
 } AMI_MBOX_MSG;
@@ -293,7 +295,7 @@ typedef struct AMI_MBOX_MSG
  * @struct  AMI_CMD_RESPONSE_HDR
  * @brief   The command response header
  */
-typedef struct AMI_CMD_RESPONSE_HDR
+typedef struct
 {
     union
     {
@@ -313,7 +315,7 @@ typedef struct AMI_CMD_RESPONSE_HDR
  * @struct  AMI_CMD_RESPONSE
  * @brief   The command response header and payload
  */
-typedef struct AMI_CMD_RESPONSE
+typedef struct
 {
     union
     {
@@ -333,7 +335,7 @@ STATIC_ASSERT( sizeof( AMI_CMD_RESPONSE ) == AMI_PROXY_RESPONSE_SIZE );
  * @struct  AMI_CMD_REQUEST_HDR
  * @brief   The request header
  */
-typedef struct AMI_CMD_REQUEST_HDR
+typedef struct
 {
     union
     {
@@ -362,7 +364,7 @@ typedef struct AMI_CMD_REQUEST_HDR
  * @struct  AMI_CMD_REQ_SENSOR_PAYLOAD
  * @brief   The sensor request payload
  */
-typedef struct AMI_CMD_REQ_SENSOR_PAYLOAD
+typedef struct
 {
     uint64_t ullAddress;
     uint32_t ulSize;
@@ -380,7 +382,7 @@ typedef struct AMI_CMD_REQ_SENSOR_PAYLOAD
  * @struct  AMI_CMD_DATA_PAYLOAD
  * @brief   The data request payload
  */
-typedef struct AMI_CMD_DATA_PAYLOAD
+typedef struct
 {
     uint64_t ullAddress;
     uint32_t ulSize;
@@ -405,7 +407,7 @@ typedef struct AMI_CMD_DATA_PAYLOAD
  * @struct  AMI_CMD_HEARTBEAT_PAYLOAD
  * @brief   The heartbeat payload
  */
-typedef struct AMI_CMD_HEARTBEAT_PAYLOAD
+typedef struct
 {
     uint8_t ucHeartbeatCount;
 
@@ -415,7 +417,7 @@ typedef struct AMI_CMD_HEARTBEAT_PAYLOAD
  * @struct  AMI_CMD_EEPROM_PAYLOAD
  * @brief   The eeprom payload
  */
-typedef struct AMI_CMD_EEPROM_PAYLOAD
+typedef struct
 {
     uint64_t ullAddress;
     uint32_t ucReqType:1;
@@ -429,7 +431,7 @@ typedef struct AMI_CMD_EEPROM_PAYLOAD
  * @struct  AMI_CMD_MODULE_PAYLOAD
  * @brief   The module payload
  */
-typedef struct AMI_CMD_MODULE_PAYLOAD
+typedef struct
 {
     uint64_t ullAddress;
     uint8_t  ucExDeviceId;
@@ -442,22 +444,39 @@ typedef struct AMI_CMD_MODULE_PAYLOAD
 } AMI_CMD_MODULE_PAYLOAD;
 
 /**
+ * @struct  AMI_CMD_FPT_FLAGS_PAYLOAD
+ * @brief   The FPT flags request payload
+ */
+typedef struct
+{
+    uint32_t ulReqType;       /* 0 = Read, 1 = Write */
+    uint32_t ulBootDevice;    /* 0 = Primary, 1 = Secondary */
+    uint32_t ulPartitionId;   /* Partition ID */
+    uint32_t ulType;          /* Partition type */
+    uint32_t ulBaseAddr;      /* Partition base address */
+    uint32_t ulSize;          /* Partition size */
+    uint32_t ulFlags;         /* Flags value (for write) */
+
+} AMI_CMD_FPT_FLAGS_PAYLOAD;
+
+/**
  * @struct  AMI_CMD_REQUEST
  * @brief   The request command header & payload
  */
-typedef struct AMI_CMD_REQUEST
+typedef struct
 {
-    struct AMI_CMD_REQUEST_HDR xHdr;
+    AMI_CMD_REQUEST_HDR xHdr;
     union
     {
-        AMI_CMD_REQ_SENSOR_PAYLOAD 	xSensorPayload;
-        AMI_CMD_DATA_PAYLOAD 		xPdiDownloadPayload;
-        AMI_CMD_DATA_PAYLOAD 		xPdiCopyPayload;
-        AMI_CMD_DATA_PAYLOAD 		xBootSelect;
-        AMI_CMD_HEARTBEAT_PAYLOAD	xHeartbeatPayload;
-        AMI_CMD_EEPROM_PAYLOAD 		xEepromPayload;
-        AMI_CMD_MODULE_PAYLOAD		xModulePayload;
-        uint8_t 					ucDebugVerbosityPayload;
+        AMI_CMD_REQ_SENSOR_PAYLOAD  xSensorPayload;
+        AMI_CMD_DATA_PAYLOAD        xPdiDownloadPayload;
+        AMI_CMD_DATA_PAYLOAD        xPdiCopyPayload;
+        AMI_CMD_DATA_PAYLOAD        xBootSelect;
+        AMI_CMD_HEARTBEAT_PAYLOAD   xHeartbeatPayload;
+        AMI_CMD_EEPROM_PAYLOAD      xEepromPayload;
+        AMI_CMD_MODULE_PAYLOAD      xModulePayload;
+        AMI_CMD_FPT_FLAGS_PAYLOAD   xFptFlagsPayload;
+        uint8_t                     ucDebugVerbosityPayload;
     };
 
 } AMI_CMD_REQUEST;
@@ -485,6 +504,7 @@ static AMI_PRIVATE_DATA xLocalData =
     MODULE_STATE_UNINITIALISED, /* xState */
     LOWER_FIREWALL              /* ulLowerFirewall */
 };
+
 static AMI_PRIVATE_DATA *pxThis = &xLocalData;
 
 
@@ -551,6 +571,16 @@ static int iHandleModuleRequest( AMI_CMD_REQUEST *pxCmdRequest );
  *
  */
 static int iHandleDebugVerbosityRequest( AMI_CMD_REQUEST *pxCmdRequest );
+
+/**
+ * @brief   Handle the FPT flags request
+ *
+ * @param   pxCmdRequest The request details
+ *
+ * @return  OK/ERROR
+ *
+ */
+static int iHandleFptFlagsRequest( AMI_CMD_REQUEST *pxCmdRequest );
 
 
 /******************************************************************************/
@@ -968,6 +998,42 @@ int iAMI_SetDebugVerbosityResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResu
                                                  OSAL_TIMEOUT_NO_WAIT ) )
         {
             INC_STAT_COUNTER( AMI_PROXY_STATS_MODULE_RW_MBOX_POST )
+            iStatus = OK;
+        }
+        else
+        {
+            INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MAILBOX_POST_FAILED )
+        }
+    }
+    else
+    {
+        INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
+    }
+    return iStatus;
+}
+
+/**
+ * @brief   Set the FPT flags response
+ */
+int iAMI_SetFptFlagsResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags )
+{
+    int iStatus = ERROR;
+
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+        ( TRUE == pxThis->iInitialised ) &&
+        ( NULL != pxSignal ) )
+    {
+        AMI_MBOX_MSG xMsg = { 0 };
+        xMsg.ucRxDataIndex = pxSignal->ucInstance;
+        xMsg.eMsgType = AMI_MSG_TYPE_FPT_FLAGS_COMPLETE;
+        xMsg.xResult = xResult;
+        xMsg.ulFptFlags = ulFlags;
+        if( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
+                                                 ( void* )&xMsg,
+                                                 OSAL_TIMEOUT_NO_WAIT ) )
+        {
+            INC_STAT_COUNTER( AMI_PROXY_STATS_BOOT_SELECT_MBOX_POST )
             iStatus = OK;
         }
         else
@@ -1524,6 +1590,72 @@ int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
 }
 
 /**
+ * @brief   Get the FPT flags request
+ */
+int iAMI_GetFptFlagsRequest( EVL_SIGNAL *pxSignal,
+                             AMI_PROXY_FPT_FLAGS_REQUEST *pxFptFlagsRequest )
+{
+    int iStatus = ERROR;
+
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+        ( TRUE == pxThis->iInitialised ) &&
+        ( NULL != pxSignal ) &&
+        ( NULL != pxFptFlagsRequest ) )
+    {
+        INC_STAT_COUNTER( AMI_PROXY_STATS_GET_BOOT_SELECT_REQUEST )
+
+        if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
+                                                  OSAL_TIMEOUT_WAIT_FOREVER ) )
+        {
+            uint8_t ucIndex = pxSignal->ucInstance;
+
+            INC_STAT_COUNTER( AMI_PROXY_STATS_TAKE_MUTEX )
+
+            if( AMI_CHECK_VALID_INDEX( ucIndex ) &&
+                ( TRUE == pxThis->xRxData[ ucIndex ].ucInUse ) &&
+                ( AMI_CMD_OPCODE_FPT_FLAGS_REQ == pxThis->xRxData[ ucIndex ].xOpCode ) )
+            {
+                pxFptFlagsRequest->xRequest =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.xRequest;
+                pxFptFlagsRequest->ulBootDevice =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulBootDevice;
+                pxFptFlagsRequest->ulPartitionId =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulPartitionId;
+                pxFptFlagsRequest->ulFlags =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulFlags;
+
+                iStatus = OK;
+            }
+            else
+            {
+                PLL_ERR( AMI_NAME, "Error invalid get FPT flags request for instance\r\n" );
+                INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_RAISE_EVENT_FPT_FLAGS_FAILED )
+            }
+
+            if( OSAL_ERRORS_NONE != iOSAL_Mutex_Release( pxThis->pvOsalMutexHdl ) )
+            {
+                INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
+                iStatus = ERROR;
+            }
+            else
+            {
+                INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
+            }
+        }
+        else
+        {
+            INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
+        }
+    }
+    else
+    {
+        INC_ERROR_COUNTER( AMI_PROXY_VALIDATION_FAILED )
+    }
+    return iStatus;
+}
+
+/**
  * @brief   Display the current stats/errors
  */
 int iAMI_PrintStatistics( void )
@@ -2022,6 +2154,14 @@ static void vProxyDriverTask( void *pvArgs )
                     }
                     break;
 
+                case AMI_CMD_OPCODE_FPT_FLAGS_REQ:
+                    iStatus = iHandleFptFlagsRequest( &xCmdRequest );
+                    if( ERROR == iStatus )
+                    {
+                        INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_SET_FPT_FLAGS_REQUEST )
+                    }
+                    break;
+
                 default:
                     PLL_ERR( AMI_NAME, "Error unsupported opcode received 0x%x\r\n", xCmdRequest.xHdr.ulOpCode );
                     INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_UNSUPPORTED_OPCODE_RX )
@@ -2087,6 +2227,11 @@ static void vProxyDriverTask( void *pvArgs )
 
                 case AMI_MSG_TYPE_DEBUG_VERBOSITY_COMPLETE:
                     INC_STAT_COUNTER( AMI_PROXY_STATS_DEBUG_VERBOSITY_MBOX_PEND )
+                    break;
+
+                case AMI_MSG_TYPE_FPT_FLAGS_COMPLETE:
+                    INC_STAT_COUNTER( AMI_PROXY_STATS_BOOT_SELECT_MBOX_PEND )
+                    xCmdResponse.ulPayload[ 0 ] = xMBoxData.ulFptFlags;
                     break;
 
                 default:
@@ -2445,6 +2590,84 @@ static int iHandleDebugVerbosityRequest( AMI_CMD_REQUEST *pxCmdRequest )
                     PLL_ERR( AMI_NAME, "Error attempting to raise event 0x%x\r\n",
                              AMI_PROXY_DRIVER_E_DEBUG_VERBOSITY );
                     INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_RAISE_EVENT_DEBUG_VERBOSITY_FAILED )
+                }
+            }
+        }
+        else
+        {
+            INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )
+        }
+    }
+    return iStatus;
+}
+
+/**
+ * @brief   Handle the FPT flags request
+ */
+static int iHandleFptFlagsRequest( AMI_CMD_REQUEST *pxCmdRequest )
+{
+    int iStatus = ERROR;
+
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+        ( NULL != pxCmdRequest ) &&
+        ( TRUE == pxThis->iInitialised ) )
+    {
+        uint8_t ucIndex = 0;
+
+        if( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
+                                                  OSAL_TIMEOUT_WAIT_FOREVER ) )
+        {
+            INC_STAT_COUNTER( AMI_PROXY_STATS_TAKE_MUTEX )
+
+            iStatus = iFindNextFreeRxDataIndex( &ucIndex );
+            if( ERROR != iStatus )
+            {
+                AMI_RX_DATA *pxRxData = &pxThis->xRxData[ucIndex];
+                pxRxData->usCid = pxCmdRequest->xHdr.usCid;
+                pxRxData->xOpCode = pxCmdRequest->xHdr.ulOpCode;
+                pxRxData->xFptFlagsRequest.xRequest = pxCmdRequest->xFptFlagsPayload.ulReqType;
+                pxRxData->xFptFlagsRequest.ulBootDevice = pxCmdRequest->xFptFlagsPayload.ulBootDevice;
+                pxRxData->xFptFlagsRequest.ulPartitionId = pxCmdRequest->xFptFlagsPayload.ulPartitionId;
+                pxRxData->ucInUse = TRUE;
+                pxRxData->xFptFlagsRequest.ulType = pxCmdRequest->xFptFlagsPayload.ulType;
+                pxRxData->xFptFlagsRequest.ulBaseAddr = pxCmdRequest->xFptFlagsPayload.ulBaseAddr;
+                pxRxData->xFptFlagsRequest.ulSize = pxCmdRequest->xFptFlagsPayload.ulSize;
+                pxRxData->xFptFlagsRequest.ulFlags = pxCmdRequest->xFptFlagsPayload.ulFlags;
+
+                PLL_DBG( AMI_NAME, "FPT Flags: Request=0x%X, BootDevice=0x%X, PartitionId=0x%X\r\n"
+                        "Type=0x%X, BaseAddr=0x%X, Size=0x%X, Flags=0x%08X\r\n",
+                    pxCmdRequest->xFptFlagsPayload.ulReqType,
+                    pxCmdRequest->xFptFlagsPayload.ulBootDevice,
+                    pxCmdRequest->xFptFlagsPayload.ulPartitionId,
+                    pxCmdRequest->xFptFlagsPayload.ulType,
+                    pxCmdRequest->xFptFlagsPayload.ulBaseAddr,
+                    pxCmdRequest->xFptFlagsPayload.ulSize,
+                    pxCmdRequest->xFptFlagsPayload.ulFlags );
+            }
+            else
+            {
+                INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_RX_DATA_INDEX_FAILED )
+            }
+
+            if( OSAL_ERRORS_NONE != iOSAL_Mutex_Release( pxThis->pvOsalMutexHdl ) )
+            {
+                INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
+            }
+
+            if( ERROR != iStatus )
+            {
+                INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
+                EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
+                                          AMI_PROXY_DRIVER_E_FPT_FLAGS,
+                                          ucIndex,
+                                          0 };
+                iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
+                if( ERROR == iStatus )
+                {
+                    PLL_ERR( AMI_NAME, "Error attempting to raise event 0x%x\r\n",
+                             AMI_PROXY_DRIVER_E_FPT_FLAGS );
+                    INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_RAISE_EVENT_FPT_FLAGS_FAILED )
                 }
             }
         }

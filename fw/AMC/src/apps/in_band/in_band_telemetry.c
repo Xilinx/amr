@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the amc in band telemetry implementation
@@ -46,35 +46,36 @@
 #define INVALID_SENSOR_ID       ( 0xFF )
 
 /* Stat & Error definitions */
-#define IN_BAND_STATS( DO )                             \
-        DO( IN_BAND_STATS_INIT_OVERALL_COMPLETE )       \
-        DO( IN_BAND_STATS_AMI_SENSOR_REQUEST )          \
-        DO( IN_BAND_STATS_AMI_UNSUPPORTED_REQUEST )     \
-        DO( IN_BAND_STATS_AMI_SENSOR_REQUEST_SUCCESS )  \
-        DO( IN_BAND_STATS_AMI_EEPROM_RW_REQUEST )       \
-        DO( IN_BAND_STATS_AMI_MODULE_RW_REQUEST )       \
-        DO( IN_BAND_STATS_AMI_DEBUG_VERBOSITY_REQUEST ) \
-        DO( IN_BAND_STATS_INIT_MUTEX )                  \
-        DO( IN_BAND_STATS_TAKE_MUTEX )                  \
-        DO( IN_BAND_STATS_RELEASE_MUTEX )               \
-        DO( IN_BAND_STATS_MAX )
+#define IN_BAND_STATS( DO )                         \
+    DO( IN_BAND_STATS_INIT_OVERALL_COMPLETE )       \
+    DO( IN_BAND_STATS_AMI_SENSOR_REQUEST )          \
+    DO( IN_BAND_STATS_AMI_UNSUPPORTED_REQUEST )     \
+    DO( IN_BAND_STATS_AMI_SENSOR_REQUEST_SUCCESS )  \
+    DO( IN_BAND_STATS_AMI_EEPROM_RW_REQUEST )       \
+    DO( IN_BAND_STATS_AMI_MODULE_RW_REQUEST )       \
+    DO( IN_BAND_STATS_AMI_DEBUG_VERBOSITY_REQUEST ) \
+    DO( IN_BAND_STATS_AMI_FPT_FLAGS_REQUEST )       \
+    DO( IN_BAND_STATS_INIT_MUTEX )                  \
+    DO( IN_BAND_STATS_TAKE_MUTEX )                  \
+    DO( IN_BAND_STATS_RELEASE_MUTEX )               \
+    DO( IN_BAND_STATS_MAX )
 
-#define IN_BAND_ERRORS( DO )                                \
-        DO( IN_BAND_ERRORS_INIT_MUTEX_FAILED )              \
-        DO( IN_BAND_ERRORS_INIT_BIND_AMI_CB_FAILED )        \
-        DO( IN_BAND_ERRORS_INIT_OVERALL_FAILED )            \
-        DO( IN_BAND_ERRORS_AMI_SENSOR_RESP_SIZE_TOO_SMALL ) \
-        DO( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_EMPTY_SDR )   \
-        DO( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_UNKNOWN_API ) \
-        DO( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_FAILED )      \
-        DO( IN_BAND_ERRORS_AMI_UNSUPPORTED_REPO )           \
-        DO( IN_BAND_ERRORS_AMI_EEPROM_RW_UNKNOWN_REQ )      \
-        DO( IN_BAND_ERRORS_AMI_MODULE_RW_UNKNOWN_REQ )      \
-        DO( IN_BAND_ERRORS_MUTEX_RELEASE_FAILED )           \
-        DO( IN_BAND_ERRORS_MUTEX_TAKE_FAILED )              \
-        DO( IN_BAND_ERRORS_MALLOC_FAILED )                  \
-        DO( IN_BAND_ERRORS_MAP_REQUEST_FAILED )             \
-        DO( IN_BAND_ERRORS_MAX )
+#define IN_BAND_ERRORS( DO )                            \
+    DO( IN_BAND_ERRORS_INIT_MUTEX_FAILED )              \
+    DO( IN_BAND_ERRORS_INIT_BIND_AMI_CB_FAILED )        \
+    DO( IN_BAND_ERRORS_INIT_OVERALL_FAILED )            \
+    DO( IN_BAND_ERRORS_AMI_SENSOR_RESP_SIZE_TOO_SMALL ) \
+    DO( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_EMPTY_SDR )   \
+    DO( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_UNKNOWN_API ) \
+    DO( IN_BAND_ERRORS_AMI_SENSOR_REQUEST_FAILED )      \
+    DO( IN_BAND_ERRORS_AMI_UNSUPPORTED_REPO )           \
+    DO( IN_BAND_ERRORS_AMI_EEPROM_RW_UNKNOWN_REQ )      \
+    DO( IN_BAND_ERRORS_AMI_MODULE_RW_UNKNOWN_REQ )      \
+    DO( IN_BAND_ERRORS_MUTEX_RELEASE_FAILED )           \
+    DO( IN_BAND_ERRORS_MUTEX_TAKE_FAILED )              \
+    DO( IN_BAND_ERRORS_MALLOC_FAILED )                  \
+    DO( IN_BAND_ERRORS_MAP_REQUEST_FAILED )             \
+    DO( IN_BAND_ERRORS_MAX )
 
 #define PRINT_STAT_COUNTER( x )  PLL_INF( IN_BAND_NAME,           \
                                           "%50s . . . . %d\r\n",  \
@@ -114,7 +115,7 @@ UTIL_MAKE_ENUM_AND_STRINGS( IN_BAND_ERRORS, IN_BAND_ERRORS, IN_BAND_ERRORS_STR )
  * @struct  IN_BAND_PRIVATE_DATA
  * @brief   Structure to hold ths in band telemetry private data
  */
-typedef struct IN_BAND_PRIVATE_DATA
+typedef struct
 {
     uint32_t ulUpperFirewall;
     void     *pvOsalMutexHdl;
@@ -134,18 +135,18 @@ typedef struct IN_BAND_PRIVATE_DATA
 
 static IN_BAND_PRIVATE_DATA xLocalData =
 {
-    UPPER_FIREWALL,             /* ulUpperFirewall */
-    NULL,                       /* pvOsalMutexHdl */
-    0,                          /* ullSharedMemBaseAddr*/
+    UPPER_FIREWALL,     /* ulUpperFirewall */
+    NULL,               /* pvOsalMutexHdl */
+    0,                  /* ullSharedMemBaseAddr*/
     {
         0
-    },                          /* pulStatCounters */
+    },                  /* pulStatCounters */
     {
         0
-    },                          /* pulErrorCounters */
-    FALSE,                      /* iInitialised */
-    FALSE,                      /* iInBandTestMode */
-    LOWER_FIREWALL              /* ulLowerFirewall */
+    },                  /* pulErrorCounters */
+    FALSE,              /* iInitialised */
+    FALSE,              /* iInBandTestMode */
+    LOWER_FIREWALL      /* ulLowerFirewall */
 
 };
 static IN_BAND_PRIVATE_DATA *pxThis = &xLocalData;
@@ -317,10 +318,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
         {
         case AMI_PROXY_DRIVER_E_SENSOR_READ:
         {
-            AMI_PROXY_SENSOR_REQUEST xSensorRequest =
-            {
-                0
-            };
+            AMI_PROXY_SENSOR_REQUEST xSensorRequest = { 0 };
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_SENSOR_REQUEST )
 
             iStatus = iAMI_GetSensorRequest( pxSignal, &xSensorRequest );
@@ -439,7 +437,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
             iStatus = iAMI_GetEepromReadWriteRequest( pxSignal, &xEepromReadWriteRequest );
             if (OK == iStatus)
             {
-                uintptr_t        ullDestAddr  = ( pxThis->ullSharedMemBaseAddr + xEepromReadWriteRequest.ullAddress );
+                uintptr_t        ullDestAddr  = pxThis->ullSharedMemBaseAddr + xEepromReadWriteRequest.ullAddress;
                 uint8_t          *pucDestAddr = ( uint8_t* )( ullDestAddr );
                 AMI_PROXY_RESULT xResult      = AMI_PROXY_RESULT_FAILURE;
 
@@ -480,16 +478,13 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
 
         case AMI_PROXY_DRIVER_E_MODULE_READ_WRITE:
         {
-            AMI_PROXY_MODULE_RW_REQUEST xModuleReadWriteRequest =
-            {
-                0
-            };
+            AMI_PROXY_MODULE_RW_REQUEST xModuleReadWriteRequest = { 0 };
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_MODULE_RW_REQUEST )
 
             iStatus = iAMI_GetModuleReadWriteRequest( pxSignal, &xModuleReadWriteRequest );
             if (OK == iStatus)
             {
-                uintptr_t        ullDestAddr  = ( pxThis->ullSharedMemBaseAddr + xModuleReadWriteRequest.ullAddress );
+                uintptr_t        ullDestAddr  = pxThis->ullSharedMemBaseAddr + xModuleReadWriteRequest.ullAddress;
                 uint8_t          *pucDestAddr = ( uint8_t* )( ullDestAddr );
                 AMI_PROXY_RESULT xResult      = AMI_PROXY_RESULT_FAILURE;
 
@@ -602,7 +597,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                                               xDownloadRequest.iLastPacket,
                                               xDownloadRequest.usPacketNum,
                                               xDownloadRequest.ulPacketSize );
-PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
+                    PLL_DBG( IN_BAND_NAME, "iAPC_PdiProgram status: 0x%x\r\n", iStatus );
                 }
                 else
                 {
@@ -635,10 +630,7 @@ PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
 
         case AMI_PROXY_DRIVER_E_PDI_COPY_START:
         {
-            AMI_PROXY_PDI_COPY_REQUEST xCopyRequest =
-            {
-                0
-            };
+            AMI_PROXY_PDI_COPY_REQUEST xCopyRequest = { 0 };
             PLL_LOG( IN_BAND_NAME, "PDI copy has started\r\n" );
 
             if (OK == iAMI_GetPdiCopyRequest( pxSignal, &xCopyRequest ))
@@ -682,10 +674,7 @@ PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
 
         case AMI_PROXY_DRIVER_E_PDI_PROGRAM_START:
         {
-            AMI_PROXY_PDI_PROGRAM_REQUEST xProgramRequest =
-            {
-                0
-            };
+            AMI_PROXY_PDI_PROGRAM_REQUEST xProgramRequest = { 0 };
             PLL_LOG( IN_BAND_NAME, "PDI progress has started\r\n" );
 
             if (OK == iAMI_GetPdiProgramRequest( pxSignal, &xProgramRequest ))
@@ -728,10 +717,7 @@ PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
 
         case AMI_PROXY_DRIVER_E_BOOT_SELECT:
         {
-            AMI_PROXY_BOOT_SELECT_REQUEST xBootSelRequest =
-            {
-                0
-            };
+            AMI_PROXY_BOOT_SELECT_REQUEST xBootSelRequest = { 0 };
             PLL_DBG( IN_BAND_NAME, "Event Boot Select Request (0x%02X)\r\n", pxSignal->ucEventType );
 
             if (OK == iAMI_GetBootSelectRequest( pxSignal, &xBootSelRequest ))
@@ -782,6 +768,72 @@ PLL_DBG( IN_BAND_NAME, "iAPC_Pdi3 status: 0x%x\r\n", iStatus );
             if (OK != iStatus)
             {
                 PLL_ERR( IN_BAND_NAME, "Error updating debug verbosity level\r\n" );
+            }
+            break;
+        }
+
+        case AMI_PROXY_DRIVER_E_FPT_FLAGS:
+        {
+            AMI_PROXY_FPT_FLAGS_REQUEST xFptFlagsRequest = { 0 };
+            INC_STAT_COUNTER( IN_BAND_STATS_AMI_FPT_FLAGS_REQUEST )
+            PLL_DBG( IN_BAND_NAME, "Event FPT Flags Request (0x%02X)\r\n", pxSignal->ucEventType );
+
+            if (OK == iAMI_GetFptFlagsRequest( pxSignal, &xFptFlagsRequest ))
+            {
+                AMI_PROXY_RESULT xResult = AMI_PROXY_RESULT_SUCCESS;
+                uint32_t ulFlagsValue = 0;
+
+                if (AMI_PROXY_CMD_RW_REQUEST_READ == xFptFlagsRequest.xRequest)
+                {
+                    /* Read FPT partition flags */
+                    APCProxyDriverFptPartition xPartition = { 0 };
+                    if (OK == iAPC_GetFptPartition(
+                            (APC_BOOT_DEVICES)xFptFlagsRequest.ulBootDevice,
+                            (int)xFptFlagsRequest.ulPartitionId,
+                            &xPartition ))
+                    {
+                        ulFlagsValue = xPartition.ulPartitionFlags;
+                        PLL_DBG( IN_BAND_NAME, "FPT Partition %d flags read: 0x%08X\r\n",
+                                 xFptFlagsRequest.ulPartitionId, ulFlagsValue );
+                    }
+                    else
+                    {
+                        xResult = AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED;
+                        PLL_ERR( IN_BAND_NAME, "Error reading FPT partition %d flags\r\n",
+                                 xFptFlagsRequest.ulPartitionId );
+                    }
+                }
+                else
+                {
+                    /* Write FPT partition flags */
+                    if (OK == iAPC_SetFptPartitionFlags(
+                            pxSignal,
+                            (APC_BOOT_DEVICES)xFptFlagsRequest.ulBootDevice,
+                            (int)xFptFlagsRequest.ulPartitionId,
+                            xFptFlagsRequest.ulFlags ))
+                    {
+                        ulFlagsValue = xFptFlagsRequest.ulFlags;
+                        PLL_DBG( IN_BAND_NAME, "FPT Partition %d flags updated to 0x%08X\r\n",
+                                 xFptFlagsRequest.ulPartitionId, ulFlagsValue );
+                    }
+                    else
+                    {
+                        xResult = AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED;
+                        PLL_ERR( IN_BAND_NAME, "Error updating FPT partition %d flags\r\n",
+                                 xFptFlagsRequest.ulPartitionId );
+                    }
+                }
+
+                iStatus = iAMI_SetFptFlagsResponse( pxSignal, xResult, ulFlagsValue );
+            }
+            else
+            {
+                iStatus = iAMI_SetFptFlagsResponse( pxSignal, AMI_PROXY_RESULT_GET_REQUEST_FAILED, 0 );
+            }
+
+            if (OK != iStatus)
+            {
+                PLL_ERR( IN_BAND_NAME, "Error processing FPT flags request\r\n" );
             }
             break;
         }

@@ -26,21 +26,22 @@
  */
 typedef enum
 {
-    APC_PROXY_DRIVER_E_DOWNLOAD_STARTED = 0,
-    APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE,
-    APC_PROXY_DRIVER_E_DOWNLOAD_BUSY,
-    APC_PROXY_DRIVER_E_DOWNLOAD_FAILED,
-    APC_PROXY_DRIVER_E_FPT_UPDATE,
-    APC_PROXY_DRIVER_E_COPY_STARTED,
-    APC_PROXY_DRIVER_E_COPY_COMPLETE,
-    APC_PROXY_DRIVER_E_COPY_BUSY,
-    APC_PROXY_DRIVER_E_COPY_FAILED,
-    APC_PROXY_DRIVER_E_PARTITION_SELECTED,
-    APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED,
-    APC_PROXY_DRIVER_E_PROGRAM_STARTED,
-    APC_PROXY_DRIVER_E_PROGRAM_COMPLETE,
-    APC_PROXY_DRIVER_E_PROGRAM_BUSY,
-    APC_PROXY_DRIVER_E_PROGRAM_FAILED,
+    APC_PROXY_DRIVER_E_DOWNLOAD_STARTED   = 0,
+    APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE  = 1,
+    APC_PROXY_DRIVER_E_DOWNLOAD_BUSY      = 2,
+    APC_PROXY_DRIVER_E_DOWNLOAD_FAILED    = 3,
+    APC_PROXY_DRIVER_E_FPT_UPDATE         = 4,
+    APC_PROXY_DRIVER_E_COPY_STARTED       = 5,
+    APC_PROXY_DRIVER_E_COPY_COMPLETE      = 6,
+    APC_PROXY_DRIVER_E_COPY_BUSY          = 7,
+    APC_PROXY_DRIVER_E_COPY_FAILED        = 8,
+    APC_PROXY_DRIVER_E_PARTITION_SELECTED = 9,
+    APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED = 10,
+    APC_PROXY_DRIVER_E_FPT_FLAGS_UPDATED  = 11,
+    APC_PROXY_DRIVER_E_PROGRAM_STARTED    = 12,
+    APC_PROXY_DRIVER_E_PROGRAM_COMPLETE   = 13,
+    APC_PROXY_DRIVER_E_PROGRAM_BUSY       = 14,
+    APC_PROXY_DRIVER_E_PROGRAM_FAILED     = 15,
     MAX_APC_PROXY_DRIVER_EVENTS
 
 } APC_PROXY_DRIVER_EVENTS;
@@ -263,6 +264,25 @@ int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice,
  */
 int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
     APCProxyDriverFptPartition *pxFptPartition );
+
+/**
+ * iAPC_SetFptPartitionFlags() - Set/Update the flags of a Flash Partition Table (FPT) Partition
+ *
+ * @pxSignal:       Current event occurance (used for tracking)
+ * @xBootDevice:    Target boot device
+ * @iPartition:     Index of partition to update (0 is the 1st partition)
+ * @ulFlags:        New flags value to set
+ *
+ * @return  OK      FPT partition flags updated successfully
+ *          ERROR   FPT partition flags not updated successfully
+ *
+ * @note    This function updates the partition flags in both the cached copy
+ *          and the flash storage
+ */
+int iAPC_SetFptPartitionFlags( EVL_SIGNAL *pxSignal,
+                               APC_BOOT_DEVICES xBootDevice,
+                               int iPartition,
+                               uint32_t ulFlags );
 
 /**
  * iAPC_PrintStatistics() - Print all the stats gathered by the proxy driver

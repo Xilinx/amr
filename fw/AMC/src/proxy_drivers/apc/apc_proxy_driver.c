@@ -8,10 +8,6 @@
  * @file apc_proxy_driver.c
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "util.h"
 #include "pll.h"
 #include "osal.h"
@@ -67,12 +63,15 @@
     DO( APC_PROXY_STATS_MBOX_PTN_SELECT_PEND )       \
     DO( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_POST ) \
     DO( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_PEND ) \
+    DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST ) \
+    DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND ) \
     DO( APC_PROXY_STATS_TASK_CREATE )                \
     DO( APC_PROXY_STATS_FPT_CREATED )                \
     DO( APC_PROXY_STATS_FPT_HEADER_LOADED )          \
     DO( APC_PROXY_STATS_FPT_PARTITION_LOADED )       \
     DO( APC_PROXY_STATS_FPT_HEADER_READ )            \
     DO( APC_PROXY_STATS_FPT_PARTITION_READ )         \
+    DO( APC_PROXY_STATS_FPT_FLAGS_UPDATED )          \
     DO( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )    \
     DO( APC_PROXY_STATS_IMAGE_COPY_COMPLETE )        \
     DO( APC_PROXY_STATS_PARTITION_SELECTED )         \
@@ -96,6 +95,7 @@
     DO( APC_PROXY_ERRORS_MBOX_COPY_POST_FAILED )             \
     DO( APC_PROXY_ERRORS_MBOX_PTN_SELECT_POST_FAILED )       \
     DO( APC_PROXY_ERRORS_MBOX_HOT_RESET_ENABLE_POST_FAILED ) \
+    DO( APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED ) \
     DO( APC_PROXY_ERRORS_MBOX_PEND_FAILED )                  \
     DO( APC_PROXY_ERRORS_TASK_CREATE_FAILED )                \
     DO( APC_PROXY_ERRORS_LOAD_FPT_FAILED )                   \
@@ -164,6 +164,7 @@ typedef enum
     APC_MSG_TYPE_COPY_PDI,
     APC_MSG_TYPE_PARTITION_SELECT,
     APC_MSG_TYPE_ENABLE_HOT_RESET,
+    APC_MSG_TYPE_UPDATE_FPT_FLAGS,
     MAX_APC_MSG_TYPE
 
 } APC_MSG_TYPES;
@@ -245,6 +246,18 @@ typedef struct
 } APCMboxCopyImage;
 
 /**
+ * @struct  APCMboxUpdateFptFlags
+ * @brief   Structure to update the FPT flags in the mailbox
+ */
+typedef struct
+{
+    APC_BOOT_DEVICES xBootDevice;
+    int iPartition;
+    uint32_t ulFlags;
+
+} APCMboxUpdateFptFlags;
+
+/**
  * @struct  APCMboxMsg
  * @brief   Data posted via the APC Proxy driver mailbox
  */
@@ -257,6 +270,7 @@ typedef struct
     {
         APCMboxDownloadImage xDownloadImageData;
         APCMboxCopyImage xCopyImageData;
+        APCMboxUpdateFptFlags xUpdateFptFlagsData;
         int iSelectedPartition;
 
     };
@@ -345,6 +359,17 @@ static int iSelectPartition( int iPartition );
  * @return  N/A
  */
 static void vEnableHotReset( void );
+
+/**
+ * @brief   Set FPT flags in cache and flash
+ *
+ * @param   xBootDevice Target boot device
+ * @param   iPartition FPT partition to set flags for
+ * @param   ulFlags Flags to set
+ *
+ * @return  OK if the FPT flags were successfully set
+ */
+static int iSetFptFlags( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulFlags );
 
 /**
  * @brief   Verify that the values downloaded to flash match the source
@@ -1018,6 +1043,61 @@ int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
 }
 
 /**
+ * @brief   Set/Update the flags of an FPT Partition
+ *
+ * This function updates the partition flags in both the cached copy
+ * and writes the updated partition entry back to flash storage.
+ */
+int iAPC_SetFptPartitionFlags( EVL_SIGNAL *pxSignal,
+                               APC_BOOT_DEVICES xBootDevice,
+                               int iPartition,
+                               uint32_t ulFlags )
+{
+    int iStatus = ERROR;
+
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( TRUE == pxThis->iInitialised ) &&
+         ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
+         ( TRUE == pxThis->piValidFpt[ xBootDevice ] ) &&
+         ( NULL != pxSignal ) )
+    {
+        if ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries )
+        {
+
+            APCMboxMsg xMsg = { 0 };
+            xMsg.eMsgType                        = APC_MSG_TYPE_UPDATE_FPT_FLAGS;
+            xMsg.ucRequestId                     = pxSignal->ucInstance;
+            xMsg.xUpdateFptFlagsData.xBootDevice = xBootDevice;
+            xMsg.xUpdateFptFlagsData.iPartition  = iPartition;
+            xMsg.xUpdateFptFlagsData.ulFlags     = ulFlags;
+
+            if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
+                                                     ( void* )&xMsg,
+                                                     OSAL_TIMEOUT_NO_WAIT ) )
+            {
+                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST )
+                iStatus = OK;
+            }
+            else
+            {
+                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED )
+            }
+        }
+        else
+        {
+            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
+        }
+    }
+    else
+    {
+        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
+    }
+
+    return iStatus;
+}
+
+/**
  * @brief   Gets the current state of the proxy
  */
 int iAPC_GetState( MODULE_STATE *pxState )
@@ -1326,6 +1406,33 @@ static void vProxyDriverTask( void *pArg )
                 {
                     vEnableHotReset();
                     INC_STAT_COUNTER( APC_PROXY_STATS_HOT_RESET_ENABLED )
+                }
+                break;
+
+            case APC_MSG_TYPE_UPDATE_FPT_FLAGS:
+                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND )
+
+                if ( (OK == iSetFptFlags( xMBoxData.xUpdateFptFlagsData.xBootDevice,
+                                    xMBoxData.xUpdateFptFlagsData.iPartition,
+                                    xMBoxData.xUpdateFptFlagsData.ulFlags )) &&
+                     ( OK == iRefreshFptData(0) ))
+                {
+                    xSignal.ucEventType = APC_PROXY_DRIVER_E_FPT_FLAGS_UPDATED;
+
+                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
+                    {
+                        INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED )
+                        INC_ERROR_COUNTER( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
+                    }
+                    else
+                    {
+                        INC_STAT_COUNTER( APC_PROXY_STATS_FPT_FLAGS_UPDATED )
+                    }
+                }
+                else
+                {
+                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_FAILED )
+                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
                 }
                 break;
 
@@ -1970,6 +2077,33 @@ static void vEnableHotReset( void )
 
     HAL_IO_WRITE32( APC_POR_ENABLE, HAL_APC_PMC_SRST_REG );
     HAL_IO_WRITE32( APC_MULTIBOOT_OFFSET( pxThis->ulNextBootAddr ), HAL_APC_PMC_BOOT_REG );
+}
+
+/**
+ * @brief   Set FPT flags in flash
+ */
+static int iSetFptFlags( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulFlags )
+{
+    int iStatus = ERROR;
+
+    if ( ( MAX_APC_BOOT_DEVICES > xBootDevice ) && ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries ) )
+    {
+        pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPartitionFlags = ulFlags;
+        if ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->write( pxThis->ppxFwIf[ xBootDevice ],
+                                                                         ( uint64_t )APC_FPT_PTN_OFFSET + ( iPartition * APC_FPT_PTN_OFFSET ),
+                                                                         ( uint8_t* )&pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ],
+                                                                         sizeof( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ] ),
+                                                                         0 ) )
+        {
+            iStatus = OK;
+        }
+    }
+    else
+    {
+        PLL_ERR( APC_NAME, "Invalid FPT partition requested for setting flags\r\n" );
+        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
+    }
+    return iStatus;
 }
 
 /**

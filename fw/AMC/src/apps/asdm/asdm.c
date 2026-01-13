@@ -101,6 +101,7 @@
     DO( ASDM_STATS_GET_FPT_HEADER )             \
     DO( ASDM_STATS_GET_FPT_PARTITION )          \
     DO( ASDM_STATS_APC_FPT_UPDATE_EVENT )       \
+    DO( ASDM_STATS_APC_FPT_FLAGS_UPDATE_EVENT ) \
     DO( ASDM_STATS_MAX )
 
 #define ASDM_ERRORS( DO )                            \
@@ -529,7 +530,7 @@ static ASDMPrivateData *pxThis = &xLocalData;
 
 static ASDMSensorHeader xAsdmHeaderInfo[] =
 {
-    /* Record Type                     |   Hdr Version  |Record Count| NumBytes */
+    /* Record Type                     |   Hdr Version |Record Count| NumBytes */
     { ASDM_REPOSITORY_TYPE_TEMP,        ASDM_HEADER_VER,      0,          0 },
     { ASDM_REPOSITORY_TYPE_VOLTAGE,     ASDM_HEADER_VER,      0,          0 },
     { ASDM_REPOSITORY_TYPE_CURRENT,     ASDM_HEADER_VER,      0,          0 },
@@ -734,16 +735,15 @@ static int iMapUnitModifier( ASC_PROXY_DRIVER_SENSOR_UNIT_MOD xUnitMod,
  * @brief   Update the global ASDM table sensor values
  *
  * @return  OK or ERROR
- *
  */
  static int iUpdateAsdmValues( void )
  {
      int iStatus = ERROR;
 
      if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( NULL != pxThis->pxAscData ) &&
-         ( NULL != pxThis->pxAsdmSdrInfo ) )
+          ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+          ( NULL != pxThis->pxAscData ) &&
+          ( NULL != pxThis->pxAsdmSdrInfo ) )
      {
          if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
                                                    OSAL_TIMEOUT_WAIT_FOREVER ) )
@@ -829,8 +829,8 @@ static int iMapUnitModifier( ASC_PROXY_DRIVER_SENSOR_UNIT_MOD xUnitMod,
      uint8_t ucNumSensors;
 
      if ( ( NULL != pxSignal ) &&
-         ( NULL != pxThis->pxAscData ) &&
-         ( AMC_CFG_UNIQUE_ID_ASC == pxSignal->ucModule ) )
+          ( NULL != pxThis->pxAscData ) &&
+          ( AMC_CFG_UNIQUE_ID_ASC == pxSignal->ucModule ) )
      {
          switch ( pxSignal->ucEventType )
          {
@@ -1015,7 +1015,7 @@ static int iGetFptData( void )
              ( ASDMFptEntry * )pvOSAL_MemAlloc( usAllocateSize );
 
          if ( ( NULL != pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary ) &&
-             ( NULL != pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY] ) )
+              ( NULL != pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY] ) )
          {
              int i = 0;
 
@@ -1051,7 +1051,7 @@ static int iGetFptData( void )
                  ( ASDMFptEntry * )pvOSAL_MemAlloc( usAllocateSize );
 
              if ( ( NULL != pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary ) &&
-                 ( NULL != pxThis->ppxFptPartitions[APC_BOOT_DEVICE_SECONDARY] ) )
+                  ( NULL != pxThis->ppxFptPartitions[APC_BOOT_DEVICE_SECONDARY] ) )
              {
                  int i = 0;
 
@@ -1126,7 +1126,7 @@ static int iGetFptData( void )
              }
 
              pxThis->pxAsdmSdrInfo[iRepoIndex].xHdr.usTotalNumBytes =
-                 ( usBytes / TOTAL_NUM_BYTES_MULTIPLE );
+                 usBytes / TOTAL_NUM_BYTES_MULTIPLE;
 
              iStatus = OK;
          }
@@ -1156,10 +1156,10 @@ static int iGetFptData( void )
              INC_STAT_COUNTER( ASDM_STATS_TAKE_MUTEX )
 
              pvOSAL_MemSet( &pxThis->pxFptHeader[APC_BOOT_DEVICE_PRIMARY],
-                            0x00,
+                            0,
                             sizeof( pxThis->pxFptHeader[APC_BOOT_DEVICE_PRIMARY] ) );
              pvOSAL_MemSet( &pxThis->pxFptHeader[APC_BOOT_DEVICE_SECONDARY],
-                            0x00,
+                            0,
                             sizeof( pxThis->pxFptHeader[APC_BOOT_DEVICE_SECONDARY] ) );
 
              if ( NULL != pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY] )
@@ -1216,20 +1216,36 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
      {
          switch ( pxSignal->ucEventType )
          {
-             case APC_PROXY_DRIVER_E_FPT_UPDATE:
-                 INC_STAT_COUNTER( ASDM_STATS_APC_FPT_UPDATE_EVENT )
+            case APC_PROXY_DRIVER_E_FPT_UPDATE:
+                INC_STAT_COUNTER( ASDM_STATS_APC_FPT_UPDATE_EVENT )
 
-                 if ( OK == iRefreshFptData() )
-                 {
-                     iStatus = OK;
-                 }
-                 else
-                 {
-                     INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
-                 }
-                 break;
+                if ( OK == iRefreshFptData() )
+                {
+                    iStatus = OK;
+                }
+                else
+                {
+                    INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
+                }
+                break;
 
-             default:
+            case APC_PROXY_DRIVER_E_FPT_FLAGS_UPDATED:
+                INC_STAT_COUNTER( ASDM_STATS_APC_FPT_FLAGS_UPDATE_EVENT )
+                PLL_DBG( ASDM_NAME, "Received FPT flags update event - refreshing FPT data\r\n" );
+
+                if ( OK == iRefreshFptData() )
+                {
+                    iStatus = OK;
+                    PLL_DBG( ASDM_NAME, "FPT data refreshed successfully after flags update\r\n" );
+                }
+                else
+                {
+                    INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
+                    PLL_ERR( ASDM_NAME, "Failed to refresh FPT data after flags update\r\n" );
+                }
+                break;
+
+            default:
                  INC_STAT_COUNTER( ASDM_STATS_AMI_UNSUPPORTED_REQUEST )
                  iStatus = OK;
                  break;
@@ -1252,8 +1268,8 @@ static int iMapAsdmRepo( ASDM_REPOSITORY_TYPE xAsdmRepo,
     int iStatus = ERROR;
 
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( NULL != pxInBandRepo ) )
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( NULL != pxInBandRepo ) )
     {
         *pxInBandRepo = AMC_ASDM_SUPPORTED_REPO_MAX;
         iStatus       = OK;
@@ -1313,10 +1329,10 @@ static int iPopulateRepoSensorList( uint8_t ucNumSensors,
     int iStatus = ERROR;
 
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iSensorListInitialised ) &&
-        ( NULL != pxThis->pxAscData ) &&
-        ( NULL != pxList ) )
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( TRUE == pxThis->iSensorListInitialised ) &&
+         ( NULL != pxThis->pxAscData ) &&
+         ( NULL != pxList ) )
     {
         uint8_t ucBit = 0;
         iStatus       = OK;
@@ -1499,7 +1515,6 @@ static int iPopulateSdrThresholds( ASC_PROXY_DRIVER_SENSOR_DATA *pxData,
         *pusByteCount = usByteCount;
 
         iStatus = OK;
-
     }
     return iStatus;
 }
@@ -2051,9 +2066,9 @@ static int iPopulateSds( uint8_t ucIndex,
      uint16_t usAllocateSizeSds = 0;
 
      if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( NULL != pxThis->pxAscData ) &&
-         ( NULL == pxThis->pxAsdmSdrInfo ) )
+          ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+          ( NULL != pxThis->pxAscData ) &&
+          ( NULL == pxThis->pxAsdmSdrInfo ) )
      {
          pxThis->pxAsdmSdrInfo =
              ( ASDMSdr * )pvOSAL_MemAlloc( MAX_ASDM_SDR_REPO * sizeof(ASDMSdr) );
@@ -2512,9 +2527,9 @@ static int iPopulateAsdmGetSizeResponse( ASDM_REPOSITORY_TYPE xRepo,
      * Size of the SDR: Header, Sensor Records and End of Repo marker.
      */
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( NULL != pucRespBuff ) &&
-        ( NULL != pusRespSizeBytes ) )
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( NULL != pucRespBuff ) &&
+         ( NULL != pusRespSizeBytes ) )
     {
         if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl,
                                                   OSAL_TIMEOUT_WAIT_FOREVER ) )
@@ -2589,9 +2604,9 @@ static int iPopulateAsdmGetSingleSensorResponse( ASDM_REPOSITORY_TYPE xRepo,
     int iStatus = ERROR;
 
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( NULL != pucRespBuff ) &&
-        ( NULL != pusRespSizeBytes ) )
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( NULL != pucRespBuff ) &&
+         ( NULL != pusRespSizeBytes ) )
     {
         /* Return the instantaneous sensor data based on the input sensor Id */
         INC_STAT_COUNTER( ASDM_STATS_ASDM_GET_SINGLE_SENSOR_API )
@@ -3952,59 +3967,44 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
 
         case AMC_ASDM_SUPPORTED_REPO_BOARD_INFO:
         {
-            uint8_t *pucEepromVersion =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xEepromVersion.pucBytesValue;
-            uint8_t *pucProductName =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xProductName.pucBytesValue;
-            uint8_t *pucBoardRevision =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xBoardRev.pucBytesValue;
-            uint8_t *pucBoardSerial =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xBoardSerial.pucBytesValue;
-            uint32_t ulMacCount =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xMacAddressCount.ulValue;
-            uint8_t *pucFirstMacAddress =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xFirstMacAddress.pucBytesValue;
-            uint8_t *pucActiveState =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xActiveState.pucBytesValue;
-            uint8_t *pucConfigMode =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xConfigMode.pucBytesValue;
-            uint8_t *pucManufacturingDate =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xManufacturingDate.pucBytesValue;
-            uint8_t *pucPartNumber =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xPartNumber.pucBytesValue;
-            uint8_t *pucUuid =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xUuid.pucBytesValue;
-            uint8_t *pucPcieId =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xPcieId.pucBytesValue;
-            uint8_t *pucPowerMode =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xMaxPowerMode.pucBytesValue;
-            uint8_t *pucMemorySize =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xMemorySize.pucBytesValue;
-            uint8_t *pucOemId =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xOemId.pucBytesValue;
-            uint8_t *pucCapability =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xCapability.pucBytesValue;
-            uint8_t *pucMfgPartNumber =
-                pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xMfgPartNumber.pucBytesValue;
+            ASDMBoardInfoRecord * pxBoardInfo = pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo;
 
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xEepromVersion.ucLength > 0 )
+            uint8_t *pucEepromVersion     = pxBoardInfo->xEepromVersion.pucBytesValue;
+            uint8_t *pucProductName       = pxBoardInfo->xProductName.pucBytesValue;
+            uint8_t *pucBoardRevision     = pxBoardInfo->xBoardRev.pucBytesValue;
+            uint8_t *pucBoardSerial       = pxBoardInfo->xBoardSerial.pucBytesValue;
+            uint32_t ulMacCount           = pxBoardInfo->xMacAddressCount.ulValue;
+            uint8_t *pucFirstMacAddress   = pxBoardInfo->xFirstMacAddress.pucBytesValue;
+            uint8_t *pucActiveState       = pxBoardInfo->xActiveState.pucBytesValue;
+            uint8_t *pucConfigMode        = pxBoardInfo->xConfigMode.pucBytesValue;
+            uint8_t *pucManufacturingDate = pxBoardInfo->xManufacturingDate.pucBytesValue;
+            uint8_t *pucPartNumber        = pxBoardInfo->xPartNumber.pucBytesValue;
+            uint8_t *pucUuid              = pxBoardInfo->xUuid.pucBytesValue;
+            uint8_t *pucPcieId            = pxBoardInfo->xPcieId.pucBytesValue;
+            uint8_t *pucPowerMode         = pxBoardInfo->xMaxPowerMode.pucBytesValue;
+            uint8_t *pucMemorySize        = pxBoardInfo->xMemorySize.pucBytesValue;
+            uint8_t *pucOemId             = pxBoardInfo->xOemId.pucBytesValue;
+            uint8_t *pucCapability        = pxBoardInfo->xCapability.pucBytesValue;
+            uint8_t *pucMfgPartNumber     = pxBoardInfo->xMfgPartNumber.pucBytesValue;
+
+            if ( pxBoardInfo->xEepromVersion.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Eeprom version: %s\r\n", pucEepromVersion );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xProductName.ucLength > 0 )
+            if ( pxBoardInfo->xProductName.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Product name: %s\r\n", pucProductName );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xBoardRev.ucLength > 0 )
+            if ( pxBoardInfo->xBoardRev.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Board Version: %s\r\n", pucBoardRevision );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xBoardSerial.ucLength > 0 )
+            if ( pxBoardInfo->xBoardSerial.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Board Serial: %s\r\n", pucBoardSerial );
             }
             PLL_INF( ASDM_NAME, "MAC count: %d\r\n", ulMacCount );
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xFirstMacAddress.ucLength > 0 )
+            if ( pxBoardInfo->xFirstMacAddress.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME,
                          "First Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n\r",
@@ -4015,7 +4015,7 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                          pucFirstMacAddress[4],
                          pucFirstMacAddress[5] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xManufacturingDate.ucLength > 0 )
+            if ( pxBoardInfo->xManufacturingDate.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME,
                          "Manufacturing date: %02x%02x%02x\r\n",
@@ -4023,11 +4023,11 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                          pucManufacturingDate[1],
                          pucManufacturingDate[2] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xPartNumber.ucLength > 0 )
+            if ( pxBoardInfo->xPartNumber.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Part number: %s\r\n", pucPartNumber );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xUuid.ucLength > 0 )
+            if ( pxBoardInfo->xUuid.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME,
                          "UUID: %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\r\n",
@@ -4048,15 +4048,15 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                          pucUuid[14],
                          pucUuid[15] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xActiveState.ucLength > 0 )
+            if ( pxBoardInfo->xActiveState.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Active state: %c\r\n", pucActiveState[0] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xConfigMode.ucLength > 0 )
+            if ( pxBoardInfo->xConfigMode.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Config mode: %02x\r\n", pucConfigMode[0] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xPcieId.ucLength > 0 )
+            if ( pxBoardInfo->xPcieId.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME,
                          "PCIe id: %02x%02x, %02x%02x, %02x%02x, %02x%02x\n\r",
@@ -4069,15 +4069,15 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                          pucPcieId[6],
                          pucPcieId[7] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xMaxPowerMode.ucLength > 0 )
+            if ( pxBoardInfo->xMaxPowerMode.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Power Mode: %d\r\n", pucPowerMode[0] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xMemorySize.ucLength > 0 )
+            if ( pxBoardInfo->xMemorySize.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Memory size: %s\r\n", pucMemorySize );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xOemId.ucLength > 0 )
+            if ( pxBoardInfo->xOemId.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME,
                          "OEM id: %02x%02x%02x%02x\r\n",
@@ -4086,14 +4086,14 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                          pucOemId[1],
                          pucOemId[0] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xCapability.ucLength > 0 )
+            if ( pxBoardInfo->xCapability.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME,
                          "Capability: %02x%02x\r\n",
                          pucCapability[1],
                          pucCapability[0] );
             }
-            if ( pxThis->pxAsdmSdrInfo[iRepoIndex].pxBoardInfo->xMfgPartNumber.ucLength > 0 )
+            if ( pxBoardInfo->xMfgPartNumber.ucLength > 0 )
             {
                 PLL_INF( ASDM_NAME, "Mfg Part number: %s\r\n", pucMfgPartNumber );
             }

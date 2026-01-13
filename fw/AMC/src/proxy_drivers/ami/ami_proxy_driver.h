@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the API for the AMR Management Interface (AMI) proxy driver
@@ -35,7 +35,7 @@
  * @enum    AMI_PROXY_DRIVER_EVENTS
  * @brief   Events raised by this proxy driver
  */
-typedef enum AMI_PROXY_DRIVER_EVENTS
+typedef enum
 {
     AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START = 0,
     AMI_PROXY_DRIVER_E_PDI_COPY_START,
@@ -47,6 +47,7 @@ typedef enum AMI_PROXY_DRIVER_EVENTS
     AMI_PROXY_DRIVER_E_EEPROM_READ_WRITE,
     AMI_PROXY_DRIVER_E_MODULE_READ_WRITE,
     AMI_PROXY_DRIVER_E_DEBUG_VERBOSITY,
+    AMI_PROXY_DRIVER_E_FPT_FLAGS,
 
     MAX_AMI_PROXY_DRIVER_EVENTS
 
@@ -56,7 +57,7 @@ typedef enum AMI_PROXY_DRIVER_EVENTS
  * @enum    AMI_PROXY_CMD_SENSOR_REQUEST
  * @brief   Sensor request types
  */
-typedef enum AMI_PROXY_CMD_SENSOR_REQUEST
+typedef enum
 {
     AMI_PROXY_CMD_SENSOR_REQUEST_GET_SIZE = 1,
     AMI_PROXY_CMD_SENSOR_REQUEST_GET_SDR,
@@ -71,7 +72,7 @@ typedef enum AMI_PROXY_CMD_SENSOR_REQUEST
  * @enum    AMI_PROXY_CMD_SENSOR_REPO
  * @brief   Sensor repo request types
  */
-typedef enum AMI_PROXY_CMD_SENSOR_REPO
+typedef enum
 {
     AMI_PROXY_CMD_SENSOR_REPO_GET_SIZE = 0,
     AMI_PROXY_CMD_SENSOR_REPO_BDINFO,
@@ -92,7 +93,7 @@ typedef enum AMI_PROXY_CMD_SENSOR_REPO
  * @enum    AMI_PROXY_CMD_RW_REQUEST
  * @brief   Request type for commands which accept read/write requests
  */
-typedef enum AMI_PROXY_CMD_RW_REQUEST
+typedef enum
 {
     AMI_PROXY_CMD_RW_REQUEST_READ = 0,
     AMI_PROXY_CMD_RW_REQUEST_WRITE,
@@ -105,7 +106,7 @@ typedef enum AMI_PROXY_CMD_RW_REQUEST
  * @enum    AMI_PROXY_RESPONSE_RESULT
  * @brief   The response result
  */
-typedef enum AMI_PROXY_RESULT
+typedef enum
 {
     AMI_PROXY_RESULT_SUCCESS = 0,
     AMI_PROXY_RESULT_FAILURE,
@@ -128,7 +129,7 @@ typedef enum AMI_PROXY_RESULT
  * @struct  AMI_PROXY_SENSOR_REQUEST
  * @brief   Sensor request
  */
-typedef struct AMI_PROXY_SENSOR_REQUEST
+typedef struct
 {
     AMI_PROXY_CMD_SENSOR_REQUEST xRequest;
     AMI_PROXY_CMD_SENSOR_REPO xRepo;
@@ -142,7 +143,7 @@ typedef struct AMI_PROXY_SENSOR_REQUEST
  * @struct  AMI_PROXY_PDI_DOWNLOAD_REQUEST
  * @brief   PDI download request
  */
-typedef struct AMI_PROXY_PDI_DOWNLOAD_REQUEST
+typedef struct
 {
     int      iBootDevice;
     int      iUpdateFpt;
@@ -160,7 +161,7 @@ typedef struct AMI_PROXY_PDI_DOWNLOAD_REQUEST
  * @struct  AMI_PROXY_PDI_PROGRAM_REQUEST
  * @brief   PDI program request
  */
-typedef struct AMI_PROXY_PDI_PROGRAM_REQUEST
+typedef struct
 {
     int      iBootDevice;
     int      iUpdateFpt;
@@ -178,7 +179,7 @@ typedef struct AMI_PROXY_PDI_PROGRAM_REQUEST
  * @struct  AMI_PROXY_PDI_COPY_REQUEST
  * @brief   PDI copy request
  */
-typedef struct AMI_PROXY_PDI_COPY_REQUEST
+typedef struct
 {
     uint64_t ullAddress;
     uint32_t ulMaxLength;
@@ -193,7 +194,7 @@ typedef struct AMI_PROXY_PDI_COPY_REQUEST
  * @struct  AMI_PROXY_BOOT_SELECT_REQUEST
  * @brief   Boot select request
  */
-typedef struct AMI_PROXY_BOOT_SELECT_REQUEST
+typedef struct
 {
     uint32_t ulPartitionSel;
 
@@ -203,7 +204,7 @@ typedef struct AMI_PROXY_BOOT_SELECT_REQUEST
  * @struct  AMI_PROXY_EEPROM_RW_REQUEST
  * @brief   Read from or write to the eeprom
  */
-typedef struct AMI_PROXY_EEPROM_RW_REQUEST
+typedef struct
 {
     AMI_PROXY_CMD_RW_REQUEST xRequest;
     uint64_t ullAddress;
@@ -216,7 +217,7 @@ typedef struct AMI_PROXY_EEPROM_RW_REQUEST
  * @struct  AMI_PROXY_MODULE_RW_REQUEST
  * @brief   Read from or write to a QSFP module
  */
-typedef struct AMI_PROXY_MODULE_RW_REQUEST
+typedef struct
 {
     AMI_PROXY_CMD_RW_REQUEST xRequest;
     uint64_t ullAddress;
@@ -228,10 +229,26 @@ typedef struct AMI_PROXY_MODULE_RW_REQUEST
 } AMI_PROXY_MODULE_RW_REQUEST;
 
 /**
+ * @struct  AMI_PROXY_FPT_FLAGS_REQUEST
+ * @brief   Read or write FPT partition flags
+ */
+typedef struct
+{
+    AMI_PROXY_CMD_RW_REQUEST xRequest;      /* Read or Write */
+    uint32_t ulBootDevice;                  /* Primary or Secondary boot device */
+    uint32_t ulPartitionId;                 /* Partition index */
+    uint32_t ulType;                        /* Partition type */
+    uint32_t ulBaseAddr;                    /* Partition base address */
+    uint32_t ulSize;                        /* Partition size */
+    uint32_t ulFlags;                       /* Flags value (for write) */
+
+} AMI_PROXY_FPT_FLAGS_REQUEST;
+
+/**
  * @struct  AMI_PROXY_IDENTITY_RESPONSE
  * @brief   Identity reponse
  */
-typedef struct AMI_PROXY_IDENTITY_RESPONSE
+typedef struct
 {
     uint8_t  ucVerMajor;        /* major version number */
     uint8_t  ucVerMinor;        /* minor version number */
@@ -248,7 +265,7 @@ typedef struct AMI_PROXY_IDENTITY_RESPONSE
  * @struct  AMI_PROXY_HEARTBEAT_RESPONSE
  * @brief   Heartbeat response
  */
-typedef struct AMI_PROXY_HEARTBEAT_RESPONSE
+typedef struct
 {
     uint8_t ucHeartbeatCount;   /* return the value sent in the request */
 
@@ -393,6 +410,18 @@ int iAMI_SetModuleReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RES
  */
 int iAMI_SetDebugVerbosityResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
 
+/**
+ * @brief   Set the response after the FPT flags request has completed
+ *
+ * @param   pxSignal    Current event occurance (used for tracking)
+ * @param   xResult     The result of the request
+ * @param   ulFlags     The flags value (for read requests)
+ *
+ * @return  OK          Data passed to proxy driver successfully
+ *          ERROR       Data not passed successfully
+ */
+int iAMI_SetFptFlagsResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags );
+
 /* Get Functions **************************************************************/
 
 /**
@@ -438,7 +467,6 @@ int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
  *
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
- *
  */
 int iAMI_GetSensorRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_SENSOR_REQUEST *pxSensorRequest );
 
@@ -462,7 +490,6 @@ int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
  *
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
- *
  */
 int iAMI_GetBootSelectRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_BOOT_SELECT_REQUEST *pxBootSelectRequest );
 
@@ -474,7 +501,6 @@ int iAMI_GetBootSelectRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_BOOT_SELECT_REQUE
  *
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
- *
  */
 int iAMI_GetEepromReadWriteRequest( EVL_SIGNAL *pxSignal,
                                     AMI_PROXY_EEPROM_RW_REQUEST *pxEepromReadWriteRequest );
@@ -487,7 +513,6 @@ int iAMI_GetEepromReadWriteRequest( EVL_SIGNAL *pxSignal,
  *
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
- *
  */
 int iAMI_GetModuleReadWriteRequest( EVL_SIGNAL *pxSignal,
                                     AMI_PROXY_MODULE_RW_REQUEST *pxModuleReadWriteRequest );
@@ -500,17 +525,27 @@ int iAMI_GetModuleReadWriteRequest( EVL_SIGNAL *pxSignal,
  *
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
- *
  */
 int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
                                    uint8_t *pucDebugVerbosityRequest );
+
+/**
+ * @brief   Get the FPT flags request
+ *
+ * @param   pxSignal                Current event occurance (used for tracking)
+ * @param   pxFptFlagsRequest       Pointer to FPT flags request structure
+ *
+ * @return  OK                      Data retrieved from proxy driver successfully
+ *          ERROR                   Data not retrieved successfully
+ */
+int iAMI_GetFptFlagsRequest( EVL_SIGNAL *pxSignal,
+                             AMI_PROXY_FPT_FLAGS_REQUEST *pxFptFlagsRequest );
 
 /**
  * @brief   Print all the stats gathered by the application
  *
  * @return  OK          Stats retrieved from proxy driver successfully
  *          ERROR       Stats not retrieved successfully
- *
  */
 int iAMI_PrintStatistics( void );
 
