@@ -157,6 +157,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		case AMI_IOC_SET_SENSOR_REFRESH:
 		case AMI_IOC_GET_FPT_HDR:
 		case AMI_IOC_GET_FPT_PARTITION:
+		case AMI_IOC_SET_FPT_PARTITION:
 		case AMI_IOC_READ_EEPROM:
 		case AMI_IOC_WRITE_EEPROM:
 		case AMI_IOC_READ_MODULE:
@@ -524,6 +525,20 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			goto done;
 		}
 
+		/* Must update FPT SDR */
+		ret = update_sdr(pf_dev, SDR_TYPE_FPT);
+
+		if (ret)
+			AMI_ERR(
+				pf_dev->amc_ctrl_ctxt,
+				"Could not update FPT SDR"
+			);
+		else
+			AMI_WARN(
+				pf_dev->amc_ctrl_ctxt,
+				"Updated FPT SDR"
+			);
+
 		ret = read_fpt_partition(
 			pf_dev,
 			data.boot_device,
@@ -541,6 +556,25 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 				&data, sizeof(data)
 			);
 		}
+		break;
+	}
+
+	case AMI_IOC_SET_FPT_PARTITION:
+	{
+		/* `arg` is a pointer to `struct ami_ioc_fpt_partition_value` */
+		struct ami_ioc_fpt_partition_value data = { 0 };
+
+		if (copy_from_user(&data, (struct ami_ioc_fpt_partition_value*)arg, sizeof(data))) {
+			ret = -EFAULT;
+			goto done;
+		}
+		AMI_DBG(pf_dev->amc_ctrl_ctxt, "Set FPT partition 0x%X boot_device 0x%X type 0x%08X, base_addr 0x%08X, size 0x%08X flags 0x%08X",
+			data.partition, data.boot_device, data.type, data.base_addr, data.size, data.flags);
+
+		ret = submit_gcq_command(pf_dev->amc_ctrl_ctxt,
+				GCQ_SUBMIT_CMD_SET_FPT_PARTITION, 0, (uint8_t*)&data, sizeof(data));
+		if (ret)
+			AMI_ERR(pf_dev->amc_ctrl_ctxt, "Failed to set FPT partition %d flags 0x%08X", data.partition, data.flags);
 		break;
 	}
 

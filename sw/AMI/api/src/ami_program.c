@@ -315,6 +315,42 @@ int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device,
 }
 
 /*
+ * Set FPT partition information.
+ */
+int ami_prog_set_fpt_partition(ami_device *dev, uint8_t boot_device,
+	uint32_t num, struct ami_fpt_partition *partition)
+{
+	int ret = AMI_STATUS_ERROR;
+	struct ami_ioc_fpt_partition_value data = { 0 };
+
+	if (!dev || !partition)
+		return AMI_API_ERROR(AMI_ERROR_EINVAL);
+
+	if (ami_open_cdev(dev) != AMI_STATUS_OK)
+		return AMI_STATUS_ERROR; /* last error is set by ami_open_cdev */
+
+	data.boot_device = boot_device;
+	data.partition = num;
+	data.type = partition->type;
+	data.base_addr = partition->base_addr;
+	data.size = partition->size;
+	data.flags = partition->flags;
+	errno = 0;
+	if (ioctl(dev->cdev, AMI_IOC_SET_FPT_PARTITION, &data) == AMI_LINUX_STATUS_ERROR) {
+		ret = AMI_API_ERROR_M(
+			AMI_ERROR_EIO,
+			"errno %d (%s)",
+			errno,
+			strerror(errno)
+		);
+	} else {
+		ret = AMI_STATUS_OK;
+	}
+
+	return ret;
+}
+
+/*
  * Get FPT partition information.
  */
 int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device,

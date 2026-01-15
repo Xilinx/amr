@@ -2,7 +2,7 @@
 /*
  * amiapp.c - This file contains the command line application for the AMI API
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -116,6 +116,10 @@ static const struct app_cmd_map commands[] =  {
 		PROFILE_DEFAULT,"\tShow partition details \r\n" },
 	{ "pdi_program",     &cmd_pdi_program,
 		PROFILE_DEFAULT,"\tProgram pdi\r\n"  },
+	{ "partition_flag_rd", &cmd_partition_flag_rd,
+		PROFILE_DEFAULT,"\tRead partition flags\r\n" },
+	{ "partition_flag_wr", &cmd_partition_flag_wr,
+		PROFILE_DEFAULT,"\tWrite partition flags\r\n" },
 	{ "bar_rd",          &cmd_bar_rd,
 		PROFILE_V80,	"\tRead from PCI BAR memory\r\n" },
 	{ "bar_wr",          &cmd_bar_wr,

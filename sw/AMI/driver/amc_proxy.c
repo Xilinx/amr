@@ -40,6 +40,7 @@
  * @AMC_PROXY_CMD_OPCODE_EEPROM_READ_WRITE: eeprom read/write request
  * @AMC_PROXY_CMD_OPCODE_MODULE_READ_WRITE: module read/write request
  * @AMC_PROXY_CMD_OPCODE_DEBUG_VERBOSITY: debug verbosity set request
+ * @AMC_PROXY_CMD_OPCODE_SET_FPT_PARTITION: set FPT partition request
  * @AMC_PROXY_CMD_OPCODE_PDI_DOWNLOAD: pdi download
  * @AMC_PROXY_CMD_OPCODE_PDI_PROGRAM: pdi program
  * @AMC_PROXY_CMD_OPCODE_SENSOR: sensor request
@@ -52,6 +53,7 @@ enum amc_proxy_cmd_opcode {
 	AMC_PROXY_CMD_OPCODE_EEPROM_READ_WRITE = 0x3,
 	AMC_PROXY_CMD_OPCODE_MODULE_READ_WRITE = 0x4,
 	AMC_PROXY_CMD_OPCODE_DEBUG_VERBOSITY   = 0x5,
+	AMC_PROXY_CMD_OPCODE_SET_FPT_PARTITION = 0x6,
 	AMC_PROXY_CMD_OPCODE_PDI_DOWNLOAD      = 0xA,
 	AMC_PROXY_CMD_OPCODE_PDI_PROGRAM       = 0xB,
 	AMC_PROXY_CMD_OPCODE_SENSOR            = 0xC,
@@ -312,6 +314,27 @@ struct amc_proxy_cmd_heartbeat_payload {
 };
 
 /**
+ * struct amc_proxy_cmd_fpt_partition_payload: FPT partition request payload command
+ *
+ * @req_type: the request type, read or write
+ * @boot_device: the boot device, primary or secondary
+ * @partition: the partition index
+ * @type: the partition type
+ * @base_addr: the partition base address
+ * @size: the partition size
+ * @flags: the flags value (for write)
+ */
+ struct amc_proxy_cmd_fpt_partition_payload {
+	uint32_t req_type;      /* 0 = Read, 1 = Write */
+	uint32_t boot_device;   /* 0 = Primary, 1 = Secondary */
+	uint32_t partition;     /* Partition index */
+	uint32_t type;          /* Partition type */
+	uint32_t base_addr;     /* Partition base address */
+	uint32_t size;          /* Partition size */
+	uint32_t flags;         /* Flags value (for write) */
+};
+
+/**
  * struct amc_proxy_cmd_request: request command, header & payload (if applicable)
  *
  * @hdr: request command header
@@ -321,6 +344,7 @@ struct amc_proxy_cmd_heartbeat_payload {
  * @eeprom_payload: the eeprom read/write request payload
  * @module_payload: the module read/write request payload
  * @debug_verbosity_payload: the debug verbosity request payload
+ * @fpt_partition_payload: the FPT partition request payload
  */
 struct amc_proxy_cmd_request {
 	struct amc_proxy_cmd_request_hdr hdr;
@@ -331,6 +355,7 @@ struct amc_proxy_cmd_request {
 		struct amc_proxy_cmd_eeprom_payload eeprom_payload;
 		struct amc_proxy_cmd_module_payload module_payload;
 		uint8_t debug_verbosity_payload;
+		struct amc_proxy_cmd_fpt_partition_payload fpt_partition_payload;
 	};
 };
 
@@ -535,7 +560,6 @@ static int amc_result_to_linux_errno(enum amc_proxy_result res)
  *
  * Find the matching cmd from submitted_cmd list using the cid
  * remove it and then invoke registered dcallback
- *
  */
 static void cmd_complete(struct amc_proxy_instance *inst, struct com_queue_entry *ccmd)
 {
@@ -685,7 +709,6 @@ static void remove_submitted_cmd(struct amc_proxy_instance *inst,
  * submitted_cmd_check_timeout() - check for any timed out requests
  *
  * @inst: the proxy instance
- *
  */
 static void submitted_cmd_check_timeout(struct amc_proxy_instance *inst)
 {
@@ -989,8 +1012,8 @@ int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd)
 		request_hdr->count = 0; /* No payload for identity request */
 		request_hdr->cid = cmd->cmd_cid;
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-						(uint8_t*)&(request_cmd_entry),
-						sizeof(request_cmd_entry), 0);
+				(uint8_t*)&request_cmd_entry,
+				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
 			list_add_tail(&cmd->cmd_list, &amc_ctxt->inst.submitted_cmds);
@@ -1037,8 +1060,8 @@ int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
 		request_cmd_entry.sensor_payload.sensor_id = sensor_req->sensor_id;
 
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-						(uint8_t*)&(request_cmd_entry),
-						sizeof(request_cmd_entry), 0);
+				(uint8_t*)&request_cmd_entry,
+				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
 			list_add_tail(&cmd->cmd_list, &amc_ctxt->inst.submitted_cmds);
@@ -1094,7 +1117,7 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
 		}
 
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-				(uint8_t*)&(request_cmd_entry),
+				(uint8_t*)&request_cmd_entry,
 				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
@@ -1136,7 +1159,7 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
 		request_cmd_entry.pdi_payload.partition_sel = device_boot->partition;
 
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-				(uint8_t*)&(request_cmd_entry),
+				(uint8_t*)&request_cmd_entry,
 				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
@@ -1223,7 +1246,7 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
 		request_cmd_entry.heartbeat_payload.request_id = heartbeat->request_id;
 
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-				(uint8_t*)&(request_cmd_entry),
+				(uint8_t*)&request_cmd_entry,
 				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
@@ -1265,7 +1288,7 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
 		request_cmd_entry.eeprom_payload.len= eeprom_rw->length;
 		request_cmd_entry.eeprom_payload.offset = eeprom_rw->offset;
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-				(uint8_t*)&(request_cmd_entry),
+				(uint8_t*)&request_cmd_entry,
 				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
@@ -1309,7 +1332,7 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
 		request_cmd_entry.module_payload.len = module_rw->length;
 		request_cmd_entry.module_payload.req_type = module_rw->type;
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-				(uint8_t*)&(request_cmd_entry),
+				(uint8_t*)&request_cmd_entry,
 				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
@@ -1351,7 +1374,53 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
 		request_cmd_entry.debug_verbosity_payload = verbosity;
 
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
-				(uint8_t*)&(request_cmd_entry),
+				(uint8_t*)&request_cmd_entry,
+				sizeof(request_cmd_entry), 0);
+		if (ret == GCQ_ERRORS_NONE) {
+			mutex_lock(&amc_ctxt->inst.lock);
+			list_add_tail(&cmd->cmd_list, &amc_ctxt->inst.submitted_cmds);
+			mutex_unlock(&amc_ctxt->inst.lock);
+		} else {
+			PR_ERR("write request failed; %d", ret);
+			ret = -EIO;
+		}
+	}
+
+	return ret;
+}
+
+/*
+ * Generate a set FPT partition request
+ */
+int amc_proxy_request_set_fpt_partition(struct amc_proxy_cmd_struct *cmd,
+	struct amc_proxy_fpt_partition_request *fpt_partition)
+{
+	struct amc_proxy_list_entry *amc_ctxt = NULL;
+	int ret = -EPERM;
+
+	if (!cmd || !fpt_partition) {
+		return -EINVAL;
+	}
+
+	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
+	if (amc_ctxt && amc_ctxt->inst.initialised) {
+
+		struct amc_proxy_cmd_request request_cmd_entry = {{{{0}}}};
+		struct amc_proxy_cmd_request_hdr *request_hdr = NULL;
+		request_hdr = &request_cmd_entry.hdr;
+		request_hdr->state = AMC_PROXY_REQUEST_CMD_NEW;
+		request_hdr->opcode = AMC_PROXY_CMD_OPCODE_SET_FPT_PARTITION;
+		request_hdr->count = sizeof(request_cmd_entry.fpt_partition_payload);
+		request_hdr->cid = cmd->cmd_cid;
+		request_cmd_entry.fpt_partition_payload.req_type = fpt_partition->req_type;
+		request_cmd_entry.fpt_partition_payload.boot_device = fpt_partition->boot_device;
+		request_cmd_entry.fpt_partition_payload.partition = fpt_partition->partition;
+		request_cmd_entry.fpt_partition_payload.type = fpt_partition->type;
+		request_cmd_entry.fpt_partition_payload.base_addr = fpt_partition->base_addr;
+		request_cmd_entry.fpt_partition_payload.size = fpt_partition->size;
+		request_cmd_entry.fpt_partition_payload.flags = fpt_partition->flags;
+		ret = gcq_write(amc_ctxt->inst.gcq_handle,
+				(uint8_t*)&request_cmd_entry,
 				sizeof(request_cmd_entry), 0);
 		if (ret == GCQ_ERRORS_NONE) {
 			mutex_lock(&amc_ctxt->inst.lock);
@@ -1397,6 +1466,25 @@ int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
 		identity->link_ver_minor = identity_payload->link_ver_minor;
 
 		ret = 0;
+	}
+	return ret;
+}
+
+/*
+ * Read back the set FPT partition response
+ */
+int amc_proxy_get_response_set_fpt_partition(struct amc_proxy_cmd_struct *cmd)
+{
+	struct amc_proxy_list_entry *amc_ctxt = NULL;
+	int ret = -EPERM;
+
+	if (!cmd) {
+		return -EINVAL;
+	}
+
+	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
+	if (amc_ctxt && amc_ctxt->inst.initialised) {
+		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 	}
 	return ret;
 }

@@ -151,7 +151,7 @@ struct ami_ioc_fpt_hdr_value {
  * @flags: The partition flags. Populated by the driver.
  */
 struct ami_ioc_fpt_partition_value {
-	uint8_t  boot_device;
+	uint32_t boot_device;
 	uint32_t partition;
 	uint32_t type;
 	uint32_t base_addr;
@@ -207,12 +207,13 @@ enum ami_ioc_app_setup {
 #define AMI_IOC_SET_SENSOR_REFRESH	_IOW(AMI_IOC_MAGIC,  6, uint16_t)
 #define AMI_IOC_GET_FPT_HDR		_IOR(AMI_IOC_MAGIC,  7, struct ami_ioc_fpt_hdr_value*)
 #define AMI_IOC_GET_FPT_PARTITION	_IOWR(AMI_IOC_MAGIC, 8, struct ami_ioc_fpt_partition_value*)
-#define AMI_IOC_READ_EEPROM		_IOWR(AMI_IOC_MAGIC, 9, struct ami_ioc_eeprom_payload*)
-#define AMI_IOC_WRITE_EEPROM		_IOW(AMI_IOC_MAGIC, 10, struct ami_ioc_eeprom_payload*)
-#define AMI_IOC_APP_SETUP		_IOW(AMI_IOC_MAGIC, 11, enum ami_ioc_app_setup)
-#define AMI_IOC_READ_MODULE		_IOW(AMI_IOC_MAGIC, 12, struct ami_ioc_module_payload*)
-#define AMI_IOC_WRITE_MODULE		_IOW(AMI_IOC_MAGIC, 13, struct ami_ioc_module_payload*)
-#define AMI_IOC_DEBUG_VERBOSITY		_IOW(AMI_IOC_MAGIC, 14, uint8_t)
-#define AMI_IOC_MAX			(15)
+#define AMI_IOC_SET_FPT_PARTITION	_IOWR(AMI_IOC_MAGIC, 9, struct ami_ioc_fpt_partition_value*)
+#define AMI_IOC_READ_EEPROM		_IOWR(AMI_IOC_MAGIC, 10, struct ami_ioc_eeprom_payload*)
+#define AMI_IOC_WRITE_EEPROM		_IOW(AMI_IOC_MAGIC, 11, struct ami_ioc_eeprom_payload*)
+#define AMI_IOC_APP_SETUP		_IOW(AMI_IOC_MAGIC, 12, enum ami_ioc_app_setup)
+#define AMI_IOC_READ_MODULE		_IOW(AMI_IOC_MAGIC, 13, struct ami_ioc_module_payload*)
+#define AMI_IOC_WRITE_MODULE		_IOW(AMI_IOC_MAGIC, 14, struct ami_ioc_module_payload*)
+#define AMI_IOC_DEBUG_VERBOSITY		_IOW(AMI_IOC_MAGIC, 15, uint8_t)
+#define AMI_IOC_MAX			(16)
 
 #endif  /* AMI_IOCTL_H */

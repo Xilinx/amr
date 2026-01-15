@@ -2,7 +2,7 @@
 /*
  * amc_proxy.h - The AMC proxy layer used to abstract away the transport.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef _AMC_PROXY_H_
@@ -186,6 +186,27 @@ struct amc_proxy_partition_copy_request {
  */
 struct amc_proxy_hearbeat_request {
         uint8_t request_id;
+};
+
+/**
+ * struct amc_proxy_fpt_partition_request: the FPT partition request data
+ *
+ * @req_type: the request type, read or write
+ * @boot_device: the boot device, primary or secondary
+ * @partition: the partition index
+ * @type: the partition type
+ * @base_addr: the partition base address
+ * @size: the partition size
+ * @flags: the flags value (for write)
+ */
+struct amc_proxy_fpt_partition_request {
+	uint32_t req_type;
+	uint32_t boot_device;
+	uint32_t partition;
+	uint32_t type;
+	uint32_t base_addr;
+	uint32_t size;
+	uint32_t flags;
 };
 
 /**
@@ -430,6 +451,17 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd,
 	uint8_t verbosity);
 
 /**
+ * amc_proxy_request_set_fpt_partition() - set FPT partition request
+ *
+ * @cmd: the proxy command structure
+ * @fpt_partition: a structure populated with the FPT partition request
+ *
+ * Return: The errno return code
+ */
+int amc_proxy_request_set_fpt_partition(struct amc_proxy_cmd_struct *cmd,
+	struct amc_proxy_fpt_partition_request *fpt_partition);
+
+/**
  * amc_proxy_get_response_identity() - retrieve the identity response
  *
  * @cmd: the proxy command structure
@@ -439,6 +471,15 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd,
  */
 int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
 	struct amc_proxy_identify_response *identity);
+
+/**
+ * amc_proxy_get_response_set_fpt_partition() - retrieve the set FPT partition response
+ *
+ * @cmd: the proxy command structure
+ *
+ * Return: The errno return code
+ */
+int amc_proxy_get_response_set_fpt_partition(struct amc_proxy_cmd_struct *cmd);
 
 /**
  * amc_proxy_get_response_sensor() - check if a valid sensor response has been received

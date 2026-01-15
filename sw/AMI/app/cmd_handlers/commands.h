@@ -2,7 +2,7 @@
 /*
  * commands.h - This file contains all supported command handlers
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_APP_COMMANDS_H
@@ -31,6 +31,12 @@ extern struct app_cmd cmd_cfgmem_program;
 
 /* "program" handler */
 extern struct app_cmd cmd_pdi_program;
+
+/* "partition_flag_rd" handler */
+extern struct app_cmd cmd_partition_flag_rd;
+
+/* "partition_flag_wr" handler */
+extern struct app_cmd cmd_partition_flag_wr;
 
 /* "sensors" handler */
 extern struct app_cmd cmd_sensors;

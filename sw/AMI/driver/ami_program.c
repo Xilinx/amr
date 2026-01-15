@@ -2,7 +2,7 @@
 /*
  * ami_program.c - This file contains functions to program (flash) devices.
  *
- * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/types.h>

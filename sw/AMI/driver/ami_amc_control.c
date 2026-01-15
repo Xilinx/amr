@@ -818,6 +818,10 @@ static enum amc_cmd_id get_cmd_command_id(enum gcq_submit_cmd_req cmd_req)
 			id = AMC_CMD_ID_COPY_PARTITION;
 			break;
 
+		case GCQ_SUBMIT_CMD_SET_FPT_PARTITION:
+			id = AMC_CMD_ID_SET_FPT_PARTITION;
+			break;
+
 		case GCQ_SUBMIT_CMD_GET_INLET_TEMP_SENSOR:
 		case GCQ_SUBMIT_CMD_GET_OUTLET_TEMP_SENSOR:
 		case GCQ_SUBMIT_CMD_GET_BOARD_TEMP_SENSOR:
@@ -1279,9 +1283,17 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 			}
 			break;
 
+		case AMC_CMD_ID_SET_FPT_PARTITION:
+			if (!data_buf) {
+				AMI_ERR(amc_ctrl_ctxt, "Invalid FPT partition data");
+				ret = -EINVAL;
+				goto done;
+			}
+			break;
+
 		/* data_buf not required */
-		case AMC_CMD_ID_DEBUG_VERBOSITY:
 		case AMC_CMD_ID_DEVICE_BOOT:
+		case AMC_CMD_ID_DEBUG_VERBOSITY:
 			break;
 
 		default:
@@ -1358,9 +1370,9 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 			/* Copy payload data to address */
 			memcpy_gcq_payload_to_device(amc_ctrl_ctxt,
-										payload_address,
-										data_buf,
-										data_size);
+							payload_address,
+							data_buf,
+							data_size);
 			break;
 
 		case AMC_CMD_ID_SENSOR:
@@ -1405,6 +1417,31 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				goto done;
 			}
 			break;
+
+		case AMC_CMD_ID_SET_FPT_PARTITION:
+		{
+			if (acquire_gcq_data(amc_ctrl_ctxt, (uint32_t *)&(payload_address), &length)) {
+				ret = -EIO;
+				goto done;
+			}
+
+			data_page_acquired = true;
+			payload_size = data_size;
+
+			AMI_VDBG(amc_ctrl_ctxt,
+				"Payload size = %d, page length = %d",
+				payload_size,
+				length);
+			if (length < payload_size) {
+				AMI_WARN(amc_ctrl_ctxt,
+					"Data request length is %d but allocated length is %d",
+					payload_size,
+					length);
+				payload_size = length;
+			}
+			memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+		}
+		break;
 
 		case AMC_CMD_ID_EEPROM_READ_WRITE:
 		case AMC_CMD_ID_MODULE_READ_WRITE:
@@ -1589,6 +1626,31 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 		ret = amc_proxy_request_debug_verbosity(amc_proxy_cmd, (uint8_t)flags);
 		break;
 
+	case AMC_CMD_ID_SET_FPT_PARTITION:
+	{
+		struct amc_proxy_fpt_partition_request fpt_partition = {0};
+		struct ami_ioc_fpt_partition_value *fpt_partition_data =
+			(struct ami_ioc_fpt_partition_value*)data_buf;
+
+		fpt_partition.req_type = 1;
+		fpt_partition.boot_device = fpt_partition_data->boot_device;
+		fpt_partition.partition = fpt_partition_data->partition;
+		fpt_partition.type = fpt_partition_data->type;
+		fpt_partition.base_addr = fpt_partition_data->base_addr;
+		fpt_partition.size = fpt_partition_data->size;
+		fpt_partition.flags = fpt_partition_data->flags;
+
+		AMI_DBG(amc_ctrl_ctxt, "AMI AMC Control: Set FPT partition 0x%X boot_device 0x%X type 0x%08X, base_addr 0x%08X, size 0x%08X flags 0x%08X",
+			fpt_partition.partition, fpt_partition.boot_device, fpt_partition.type,
+			fpt_partition.base_addr, fpt_partition.size, fpt_partition.flags);
+		ret = amc_proxy_request_set_fpt_partition(amc_proxy_cmd, &fpt_partition);
+		if (ret) {
+			AMI_ERR(amc_ctrl_ctxt, "Failed to set FPT partition %d flags 0x%08X", fpt_partition.partition, fpt_partition.flags);
+			goto done;
+		}
+			break;
+	}
+
 	default:
 		ret = -EINVAL;
 		AMI_ERR(amc_ctrl_ctxt, "Unsupported request %d", cmd_id);
@@ -1696,6 +1758,10 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 		case AMC_CMD_ID_DEBUG_VERBOSITY:
 			ret = amc_proxy_get_response_debug_verbosity(amc_proxy_cmd);
+			break;
+
+		case AMC_CMD_ID_SET_FPT_PARTITION:
+			ret = amc_proxy_get_response_set_fpt_partition(amc_proxy_cmd);
 			break;
 
 		default:

@@ -650,10 +650,10 @@ int discover_sensors(struct pf_dev_struct *pf_dev, int *empty_sdr_count)
 		ret = get_sdr(pf_dev->amc_ctrl_ctxt, discovery_repos[i],
 				&pf_dev->sensor_repos[i]);
 
-        if (ret == -ENODATA) {
+	if (ret == -ENODATA) {
 			*empty_sdr_count += 1;
 			ret = SUCCESS;
-        } else if (ret) {
+	} else if (ret) {
 			break;
 		}
 
@@ -1164,6 +1164,65 @@ int read_fpt_hdr(struct pf_dev_struct *pf_dev, uint8_t boot_device, struct fpt_h
 
 		case AMI_AMC_BOOT_DEVICE_SECONDARY:
 			*hdr = repo->fpt.hdr_secondary;
+			break;
+
+		default:
+			return -EINVAL;
+			break;
+	}
+
+	return 0;
+}
+
+/*
+ * set_fpt_partition() - Set a FPT partition.
+ * @pf_dev: Pointer to top level PCI data struct.
+ * @boot_device: Target boot device
+ * @partition_id: The partition to set.
+ * @partition: Pointer to the partition information to set.
+ *
+ * Sets a stored FTP partition.
+ *
+ * Return: 0 on success or negative error code.
+ */
+int set_fpt_partition(struct pf_dev_struct	*pf_dev,
+	uint8_t			boot_device,
+	uint32_t		partition_id,
+	struct fpt_partition	*partition)
+{
+	struct sdr_repo *repo = NULL;
+
+	if (!pf_dev || !partition || (boot_device >= AMI_AMC_BOOT_DEVICE_MAX))
+		return -EINVAL;
+
+	repo = find_sdr_repo(pf_dev->sensor_repos,
+				pf_dev->num_sensor_repos,
+				SDR_TYPE_FPT);
+	if (!repo)
+		return -EINVAL;
+
+	if (!repo->num_records)
+		return -ENODATA;
+
+	switch (boot_device) {
+		case AMI_AMC_BOOT_DEVICE_PRIMARY:
+			if (partition_id > (repo->fpt.hdr_primary.num_entries - 1))
+				return -EINVAL;
+
+			if (repo->fpt.partition_primary == NULL)
+				return -ENODATA;
+
+			*partition = repo->fpt.partition_primary[partition_id];
+			break;
+
+		case AMI_AMC_BOOT_DEVICE_SECONDARY:
+			if (partition_id > (repo->fpt.hdr_secondary.num_entries - 1))
+				return -EINVAL;
+
+			if (repo->fpt.partition_secondary == NULL)
+				return -ENODATA;
+
+			*partition = repo->fpt.partition_secondary[partition_id];
 			break;
 
 		default:

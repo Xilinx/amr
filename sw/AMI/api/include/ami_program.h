@@ -82,7 +82,7 @@ enum ami_fpt_type {
 struct ami_fpt_partition {
 	enum ami_fpt_type type;
 	uint32_t base_addr;
-	uint32_t size;
+	uint32_t size;  /* in bytes */
 	uint32_t flags;
 };
 
@@ -176,6 +176,18 @@ int ami_prog_copy_partition(ami_device *dev, uint32_t src_device,
  */
 int ami_prog_get_fpt_header(ami_device *dev, uint8_t boot_device,
 	struct ami_fpt_header *header);
+
+/**
+ * ami_prog_set_fpt_partition() - Set FPT partition information.
+ * @dev: Device handle.
+ * @boot_device: Target boot device.
+ * @num: Partition number to set.
+ * @partition: Struct to hold partition information.
+ *
+ * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
+ */
+int ami_prog_set_fpt_partition(ami_device *dev, uint8_t boot_device,
+	uint32_t num, struct ami_fpt_partition *partition);
 
 /**
  * ami_prog_get_fpt_partition() - Get FPT partition information.
