@@ -163,6 +163,24 @@ static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, ch
 		printf("Flags: 0x%08x\r\n", fpt_partition.flags);
 	}
 
+	if (fpt_partition.type == AMI_FPT_TYPE_PDI_USER) {
+		printf("Power-up load: %s\r\n",
+			fpt_partition.user.powerup_flag ? "On" : "Off");
+	} else {
+		printf("Power-up load: %s\r\n", "N/A");
+	}
+
+	if (fpt_partition.type == AMI_FPT_TYPE_PDI_USER) {
+		if (fpt_partition.user.powerup_error == 0)
+			printf("Power-up load status: %s\r\n", "Not Loaded");
+		else if (fpt_partition.user.powerup_error == 1)
+			printf("Power-up load status: %s\r\n", "Loaded");
+		else
+			printf("Power-up load status: %s\r\n", "Error");
+	} else {
+		printf("Power-up load status: %s\r\n", "N/A");
+	}
+
 	ami_dev_delete(&dev);
 	return ret;
 }

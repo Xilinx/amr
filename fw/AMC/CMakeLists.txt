@@ -1,4 +1,4 @@
-# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 cmake_minimum_required(VERSION 3.7.0)
@@ -78,7 +78,7 @@ else()
     endif()
 
     #Add build UTC timestamp
-    string(TIMESTAMP BUILD_TIME "%a %b %Y %H:%M:%S" UTC)
+    string(TIMESTAMP BUILD_TIME "%a %b %d %Y %H:%M:%S" UTC)
     add_definitions(-DOOB_ENABLED)
     add_definitions(-DUTC_BUILD_TIME="${BUILD_TIME} UTC")
 

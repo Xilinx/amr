@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the main entry point for the AMR Managment Controller
@@ -113,7 +113,6 @@ typedef enum
  *
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
- *
  */
 static int iApcCallback( EVL_SIGNAL *pxSignal );
 static int iAmiCallback( EVL_SIGNAL *pxSignal );
@@ -129,7 +128,6 @@ static int iBmcCallback( EVL_SIGNAL *pxSignal );
  * @brief   Get project info
  *
  * @return  N/A
- *
  */
 static void vGetProjectInfo( void );
 
@@ -138,7 +136,6 @@ static void vGetProjectInfo( void );
  *
  * @return  OK if all core libraries initialised successfully
  *          ERROR if any or all core libraries not initialised
- *
  */
 static int iInitCoreLibs( void );
 
@@ -147,7 +144,6 @@ static int iInitCoreLibs( void );
  *
  * @return  OK if all device drivers initialised and created successfully
  *          ERROR if any or all device drivers not initialised
- *
  */
 static int iInitDeviceDrivers( void );
 
@@ -156,7 +152,6 @@ static int iInitDeviceDrivers( void );
  *
  * @return  OK if all Proxy Drivers initialised and bound successfully
  *          ERROR if any or all proxy drivers not initialised
- *
  */
 static int iInitProxies( void );
 
@@ -165,7 +160,6 @@ static int iInitProxies( void );
  *
  * @return  OK if all Apps initialised and created successfully
  *          ERROR if any or all apps not initialised
- *
  */
 static int iInitApp( void );
 
@@ -176,6 +170,14 @@ static int iInitApp( void );
  *          ERROR if debug enabled but did not initialise
  */
 static int iInitDebug( void );
+
+/**
+ * @brief   Load PDI from OSPI flash on power-up
+ *
+ * @return  OK if PDI loaded successfully
+ *          ERROR if PDI loading failed
+ */
+static int iLoadPdiOnPowerUp( void );
 
 /**
  * @brief   The main task that init the FAL & proxy drivers
@@ -236,33 +238,33 @@ static EEPROM_CFG xEepromCfg =
 };
 
 /* AXC External Device configs */
-AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice1 =
+static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice1 =
 {
     &xQsfpIf1, 0
 };
 
-AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice2 =
+static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice2 =
 {
     &xQsfpIf2, 1
 };
 
-AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice3 =
+static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice3 =
 {
     &xQsfpIf3, 2
 };
 
-AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice4 =
+static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice4 =
 {
     &xQsfpIf4, 3
 };
 
-AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xDimmDevice =
+static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xDimmDevice =
 {
     &xDimmIf, 4
 };
 
-uint64_t ullAmcInitStatus = 0;
-XLoader_ClientInstance XLoaderInstance;
+static uint64_t ullAmcInitStatus = 0;          /* AMC initialisation status */
+static XLoader_ClientInstance XLoaderInstance; /* XLoader instance */
 
 
 /******************************************************************************/
@@ -270,7 +272,7 @@ XLoader_ClientInstance XLoaderInstance;
 /******************************************************************************/
 
 /*
- * @brief   The main task
+ * @brief   AMC main task
  */
 static void vTaskFuncMain( void )
 {
@@ -656,16 +658,17 @@ static void vGetProjectInfo( void )
     iOSAL_Task_SleepMs( AMC_GET_PROJECT_INFO_SLEEP_MS );
 
     vPLL_Printf( "\r\n" );
-    vPLL_Printf( "################################################################\r\n" );
-    vPLL_Printf( "#                                                              #\r\n" );
-    vPLL_Printf( "#                             A M C                            #\r\n" );
-    vPLL_Printf( "#                                                              #\r\n" );
-    vPLL_Printf( "# Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc.       #\r\n" );
-    vPLL_Printf( "# All rights reserved.                                         #\r\n" );
-    vPLL_Printf( "#                                                              #\r\n" );
-    vPLL_Printf( "# SPDX-License-Identifier: MIT                                 #\r\n" );
-    vPLL_Printf( "#                                                              #\r\n" );
-    vPLL_Printf( "################################################################\r\n" );
+    vPLL_Printf( "###################################################################\r\n" );
+    vPLL_Printf( "#                        ╔═╗    ╔╦╗    ╔═╗                        #\r\n" );
+    vPLL_Printf( "#                        ╠═╣    ║║║    ║                          #\r\n" );
+    vPLL_Printf( "#                        ╩ ╩    ╩ ╩    ╚═╝                        #\r\n" );
+    vPLL_Printf( "#                 Adaptive Management Controller                  #\r\n" );
+    vPLL_Printf( "#                                                                 #\r\n" );
+    vPLL_Printf( "# Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc.          #\r\n" );
+    vPLL_Printf( "# All rights reserved.                                            #\r\n" );
+    vPLL_Printf( "# SPDX-License-Identifier: MIT                                    #\r\n" );
+    vPLL_Printf( "#                                                                 #\r\n" );
+    vPLL_Printf( "###################################################################\r\n" );
     PLL_LOG( AMC_NAME,
              "AMC: %d.%d.%d-%d.%.*s.%.*s%c [%s]\r\n",
              GIT_TAG_VER_MAJOR,
@@ -794,6 +797,16 @@ static int iInitProxies( void )
                 PLL_ERR( AMC_NAME, "Error binding to APC Proxy Driver\r\n" );
             }
             ullAmcInitStatus |= AMC_CFG_APC_INITIALISED;
+
+            /* Load PDI from OSPI flash on power-up */
+            if( OK == iLoadPdiOnPowerUp() )
+            {
+                PLL_INF( AMC_NAME, "PDI loaded from OSPI flash on power-up\r\n" );
+            }
+            else
+            {
+                PLL_WRN( AMC_NAME, "Failed to load PDI from OSPI flash on power-up\r\n" );
+            }
         }
         else
         {
@@ -1134,4 +1147,95 @@ static void vConfigureSharedMemTable( void )
     pvOSAL_MemCpy( pucDestAdd, &uuid, sizeof(uuid) );
     HAL_FLUSH_CACHE_DATA( ( HAL_RPU_SHARED_MEMORY_BASEADDR + xShmTable.xUuid.ulUuidOff ),
                           xShmTable.xUuid.ulUuidLen );
+}
+
+/**
+ * @brief   Load PDI from OSPI flash on power-up using PLM
+ *
+ * This function loads a PDI image from a specified FPT partition in OSPI flash
+ * during system power-up. It uses the XLoader_LoadPartialPdi function from PLM
+ * with XLOADER_PDI_OSPI as the source.
+ */
+static int iLoadPdiOnPowerUp( void )
+{
+    int iStatus = ERROR;
+    u32 PdiLoadStatus = 0U;
+    APCProxyDriverFptHeader xFptHeader = { 0 };
+    APCProxyDriverFptPartition xFptPartition = { 0 };
+    uint64_t ullPdiAddr = 0;
+
+    PLL_INF( AMC_NAME, "Loading PDI from OSPI flash on power-up...\r\n" );
+    PLL_INF( AMC_NAME, "Boot device: %d, Partition: %d\r\n",
+             USER_PDI_POWERUP_BOOT_DEVICE, USER_PDI_POWERUP_PARTITION );
+
+    /* Verify XLoader instance is valid */
+    if ( NULL == XLoaderInstance.MailboxPtr )
+    {
+        PLL_ERR( AMC_NAME, "Error: XLoader instance not initialized\r\n" );
+        goto fail;
+    }
+
+    /* Get FPT header to validate partition exists */
+    if ( OK != iAPC_GetFptHeader( ( APC_BOOT_DEVICES )USER_PDI_POWERUP_BOOT_DEVICE, &xFptHeader ) )
+    {
+        PLL_ERR( AMC_NAME, "Error: Failed to get FPT header\r\n" );
+        goto fail;
+    }
+
+    /* Validate partition index */
+    if ( USER_PDI_POWERUP_PARTITION >= xFptHeader.ucNumEntries )
+    {
+        PLL_ERR( AMC_NAME, "Error: Invalid partition %d (max %d)\r\n",
+                USER_PDI_POWERUP_PARTITION, xFptHeader.ucNumEntries );
+        goto fail;
+    }
+
+    /* Get partition info to get PDI address */
+    if ( OK != iAPC_GetFptPartition( ( APC_BOOT_DEVICES )USER_PDI_POWERUP_BOOT_DEVICE,
+                                    USER_PDI_POWERUP_PARTITION,
+                                    &xFptPartition ) )
+    {
+        PLL_ERR( AMC_NAME, "Error: Failed to get FPT partition info\r\n" );
+        goto fail;
+    }
+
+    /* Is power up load flag set? */
+    if ( ( xFptPartition.user.powerup_flag ) == 0U )
+    {
+        PLL_INF( AMC_NAME, "Power load user partition : disabled\r\n");
+        ulUserPdiLoadStatus = USER_PDI_POWERUP_NOT_LOADED;
+        iStatus = OK;
+        goto fail;
+    }
+
+    /* Get PDI address from partition base address */
+    ullPdiAddr = ( uint64_t )xFptPartition.ulPartitionBaseAddr;
+
+    PLL_INF( AMC_NAME, "PDI address: 0x%llx, Size: 0x%x bytes\r\n",
+           ullPdiAddr, xFptPartition.ulPartitionSize );
+
+    /* Load PDI directly from OSPI flash using PLM */
+    if (XST_SUCCESS != XLoader_LoadPartialPdi( &XLoaderInstance,
+                                    XLOADER_PDI_OSPI,
+                                    ullPdiAddr,
+                                    &PdiLoadStatus ))
+    {
+        PLL_ERR( AMC_NAME, "Error: Failed to load PDI\r\n" );
+    }
+    else
+    {
+        iStatus = OK;
+        ulUserPdiLoadStatus = USER_PDI_POWERUP_LOADED;
+    }
+    iOSAL_Task_SleepMs( AMC_TASK_SLEEP_MS );
+
+fail:
+    if ( OK != iStatus )
+    {
+        PLL_ERR( AMC_NAME, "Error: PDI load failed, status 0x%X, PLM status 0x%X\r\n",
+                iStatus, PdiLoadStatus );
+        ulUserPdiLoadStatus = USER_PDI_POWERUP_ERROR;
+    }
+
+    return iStatus;
 }

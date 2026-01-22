@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the header for the ASDM (AMR Data Store Model) API's
@@ -22,10 +22,9 @@
 /******************************************************************************/
 
 /* ASDM API Completion */
-#define ASDM_SDR_RESP_BYTE_CC                   ( 0x0 )
-#define ASDM_SDR_RESP_BYTE_REPO_TYPE            ( 0x1 )
-#define ASDM_SDR_RESP_BYTE_SIZE                 ( 0x2 )
-
+#define ASDM_SDR_RESP_BYTE_CC               ( 0x0 )
+#define ASDM_SDR_RESP_BYTE_REPO_TYPE        ( 0x1 )
+#define ASDM_SDR_RESP_BYTE_SIZE             ( 0x2 )
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -81,7 +80,6 @@ typedef enum ASDM_SDR_COMPLETION_CODE
     ASDM_SDR_COMPLETION_CODE_MAX
 
 } ASDM_SDR_COMPLETION_CODE;
-
 
 /******************************************************************************/
 /* Function declarations                                                      */

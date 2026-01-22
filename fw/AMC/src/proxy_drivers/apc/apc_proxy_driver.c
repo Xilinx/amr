@@ -65,6 +65,9 @@
     DO( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_PEND ) \
     DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST ) \
     DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND ) \
+    DO( APC_PROXY_STATS_MBOX_LOAD_PDI_POST )         \
+    DO( APC_PROXY_STATS_MBOX_LOAD_PDI_PEND )         \
+    DO( APC_PROXY_STATS_PDI_LOAD_COMPLETE )          \
     DO( APC_PROXY_STATS_TASK_CREATE )                \
     DO( APC_PROXY_STATS_FPT_CREATED )                \
     DO( APC_PROXY_STATS_FPT_HEADER_LOADED )          \
@@ -96,6 +99,9 @@
     DO( APC_PROXY_ERRORS_MBOX_PTN_SELECT_POST_FAILED )       \
     DO( APC_PROXY_ERRORS_MBOX_HOT_RESET_ENABLE_POST_FAILED ) \
     DO( APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED ) \
+    DO( APC_PROXY_ERRORS_MBOX_LOAD_PDI_POST_FAILED )         \
+    DO( APC_PROXY_ERRORS_PDI_LOAD_FAILED )                   \
+    DO( APC_PROXY_ERRORS_XLOADER_INSTANCE_NULL )             \
     DO( APC_PROXY_ERRORS_MBOX_PEND_FAILED )                  \
     DO( APC_PROXY_ERRORS_TASK_CREATE_FAILED )                \
     DO( APC_PROXY_ERRORS_LOAD_FPT_FAILED )                   \
@@ -277,6 +283,7 @@ typedef struct
 
 } APCMboxMsg;
 
+uint32_t ulUserPdiLoadStatus = 0;       /* User PDI power on load status 0: Success */
 
 /******************************************************************************/
 /* Local Function declarations                                                */
@@ -389,7 +396,6 @@ static int iVerifyDownload( APCMboxDownloadImage *pxImageData );
  * @return  OK or ERROR
  */
 static int iRefreshFptData( APC_BOOT_DEVICES xBootDevice );
-
 
 /******************************************************************************/
 /* Local variables                                                            */
@@ -1137,7 +1143,6 @@ int iAPC_GetState( MODULE_STATE *pxState )
     }
     return iStatus;
 }
-
 
 /******************************************************************************/
 /* Local Function implementations                                             */
@@ -2088,12 +2093,19 @@ static int iSetFptFlags( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t 
 
     if ( ( MAX_APC_BOOT_DEVICES > xBootDevice ) && ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries ) )
     {
-        pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPartitionFlags = ulFlags;
-        if ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->write( pxThis->ppxFwIf[ xBootDevice ],
+        if ( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPartitionFlags != ulFlags )
+        {
+            pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPartitionFlags = ulFlags;
+            if ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->write( pxThis->ppxFwIf[ xBootDevice ],
                                                                          ( uint64_t )APC_FPT_PTN_OFFSET + ( iPartition * APC_FPT_PTN_OFFSET ),
                                                                          ( uint8_t* )&pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ],
                                                                          sizeof( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ] ),
                                                                          0 ) )
+            {
+                iStatus = OK;
+            }
+        }
+        else
         {
             iStatus = OK;
         }

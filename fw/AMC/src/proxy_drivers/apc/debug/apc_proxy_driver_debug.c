@@ -440,7 +440,8 @@ static void vGetFptPartition( void )
             PLL_DAL( APC_DBG_NAME, "\tPartition type . . . . : 0x%08X\r\n", xFptPartition.ulPartitionType );
             PLL_DAL( APC_DBG_NAME, "\tPartition base address : 0x%08X\r\n", xFptPartition.ulPartitionBaseAddr );
             PLL_DAL( APC_DBG_NAME, "\tPartition size . . . . : 0x%08X\r\n", xFptPartition.ulPartitionSize );
-            PLL_DAL( APC_DBG_NAME, "\tPartition flags . . .  : 0x%08X\r\n", xFptPartition.ulPartitionFlags );
+            PLL_DAL( APC_DBG_NAME, "\tPartition flags . . .  : 0x%08X\r\n", xFptPartition.ulPartitionFlags |
+                                                                                          ulUserPdiLoadStatus);
             PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
         }
     }

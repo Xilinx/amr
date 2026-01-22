@@ -2,7 +2,7 @@
 /*
  * cmd_reload.c - This file contains the implementation for the command "reload"
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -63,14 +63,6 @@ enum reload_type {
  */
 static int do_cmd_reload(struct app_option *options, int num_args, char **args);
 
-/**
- * parse_reload_type() - Parse the reload type option string into an enum value.
- * @reload_type: The human readable string to parse.
- *
- * Return: equivalent enum value or RELOAD_TYPE_INVALID if unknown
- */
-static enum reload_type parse_reload_type(const char *reload_type);
-
 /*****************************************************************************/
 /* Global variables                                                          */
 /*****************************************************************************/
@@ -115,7 +107,10 @@ struct app_cmd cmd_reload = {
 /*****************************************************************************/
 
 /*
- * Parse the reload type option.
+ * parse_reload_type() - Parse the reload type option string into an enum value.
+ * @reload_type: The human readable string to parse.
+ *
+ * Return: equivalent enum value or RELOAD_TYPE_INVALID if unknown
  */
 static enum reload_type parse_reload_type(const char *reload_type)
 {

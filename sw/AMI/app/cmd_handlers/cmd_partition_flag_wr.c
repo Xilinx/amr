@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * cmd_partition_flag_wr.c - This file contains the implementation for the command "partition_flag_wr"
+ * cmd_partition_flag_wr.c - This file contains the implementation for
+                             the command "partition_flag_wr"
  *
  * Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
@@ -41,7 +42,8 @@
  *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
-static int do_cmd_partition_flag_wr(struct app_option *options, int num_args, char **args);
+static int do_cmd_partition_flag_wr(struct app_option *options,
+	int num_args, char **args);
 
 /*****************************************************************************/
 /* Global variables                                                          */
@@ -52,7 +54,7 @@ static int do_cmd_partition_flag_wr(struct app_option *options, int num_args, ch
  * d: Device
  * t: Boot device type
  * p: Partition number
- * i: Flags value
+ * i: Flags value <on|off>
  */
 static const char short_options[] = "hd:t:p:i:";
 
@@ -70,7 +72,10 @@ static const char help_msg[] = \
 	"\t-d <b>:[d].[f]        Specify the device BDF\r\n"
 	"\t-t <type>             Specify the boot device type (primary or secondary)\r\n"
 	"\t-p <partition>        Partition number to write\r\n"
-	"\t-i <flags>            Flags to write\r\n"
+	"\t-i <flags>            Powerup autoload flag to write\r\n"
+	"\t                      Possible values are:\r\n"
+	"\t                        on=power on load user partition\r\n"
+	"\t                        off=do not power on load user partition\r\n"
 ;
 
 struct app_cmd cmd_partition_flag_wr = {
@@ -150,7 +155,14 @@ static int do_cmd_partition_flag_wr(struct app_option *options, int num_args, ch
 	}
 
 	/* Parition flags */
-	flags = (uint32_t)strtoul(partition_flags->arg, NULL, 0);
+	if (strcmp(partition_flags->arg, "on") == 0) {
+		flags = 1;
+	} else if (strcmp(partition_flags->arg, "off") == 0) {
+		flags = 0;
+	} else {
+		APP_USER_ERROR("Invalid partition flag value", help_msg);
+		return AMI_STATUS_ERROR;
+	}
 
 	/* Find device */
 	if (ami_dev_find(device->arg, &dev) != AMI_STATUS_OK) {

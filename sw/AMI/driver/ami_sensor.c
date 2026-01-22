@@ -1135,7 +1135,7 @@ int read_power_sensors(struct pf_dev_struct *pf_dev, bool *fresh)
  * @boot_device: Target boot device
  * @hdr: Pointer to populated with the header.
  *
- * Returns the stored FTP header
+ * Returns the stored FPT header
  *
  * Return: 0 on success or negative error code.
  */
@@ -1181,7 +1181,7 @@ int read_fpt_hdr(struct pf_dev_struct *pf_dev, uint8_t boot_device, struct fpt_h
  * @partition_id: The partition to set.
  * @partition: Pointer to the partition information to set.
  *
- * Sets a stored FTP partition.
+ * Sets a stored FPT partition.
  *
  * Return: 0 on success or negative error code.
  */
@@ -1240,14 +1240,14 @@ int set_fpt_partition(struct pf_dev_struct	*pf_dev,
  * @partition_id: The partition to fetch.
  * @partition: Pointer to populated with the partition information.
  *
- * Returns a stored FTP partition.
+ * Returns a stored FPT partition.
  *
  * Return: 0 on success or negative error code.
  */
 int read_fpt_partition(struct pf_dev_struct	*pf_dev,
-		       uint8_t			boot_device,
-		       uint32_t			partition_id,
-		       struct fpt_partition	*partition)
+			uint8_t			boot_device,
+			uint32_t		partition_id,
+			struct fpt_partition	*partition)
 {
 	struct sdr_repo *repo = NULL;
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # E.g. Build:
@@ -261,7 +261,7 @@ build_amc
 cat << EOF > ./build/amr_ospi_pdi.bif
 all:
 {
-    image { { type=bootimage, file=$(find ${SDT_DIR} -name '*.pdi') } }
+    image { { type=bootimage, file=$(find ${SDT_DIR} -name "*.pdi" | sort | sed -n '1p') } }
     image { id = 0x1c000000, name=rpu_subsystem, delay_handoff
             { core=r5-0, file=./build/amc.elf } }
 }

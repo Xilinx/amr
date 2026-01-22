@@ -562,7 +562,6 @@ static const char *pcConvertRepoStr[] =
     [ASDM_REPOSITORY_TYPE_BOARD_INFO]  = "BDINFO",
 };
 
-
 /******************************************************************************/
 /* Local function definition                                                  */
 /******************************************************************************/
@@ -1020,6 +1019,7 @@ static int iGetFptData( void )
              int i = 0;
 
              INC_STAT_COUNTER( ASDM_STATS_MALLOC )
+             pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][USER_PDI_POWERUP_PARTITION].ulPartitionFlags |= ulUserPdiLoadStatus;
 
              for ( i = 0; i < pxThis->pxFptHeader[APC_BOOT_DEVICE_PRIMARY].ucNumEntries; i++ )
              {
@@ -2130,7 +2130,7 @@ static int iPopulateSds( uint8_t ucIndex,
                          }
                          else
                          {
-                             /* To deal with scenario that invalid FTP header is returned -
+                             /* To deal with scenario that invalid FPT header is returned -
                              force the rest of the ASDM to be populated */
                              pxThis->pxSensorList[iRepoIndex].ucNumFound = 0;
                              iStatus = OK;
@@ -3926,7 +3926,8 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Partition flags: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulPartitionFlags );
+                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulPartitionFlags |
+                         ulUserPdiLoadStatus);
             }
             PLL_INF( ASDM_NAME, "\r\n" );
 

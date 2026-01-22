@@ -76,16 +76,16 @@
 #define FPT_HEADER_ROW_NUM_ENTRIES	(3)
 
 /* FPT partition information */
-#define NUM_PARTITION_COLS			(5)
-#define PARTITION_COL_ID			(0)
-#define PARTITION_COL_TYPE			(1)
-#define PARTITION_COL_ADDR			(2)
-#define PARTITION_COL_SIZE			(3)
-#define PARTITION_COL_FLAGS			(4)
+#define PARTITION_COL_ID		(0)
+#define PARTITION_COL_TYPE		(1)
+#define PARTITION_COL_ADDR		(2)
+#define PARTITION_COL_SIZE		(3)
+#define PARTITION_COL_LOAD		(4) /* Power on load user partition */
+#define PARTITION_COL_STATUS		(5) /* Power on load user partition status */
+#define NUM_PARTITION_COLS		(6)
 
 /* Manufacturing info */
-#define NUM_MFG_INFO_ROWS			(17)
-#define NUM_MFG_INFO_COLS			(2)
+#define NUM_MFG_INFO_COLS		(2)
 #define MFG_INFO_HEADER_INFO		(0)
 #define MFG_INFO_EEPROM_VERSION		(0)
 #define MFG_INFO_PRODUCT_NAME		(1)
@@ -97,23 +97,24 @@
 #define MFG_INFO_CONFIG_MODE		(7)
 #define MFG_INFO_MAX_POWER_MODE		(8)
 #define MFG_INFO_ACTIVE_STATE		(9)
-#define MFG_INFO_MANUFACTURING_DATE (10)
-#define MFG_INFO_UUID				(11)
-#define MFG_INFO_PCIE_ID			(12)
-#define MFG_INFO_OEM_ID				(13)
-#define MFG_INFO_CAPABILITY			(14)
-#define MFG_INFO_PART_NUM			(15)
+#define MFG_INFO_MANUFACTURING_DATE	(10)
+#define MFG_INFO_UUID			(11)
+#define MFG_INFO_PCIE_ID		(12)
+#define MFG_INFO_OEM_ID			(13)
+#define MFG_INFO_CAPABILITY		(14)
+#define MFG_INFO_PART_NUM		(15)
 #define MFG_INFO_MFG_PART_NUM		(16)
+#define NUM_MFG_INFO_ROWS		(17)
 
-#define MFG_OEM_ID_BASE				(16)
-#define MFG_TIMESTAMP_BASE			(10)
-#define MFG_DATE_TM_YEAR			(1996 - 1900)
+#define MFG_OEM_ID_BASE			(16)
+#define MFG_TIMESTAMP_BASE		(10)
+#define MFG_DATE_TM_YEAR		(1996 - 1900)
 #define FPGA_CONFIG_MODE_QSPIX4		(7)
 #define FPGA_CONFIG_MODE_OSPI		(8)
-#define MAX_POWER_MODE_75W			(0)
-#define MAX_POWER_MODE_150W			(1)
-#define MAX_POWER_MODE_225W			(2)
-#define MAX_POWER_MODE_350W			(3)
+#define MAX_POWER_MODE_75W		(0)
+#define MAX_POWER_MODE_150W		(1)
+#define MAX_POWER_MODE_225W		(2)
+#define MAX_POWER_MODE_350W		(3)
 
 #define NOT_APPLICABLE_FIELD		"N/A"
 
@@ -537,8 +538,12 @@ static int populate_partition_header(ami_device *dev, char **header,
 				sprintf(header[i], "%s", "Size");
 				break;
 
-			case PARTITION_COL_FLAGS:
-				sprintf(header[i], "%s", "Flags");
+			case PARTITION_COL_LOAD:
+				sprintf(header[i], "%s", "Power-up Load");
+				break;
+
+			case PARTITION_COL_STATUS:
+				sprintf(header[i], "%s", "Status");
 				break;
 
 			default:
@@ -585,8 +590,26 @@ static int construct_partition_row(struct ami_fpt_partition *part, int part_num,
 				sprintf(row[col], "0x%08x", part->size);
 				break;
 
-			case PARTITION_COL_FLAGS:
-				sprintf(row[col], "0x%08x", part->flags);
+			case PARTITION_COL_LOAD:
+				if (part->type == AMI_FPT_TYPE_PDI_USER) {
+					sprintf(row[col], "%s",
+					    part->user.powerup_flag ? "On" : "Off");
+				} else {
+					sprintf(row[col], "%s", "N/A");
+				}
+				break;
+
+			case PARTITION_COL_STATUS:
+				if (part->type == AMI_FPT_TYPE_PDI_USER) {
+					if (part->user.powerup_error == 0)
+						sprintf(row[col], "%s", "Not Loaded");
+					else if (part->user.powerup_error == 1)
+						sprintf(row[col], "%s", "Loaded");
+					else
+						sprintf(row[col], "%s", "Error");
+				} else {
+					sprintf(row[col], "%s", "N/A");
+				}
 				break;
 
 			default:
@@ -644,13 +667,28 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 				);
 				break;
 
-			case PARTITION_COL_FLAGS:
-				json_append_member(
-					row,
-					"flags",
-					json_mknumber(part->flags)
-				);
+			case PARTITION_COL_LOAD:
+				if (part->type == AMI_FPT_TYPE_PDI_USER) {
+					json_append_member(row, "Power-up Load", json_mkstring(
+						part->user.powerup_flag ? "Enabled" : "Disabled"));
+				} else {
+					json_append_member(row, "Power-up Load", json_mkstring("N/A"));
+				}
 				break;
+
+			case PARTITION_COL_STATUS:
+				if (part->type == AMI_FPT_TYPE_PDI_USER) {
+					if (part->user.powerup_error == 0)
+						json_append_member(row, "status", json_mkstring("Not Loaded"));
+					else if (part->user.powerup_error == 1)
+						json_append_member(row, "status", json_mkstring("Loaded"));
+					else
+						json_append_member(row, "status", json_mkstring("Error"));
+				} else {
+					json_append_member(row, "status", json_mkstring("N/A"));
+				}
+				break;
+
 			default:
 				break;
 		}
@@ -1890,65 +1928,65 @@ int print_fpt_info(ami_device *dev, uint8_t boot_device, struct app_option *opti
 
 	/* print partition information */
 	ret = print_table_data(
-		dev,
-		NUM_PARTITION_COLS,
-		hdr.num_entries,
-		(format == APP_OUT_FORMAT_TABLE) ? (stream) : (NULL),
-		TABLE_DIVIDER_HEADER_ONLY,
-		&populate_partition_values,
-		&populate_partition_header,
-		&boot_device,
-		NULL
-	);
+			dev,
+			NUM_PARTITION_COLS,
+			hdr.num_entries,
+			(format == APP_OUT_FORMAT_TABLE) ? (stream) : (NULL),
+			TABLE_DIVIDER_HEADER_ONLY,
+			&populate_partition_values,
+			&populate_partition_header,
+			&boot_device,
+			NULL
+		);
 
 	/* Write to file */
 	if (stream && (ret != EXIT_FAILURE) && (format != APP_OUT_FORMAT_TABLE)) {
 		switch (format) {
-		case APP_OUT_FORMAT_JSON:
-		{
-			JsonNode *h = NULL;
-			JsonNode *p = NULL;
+			case APP_OUT_FORMAT_JSON:
+			{
+				JsonNode *h = NULL;
+				JsonNode *p = NULL;
 
-			ret = gen_json_data(
-				dev,
-				NUM_FPT_HEADER_COLS,
-				NUM_FPT_HEADER_ROWS,
-				&populate_fpt_values,
-				&hdr,
-				&h
-			);
-
-			if (ret == EXIT_SUCCESS) {
 				ret = gen_json_data(
 					dev,
-					NUM_PARTITION_COLS,
-					hdr.num_entries,
-					&populate_partition_values,
-					&boot_device,
-					&p
+					NUM_FPT_HEADER_COLS,
+					NUM_FPT_HEADER_ROWS,
+					&populate_fpt_values,
+					&hdr,
+					&h
 				);
 
 				if (ret == EXIT_SUCCESS) {
-					JsonNode *parent = NULL;
+					ret = gen_json_data(
+						dev,
+						NUM_PARTITION_COLS,
+						hdr.num_entries,
+						&populate_partition_values,
+						&boot_device,
+						&p
+					);
 
-					parent = json_mkobject();
-					json_append_member(parent, "header", h);
-					json_append_member(parent, "partitions", p);
+					if (ret == EXIT_SUCCESS) {
+						JsonNode *parent = NULL;
 
-					print_json_obj(parent, stream);
-					json_delete(parent);
+						parent = json_mkobject();
+						json_append_member(parent, "header", h);
+						json_append_member(parent, "partitions", p);
+
+						print_json_obj(parent, stream);
+						json_delete(parent);
+					} else {
+						APP_ERROR("could not create partition json");
+					}
 				} else {
-					APP_ERROR("could not create partition json");
+					APP_ERROR("could not create FPT header json");
 				}
-			} else {
-				APP_ERROR("could not create FPT header json");
+				break;
 			}
-			break;
-		}
 
-		default:
-			APP_ERROR("invalid output format");
-			break;
+			default:
+				APP_ERROR("invalid output format");
+				break;
 		}
 	}
 

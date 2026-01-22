@@ -15,6 +15,13 @@
 #include "fw_if.h"
 #include "xloader_client.h"
 
+/* PDI Load on Power-up Configuration */
+#define USER_PDI_POWERUP_BOOT_DEVICE   ( 0 ) /* 0 = Primary (OSPI), 1 = Secondary */
+#define USER_PDI_POWERUP_PARTITION     ( 2 )
+#define USER_PDI_POWERUP_FLAG          ( 1 << 0 )    /* User PDI power on load flag */
+#define USER_PDI_POWERUP_NOT_LOADED    ( 0x0 << 16 ) /* Power on load user partition not loaded */
+#define USER_PDI_POWERUP_LOADED        ( 0x1 << 16 ) /* Power on load user partition loaded */
+#define USER_PDI_POWERUP_ERROR         ( 0x2 << 16 ) /* Power on load user partition error */
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -87,10 +94,21 @@ typedef struct
     uint32_t    ulPartitionType;
     uint32_t    ulPartitionBaseAddr;
     uint32_t    ulPartitionSize;
-    uint32_t    ulPartitionFlags;
+    union {
+        uint32_t ulPartitionFlags;     /* User defined flags */
+        struct {
+            uint32_t powerup_flag:1;    /* Power on load user partition flag
+                                           0: Disabled, 1: Enabled */
+            uint32_t reserved1:15;      /* Reserved for future use */
+            uint32_t powerup_error:2;   /* Power on load user partition error flag
+                                           0: Not Loaded, 1: Loaded, 2: Error */
+            uint32_t reserved2:15;      /* Reserved for future use */
+        } user;
+    };
 
 } APCProxyDriverFptPartition;
 
+extern uint32_t ulUserPdiLoadStatus;    /* User PDI power on load status 0: Success */
 
 /******************************************************************************/
 /* Function declarations                                                      */

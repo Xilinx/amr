@@ -792,7 +792,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
                             (int)xFptFlagsRequest.ulPartitionId,
                             &xPartition ))
                     {
-                        ulFlagsValue = xPartition.ulPartitionFlags;
+                        ulFlagsValue = xPartition.ulPartitionFlags | ulUserPdiLoadStatus;
                         PLL_DBG( IN_BAND_NAME, "FPT Partition %d flags read: 0x%08X\r\n",
                                  xFptFlagsRequest.ulPartitionId, ulFlagsValue );
                     }
