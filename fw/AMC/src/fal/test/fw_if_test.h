@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This header file contains the FW IF test interface definitions.
@@ -9,10 +9,6 @@
 
 #ifndef _FW_IF_TEST_H_
 #define _FW_IF_TEST_H_
-
-/*****************************************************************************/
-/* includes                                                                  */
-/*****************************************************************************/
 
 #include "fw_if.h"
 
@@ -32,7 +28,7 @@
  * @enum    FW_IF_TEST_IOCTRL_OPTION
  * @brief   ioctrl options for test interfaces (generic across all test interfaces)
  */
-typedef enum _FW_IF_TEST_IOCTRL_OPTIONS
+typedef enum
 {
     FW_IF_TEST_IOCTRL_ENABLE_DEBUG_PRINT = MAX_FW_IF_COMMON_IOCTRL_OPTION,
     FW_IF_TEST_IOCTRL_DISABLE_DEBUG_PRINT,
@@ -52,27 +48,27 @@ typedef enum _FW_IF_TEST_IOCTRL_OPTIONS
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_TEST_INIT_CFG
+ * @struct  FWIfTestInitCfg
  * @brief   config options for test initialisation (generic across all test interfaces)
  */
-typedef struct _FW_IF_TEST_INIT_CFG
+typedef struct
 {
-    uint32_t        driverId;
-    char            *driverName;
-    int             debugPrint;
+    uint32_t  driverId;
+    char      *driverName;
+    int       debugPrint;
 
-} FW_IF_TEST_INIT_CFG;
+} FWIfTestInitCfg;
 
 /**
- * @struct  FW_IF_TEST_CFG
+ * @struct  FWIfTestCfg
  * @brief   config options for test interfaces (generic across all test interfaces)
  */
-typedef struct _FW_IF_TEST_CFG
+typedef struct
 {
-    uint32_t        ifId;
-    char            *ifName;
+    uint32_t  ifId;
+    char      *ifName;
 
-} FW_IF_TEST_CFG;
+} FWIfTestCfg;
 
 
 /*****************************************************************************/
@@ -86,7 +82,7 @@ typedef struct _FW_IF_TEST_CFG
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t FW_IF_test_init( FW_IF_TEST_INIT_CFG *pxCfg );
+extern uint32_t FW_IF_test_init( FWIfTestInitCfg *pxCfg );
 
 /**
  * @brief   creates an instance of the test interface
@@ -96,6 +92,6 @@ extern uint32_t FW_IF_test_init( FW_IF_TEST_INIT_CFG *pxCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t FW_IF_test_create( FW_IF_CFG *pxFwIf, FW_IF_TEST_CFG *pxTestCfg );
+extern uint32_t FW_IF_test_create( FWIfCfg *pxFwIf, FWIfTestCfg *pxTestCfg );
 
 #endif /* _FW_IF_TEST_H_ */

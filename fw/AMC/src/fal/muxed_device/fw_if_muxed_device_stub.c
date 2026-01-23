@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF QSFP Stub abstraction.
  *
  * @file fw_if_qsfp_stub.c
  */
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -22,40 +18,39 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define FW_IF_QSFP_NAME             "FW_IF_QSFP"
+#define FW_IF_QSFP_NAME   "FW_IF_QSFP"
 
-#define QSFP_UPPER_FIREWALL         ( 0xBEEFCAFE )
-#define QSFP_LOWER_FIREWALL         ( 0xDEADFACE )
+#define CHECK_DRIVER            if( FW_IF_FALSE == pxThis->iInitialised )
+                                    return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
+#define CHECK_FIREWALLS( f )    if( ( UPPER_FIREWALL != f->upperFirewall ) &&        \
+                                    ( LOWER_FIREWALL != f->lowerFirewall ) &&        \
+                                    ( UPPER_FIREWALL != pxThis->ulUpperFirewall ) && \
+                                    ( LOWER_FIREWALL != pxThis->ulLowerFirewall ) ) \
+                                        return FW_IF_ERRORS_INVALID_HANDLE
 
-#define CHECK_DRIVER                if( FW_IF_FALSE == pxThis->iInitialised ) return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
-#define CHECK_FIREWALLS( f )        if( ( QSFP_UPPER_FIREWALL != f->upperFirewall ) &&        \
-                                        ( QSFP_LOWER_FIREWALL != f->lowerFirewall ) &&        \
-                                        ( QSFP_UPPER_FIREWALL != pxThis->ulUpperFirewall ) && \
-                                        ( QSFP_LOWER_FIREWALL != pxThis->ulLowerFirewall ) ) return FW_IF_ERRORS_INVALID_HANDLE
-
-#define CHECK_HDL( f )              if( NULL == f ) return FW_IF_ERRORS_INVALID_HANDLE
-#define CHECK_CFG( f )              if( NULL == ( f )->cfg  ) return FW_IF_ERRORS_INVALID_CFG
+#define CHECK_HDL( f )          if( NULL == f ) return FW_IF_ERRORS_INVALID_HANDLE
+#define CHECK_CFG( f )          if( NULL == ( f )->cfg  ) return FW_IF_ERRORS_INVALID_CFG
 
 /* Stat & Error definitions */
-#define FW_IF_QSFP_STATS( DO )   \
-    DO( FW_IF_QSFP_STATS_INIT_OVERALL_COMPLETE )         \
-    DO( FW_IF_QSFP_STATS_INSTANCE_CREATE )               \
+#define FW_IF_QSFP_STATS( DO )                    \
+    DO( FW_IF_QSFP_STATS_INIT_OVERALL_COMPLETE )  \
+    DO( FW_IF_QSFP_STATS_INSTANCE_CREATE )        \
     DO( FW_IF_QSFP_STATS_MAX )
 
-#define FW_IF_QSFP_ERRORS( DO )    \
-    DO( FW_IF_QSFP_STATS_INSTANCE_CREATE_FAILED )        \
-    DO( FW_IF_QSFP_ERRORS_VALIDATION_FAILED )            \
+#define FW_IF_QSFP_ERRORS( DO )                   \
+    DO( FW_IF_QSFP_STATS_INSTANCE_CREATE_FAILED ) \
+    DO( FW_IF_QSFP_ERRORS_VALIDATION_FAILED )     \
     DO( FW_IF_QSFP_ERRORS_MAX )
 
-#define PRINT_STAT_COUNTER( x )             PLL_INF( FW_IF_QSFP_NAME, "%50s . . . . %d\r\n",          \
-                                                     FW_IF_QSFP_STATS_STR[ x ],      \
-                                                     pxThis->ulStatCounters[ x ] )
-#define PRINT_ERROR_COUNTER( x )            PLL_INF( FW_IF_QSFP_NAME, "%50s . . . . %d\r\n",          \
-                                                     FW_IF_QSFP_ERRORS_STR[ x ],     \
-                                                     pxThis->ulErrorCounters[ x ] )
+#define PRINT_STAT_COUNTER( x )   PLL_INF( FW_IF_QSFP_NAME, "%50s . . . . %d\r\n", \
+                                           FW_IF_QSFP_STATS_STR[ x ],              \
+                                           pxThis->ulStatCounters[ x ] )
+#define PRINT_ERROR_COUNTER( x )  PLL_INF( FW_IF_QSFP_NAME, "%50s . . . . %d\r\n", \
+                                           FW_IF_QSFP_ERRORS_STR[ x ],             \
+                                           pxThis->ulErrorCounters[ x ] )
 
-#define INC_STAT_COUNTER( x )               { if( x < FW_IF_QSFP_STATS_MAX )pxThis->ulStatCounters[ x ]++; }
-#define INC_ERROR_COUNTER( x )              { if( x < FW_IF_QSFP_ERRORS_MAX )pxThis->ulErrorCounters[ x ]++; }
+#define INC_STAT_COUNTER( x )     { if( x < FW_IF_QSFP_STATS_MAX )pxThis->ulStatCounters[ x ]++; }
+#define INC_ERROR_COUNTER( x )    { if( x < FW_IF_QSFP_ERRORS_MAX )pxThis->ulErrorCounters[ x ]++; }
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -79,39 +74,40 @@ UTIL_MAKE_ENUM_AND_STRINGS( FW_IF_QSFP_ERRORS, FW_IF_QSFP_ERRORS, FW_IF_QSFP_ERR
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_QSFP_PRIVATE_DATA
+ * @struct  FWIfQsfpPRIVATE_DATA
  * @brief   Structure to hold this FAL's private data
  */
-typedef struct FW_IF_QSFP_PRIVATE_DATA
+typedef struct
 {
-    uint32_t                        ulUpperFirewall;
+    uint32_t               ulUpperFirewall;
 
-    FW_IF_MUXED_DEVICE_INIT_CFG     xLocalCfg;
-    int                             iInitialised;
-    uint32_t                        ulStatCounters[ FW_IF_QSFP_STATS_MAX ];
-    uint32_t                        ulErrorCounters[ FW_IF_QSFP_ERRORS_MAX ];
-    int                             iDebugPrint;
+    FWIfMuxedDeviceInitCfg xLocalCfg;
+    int                    iInitialised;
+    uint32_t               ulStatCounters[ FW_IF_QSFP_STATS_MAX ];
+    uint32_t               ulErrorCounters[ FW_IF_QSFP_ERRORS_MAX ];
+    int                    iDebugPrint;
 
-    uint32_t                        ulLowerFirewall;
+    uint32_t               ulLowerFirewall;
 
-} FW_IF_QSFP_PRIVATE_DATA;
+} FWIfQsfpPRIVATE_DATA;
 
 
 /*****************************************************************************/
 /* local variables                                                           */
 /*****************************************************************************/
 
-static FW_IF_QSFP_PRIVATE_DATA xLocalData =
+static FWIfQsfpPRIVATE_DATA xLocalData =
 {
-    QSFP_UPPER_FIREWALL,    /* ulUpperFirewall */
-    { 0 },                  /* xLocalCfg       */
-    FW_IF_FALSE,            /* iInitialised    */
-    { 0 },                  /* ulStatCounters  */
-    { 0 },                  /* ulErrorCounters */
-    FW_IF_FALSE,            /* iDebugPrint     */
-    QSFP_LOWER_FIREWALL     /* ulLowerFirewall */
+    UPPER_FIREWALL, /* ulUpperFirewall */
+    { 0 },          /* xLocalCfg       */
+    FW_IF_FALSE,    /* iInitialised    */
+    { 0 },          /* ulStatCounters  */
+    { 0 },          /* ulErrorCounters */
+    FW_IF_FALSE,    /* iDebugPrint     */
+    LOWER_FIREWALL  /* ulLowerFirewall */
 };
-static FW_IF_QSFP_PRIVATE_DATA *pxThis = &xLocalData;
+
+static FWIfQsfpPRIVATE_DATA *pxThis = &xLocalData;
 
 
 /*****************************************************************************/
@@ -125,7 +121,7 @@ static uint32_t ulQsfpOpen( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -152,7 +148,7 @@ static uint32_t ulQsfpClose( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -178,7 +174,7 @@ static uint32_t ulQsfpWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -207,7 +203,7 @@ static uint32_t ulQsfpRead( void *pvFwIf, uint64_t ullSrcPort, uint8_t *pucData,
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -237,7 +233,7 @@ static uint32_t ulQsfpIoctrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -297,7 +293,7 @@ static uint32_t ulQsfpBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -331,7 +327,7 @@ static uint32_t ulQsfpBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 /**
  * @brief   initialisation function for QSFP interfaces (generic across all QSFP interfaces)
  */
-uint32_t ulFW_IF_MUXED_DEVICE_Init( FW_IF_MUXED_DEVICE_INIT_CFG *pxInitCfg )
+uint32_t ulFW_IF_MUXED_DEVICE_Init( FWIfMuxedDeviceInitCfg *pxInitCfg )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
@@ -348,7 +344,7 @@ uint32_t ulFW_IF_MUXED_DEVICE_Init( FW_IF_MUXED_DEVICE_INIT_CFG *pxInitCfg )
         /*
          * Initilise config data shared between all QSFPs.
          */
-        pvOSAL_MemCpy( &pxThis->xLocalCfg, pxInitCfg, sizeof( FW_IF_MUXED_DEVICE_INIT_CFG ) );
+        pvOSAL_MemCpy( &pxThis->xLocalCfg, pxInitCfg, sizeof(FWIfMuxedDeviceInitCfg) );
         pxThis->iInitialised = FW_IF_TRUE;
         INC_STAT_COUNTER( FW_IF_QSFP_STATS_INIT_OVERALL_COMPLETE )
     }
@@ -359,7 +355,7 @@ uint32_t ulFW_IF_MUXED_DEVICE_Init( FW_IF_MUXED_DEVICE_INIT_CFG *pxInitCfg )
 /**
  * @brief   creates an instance of the QSFP interface
  */
-uint32_t ulFW_IF_MUXED_DEVICE_Create( FW_IF_CFG *pxFwIf, FW_IF_MUXED_DEVICE_CFG *pxQsfpCfg )
+uint32_t ulFW_IF_MUXED_DEVICE_Create( FWIfCfg *pxFwIf, FW_IF_MUXED_DEVICE_CFG *pxQsfpCfg )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
@@ -367,9 +363,9 @@ uint32_t ulFW_IF_MUXED_DEVICE_Create( FW_IF_CFG *pxFwIf, FW_IF_MUXED_DEVICE_CFG 
 
     if( ( NULL != pxFwIf ) && ( NULL != pxQsfpCfg ) )
     {
-        FW_IF_CFG xLocalIf =
+        FWIfCfg xLocalIf =
         {
-            .upperFirewall  = QSFP_UPPER_FIREWALL,
+            .upperFirewall  = UPPER_FIREWALL,
             .open           = &ulQsfpOpen,
             .close          = &ulQsfpClose,
             .write          = &ulQsfpWrite,
@@ -377,10 +373,10 @@ uint32_t ulFW_IF_MUXED_DEVICE_Create( FW_IF_CFG *pxFwIf, FW_IF_MUXED_DEVICE_CFG 
             .ioctrl         = &ulQsfpIoctrl,
             .bindCallback   = &ulQsfpBindCallback,
             .cfg            = ( void* )pxQsfpCfg,
-            .lowerFirewall  = QSFP_LOWER_FIREWALL
+            .lowerFirewall  = LOWER_FIREWALL
         };
 
-        pvOSAL_MemCpy( pxFwIf, &xLocalIf, sizeof( FW_IF_CFG ) );
+        pvOSAL_MemCpy( pxFwIf, &xLocalIf, sizeof( FWIfCfg ) );
         INC_STAT_COUNTER( FW_IF_QSFP_STATS_INSTANCE_CREATE );
         PLL_DBG( FW_IF_QSFP_NAME, "ulFW_IF_MUXED_DEVICE_Create\r\n" );
     }

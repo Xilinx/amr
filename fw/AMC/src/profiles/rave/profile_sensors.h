@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the sensors profile for the Rave
@@ -116,7 +116,7 @@ static inline int iSensorIsEnabled( void )
 /* Public variables                                                           */
 /******************************************************************************/
 
-ASC_PROXY_DRIVER_SENSOR_DATA PROFILE_SENSORS_SENSOR_DATA[ PROFILE_SENSORS_NUM_SENSORS ] =
+ASCProxyDriverSensorData PROFILE_SENSORS_SENSOR_DATA[ PROFILE_SENSORS_NUM_SENSORS ] =
 {
     { "FPGA_Temp", FPGA_DEVICE_ID, ASC_PROXY_DRIVER_SENSOR_BITFIELD_TEMPERATURE, FALSE, 0,
       { 0, ASC_SENSOR_I2C_BUS_INVALID, ASC_SENSOR_I2C_BUS_INVALID, ASC_SENSOR_I2C_BUS_INVALID }, iSensorIsEnabled,

@@ -10,10 +10,6 @@
 #ifndef _ASDM_H_
 #define _ASDM_H_
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "util.h"
 
 
@@ -34,7 +30,7 @@
  * @enum    ASDM_API_ID_TYPE
  * @brief   is a unique number that represents API ID type
  */
-typedef enum ASDM_API_ID_TYPE
+typedef enum
 {
     ASDM_API_ID_TYPE_GET_SDR_SIZE           = 1,
     ASDM_API_ID_TYPE_GET_SDR                = 2,
@@ -53,7 +49,7 @@ typedef enum ASDM_API_ID_TYPE
  * @enum    ASDM_REPOSITORY_TYPE
  * @brief   is a unique number that represents each repo type
  */
-typedef enum ASDM_REPOSITORY_TYPE
+typedef enum
 {
     ASDM_REPOSITORY_TYPE_BOARD_INFO  = 0xC0,
     ASDM_REPOSITORY_TYPE_TEMP        = 0xC1,
@@ -71,7 +67,7 @@ typedef enum ASDM_REPOSITORY_TYPE
  * @enum    ASDM_SDR_COMPLETION_CODE
  * @brief   the request completion code
  */
-typedef enum ASDM_SDR_COMPLETION_CODE
+typedef enum
 {
     ASDM_SDR_COMPLETION_CODE_NOT_AVAILABLE = 0x00,
     ASDM_SDR_COMPLETION_CODE_OPERATION_SUCCESS,

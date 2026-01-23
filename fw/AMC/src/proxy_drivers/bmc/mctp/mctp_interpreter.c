@@ -1,16 +1,11 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the MCTP Interpreter functionality
  *
  * @file pldm_mctp_interpreter.c
  */
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <stdint.h>
 #include <stddef.h>
@@ -76,19 +71,19 @@ extern int iResponseDataWrite( uint8_t *pucData, uint16_t usDataSize );
 /******************************************************************************/
 
 /**
- * @enum    OoB_RequestType
+ * @enum    OOB_REQUEST_TYPE
  * @brief   Possible Out Of Bound request types
  */
-typedef enum OoB_RequestType
+typedef enum
 {
-    OoB_REQ_TYPE_UNKNOWN        = ( 0x0 ),
-    OoB_REQ_TYPE_FRU_ONLY       = ( 0x1 ),
-    OoB_REQ_TYPE_SMBUS_DEFAULT  = ( 0x2 ),
-    OoB_REQ_TYPE_SMBUS_STANDARD = ( 0x3 ),
-    OoB_REQ_TYPE_PLDM_MCTP      = ( 0x4 ),
+    OoB_REQ_TYPE_UNKNOWN        = 0x0,
+    OoB_REQ_TYPE_FRU_ONLY       = 0x1,
+    OoB_REQ_TYPE_SMBUS_DEFAULT  = 0x2,
+    OoB_REQ_TYPE_SMBUS_STANDARD = 0x3,
+    OoB_REQ_TYPE_PLDM_MCTP      = 0x4,
     MAX_OoB_REQ_TYPE
 
-} OoB_RequestType;
+} OOB_REQUEST_TYPE;
 
 /**
  * @brief   Send response to MCTP message
@@ -150,8 +145,8 @@ void process_pmci_request( int i2cSlaveReadCount )
     uint8_t  saved_byte   = 0U;
     uint8_t  byte_count   = 0U;
 
-    mctp_message *req  = ( mctp_message * ) ReqBuffer;
-    mctp_message *resp = ( mctp_message * ) RespBuffer;
+    mctp_message *req  = ( mctp_message * )ReqBuffer;
+    mctp_message *resp = ( mctp_message * )RespBuffer;
 
     uint8_t         SOM               = req->som;
     uint8_t         EOM               = ( req->eom ) << 1;
@@ -185,7 +180,7 @@ void process_pmci_request( int i2cSlaveReadCount )
      * Add the slave address.
      */
     /* This is the address we set our SMBus up with */
-    req->dest_slave_addr = ( 0x18 << 1 );
+    req->dest_slave_addr = 0x18 << 1;
 
 #if defined( SPDM_DEBUG )
     /*

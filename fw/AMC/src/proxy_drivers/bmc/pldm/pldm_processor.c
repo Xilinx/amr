@@ -1,16 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains PLDM enums, structures and functions
  *
  * @file pldm_processor.c
  */
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <unistd.h>
 #include "pldm.h"
@@ -484,13 +479,13 @@ int pldm_cmd_GetSensorReading( const void *PayLoadIn, void *PayLoadOut )
  */
 int pldm_cmd_GetPDRRepositoryInfo( const void *PayLoadIn, void *PayLoadOut )
 {
-    int response_size                   = 0;
-    const PDR_RepositoryInfo *repo_info = getPDRRepository();
+    int response_size                  = 0;
+    const PDRRepositoryInfo *repo_info = getPDRRepository();
 
     struct __attribute__ ( ( __packed__ ) )
     {
         uint8_t   CompletionCode;
-        enum8_t   repositoryState;
+        uint8_t   repositoryState;
         TimeStamp updateTime;
         TimeStamp OEMUpdateTime;
         uint32_t  recordCount;
@@ -528,8 +523,8 @@ int pldm_cmd_GetPDRRepositoryInfo( const void *PayLoadIn, void *PayLoadOut )
  */
 int pldm_cmd_GetPDR( const void *PayLoadIn, void *PayLoadOut )
 {
-    int response_size                   = 0;
-    const PDR_RepositoryInfo *repo_info = getPDRRepository();
+    int response_size                  = 0;
+    const PDRRepositoryInfo *repo_info = getPDRRepository();
     const CommonPDRFormat    *current_record;
     uint32_t                 record_handle = 0;
     uint8_t                  *data;

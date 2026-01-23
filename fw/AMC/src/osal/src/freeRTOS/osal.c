@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the (OSAL) API implementation for FreeRTOS.
  *
  * @file osal_FreeRTOS.c
  */
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 
 /* Standard includes */
 #include <stdio.h>
@@ -62,18 +58,18 @@
 /*****************************************************************************/
 
 /**
- * @struct OSAL_TASK_MEMORY
+ * @struct OSALTaskMemory
  *
  * @brief Struct to store task's stack, TCB (Task control block) and handle.
  *        Used for static task allocation.
  */
-typedef struct OSAL_TASK_MEMORY
+typedef struct
 {
     StackType_t xStack[ OSAL_TASK_MAX_STACK_SIZE ];
     StaticTask_t xTcb;
     TaskHandle_t xTaskHandle;
 
-} OSAL_TASK_MEMORY;
+} OSALTaskMemory;
 
 
 /*****************************************************************************/
@@ -90,15 +86,15 @@ static void *pvStrNCpySemHandle   = NULL;
 static void *pvMemCmpSemHandle    = NULL;
 static void *pvMemMoveSemHandle   = NULL;
 
-static OSAL_TASK_MEMORY xTaskMemoryPool[ OSAL_MAX_TASKS ] = { 0 };
-static BaseType_t xTaskMemoryUsed[ OSAL_MAX_TASKS ]       = { 0 }; /* 0 - unused, 1 - used */
+static OSALTaskMemory xTaskMemoryPool[ OSAL_MAX_TASKS ] = { 0 };
+static BaseType_t xTaskMemoryUsed[ OSAL_MAX_TASKS ]     = { 0 }; /* 0 - unused, 1 - used */
 
 
 /*****************************************************************************/
 /* Debug stats structs                                                       */
 /*****************************************************************************/
 
-typedef struct OSAL_TASK_STATS_LINKED_LIST
+typedef struct OSALTaskStatsLinkedList
 {
     void* pvTask;
     char* pcName;
@@ -107,33 +103,33 @@ typedef struct OSAL_TASK_STATS_LINKED_LIST
     uint32_t ulTaskPriority;
     uint16_t usTaskStackWaterMark;
     uint32_t ulCpuUsagePercentage;
-    struct OSAL_TASK_STATS_LINKED_LIST* pxNext;
+    struct OSALTaskStatsLinkedList* pxNext;
 
-} OSAL_TASK_STATS_LINKED_LIST;
+} OSALTaskStatsLinkedList;
 
-typedef struct OSAL_SEM_STATS_LINKED_LIST
+typedef struct OSALSemStatsLinkedList
 {
     void* pvSem;
     char* pcName;
     int iPostCount;
     int iPendCount;
     char* pcStatus;
-    struct OSAL_SEM_STATS_LINKED_LIST* pxNext;
+    struct OSALSemStatsLinkedList* pxNext;
 
-} OSAL_SEM_STATS_LINKED_LIST;
+} OSALSemStatsLinkedList;
 
-typedef struct OSAL_MUTEX_STATS_LINKED_LIST
+typedef struct OSALMutexStatsLinkedList
 {
     void* pvMutex;
     char* pcName;
     int iTakeCount;
     int iReleaseCount;
     char* pcStatus;
-    struct OSAL_MUTEX_STATS_LINKED_LIST* pxNext;
+    struct OSALMutexStatsLinkedList* pxNext;
 
-} OSAL_MUTEX_STATS_LINKED_LIST;
+} OSALMutexStatsLinkedList;
 
-typedef struct OSAL_MBOX_STATS_LINKED_LIST
+typedef struct OSALMboxStatsLinkedList
 {
     void* pvMailbox;
     char* pcName;
@@ -143,22 +139,22 @@ typedef struct OSAL_MBOX_STATS_LINKED_LIST
     int iRxCount;
     int iItemCount;
     char* pcStatus;
-    struct OSAL_MBOX_STATS_LINKED_LIST* pxNext;
+    struct OSALMboxStatsLinkedList* pxNext;
 
-} OSAL_MBOX_STATS_LINKED_LIST;
+} OSALMboxStatsLinkedList;
 
-typedef struct OSAL_EVENT_STATS_LINKED_LIST
+typedef struct OSALEventStatsLinkedList
 {
     void* pvEvent;
     char* pcName;
     uint32_t ulFlagWait;
     uint32_t ulFlagSet;
-    char* pcStatus;
-    struct OSAL_EVENT_STATS_LINKED_LIST* pxNext;
+    char*  pcStatus;
+    struct OSALEventStatsLinkedList* pxNext;
 
-} OSAL_EVENT_STATS_LINKED_LIST;
+} OSALEventStatsLinkedList;
 
-typedef struct OSAL_TIMER_STATS_LINKED_LIST
+typedef struct OSALTimerStatsLinkedList
 {
     void* pvTimer;
     char* pcName;
@@ -166,26 +162,39 @@ typedef struct OSAL_TIMER_STATS_LINKED_LIST
     uint32_t ulDurationMs;
     int iRunCount;
     char* pcStatus;
-    struct OSAL_TIMER_STATS_LINKED_LIST* pxNext;
+    struct OSALTimerStatsLinkedList* pxNext;
 
-} OSAL_TIMER_STATS_LINKED_LIST;
+} OSALTimerStatsLinkedList;
 
-typedef struct OSAL_OS_STATS
+typedef struct OSALMemoryStatsLinkedList
 {
-    struct OSAL_TASK_STATS_LINKED_LIST *pxTaskHead;
-    struct OSAL_SEM_STATS_LINKED_LIST *pxSemHead;
-    struct OSAL_MUTEX_STATS_LINKED_LIST *pxMutexHead;
-    struct OSAL_MBOX_STATS_LINKED_LIST *pxMailboxHead;
-    struct OSAL_EVENT_STATS_LINKED_LIST *pxEventHead;
-    struct OSAL_TIMER_STATS_LINKED_LIST *pxTimerHead;
-    struct OSAL_MEMORY_STATS_LINKED_LIST *pxMemHead;
+    void* pvMemory;
+    char* pcName;
+    uint32_t ulSize;
+    char* pcStatus;
+} OSALMemoryStatsLinkedList;
+
+/**
+ * @struct OSALOSStats
+ *
+ * @brief Struct to store OS stats.
+ */
+typedef struct
+{
+    struct OSALTaskStatsLinkedList   *pxTaskHead;
+    struct OSALSemStatsLinkedList    *pxSemHead;
+    struct OSALMutexStatsLinkedList  *pxMutexHead;
+    struct OSALMboxStatsLinkedList   *pxMailboxHead;
+    struct OSALEventStatsLinkedList  *pxEventHead;
+    struct OSALTimerStatsLinkedList  *pxTimerHead;
+    struct OSALMemoryStatsLinkedList *pxMemHead;
 
     int iMemAllocCallCount;
     int iMemFreeCallCount;
 
-} OSAL_OS_STATS;
+} OSALOSStats;
 
-static OSAL_OS_STATS xOsStatsHandle =
+static OSALOSStats xOsStatsHandle =
 {
     NULL,   /* pxTaskHead */
     NULL,   /* pxSemHead */
@@ -196,10 +205,10 @@ static OSAL_OS_STATS xOsStatsHandle =
     NULL,   /* pxMemHead */
 
     0,      /* iMemAllocCallCount */
-    0      /* iMemFreeCallCount */
+    0       /* iMemFreeCallCount */
 };
 
-static OSAL_OS_STATS * pxOsStatsHandle = &xOsStatsHandle;
+static OSALOSStats * pxOsStatsHandle = &xOsStatsHandle;
 
 
 /******************************************************************************/
@@ -211,54 +220,54 @@ static OSAL_OS_STATS * pxOsStatsHandle = &xOsStatsHandle;
  *
  * @param pvTaskHandle Task handle to search for.
  *
- * @return OSAL_TASK_STATS_LINKED_LIST* Linked List node that matches the given key, NULL if no match found.
+ * @return OSALTaskStatsLinkedList* Linked List node that matches the given key, NULL if no match found.
  */
-static OSAL_TASK_STATS_LINKED_LIST* pxFindTask( void* pvTaskHandle );
+static OSALTaskStatsLinkedList* pxFindTask( void* pvTaskHandle );
 
 /**
  * @brief Searches the linked list for the given key.
  *
  * @param pvSemHandle Sem handle to search for.
  *
- * @return OSAL_SEM_STATS_LINKED_LIST* Linked List node that matches the given key, NULL if no match found.
+ * @return OSALSemStatsLinkedList* Linked List node that matches the given key, NULL if no match found.
  */
-static OSAL_SEM_STATS_LINKED_LIST* pxFindSem( void* pvSemHandle );
+static OSALSemStatsLinkedList* pxFindSem( void* pvSemHandle );
 
 /**
  * @brief Searches the linked list for the given key.
  *
  * @param pvMutexHandle Mutex handle to search for.
  *
- * @return OSAL_MUTEX_STATS_LINKED_LIST* Linked List node that matches the given key, NULL if no match found.
+ * @return OSALMutexStatsLinkedList* Linked List node that matches the given key, NULL if no match found.
  */
-static OSAL_MUTEX_STATS_LINKED_LIST* pxFindMutex( void* pvMutexHandle );
+static OSALMutexStatsLinkedList* pxFindMutex( void* pvMutexHandle );
 
 /**
  * @brief Searches the linked list for the given key.
  *
  * @param pvMailboxHandle Mailbox handle to search for.
  *
- * @return OSAL_MBOX_STATS_LINKED_LIST* Linked List node that matches the given key, NULL if no match found.
+ * @return OSALMboxStatsLinkedList* Linked List node that matches the given key, NULL if no match found.
  */
-static OSAL_MBOX_STATS_LINKED_LIST* pxFindMailbox( void* pvMailboxHandle );
+static OSALMboxStatsLinkedList* pxFindMailbox( void* pvMailboxHandle );
 
 /**
  * @brief Searches the linked list for the given key.
  *
  * @param pvEventHandle Event handle to search for.
  *
- * @return OSAL_EVENT_STATS_LINKED_LIST* Linked List node that matches the given key, NULL if no match found.
+ * @return OSALEventStatsLinkedList* Linked List node that matches the given key, NULL if no match found.
  */
-static OSAL_EVENT_STATS_LINKED_LIST* pxFindEvent( void* pvEventHandle );
+static OSALEventStatsLinkedList* pxFindEvent( void* pvEventHandle );
 
 /**
  * @brief Searches the linked list for the given key.
  *
  * @param pvTimerHandle Timer handle to search for.
  *
- * @return OSAL_TIMER_STATS_LINKED_LIST* Linked List node that matches the given key, NULL if no match found.
+ * @return OSALTimerStatsLinkedList* Linked List node that matches the given key, NULL if no match found.
  */
-static OSAL_TIMER_STATS_LINKED_LIST* pxFindTimer( void* pvTimerHandle );
+static OSALTimerStatsLinkedList* pxFindTimer( void* pvTimerHandle );
 
 /**
  * @brief Prints debug stats header.
@@ -356,14 +365,14 @@ uint32_t vGetRunTimeCounterValue( void );
  *
  * @returns Pointer to a struct that holds the new tasks stack and TCB.
 */
-static OSAL_TASK_MEMORY* pxAllocateTaskMemory( void );
+static OSALTaskMemory* pxAllocateTaskMemory( void );
 
 /**
  * @brief Frees up task memory when it is no longer needed.
  *
  * @param pxMemory Pointer to the struct that needs free'd.
 */
-static void vDeallocateTaskMemory( OSAL_TASK_MEMORY* pxMemory );
+static void vDeallocateTaskMemory( OSALTaskMemory* pxMemory );
 
 
 /*****************************************************************************/
@@ -447,7 +456,7 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
         usStartTaskStackSize =  usStartTaskStackSize / sizeof( StackType_t );
 
         /* Try to allocate a stack from the memory pool */
-        OSAL_TASK_MEMORY *pxMemory = pxAllocateTaskMemory();
+        OSALTaskMemory *pxMemory = pxAllocateTaskMemory();
 
         if( NULL != pxMemory )
         {
@@ -490,7 +499,7 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
                     iStatus = OSAL_ERRORS_NONE;
 
                     /* Initialising OS struct */
-                    pxOsStatsHandle = ( OSAL_OS_STATS* ) pvPortMalloc( sizeof( OSAL_OS_STATS ) );
+                    pxOsStatsHandle = ( OSALOSStats* ) pvPortMalloc( sizeof( OSALOSStats ) );
                     if( NULL != pxOsStatsHandle )
                     {
                         pxOsStatsHandle->pxTaskHead = NULL;
@@ -505,7 +514,7 @@ int iOSAL_StartOS( int         iRoundRobinEnabled,
                         pxOsStatsHandle->iMemFreeCallCount  = 0;
 
                         /* Adding main task to linked list */
-                        OSAL_TASK_STATS_LINKED_LIST *pxNewNode = ( OSAL_TASK_STATS_LINKED_LIST* ) pvOSAL_MemAlloc( sizeof( OSAL_TASK_STATS_LINKED_LIST ) );
+                        OSALTaskStatsLinkedList *pxNewNode = ( OSALTaskStatsLinkedList* ) pvOSAL_MemAlloc( sizeof( OSALTaskStatsLinkedList ) );
                         if( NULL != pxNewNode )
                         {
                             pxNewNode->pvTask = *ppvTaskHandle;
@@ -633,7 +642,7 @@ int iOSAL_Task_Create( void**      ppvTaskHandle,
         usTaskStackSize = usTaskStackSize / sizeof( StackType_t );
 
         /* Try to allocate a stack from the memory pool */
-        OSAL_TASK_MEMORY* pxMemory = pxAllocateTaskMemory();
+        OSALTaskMemory* pxMemory = pxAllocateTaskMemory();
 
         if( NULL != pxMemory )
         {
@@ -650,7 +659,7 @@ int iOSAL_Task_Create( void**      ppvTaskHandle,
                 pxMemory->xTaskHandle = *ppvTaskHandle;
 
                 /* Add task to debug stats */
-                OSAL_TASK_STATS_LINKED_LIST *pxNewNode = ( OSAL_TASK_STATS_LINKED_LIST* ) pvOSAL_MemAlloc( sizeof( OSAL_TASK_STATS_LINKED_LIST ) );
+                OSALTaskStatsLinkedList *pxNewNode = ( OSALTaskStatsLinkedList* ) pvOSAL_MemAlloc( sizeof( OSALTaskStatsLinkedList ) );
                 if( NULL != pxNewNode )
                 {
                     pxNewNode->pvTask = *ppvTaskHandle;
@@ -696,7 +705,7 @@ int iOSAL_Task_Delete( void** ppvTaskHandle )
     if( ( NULL != ppvTaskHandle ) &&
         ( NULL != *ppvTaskHandle ) )
     {
-        OSAL_TASK_STATS_LINKED_LIST *pxCurrent = pxFindTask( *ppvTaskHandle );
+        OSALTaskStatsLinkedList *pxCurrent = pxFindTask( *ppvTaskHandle );
 
         if( NULL != pxCurrent)
         {
@@ -704,7 +713,7 @@ int iOSAL_Task_Delete( void** ppvTaskHandle )
         }
 
         TaskHandle_t xTaskToDelete = ( TaskHandle_t )*ppvTaskHandle;
-        OSAL_TASK_MEMORY* pxMemory = NULL;
+        OSALTaskMemory* pxMemory = NULL;
 
         for( int i = 0; i < OSAL_MAX_TASKS; i++ )
         {
@@ -745,7 +754,7 @@ int iOSAL_Task_Suspend( void* pvTaskHandle )
     {
         vTaskSuspend( ( TaskHandle_t )pvTaskHandle );
 
-        OSAL_TASK_STATS_LINKED_LIST *pxCurrent = pxFindTask( pvTaskHandle );
+        OSALTaskStatsLinkedList *pxCurrent = pxFindTask( pvTaskHandle );
         if( NULL != pxCurrent)
         {
             pxCurrent->pcStatus = strdup( "Suspended" );
@@ -769,7 +778,7 @@ int iOSAL_Task_Resume( void* pvTaskHandle )
     {
         vTaskResume( ( TaskHandle_t )pvTaskHandle );
 
-        OSAL_TASK_STATS_LINKED_LIST *pxCurrent = pxFindTask( pvTaskHandle );
+        OSALTaskStatsLinkedList *pxCurrent = pxFindTask( pvTaskHandle );
         if( NULL != pxCurrent)
         {
             pxCurrent->pcStatus = strdup( "Active" );
@@ -848,7 +857,7 @@ int iOSAL_Semaphore_Create( void** ppvSemHandle,
         if( NULL != *ppvSemHandle )
         {
             /* Add semaphore to debug stats */
-            OSAL_SEM_STATS_LINKED_LIST *pxNewNode = ( OSAL_SEM_STATS_LINKED_LIST* ) pvOSAL_MemAlloc( sizeof( OSAL_SEM_STATS_LINKED_LIST ) );
+            OSALSemStatsLinkedList *pxNewNode = ( OSALSemStatsLinkedList* ) pvOSAL_MemAlloc( sizeof( OSALSemStatsLinkedList ) );
             if( NULL != pxNewNode )
             {
                 pxNewNode->pvSem = *ppvSemHandle;
@@ -885,7 +894,7 @@ int iOSAL_Semaphore_Destroy( void** ppvSemHandle )
     if( ( NULL != ppvSemHandle  ) &&
         ( NULL != *ppvSemHandle ) )
     {
-        OSAL_SEM_STATS_LINKED_LIST *pxCurrent = pxFindSem( *ppvSemHandle );
+        OSALSemStatsLinkedList *pxCurrent = pxFindSem( *ppvSemHandle );
         if( NULL != pxCurrent)
         {
             pxCurrent->pcStatus = strdup( "Deleted" );
@@ -942,7 +951,7 @@ int iOSAL_Semaphore_Pend( void* pvSemHandle, uint32_t ulTimeoutMs )
         else
         {
 
-            OSAL_SEM_STATS_LINKED_LIST *pxCurrent = pxFindSem( pvSemHandle );
+            OSALSemStatsLinkedList *pxCurrent = pxFindSem( pvSemHandle );
             if( NULL != pxCurrent)
             {
                 pxCurrent->iPendCount++;
@@ -973,7 +982,7 @@ int iOSAL_Semaphore_Post( void* pvSemHandle )
         }
         else
         {
-            OSAL_SEM_STATS_LINKED_LIST *pxCurrent = pxFindSem( pvSemHandle );
+            OSALSemStatsLinkedList *pxCurrent = pxFindSem( pvSemHandle );
             if( NULL != pxCurrent)
             {
                 pxCurrent->iPostCount++;
@@ -1044,7 +1053,7 @@ int iOSAL_Mutex_Create( void**      ppvMutexHandle,
         if( NULL != *ppvMutexHandle )
         {
             /* Add mutex to debug stats */
-            OSAL_MUTEX_STATS_LINKED_LIST *pxNewNode = ( OSAL_MUTEX_STATS_LINKED_LIST* ) pvOSAL_MemAlloc( sizeof( OSAL_SEM_STATS_LINKED_LIST ) );
+            OSALMutexStatsLinkedList *pxNewNode = ( OSALMutexStatsLinkedList* ) pvOSAL_MemAlloc( sizeof( OSALSemStatsLinkedList ) );
             if( NULL != pxNewNode )
             {
                 pxNewNode->pvMutex = *ppvMutexHandle;
@@ -1081,7 +1090,7 @@ int iOSAL_Mutex_Destroy( void** ppvMutexHandle )
     if( ( NULL != ppvMutexHandle  ) &&
         ( NULL != *ppvMutexHandle ) )
     {
-        OSAL_MUTEX_STATS_LINKED_LIST *pxCurrent = pxFindMutex( *ppvMutexHandle );
+        OSALMutexStatsLinkedList *pxCurrent = pxFindMutex( *ppvMutexHandle );
         if( NULL != pxCurrent)
         {
             pxCurrent->pcStatus = strdup( "Deleted" );
@@ -1141,7 +1150,7 @@ int iOSAL_Mutex_Take( void*    pvMutexHandle,
         }
         else
         {
-            OSAL_MUTEX_STATS_LINKED_LIST *pxCurrent = pxFindMutex( pvMutexHandle);
+            OSALMutexStatsLinkedList *pxCurrent = pxFindMutex( pvMutexHandle);
             if( NULL != pxCurrent)
             {
                 pxCurrent->iTakeCount++;
@@ -1176,7 +1185,7 @@ int iOSAL_Mutex_Release( void* pvMutexHandle )
         }
         else
         {
-            OSAL_MUTEX_STATS_LINKED_LIST *pxCurrent = pxFindMutex( pvMutexHandle);
+            OSALMutexStatsLinkedList *pxCurrent = pxFindMutex( pvMutexHandle);
             if( NULL != pxCurrent)
             {
                 pxCurrent->iReleaseCount++;
@@ -1216,7 +1225,7 @@ int iOSAL_MBox_Create( void**      ppvMBoxHandle,
         if( NULL != *ppvMBoxHandle )
         {
             /* Add mbox to debug stats */
-            OSAL_MBOX_STATS_LINKED_LIST *pxNewNode = ( OSAL_MBOX_STATS_LINKED_LIST* ) pvOSAL_MemAlloc( sizeof( OSAL_MBOX_STATS_LINKED_LIST ) );
+            OSALMboxStatsLinkedList *pxNewNode = ( OSALMboxStatsLinkedList* ) pvOSAL_MemAlloc( sizeof( OSALMboxStatsLinkedList ) );
             if( NULL != pxNewNode )
             {
                 pxNewNode->pvMailbox = *ppvMBoxHandle;
@@ -1256,7 +1265,7 @@ int iOSAL_MBox_Destroy( void** ppvMBoxHandle )
     if( ( NULL != ppvMBoxHandle  ) &&
         ( NULL != *ppvMBoxHandle ) )
     {
-        OSAL_MBOX_STATS_LINKED_LIST *pxCurrent = pxFindMailbox( *ppvMBoxHandle);
+        OSALMboxStatsLinkedList *pxCurrent = pxFindMailbox( *ppvMBoxHandle);
         if( NULL != pxCurrent)
         {
             pxCurrent->pcStatus = strdup( "Deleted" );
@@ -1320,7 +1329,7 @@ int iOSAL_MBox_Pend( void*    pvMBoxHandle,
         }
         else
         {
-            OSAL_MBOX_STATS_LINKED_LIST *pxCurrent = pxFindMailbox( pvMBoxHandle );
+            OSALMboxStatsLinkedList *pxCurrent = pxFindMailbox( pvMBoxHandle );
             if( NULL != pxCurrent)
             {
                 pxCurrent->iRxCount++;
@@ -1380,7 +1389,7 @@ int iOSAL_MBox_Post( void*    pvMBoxHandle,
         }
         else
         {
-            OSAL_MBOX_STATS_LINKED_LIST *pxCurrent = pxFindMailbox( pvMBoxHandle );
+            OSALMboxStatsLinkedList *pxCurrent = pxFindMailbox( pvMBoxHandle );
             if( NULL != pxCurrent)
             {
                 pxCurrent->iTxCount++;
@@ -1457,7 +1466,7 @@ int iOSAL_EventFlag_Create( void** ppvEventFlagHandle, const char* pcEventFlagNa
         if( NULL != *ppvEventFlagHandle )
         {
             /* Add event to debug stats */
-            OSAL_EVENT_STATS_LINKED_LIST *pxNewNode = ( OSAL_EVENT_STATS_LINKED_LIST* ) pvOSAL_MemAlloc( sizeof( OSAL_EVENT_STATS_LINKED_LIST ) );
+            OSALEventStatsLinkedList *pxNewNode = ( OSALEventStatsLinkedList* ) pvOSAL_MemAlloc( sizeof( OSALEventStatsLinkedList ) );
             if( NULL != pxNewNode )
             {
                 pxNewNode->pvEvent = *ppvEventFlagHandle;
@@ -1494,7 +1503,7 @@ int iOSAL_EventFlag_Destroy( void** ppvEventFlagHandle )
     if( ( NULL != ppvEventFlagHandle  ) &&
         ( NULL != *ppvEventFlagHandle ) )
     {
-        OSAL_EVENT_STATS_LINKED_LIST *pxCurrent = pxFindEvent( *ppvEventFlagHandle);
+        OSALEventStatsLinkedList *pxCurrent = pxFindEvent( *ppvEventFlagHandle);
         if( NULL != pxCurrent)
         {
             pxCurrent->pcStatus = strdup( "Deleted" );
@@ -1549,7 +1558,7 @@ int iOSAL_EventFlag_Pend( void* pvEventFlagHandle, uint32_t ulFlagWait, uint32_t
                              xWaitForAllBits,
                              xTimeoutTicks );
 
-        OSAL_EVENT_STATS_LINKED_LIST *pxCurrent = pxFindEvent( pvEventFlagHandle );
+        OSALEventStatsLinkedList *pxCurrent = pxFindEvent( pvEventFlagHandle );
         if( NULL != pxCurrent)
         {
             pxCurrent->ulFlagWait = ulFlagWait;
@@ -1574,7 +1583,7 @@ int iOSAL_EventFlag_Post( void* pvEventFlagHandle, uint32_t ulFlagSet )
         xEventGroupSetBits( ( EventGroupHandle_t )pvEventFlagHandle,
                             ( EventBits_t )ulFlagSet );
 
-        OSAL_EVENT_STATS_LINKED_LIST *pxCurrent = pxFindEvent( pvEventFlagHandle );
+        OSALEventStatsLinkedList *pxCurrent = pxFindEvent( pvEventFlagHandle );
         if( NULL != pxCurrent)
         {
             pxCurrent->ulFlagSet = ulFlagSet;
@@ -1664,7 +1673,7 @@ int iOSAL_Timer_Create( void** ppvTimerHandle,
         if( NULL != *ppvTimerHandle )
         {
             /* Add timer to debug stats */
-            OSAL_TIMER_STATS_LINKED_LIST *pxNewNode = ( OSAL_TIMER_STATS_LINKED_LIST* ) pvOSAL_MemAlloc( sizeof( OSAL_TIMER_STATS_LINKED_LIST ) );
+            OSALTimerStatsLinkedList *pxNewNode = ( OSALTimerStatsLinkedList* ) pvOSAL_MemAlloc( sizeof( OSALTimerStatsLinkedList ) );
             if( NULL != pxNewNode )
             {
                 pxNewNode->pvTimer = *ppvTimerHandle;
@@ -1701,7 +1710,7 @@ int iOSAL_Timer_Destroy( void** ppvTimerHandle )
     if( ( NULL != ppvTimerHandle ) &&
         ( NULL != *ppvTimerHandle ) )
     {
-        OSAL_TIMER_STATS_LINKED_LIST *pxCurrent = pxFindTimer( *ppvTimerHandle);
+        OSALTimerStatsLinkedList *pxCurrent = pxFindTimer( *ppvTimerHandle);
         if( NULL != pxCurrent)
         {
             pxCurrent->pcStatus = strdup( "Deleted" );
@@ -1769,7 +1778,7 @@ int iOSAL_Timer_Start( void* pvTimerHandle, uint32_t ulDurationMs )
             }
             else
             {
-                OSAL_TIMER_STATS_LINKED_LIST *pxCurrent = pxFindTimer( pvTimerHandle );
+                OSALTimerStatsLinkedList *pxCurrent = pxFindTimer( pvTimerHandle );
                 if( NULL != pxCurrent)
                 {
                     pxCurrent->ulDurationMs = ulDurationMs;
@@ -1851,7 +1860,7 @@ int iOSAL_Timer_Reset( void* pvTimerHandle, uint32_t ulDurationMs )
             }
             else
             {
-                OSAL_TIMER_STATS_LINKED_LIST *pxCurrent = pxFindTimer( pvTimerHandle );
+                OSALTimerStatsLinkedList *pxCurrent = pxFindTimer( pvTimerHandle );
                 if( NULL != pxCurrent)
                 {
                     pxCurrent->ulDurationMs = ulDurationMs;
@@ -2245,10 +2254,10 @@ int iOSAL_MemCmp( const void *pvMemoryOne, const void *pvMemoryTwo, uint32_t usS
 /**
  * @brief   Looks for a free block in the task shared memory pool.
  */
-static OSAL_TASK_MEMORY* pxAllocateTaskMemory( void )
+static OSALTaskMemory* pxAllocateTaskMemory( void )
 {
     int i = 0;
-    OSAL_TASK_MEMORY* pxMemory = NULL;
+    OSALTaskMemory* pxMemory = NULL;
 
     for( i = 0; i < OSAL_MAX_TASKS; i++ )
     {
@@ -2265,7 +2274,7 @@ static OSAL_TASK_MEMORY* pxAllocateTaskMemory( void )
 /**
  * @brief   Frees a block of the task shared memory pool.
  */
-static void vDeallocateTaskMemory( OSAL_TASK_MEMORY* pxMemory )
+static void vDeallocateTaskMemory( OSALTaskMemory* pxMemory )
 {
     int iIndex = 0;
     iIndex = pxMemory - xTaskMemoryPool;
@@ -2347,11 +2356,11 @@ void vOSAL_ClearAllStats( void )
     {
         /* strdup uses malloc under the hood - vOSAL_MemFree can't be used */
 
-        OSAL_TASK_STATS_LINKED_LIST* pxCurrentTask = pxOsStatsHandle->pxTaskHead;
+        OSALTaskStatsLinkedList* pxCurrentTask = pxOsStatsHandle->pxTaskHead;
 
         while( NULL != pxCurrentTask )
         {
-            OSAL_TASK_STATS_LINKED_LIST* pxTemp = pxCurrentTask;
+            OSALTaskStatsLinkedList* pxTemp = pxCurrentTask;
             pxCurrentTask = pxCurrentTask->pxNext;
 
             free( pxTemp->pcName );
@@ -2360,11 +2369,11 @@ void vOSAL_ClearAllStats( void )
         }
         pxOsStatsHandle->pxTaskHead = NULL;
 
-        OSAL_SEM_STATS_LINKED_LIST* pxCurrentSem = pxOsStatsHandle->pxSemHead;
+        OSALSemStatsLinkedList* pxCurrentSem = pxOsStatsHandle->pxSemHead;
 
         while( NULL != pxCurrentSem )
         {
-            OSAL_SEM_STATS_LINKED_LIST* pxTemp = pxCurrentSem;
+            OSALSemStatsLinkedList* pxTemp = pxCurrentSem;
             pxCurrentSem = pxCurrentSem->pxNext;
 
             free( pxTemp->pcName );
@@ -2373,11 +2382,11 @@ void vOSAL_ClearAllStats( void )
         }
         pxOsStatsHandle->pxSemHead = NULL;
 
-        OSAL_MUTEX_STATS_LINKED_LIST* pxCurrentMutex = pxOsStatsHandle->pxMutexHead;
+        OSALMutexStatsLinkedList* pxCurrentMutex = pxOsStatsHandle->pxMutexHead;
 
         while( NULL != pxCurrentMutex )
         {
-            OSAL_MUTEX_STATS_LINKED_LIST* pxTemp = pxCurrentMutex;
+            OSALMutexStatsLinkedList* pxTemp = pxCurrentMutex;
             pxCurrentMutex = pxCurrentMutex->pxNext;
 
             free( pxTemp->pcName );
@@ -2386,11 +2395,11 @@ void vOSAL_ClearAllStats( void )
         }
         pxOsStatsHandle->pxMutexHead = NULL;
 
-        OSAL_MBOX_STATS_LINKED_LIST* pxCurrentMailbox = pxOsStatsHandle->pxMailboxHead;
+        OSALMboxStatsLinkedList* pxCurrentMailbox = pxOsStatsHandle->pxMailboxHead;
 
         while( NULL != pxCurrentMailbox )
         {
-            OSAL_MBOX_STATS_LINKED_LIST* pxTemp = pxCurrentMailbox;
+            OSALMboxStatsLinkedList* pxTemp = pxCurrentMailbox;
             pxCurrentMailbox = pxCurrentMailbox->pxNext;
 
             free( pxTemp->pcName );
@@ -2399,11 +2408,11 @@ void vOSAL_ClearAllStats( void )
         }
         pxOsStatsHandle->pxMailboxHead = NULL;
 
-        OSAL_EVENT_STATS_LINKED_LIST* pxCurrentEvent = pxOsStatsHandle->pxEventHead;
+        OSALEventStatsLinkedList* pxCurrentEvent = pxOsStatsHandle->pxEventHead;
 
         while( NULL != pxCurrentEvent )
         {
-            OSAL_EVENT_STATS_LINKED_LIST* pxTemp = pxCurrentEvent;
+            OSALEventStatsLinkedList* pxTemp = pxCurrentEvent;
             pxCurrentEvent = pxCurrentEvent->pxNext;
 
             free( pxTemp->pcName );
@@ -2412,11 +2421,11 @@ void vOSAL_ClearAllStats( void )
         }
         pxOsStatsHandle->pxEventHead = NULL;
 
-        OSAL_TIMER_STATS_LINKED_LIST* pxCurrentTimer = pxOsStatsHandle->pxTimerHead;
+        OSALTimerStatsLinkedList* pxCurrentTimer = pxOsStatsHandle->pxTimerHead;
 
         while( NULL != pxCurrentTimer )
         {
-            OSAL_TIMER_STATS_LINKED_LIST* pxTemp = pxCurrentTimer;
+            OSALTimerStatsLinkedList* pxTemp = pxCurrentTimer;
             pxCurrentTimer = pxCurrentTimer->pxNext;
 
             free( pxTemp->pcName );
@@ -2479,7 +2488,7 @@ static void vPrint_OS_Stats( void )
  */
 static void vPrint_Task_Stats( OSAL_STATS_VERBOSITY eVerbosity )
 {
-    OSAL_TASK_STATS_LINKED_LIST* pxCurrentTask = pxOsStatsHandle->pxTaskHead;
+    OSALTaskStatsLinkedList* pxCurrentTask = pxOsStatsHandle->pxTaskHead;
     int iTaskCount = 0;
 
     vCalculateStackWatermark();
@@ -2584,7 +2593,7 @@ static void vPrint_Task_Stats( OSAL_STATS_VERBOSITY eVerbosity )
  */
 static void vPrint_Sem_Stats( OSAL_STATS_VERBOSITY eVerbosity )
 {
-    OSAL_SEM_STATS_LINKED_LIST* pxCurrentSem = pxOsStatsHandle->pxSemHead;
+    OSALSemStatsLinkedList* pxCurrentSem = pxOsStatsHandle->pxSemHead;
     int iSemCount = 0;
 
     vPrint_Header( "Semaphore" );
@@ -2639,7 +2648,7 @@ static void vPrint_Sem_Stats( OSAL_STATS_VERBOSITY eVerbosity )
  */
 static void vPrint_Mutex_Stats( OSAL_STATS_VERBOSITY eVerbosity )
 {
-    OSAL_MUTEX_STATS_LINKED_LIST* pxCurrentMutex = pxOsStatsHandle->pxMutexHead;
+    OSALMutexStatsLinkedList* pxCurrentMutex = pxOsStatsHandle->pxMutexHead;
     int iMutexCount = 0;
 
     vPrint_Header( "Mutex" );
@@ -2694,7 +2703,7 @@ static void vPrint_Mutex_Stats( OSAL_STATS_VERBOSITY eVerbosity )
  */
 static void vPrint_Mailbox_Stats( OSAL_STATS_VERBOSITY eVerbosity )
 {
-    OSAL_MBOX_STATS_LINKED_LIST* pxCurrentMailbox = pxOsStatsHandle->pxMailboxHead;
+    OSALMboxStatsLinkedList* pxCurrentMailbox = pxOsStatsHandle->pxMailboxHead;
     int iMailboxCount = 0;
 
     vPrint_Header( "Mailbox" );
@@ -2749,7 +2758,7 @@ static void vPrint_Mailbox_Stats( OSAL_STATS_VERBOSITY eVerbosity )
  */
 static void vPrint_Event_Stats( OSAL_STATS_VERBOSITY eVerbosity )
 {
-    OSAL_EVENT_STATS_LINKED_LIST* pxCurrentEvent = pxOsStatsHandle->pxEventHead;
+    OSALEventStatsLinkedList* pxCurrentEvent = pxOsStatsHandle->pxEventHead;
     int iEventCount = 0;
 
     vPrint_Header( "Event" );
@@ -2804,7 +2813,7 @@ static void vPrint_Event_Stats( OSAL_STATS_VERBOSITY eVerbosity )
  */
 static void vPrint_Timer_Stats( OSAL_STATS_VERBOSITY eVerbosity )
 {
-    OSAL_TIMER_STATS_LINKED_LIST* pxCurrentTimer = pxOsStatsHandle->pxTimerHead;
+    OSALTimerStatsLinkedList* pxCurrentTimer = pxOsStatsHandle->pxTimerHead;
     int iTimerCount = 0;
 
     vPrint_Header( "Timer" );
@@ -2869,13 +2878,13 @@ static void vPrint_Memory_Stats( void )
 /**
  * @brief Searches for node in the task linked list that matches the handle.
  */
-static OSAL_TASK_STATS_LINKED_LIST* pxFindTask( void* pvTaskHandle )
+static OSALTaskStatsLinkedList* pxFindTask( void* pvTaskHandle )
 {
-    OSAL_TASK_STATS_LINKED_LIST *pxTaskNode = NULL;
+    OSALTaskStatsLinkedList *pxTaskNode = NULL;
 
     if( NULL != pvTaskHandle )
     {
-        OSAL_TASK_STATS_LINKED_LIST *pxCurrentNode = pxOsStatsHandle->pxTaskHead;
+        OSALTaskStatsLinkedList *pxCurrentNode = pxOsStatsHandle->pxTaskHead;
 
         while( ( NULL != pxCurrentNode ) &&
                ( pxCurrentNode->pvTask != pvTaskHandle ) )
@@ -2893,13 +2902,13 @@ static OSAL_TASK_STATS_LINKED_LIST* pxFindTask( void* pvTaskHandle )
 /**
  * @brief Searches for node in the sem linked list that matches the handle.
  */
-static OSAL_SEM_STATS_LINKED_LIST* pxFindSem( void* pvSemHandle )
+static OSALSemStatsLinkedList* pxFindSem( void* pvSemHandle )
 {
-    OSAL_SEM_STATS_LINKED_LIST *pxSemNode = NULL;
+    OSALSemStatsLinkedList *pxSemNode = NULL;
 
     if( NULL != pvSemHandle )
     {
-        OSAL_SEM_STATS_LINKED_LIST *pxCurrentNode = pxOsStatsHandle->pxSemHead;
+        OSALSemStatsLinkedList *pxCurrentNode = pxOsStatsHandle->pxSemHead;
 
         while( ( NULL != pxCurrentNode ) &&
                ( pxCurrentNode->pvSem != pvSemHandle ) )
@@ -2917,13 +2926,13 @@ static OSAL_SEM_STATS_LINKED_LIST* pxFindSem( void* pvSemHandle )
 /**
  * @brief Searches for node in the mutex linked list that matches the handle.
  */
-static OSAL_MUTEX_STATS_LINKED_LIST* pxFindMutex( void* pvMutexHandle )
+static OSALMutexStatsLinkedList* pxFindMutex( void* pvMutexHandle )
 {
-    OSAL_MUTEX_STATS_LINKED_LIST *pxMutexNode = NULL;
+    OSALMutexStatsLinkedList *pxMutexNode = NULL;
 
     if( NULL != pvMutexHandle )
     {
-        OSAL_MUTEX_STATS_LINKED_LIST *pxCurrentNode = pxOsStatsHandle->pxMutexHead;
+        OSALMutexStatsLinkedList *pxCurrentNode = pxOsStatsHandle->pxMutexHead;
 
         while( ( NULL != pxCurrentNode ) &&
                ( pxCurrentNode->pvMutex != pvMutexHandle ) )
@@ -2941,13 +2950,13 @@ static OSAL_MUTEX_STATS_LINKED_LIST* pxFindMutex( void* pvMutexHandle )
 /**
  * @brief Searches for node in the mailbox linked list that matches the handle.
  */
-static OSAL_MBOX_STATS_LINKED_LIST* pxFindMailbox( void* pvMailboxHandle )
+static OSALMboxStatsLinkedList* pxFindMailbox( void* pvMailboxHandle )
 {
-    OSAL_MBOX_STATS_LINKED_LIST *pxMailboxNode = NULL;
+    OSALMboxStatsLinkedList *pxMailboxNode = NULL;
 
     if( NULL != pvMailboxHandle )
     {
-        OSAL_MBOX_STATS_LINKED_LIST *pxCurrentNode = pxOsStatsHandle->pxMailboxHead;
+        OSALMboxStatsLinkedList *pxCurrentNode = pxOsStatsHandle->pxMailboxHead;
 
         while( ( NULL != pxCurrentNode ) &&
                ( pxCurrentNode->pvMailbox != pvMailboxHandle ) )
@@ -2965,13 +2974,13 @@ static OSAL_MBOX_STATS_LINKED_LIST* pxFindMailbox( void* pvMailboxHandle )
 /**
  * @brief Searches for node in the event linked list that matches the handle.
  */
-static OSAL_EVENT_STATS_LINKED_LIST* pxFindEvent( void* pvEventHandle )
+static OSALEventStatsLinkedList* pxFindEvent( void* pvEventHandle )
 {
-    OSAL_EVENT_STATS_LINKED_LIST *pxEventNode = NULL;
+    OSALEventStatsLinkedList *pxEventNode = NULL;
 
     if( NULL != pvEventHandle )
     {
-        OSAL_EVENT_STATS_LINKED_LIST *pxCurrentNode = pxOsStatsHandle->pxEventHead;
+        OSALEventStatsLinkedList *pxCurrentNode = pxOsStatsHandle->pxEventHead;
 
         while( ( NULL != pxCurrentNode ) &&
                ( pxCurrentNode->pvEvent != pvEventHandle ) )
@@ -2989,13 +2998,13 @@ static OSAL_EVENT_STATS_LINKED_LIST* pxFindEvent( void* pvEventHandle )
 /**
  * @brief Searches for node in the timer linked list that matches the handle.
  */
-static OSAL_TIMER_STATS_LINKED_LIST* pxFindTimer( void* pvTimerHandle )
+static OSALTimerStatsLinkedList* pxFindTimer( void* pvTimerHandle )
 {
-    OSAL_TIMER_STATS_LINKED_LIST *pxTimerNode = NULL;
+    OSALTimerStatsLinkedList *pxTimerNode = NULL;
 
     if( NULL != pvTimerHandle )
     {
-        OSAL_TIMER_STATS_LINKED_LIST *pxCurrentNode = pxOsStatsHandle->pxTimerHead;
+        OSALTimerStatsLinkedList *pxCurrentNode = pxOsStatsHandle->pxTimerHead;
 
         while( ( NULL != pxCurrentNode ) &&
                ( pxCurrentNode->pvTimer != pvTimerHandle ) )
@@ -3067,7 +3076,7 @@ static void vCalculateStackWatermark( void )
 
         for ( i = 0; i < uxArraySize; i++ )
         {
-            OSAL_TASK_STATS_LINKED_LIST *pxCurrent = pxFindTask( pxTaskStatusArray[ i ].xHandle );
+            OSALTaskStatsLinkedList *pxCurrent = pxFindTask( pxTaskStatusArray[ i ].xHandle );
 
             if( NULL != pxCurrent)
             {
@@ -3108,7 +3117,7 @@ static void vCalculateCpuUsage( void )
 
             ulStatsAsPercentage = xTaskStatus.ulRunTimeCounter / ulTotalTime;
 
-            OSAL_TASK_STATS_LINKED_LIST *pxCurrent = pxFindTask( pxTaskStatusArray[ x ].xHandle );
+            OSALTaskStatsLinkedList *pxCurrent = pxFindTask( pxTaskStatusArray[ x ].xHandle );
             if( NULL != pxCurrent )
             {
                 if( OK == strcmp( pxCurrent->pcStatus, "Active" ) )

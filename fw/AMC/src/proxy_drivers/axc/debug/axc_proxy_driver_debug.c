@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the AVED External Device Control (AXC) debug implementation
+ * This file contains the AMR External Device Control (AXC) debug implementation
  *
  * @file axc_proxy_driver_debug.c
  */
@@ -117,7 +117,7 @@ static void vGetTemperature( void );
  *          ERROR if an error was raised in the callback
  *
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal );
+static int iTestCallback( EVLSignal *pxSignal );
 
 
 /******************************************************************************/
@@ -302,7 +302,7 @@ static void vGetPage( void )
     int iExDevId = 0;
     int iPageNum = 0;
     int i = 0;
-    AXC_PROXY_DRIVER_PAGE_DATA xTestPage = { { 0 } };
+    AXCProxyDriverPageData xTestPage = { { 0 } };
     if( OK != iDAL_GetIntInRange( "Enter External Device ID (1-4):", &iExDevId, 0, AXC_DBG_MAX_QSFP_NUM ) )
     {
         PLL_DAL( AXC_DBG_NAME, "Error retrieving External Device ID\r\n" );
@@ -373,7 +373,7 @@ static void vGetIoStatus( void )
 static void vGetAllIoStatuses( void )
 {
     int iExDevId = 0;
-    AXC_PROXY_DRIVER_QSFP_IO_STATUSES xTestStatuses = { 0 };
+    AXCProxyDriverQsfpIoStatuses xTestStatuses = { 0 };
     if( OK != iDAL_GetIntInRange( "Enter External Device ID (1-4):", &iExDevId, 0, AXC_DBG_MAX_QSFP_NUM ) )
     {
         PLL_DAL( AXC_DBG_NAME, "Error retrieving External Device ID\r\n" );
@@ -450,7 +450,7 @@ static void vGetTemperature( void )
 /**
  * @brief   EVL Callback for binding test prints
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal )
+static int iTestCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 

@@ -1,6 +1,6 @@
 # SMBus Application API Usage Examples
 
-Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: MIT
 
 ## Introduction
@@ -23,7 +23,7 @@ Application will be required to store the pointer for accessing further SMBus AP
 
 ```sh
 /* Application code will be passed a pointer to the SMBus profile from xInitSMBus() */
-struct  SMBus_Profile* pxSMBusProfile = NULL;
+struct  SMBusProfile* pxSMBusProfile = NULL;
 ```
 
 

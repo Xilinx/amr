@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of INA3221 sensor read
@@ -7,10 +7,6 @@
  *
  * @file ina3221.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "util.h"
 #include "pll.h"
@@ -22,9 +18,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-
-#define UPPER_FIREWALL                      ( 0xBABECAFE )
-#define LOWER_FIREWALL                      ( 0xDEADFACE )
 
 #define INA3221_NAME                        "INA3221"
 
@@ -99,10 +92,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( INA3221_ERRORS, INA3221_ERRORS, INA3221_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  INA3221_PRIVATE_DATA
+ * @struct  INA3221PrivateData
  * @brief   Private driver data
  */
-typedef struct INA3221_PRIVATE_DATA
+typedef struct
 {
     uint32_t    ulUpperFirewall;
 
@@ -111,14 +104,14 @@ typedef struct INA3221_PRIVATE_DATA
 
     uint32_t    ulLowerFirewall;
 
-} INA3221_PRIVATE_DATA;
+} INA3221PrivateData;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static INA3221_PRIVATE_DATA xPrivateData =
+static INA3221PrivateData xPrivateData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall */
     { 0 },              /* ulStats */
@@ -126,7 +119,7 @@ static INA3221_PRIVATE_DATA xPrivateData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 };
 
-static INA3221_PRIVATE_DATA *pxThis = &xPrivateData;
+static INA3221PrivateData *pxThis = &xPrivateData;
 
 
 /******************************************************************************/
@@ -136,7 +129,8 @@ static INA3221_PRIVATE_DATA *pxThis = &xPrivateData;
 /**
  * @brief   Read voltage using INA3221 sensor
  */
-int iINA3221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfVoltageInMV )
+int iINA3221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr,
+        uint8_t ucChannelNum, float *pfVoltageInMV )
 {
     int      iStatus                             = ERROR;
     uint8_t  pucWriteBuf[ INA3221_BUFFER_SIZE ]  = { 0 };

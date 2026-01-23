@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions
@@ -21,10 +21,10 @@
 #include "smbus_version.h"
 
 
-static SMBus_Profile xSMBusProfile =
+static SMBusProfile xSMBusProfile =
 {
     .pFnReadTicks           = 0,
-    .pvBaseAddr          = 0,
+    .pvBaseAddr             = 0,
     .ulTransactionID        = 0,
     .ulInitialize           = 0,
     .xLogCircularBuf        = { 0 },
@@ -56,7 +56,7 @@ uint32_t ulSMBusCeil( float fNum )
 /**
  * @brief    Converts a protocol enum value to a text string for logging
  */
-SMBUS_ERROR_TYPE xSMBusFirewallCheck( SMBus_Profile* pxSMBusProfile )
+SMBUS_ERROR_TYPE xSMBusFirewallCheck( SMBusProfile* pxSMBusProfile )
 {
     SMBUS_ERROR_TYPE    xError = SMBUS_SUCCESS;
     int                 i = 0;
@@ -87,7 +87,7 @@ SMBUS_ERROR_TYPE xSMBusFirewallCheck( SMBus_Profile* pxSMBusProfile )
  *           raised against that instance and call into the state machine for that
  *           instance with each event found
  */
-void vSMBusEventQueueHandle( SMBus_Profile* pxSMBusProfile )
+void vSMBusEventQueueHandle( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucAnyEvent;
     int i;
@@ -112,7 +112,7 @@ void vSMBusEventQueueHandle( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Retrieves the SMBus driver version
  */
-SMBUS_ERROR_TYPE xSMBusGetVersion( SMBus_Profile* pxSMBusProfile, SMBus_Version* pxSMBusVersion )
+SMBUS_ERROR_TYPE xSMBusGetVersion( SMBusProfile* pxSMBusProfile, SMBus_Version* pxSMBusVersion )
 {
     SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
 
@@ -156,7 +156,7 @@ SMBUS_ERROR_TYPE xSMBusGetVersion( SMBus_Profile* pxSMBusProfile, SMBus_Version*
 /**
  * @brief    Disables and then clears all SMBus interrupts
  */
-SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBus_Profile* pxSMBusProfile )
+SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBusProfile* pxSMBusProfile )
 {
     SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
 
@@ -188,7 +188,7 @@ SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBus_Profile* pxSMBu
 /**
  * @brief    enables all necessary SMBus interrupts
  */
-SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBus_Profile* pxSMBusProfile )
+SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBusProfile* pxSMBusProfile )
 {
     SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
 
@@ -218,8 +218,9 @@ SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBus_Profile* pxSMBusProfile 
  *           Sets up hardware registers for the frequency class supplied
  *           initializes software structures, sets up log and event queues
  */
-SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile, SMBUS_FREQ_CLASS xFrequencyClass, void * pvBaseAddr,
-                SMBUS_LOG_LEVEL xLogLevel, SMBUS_USER_ENV_READ_TICKS pFnReadTicks )
+SMBUS_ERROR_TYPE xInitSMBus( SMBusProfile** ppxSMBusProfile, SMBUS_FREQ_CLASS xFrequencyClass,
+    void * pvBaseAddr,
+    SMBUS_LOG_LEVEL xLogLevel, SMBUS_USER_ENV_READ_TICKS pFnReadTicks )
 {
     SMBUS_ERROR_TYPE xError                         = SMBUS_SUCCESS;
     int              i                              = 0;
@@ -237,7 +238,7 @@ SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile, SMBUS_FREQ_CLASS x
          ( SMBUS_FREQ_MAX > xFrequencyClass )  &&
          ( SMBUS_LOG_LEVEL_MAX > xLogLevel ) )
     {
-        SMBus_Profile* pxSMBusProfile   = &xSMBusProfile;
+        SMBusProfile* pxSMBusProfile   = &xSMBusProfile;
         *ppxSMBusProfile = &xSMBusProfile;
 
         /* Check if we have initialized using this profile already */
@@ -477,7 +478,7 @@ SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile, SMBUS_FREQ_CLASS x
  * @brief    Checks all instances have already been removed
  *           If so sets Profile structure to default values
  */
-SMBUS_ERROR_TYPE xDeinitSMBus( SMBus_Profile** ppxSMBusProfile )
+SMBUS_ERROR_TYPE xDeinitSMBus( SMBusProfile** ppxSMBusProfile )
 {
     SMBUS_ERROR_TYPE xError = SMBUS_SUCCESS;
     int              i      = 0;
@@ -525,7 +526,7 @@ SMBUS_ERROR_TYPE xDeinitSMBus( SMBus_Profile** ppxSMBusProfile )
  *           supplied data associated with the instance and enables the hardware
  *           to send or receive SMBus messages for the supplied instance
  */
-uint8_t ucCreateSMBusInstance( SMBus_Profile* pxSMBusProfile,
+uint8_t ucCreateSMBusInstance( SMBusProfile* pxSMBusProfile,
                                uint8_t ucSMBusAddr,
                                uint8_t ucUDID[SMBUS_UDID_LENGTH],
                                SMBUS_ARP_CAPABILITY xARPCapability,
@@ -705,7 +706,7 @@ uint8_t ucCreateSMBusInstance( SMBus_Profile* pxSMBusProfile,
  *           it. If the instance being removed is the only instance then the ARP
  *           instance is also removed
  */
-SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBusInstanceID )
+SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBusProfile* pxSMBusProfile, uint8_t ucSMBusInstanceID )
 {
     SMBUS_ERROR_TYPE xError               = SMBUS_ERROR;
     uint8_t          ucDestroyArpInstance = SMBUS_TRUE;
@@ -819,7 +820,7 @@ SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBus_Profile* pxSMBusProfile, uint8_t u
  * @brief    Will initiate an SMBus message from the supplied intance as a
  *           controller
  */
-SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBusInstanceID,
+SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBusProfile* pxSMBusProfile, uint8_t ucSMBusInstanceID,
                                         uint8_t ucSMBusDestAddr, uint8_t ucCommand,
                                         SMBUS_COMMAND_PROTOCOL xProtocol, uint16_t usDataSize, uint8_t* pucData,
                                         uint8_t ucPecRequiredForTransaction, uint32_t* pulTransactionID )
@@ -911,7 +912,7 @@ SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile,
  * @brief    Retrieves SMBus log that is stored as a circular buffer in profile struct
  *           as ASCII char array
  */
-SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile, char* pcLogBuffer, uint32_t* pulLogSizeBytes )
+SMBUS_ERROR_TYPE xSMBusGetLog( SMBusProfile* pxSMBusProfile, char* pcLogBuffer, uint32_t* pulLogSizeBytes )
 {
     SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
 
@@ -939,7 +940,7 @@ SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile, char* pcLogBuffer,
 /**
  * @brief    Resets SMBus Driver Log
  */
-SMBUS_ERROR_TYPE xSMBusLogReset( SMBus_Profile* pxSMBusProfile )
+SMBUS_ERROR_TYPE xSMBusLogReset( SMBusProfile* pxSMBusProfile )
 {
     SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
 
@@ -964,7 +965,7 @@ SMBUS_ERROR_TYPE xSMBusLogReset( SMBus_Profile* pxSMBusProfile )
  *
  * @brief    Enables logging
  */
-void vSMBusLogEnable( SMBus_Profile* pxSMBusProfile )
+void vSMBusLogEnable( SMBusProfile* pxSMBusProfile )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -983,7 +984,7 @@ void vSMBusLogEnable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Disables logging
  */
-void vSMBusLogDisable( SMBus_Profile* pxSMBusProfile )
+void vSMBusLogDisable( SMBusProfile* pxSMBusProfile )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -1002,7 +1003,7 @@ void vSMBusLogDisable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Resets the statistics log values for the specified instance
  */
-void vSMBusResetStatsLogInstance( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBusInstance )
+void vSMBusResetStatsLogInstance( SMBusProfile* pxSMBusProfile, uint8_t ucSMBusInstance )
 {
     int i = 0;
 
@@ -1031,7 +1032,7 @@ void vSMBusResetStatsLogInstance( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBus
 /**
  * @brief    Reads the statistics log values for the specified instance
  */
-void vSMBusReadStatsLogInstance( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBusInstance,
+void vSMBusReadStatsLogInstance( SMBusProfile* pxSMBusProfile, uint8_t ucSMBusInstance,
     SMBus_Log* pxSMBusMessageLog )
 {
     int i = 0;
@@ -1177,7 +1178,7 @@ char* pcProtocolToString( uint8_t ucProtocol )
  *           supplied data associated with the instance and enables the hardware
  *           to send or receive I2C messages for the supplied instance
  */
-uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CCreateDevice( I2CProfile* pxI2cProfile,
 						   uint8_t ucAddr,
 						   I2C_USER_ENV_GET_DATA_TYPE    pFnGetData,
 						   I2C_USER_ENV_WRITE_DATA_TYPE  pFnWriteData,
@@ -1188,14 +1189,14 @@ uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
     uint8_t    ucInstanceToReturn = SMBUS_INVALID_INSTANCE;
     uint8_t    ucOkToContinue     = SMBUS_TRUE;
     int        i                  = 0;
-    SMBus_Profile* pxSMBusProfile = NULL;
+    SMBusProfile* pxSMBusProfile = NULL;
 
     if ( ( NULL != pxI2cProfile ) &&
         ( NULL !=  pFnGetData ) &&
         ( NULL !=  pFnWriteData ) &&
         ( NULL !=  pFnAnnounceResult ) )
     {
-        pxSMBusProfile = ( SMBus_Profile* )pxI2cProfile;
+        pxSMBusProfile = ( SMBusProfile* )pxI2cProfile;
 
         if ( SMBUS_SUCCESS != xSMBusFirewallCheck( pxSMBusProfile ) )
         {
@@ -1271,17 +1272,17 @@ uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
 /**
  * @brief    Destroys a previously created i2c device
  */
-uint8_t ucI2CDestroyDevice( I2C_Profile* pxI2cProfile, uint8_t ucDeviceId )
+uint8_t ucI2CDestroyDevice( I2CProfile* pxI2cProfile, uint8_t ucDeviceId )
 {
-    SMBUS_ERROR_TYPE xError         = SMBUS_ERROR;
-    int              j              = 0;
-    SMBus_Profile*   pxSMBusProfile = NULL;
+    SMBUS_ERROR_TYPE xError        = SMBUS_ERROR;
+    int              j             = 0;
+    SMBusProfile*   pxSMBusProfile = NULL;
 
 
     if ( ( NULL != pxI2cProfile ) &&
         ( SMBUS_LAST_NON_ARP_SMBUS_INSTANCE >= ucDeviceId ) )
     {
-        pxSMBusProfile = ( SMBus_Profile* )pxI2cProfile;
+        pxSMBusProfile = ( SMBusProfile* )pxI2cProfile;
 
         if ( SMBUS_SUCCESS != xSMBusFirewallCheck( pxSMBusProfile ) )
         {
@@ -1341,16 +1342,16 @@ uint8_t ucI2CDestroyDevice( I2C_Profile* pxI2cProfile, uint8_t ucDeviceId )
 /**
  *	@brief	Writes data to a remote slave as a master
  */
-uint8_t ucI2CWriteData( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CWriteData( I2CProfile* pxI2cProfile,
 						uint8_t  ucDeviceId,
 						uint8_t  ucAddr,
 						uint8_t* pucData,
 						uint16_t usNumBytes )
 {
    SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
-   SMBus_Profile*  pxSMBusProfile      = NULL;
+   SMBusProfile*  pxSMBusProfile      = NULL;
 
-    pxSMBusProfile = ( SMBus_Profile* )pxI2cProfile;
+    pxSMBusProfile = ( SMBusProfile* )pxI2cProfile;
 
     if ( ( NULL != pxSMBusProfile ) &&
         ( SMBUS_LAST_NON_ARP_SMBUS_INSTANCE >= ucDeviceId ) &&
@@ -1415,15 +1416,15 @@ uint8_t ucI2CWriteData( I2C_Profile* pxI2cProfile,
 /**
  *	@brief	Reads data from a remote slave as a master
  */
-uint8_t ucI2CReadData( I2C_Profile* pxI2cProfile,
-					   uint8_t   ucDeviceId,
-					   uint8_t   ucAddr,
-					   uint16_t  usNumBytes )
+uint8_t ucI2CReadData( I2CProfile* pxI2cProfile,
+                       uint8_t   ucDeviceId,
+                       uint8_t   ucAddr,
+                       uint16_t  usNumBytes )
 {
    SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
-   SMBus_Profile*  pxSMBusProfile      = NULL;
+   SMBusProfile*  pxSMBusProfile      = NULL;
 
-    pxSMBusProfile = ( SMBus_Profile* )pxI2cProfile;
+    pxSMBusProfile = ( SMBusProfile* )pxI2cProfile;
 
     if ( ( NULL != pxSMBusProfile ) &&
         ( SMBUS_LAST_NON_ARP_SMBUS_INSTANCE >= ucDeviceId ) &&
@@ -1480,17 +1481,17 @@ uint8_t ucI2CReadData( I2C_Profile* pxI2cProfile,
 /**
  *	@brief	Writes data to and then reads from remote slave as a master
  */
-uint8_t ucI2CWriteReadData( I2C_Profile* pxI2cProfile,
-						    uint8_t   ucDeviceId,
-						    uint8_t   ucAddr,
-						    uint8_t*  pucWriteData,
-						    uint16_t  usNumWriteBytes,
-						    uint16_t  usNumReadBytes )
+uint8_t ucI2CWriteReadData( I2CProfile* pxI2cProfile,
+                            uint8_t   ucDeviceId,
+                            uint8_t   ucAddr,
+                            uint8_t*  pucWriteData,
+                            uint16_t  usNumWriteBytes,
+                            uint16_t  usNumReadBytes )
 {
    SMBUS_ERROR_TYPE xError = SMBUS_ERROR;
-   SMBus_Profile* pxSMBusProfile = NULL;
+   SMBusProfile* pxSMBusProfile = NULL;
 
-    pxSMBusProfile = ( SMBus_Profile* )pxI2cProfile;
+    pxSMBusProfile = ( SMBusProfile* )pxI2cProfile;
 
     if ( ( NULL != pxSMBusProfile ) &&
         ( SMBUS_LAST_NON_ARP_SMBUS_INSTANCE >= ucDeviceId ) &&

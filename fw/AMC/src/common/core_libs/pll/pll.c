@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of the Printing and Logging Library (PLL)
@@ -23,9 +23,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-
-#define UPPER_FIREWALL         ( 0xBABECAFE )
-#define LOWER_FIREWALL         ( 0xDEADFACE )
 
 #define PLL_NAME               "PLL"
 
@@ -99,7 +96,7 @@ UTIL_MAKE_ENUM_AND_STRINGS( PLL_ERRORS, PLL_ERRORS, PLL_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  PLL_PrivateData
+ * @struct  PLLPrivateData
  * @brief   Locally held private data
  */
 typedef struct
@@ -123,14 +120,14 @@ typedef struct
 
     uint32_t            ulLowerFirewall;
 
-} PLL_PrivateData;
+} PLLPrivateData;
 
 
 /******************************************************************************/
 /* Local data                                                                 */
 /******************************************************************************/
 
-static PLL_PrivateData xLocalData =
+static PLLPrivateData xLocalData =
 {
     UPPER_FIREWALL, /* ulUpperFirewall   */
 
@@ -153,7 +150,7 @@ static PLL_PrivateData xLocalData =
     LOWER_FIREWALL
 };
 
-static PLL_PrivateData *pxThis = &xLocalData;
+static PLLPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -543,13 +540,13 @@ int iPLL_DumpLog( void )
             int i = 0;
             for( i = 0; i < PLL_LOG_MAX_RECS; i++ )
             {
-                PLL_LOG_MSG xMsg = { 0 };
+                PLLLogMsg xMsg = { 0 };
 
                 /* Calculate the address of the log message for the current index */
                 uintptr_t ulLogMsgAddr = ( uintptr_t )( HAL_RPU_SHARED_MEMORY_BASEADDR + xLogMsg.ulLogMsgBufOffset ) +
-                                         ( i * sizeof( PLL_LOG_MSG ) );
+                                         ( i * sizeof(PLLLogMsg) );
 
-                pvOSAL_MemCpy( &xMsg, ( uint32_t* )ulLogMsgAddr, sizeof( PLL_LOG_MSG ) );
+                pvOSAL_MemCpy( &xMsg, ( uint32_t* )ulLogMsgAddr, sizeof(PLLLogMsg) );
 
                 if( 0 != strlen( xMsg.pcBuff ) )
                 {
@@ -816,7 +813,7 @@ static int iLogCollect( char *pcBuf )
             uint32_t ulMsgBufAddr = HAL_RPU_SHARED_MEMORY_BASEADDR + xLogMsg.ulLogMsgBufOffset;
             char pcTempBuf[PLL_LOG_ENTRY_SIZE] = { 0 };
             uint32_t ulLogIdx = 0;
-            PLL_LOG_MSG xLog = { 0 };
+            PLLLogMsg xLog = { 0 };
 
             /* Read current index */
             ulLogIdx = HAL_IO_READ32( ulLogMsgAddr );

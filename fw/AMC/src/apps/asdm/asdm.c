@@ -35,9 +35,6 @@
 
 #define ASDM_NAME "ASDM"
 
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
-
 #define ASDM_RECORD_FIELD_BYTES_MAX   ( 30 )
 #define ASDM_RECORD_FIELD_LENGTH_MASK ( 0x3F )
 #define ASDM_RECORD_FIELD_TYPE_MASK   ( 0x03 )
@@ -156,7 +153,7 @@ static inline int iSensorIsEnabled( void )
     return HAL_POWER_SENSORS_ENBALED;
 }
 
-ASC_PROXY_DRIVER_SENSOR_DATA xTotalPowerData[TOTAL_POWER_NUM_RECORDS] =
+ASCProxyDriverSensorData xTotalPowerData[TOTAL_POWER_NUM_RECORDS] =
 {
     {
         "Total_Power", 1, ASC_PROXY_DRIVER_SENSOR_BITFIELD_POWER, FALSE, 0x0, {
@@ -468,24 +465,24 @@ typedef struct
  */
 typedef struct
 {
-    uint32_t                       ulUpperFirewall;
-    int                            iSensorListInitialised;
-    int                            iInitialised;
-    ASC_PROXY_DRIVER_SENSOR_DATA   *pxAscData;
-    uint8_t                        ucAscNumSensors;
-    ASDMSensorList                 pxSensorList[AMC_ASDM_SUPPORTED_REPO_MAX];
-    ASDMSdr                        *pxAsdmSdrInfo;      /* pointer to the dynamically allocated ASDM */
-    ASDMSds                        *pxAsdmSdsInfo;      /* pointer to the dynamically allocated SDS */
-    void                           *pvOsalMutexHdl;     /* mutex to protect access to ASDM */
-    uint32_t                       ulPowerCalcIterations;
-    uint32_t                       ulAveragePower;
-    uint32_t                       ulMaxPower;
-    APCProxyDriverFptHeader        pxFptHeader[MAX_APC_BOOT_DEVICES];
-    APCProxyDriverFptPartition    *ppxFptPartitions[MAX_APC_BOOT_DEVICES + 1];
-    ASDMBoardInfoRecord            *pxBoardInfo;
-    uint32_t                       pulStatCounters[ASDM_STATS_MAX];
-    uint32_t                       pulErrorCounters[ASDM_ERRORS_MAX];
-    uint32_t                       ulLowerFirewall;
+    uint32_t                   ulUpperFirewall;
+    int                        iSensorListInitialised;
+    int                        iInitialised;
+    ASCProxyDriverSensorData   *pxAscData;
+    uint8_t                    ucAscNumSensors;
+    ASDMSensorList             pxSensorList[AMC_ASDM_SUPPORTED_REPO_MAX];
+    ASDMSdr                    *pxAsdmSdrInfo;      /* pointer to the dynamically allocated ASDM */
+    ASDMSds                    *pxAsdmSdsInfo;      /* pointer to the dynamically allocated SDS */
+    void                       *pvOsalMutexHdl;     /* mutex to protect access to ASDM */
+    uint32_t                   ulPowerCalcIterations;
+    uint32_t                   ulAveragePower;
+    uint32_t                   ulMaxPower;
+    APCProxyDriverFptHeader    pxFptHeader[MAX_APC_BOOT_DEVICES];
+    APCProxyDriverFptPartition *ppxFptPartitions[MAX_APC_BOOT_DEVICES + 1];
+    ASDMBoardInfoRecord        *pxBoardInfo;
+    uint32_t                   pulStatCounters[ASDM_STATS_MAX];
+    uint32_t                   pulErrorCounters[ASDM_ERRORS_MAX];
+    uint32_t                   ulLowerFirewall;
 
 } ASDMPrivateData;
 
@@ -822,7 +819,7 @@ static int iMapUnitModifier( ASC_PROXY_DRIVER_SENSOR_UNIT_MOD xUnitMod,
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
  */
- static int iAscCallback( EVL_SIGNAL *pxSignal )
+ static int iAscCallback( EVLSignal *pxSignal )
  {
      int iStatus = ERROR;
      uint8_t ucNumSensors;
@@ -1208,7 +1205,7 @@ static int iGetFptData( void )
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
  */
-static int iApcCallback( EVL_SIGNAL *pxSignal )
+static int iApcCallback( EVLSignal *pxSignal )
 {
      int iStatus = ERROR;
 
@@ -1447,7 +1444,7 @@ static int iMapSensorTag( AMC_ASDM_SUPPORTED_REPO xAsdmRepo,
  *
  * @return  OK or ERROR
  */
-static int iPopulateSdrThresholds( ASC_PROXY_DRIVER_SENSOR_DATA *pxData,
+static int iPopulateSdrThresholds( ASCProxyDriverSensorData *pxData,
                                    ASDMSdrRecord *pxSdr,
                                    uint8_t ucSnsrValueLen,
                                    uint8_t ucInBandRepo,
@@ -1532,7 +1529,7 @@ static int iPopulateSdrThresholds( ASC_PROXY_DRIVER_SENSOR_DATA *pxData,
  */
  static int iPopulateSdr( uint8_t ucIndex,
                           uint8_t ucRepoType,
-                          ASC_PROXY_DRIVER_SENSOR_DATA *pxData,
+                          ASCProxyDriverSensorData *pxData,
                           ASDMSdrRecord *pxSdr,
                           uint16_t *pusByteCount )
 {
@@ -1677,7 +1674,7 @@ static int iPopulateSdrThresholds( ASC_PROXY_DRIVER_SENSOR_DATA *pxData,
  */
 static int iPopulateSds( uint8_t ucIndex,
                          uint8_t ucRepoType,
-                         ASC_PROXY_DRIVER_SENSOR_DATA *pxData,
+                         ASCProxyDriverSensorData *pxData,
                          ASDMSdsRecord *pxSds,
                          uint16_t *pusByteCount )
 {
@@ -3257,7 +3254,7 @@ int iASDM_Initialise( uint8_t ucNumSensors )
             pxThis->ucAscNumSensors = ucNumSensors;
 
             /* Allocate memory to store the ASC data */
-            pxThis->pxAscData = pvOSAL_MemAlloc( sizeof( ASC_PROXY_DRIVER_SENSOR_DATA ) * ucNumSensors );
+            pxThis->pxAscData = pvOSAL_MemAlloc( sizeof(ASCProxyDriverSensorData) * ucNumSensors );
             if ( NULL != pxThis->pxAscData )
             {
                 INC_STAT_COUNTER( ASDM_STATS_MALLOC )

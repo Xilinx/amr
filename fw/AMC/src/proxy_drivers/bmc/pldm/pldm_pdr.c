@@ -1,16 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the PDR functions
  *
  * @file pldm_pdr.c
  */
-
-
-/******************************************************************************/
-/* Includes                                                                    */
-/******************************************************************************/
 
 #include "unistd.h"
 #include "pldm_pdr.h"
@@ -26,24 +21,14 @@
 
 #define PDR_HEADER_VERSION 0x1
 
-#define DATATYPE_EDataTypeUInt8  uint8_t
-#define DATATYPE_EDataTypeSInt8  int8_t
-#define DATATYPE_EDataTypeUInt16 uint16_t
-#define DATATYPE_EDataTypeSInt16 int16_t
-#define DATATYPE_EDataTypeUInt32 uint32_t
-#define DATATYPE_EDataTypeSInt32 int32_t
-#define DATATYPE_EDataTypeReal32 real32_t
-
 #define _DataType( x ) DATATYPE_ ## x
-
-#define __DATE_ ( 0x18012024 )
 
 
 /******************************************************************************/
 /* Globals                                                                   */
 /******************************************************************************/
 
-PDR_RepositoryInfo MSP432_PDR_Repository =
+PDRRepositoryInfo MSP432_PDR_Repository =
 {
     .repositoryState = ERepoStateFailed,                                       /* as repo is not intialized yet */
     /*intialization of repo related info in the init function */
@@ -109,8 +94,8 @@ uint32_t sensor_name_empty_space( uint8_t *namePDR )
  */
 void update_tid( uint8_t tid )
 {
-    PDR_RepositoryInfo    *repo;
-    TerminusPDRFormat_UID *terminusPDR;
+    PDRRepositoryInfo    *repo;
+    TerminusPDRFormatUid *terminusPDR;
 
     /*
      * initialize repo if it is not already initialized.
@@ -133,7 +118,7 @@ void update_tid( uint8_t tid )
 /**
  * @brief   Get the current PDR repository
  */
-const PDR_RepositoryInfo *getPDRRepository( void )
+const PDRRepositoryInfo *getPDRRepository( void )
 {
     vPdrRepoInit();
     /* Sanity: Although called multiple times,

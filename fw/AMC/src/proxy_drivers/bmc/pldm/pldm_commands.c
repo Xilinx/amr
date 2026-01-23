@@ -1,16 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains PLDM command enums, structures and functions
  *
  * @file pldm_commands.c
  */
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <unistd.h>
 
@@ -51,18 +46,18 @@
 /******************************************************************************/
 
 /**
- * @struct  Pldm_command_list
+ * @struct  PldmCommandList
  * @brief   PLDM command list variables
  */
-typedef struct Pldm_command_list
+typedef struct PldmCommandList
 {
-    const PldmFunction       *funcList;
-    const uint32_t           max_command_id;
-    const uint32_t           version_id;
-    uint8_t                  Pldm_Command_Supported[ 32 ];
-    struct Pldm_command_list *next;                                            /* pointer to next command list for the same type but different version */
+    const PldmFunction     *funcList;
+    const uint32_t         max_command_id;
+    const uint32_t         version_id;
+    uint8_t                Pldm_Command_Supported[ 32 ];
+    struct PldmCommandList *next;                                            /* pointer to next command list for the same type but different version */
 
-}Pldm_command_list;
+} PldmCommandList;
 
 
 /******************************************************************************/
@@ -118,13 +113,13 @@ const static PldmFunction PldmType2_cmd[ MAX_PLDM_2_COMMAND ] =
 
 static int PldmInitDone = 0;
 
-Pldm_command_list type0_cmd_list =
+PldmCommandList type0_cmd_list =
 {
     PldmType0_cmd,  MAX_PLDM_0_COMMAND, 0, {
         0
     }, NULL
 };
-Pldm_command_list type2_cmd_list =
+PldmCommandList type2_cmd_list =
 {
     PldmType2_cmd,  MAX_PLDM_2_COMMAND, 1, {
         0
@@ -134,7 +129,7 @@ Pldm_command_list type2_cmd_list =
 /*
  * Assuming non-defined entries will be NULL
  */
-Pldm_command_list *pldm_type_cmd[ MAX_PLDM_TYPE ] =
+PldmCommandList *pldm_type_cmd[ MAX_PLDM_TYPE ] =
 {
     [ 0 ] = &type0_cmd_list,
     [ 2 ] = &type2_cmd_list
@@ -177,7 +172,7 @@ int pldm_command_init( void )
 
     for(type_index = 0; type_index < MAX_PLDM_TYPE; type_index++)
     {
-        Pldm_command_list *current_cmd_list = pldm_type_cmd[ type_index ];
+        PldmCommandList *current_cmd_list = pldm_type_cmd[ type_index ];
         if( current_cmd_list != NULL )
         {
             Pldm_Type_Supported[ type_index / 8 ] |= ( 1 << ( type_index % 8 ) );
@@ -263,7 +258,7 @@ int IsPldmTypeSupported( const uint8_t type )
  */
 int get_pldm_func( uint8_t pldm_type, uint8_t pldm_cmd, PldmFunction *func )
 {
-    Pldm_command_list *current_cmd_list = NULL;
+    PldmCommandList *current_cmd_list = NULL;
 
     *func = NULL;
 
@@ -327,8 +322,8 @@ int getPldmTypeSupport( uint8_t *typeSupported )
  */
 int IsPldmVersionSupported( const uint8_t type, const uint8_t *ver )
 {
-    int               version_id        = 0;
-    Pldm_command_list *current_cmd_list = NULL;
+    int               version_id      = 0;
+    PldmCommandList *current_cmd_list = NULL;
 
     if( !IsPldmTypeSupported( type ) )
     {
@@ -373,9 +368,9 @@ int getPldmVersionSupport( const uint8_t type,
                            const uint32_t num_version,
                            int *moreAvailable )
 {
-    int               i                 = 0;
-    int               ret_size          = 0;
-    Pldm_command_list *current_cmd_list = NULL;
+    int               i               = 0;
+    int               ret_size        = 0;
+    PldmCommandList *current_cmd_list = NULL;
 
     *moreAvailable = 0;
 
@@ -439,9 +434,9 @@ int getPldmVersionSupport( const uint8_t type,
  */
 int getPldmCmdSupport( const uint8_t type, const uint8_t *ver, uint8_t *cmdSupported )
 {
-    Pldm_command_list *current_cmd_list = NULL;
-    int               ret_size          = 0;
-    int               version_id        = 0;
+    PldmCommandList *current_cmd_list = NULL;
+    int               ret_size        = 0;
+    int               version_id      = 0;
 
     /*
      * Todo: check if error codes can be communicated back instead of just 0

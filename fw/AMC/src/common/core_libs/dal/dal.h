@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the public API of the Debug Access Library (DAL)
@@ -8,10 +8,6 @@
  */
 #ifndef _DAL_H_
 #define _DAL_H_
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 
@@ -44,7 +40,7 @@ typedef void ( *DAL_DEBUG_FUNCTION )( void );
  * @struct  DAL_HDL
  * @brief   Handle to an option in the debug menu
  */
-typedef struct DAL_MENU_OPTION * DAL_HDL;
+typedef struct DALMenuOption * DAL_HDL;
 
 
 /******************************************************************************/

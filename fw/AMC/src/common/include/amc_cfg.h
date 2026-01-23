@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the event definitions and the initialisation status
@@ -84,7 +84,7 @@
  * @enum    AMC_EVENT_UNIQUE_IDS
  * @brief   Unique ID of each proxy driver
  */
-typedef enum AMC_CFG_UNIQUE_IDS
+typedef enum
 {
     AMC_CFG_UNIQUE_ID_AXC,
     AMC_CFG_UNIQUE_ID_APC,

@@ -1,16 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the MCTP message handling functions
  *
  * @file mctp_commands.c
  */
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <unistd.h>
 #include <string.h>
@@ -73,14 +68,13 @@ extern int iGetUuid( uint8_t *pucUuid );
  */
 enum mctpCtrlCmdID
 {
-    MCTP_CMD_SETEID              = ( 0x1 ),
-    MCTP_CMD_GETEID              = ( 0x2 ),
-    MCTP_CMD_GETUUID             = ( 0x3 ),
-    MCTP_CMD_GETVERSION          = ( 0x4 ),
-    MCTP_CMD_GETMSGTYPE          = ( 0x5 ),
-    MCTP_CMD_ROUTING_INFO_UPDATE = ( 0x9 ),
+    MCTP_CMD_SETEID              = 0x1,
+    MCTP_CMD_GETEID              = 0x2,
+    MCTP_CMD_GETUUID             = 0x3,
+    MCTP_CMD_GETVERSION          = 0x4,
+    MCTP_CMD_GETMSGTYPE          = 0x5,
+    MCTP_CMD_ROUTING_INFO_UPDATE = 0x9,
     MAX_MCTP_CTRL_COMMAND
-
 };
 
 /**
@@ -89,11 +83,10 @@ enum mctpCtrlCmdID
  */
 enum setEIDOperations_req
 {
-    SET_EID             = ( 0x00 ),
-    FORCE_EID           = ( 0x01 ),
-    RESET_EID           = ( 0x02 ),
-    SET_DISCOVERED_FLAG = ( 0x03 )
-
+    SET_EID             = 0x00,
+    FORCE_EID           = 0x01,
+    RESET_EID           = 0x02,
+    SET_DISCOVERED_FLAG = 0x03
 };
 
 /**
@@ -102,9 +95,8 @@ enum setEIDOperations_req
  */
 enum setEIDassigmntStatus_resp
 {
-    EID_ASSIGNMENT_ACCEPTED = ( 0x0 ),
-    EID_ASSIGNMENT_REJECTED = ( 0x1 )
-
+    EID_ASSIGNMENT_ACCEPTED = 0x0,
+    EID_ASSIGNMENT_REJECTED = 0x1
 };
 
 

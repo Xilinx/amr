@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains private definitions for the SMBus driver.
@@ -237,10 +237,10 @@ typedef struct
 } SMBus_Instance;
 
 /*
- * @struct SMBus_Profile
+ * @struct SMBusProfile
  * @brief  Structure to hold a single SMBus profile
  */
-typedef struct SMBus_Profile
+typedef struct SMBusProfile
 {
     SMBUS_USER_ENV_READ_TICKS  pFnReadTicks;
     void*                      pvBaseAddr;
@@ -254,7 +254,7 @@ typedef struct SMBus_Profile
     SMBUS_LOG_LEVEL            xLogLevel;
     uint8_t                    ucUDIDMatch[SMBUS_NUM_NON_ARP_INSTANCES];
 
-} SMBus_Profile;
+} SMBusProfile;
 
 /**
  * @brief    Does a ceiling conversion on a floating point number and returns the
@@ -271,7 +271,7 @@ uint32_t ulSMBusCeil( float fNum );
  * @param    ucProtocol is any protocol enum value
  * @return   A character string of the protocol
  */
-SMBUS_ERROR_TYPE xSMBusFirewallCheck(SMBus_Profile* pxSMBusProfile);
+SMBUS_ERROR_TYPE xSMBusFirewallCheck(SMBusProfile* pxSMBusProfile);
 
 /**
  * @brief    Will add a log entry into the debug log
@@ -285,7 +285,7 @@ SMBUS_ERROR_TYPE xSMBusFirewallCheck(SMBus_Profile* pxSMBusProfile);
  *
  * @return   None
  */
-void vLogAddEntry( SMBus_Profile* pxSMBusProfile, SMBUS_LOG_LEVEL xLogLevel, uint32_t ulInstance,
+void vLogAddEntry( SMBusProfile* pxSMBusProfile, SMBUS_LOG_LEVEL xLogLevel, uint32_t ulInstance,
                    SMBUS_LOG_EVENT xLogEvent, uint32_t ulEntry1, uint32_t ulEntry2 );
 
 /**
@@ -305,7 +305,7 @@ char* pcProtocolToString( uint8_t ucProtocol );
  * @param    pxSMBusProfile is a pointer to the SMBus profile structure.
  * @return   None
  */
-void vSMBusEventQueueHandle( SMBus_Profile* pxSMBusProfile );
+void vSMBusEventQueueHandle( SMBusProfile* pxSMBusProfile );
 /**
  * @brief    Initializes the debug log. Setting its pointer to zero
  *
@@ -313,7 +313,7 @@ void vSMBusEventQueueHandle( SMBus_Profile* pxSMBusProfile );
  *
  * @return   None
  */
-void vLogInitialize( SMBus_Profile* pxSMBusProfile );
+void vLogInitialize( SMBusProfile* pxSMBusProfile );
 
 /**
  * @brief    Will retreive the log as a character string
@@ -324,7 +324,7 @@ void vLogInitialize( SMBus_Profile* pxSMBusProfile );
  *
  * @return   None
  */
-void vLogDisplayLog( SMBus_Profile* pxSMBusProfile, char* pcLogBuffer, uint32_t* usLogSizeBytes );
+void vLogDisplayLog( SMBusProfile* pxSMBusProfile, char* pcLogBuffer, uint32_t* usLogSizeBytes );
 
 /******************************************************************************/
 /* Driver Internal APIs                                                       */
@@ -337,7 +337,7 @@ void vLogDisplayLog( SMBus_Profile* pxSMBusProfile, char* pcLogBuffer, uint32_t*
  *
  * @return   None
  */
-void vSMBusLogEnable( SMBus_Profile* pxSMBusProfile );
+void vSMBusLogEnable( SMBusProfile* pxSMBusProfile );
 
 /**
  * @brief    Disables logging
@@ -346,7 +346,7 @@ void vSMBusLogEnable( SMBus_Profile* pxSMBusProfile );
  *
  * @return   None
  */
-void vSMBusLogDisable( SMBus_Profile* pxSMBusProfile );
+void vSMBusLogDisable( SMBusProfile* pxSMBusProfile );
 
 /**
  * @brief    Resets the statistics log values for the specified instance
@@ -356,7 +356,7 @@ void vSMBusLogDisable( SMBus_Profile* pxSMBusProfile );
  *
  * @return   None
  */
-void vSMBusResetStatsLogInstance( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBusInstance );
+void vSMBusResetStatsLogInstance( SMBusProfile* pxSMBusProfile, uint8_t ucSMBusInstance );
 
 /**
  * @brief    Reads the statistics log values for the specified instance
@@ -367,7 +367,7 @@ void vSMBusResetStatsLogInstance( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBus
  *
  * @return   None
  */
-void vSMBusReadStatsLogInstance( SMBus_Profile* pxSMBusProfile, uint8_t ucSMBusInstance,
+void vSMBusReadStatsLogInstance( SMBusProfile* pxSMBusProfile, uint8_t ucSMBusInstance,
     SMBus_Log* pSMBusMessageLog );
 
 #ifdef __cplusplus

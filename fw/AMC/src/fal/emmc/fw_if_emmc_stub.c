@@ -1,16 +1,11 @@
 /**
-* Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This file contains the FW IF EMMC interface implementation stubs.
 *
 * @file fw_if_emmc_stub.c
 */
-
-
-/*****************************************************************************/
-/* includes                                                                  */
-/*****************************************************************************/
 
 #include "fw_if_emmc.h"
 
@@ -24,12 +19,10 @@
 /*****************************************************************************/
 
 #define FW_IF_EMMC_NAME         "FW_IF_EMMC"
-#define EMMC_UPPER_FIREWALL     ( 0xBEEFCAFE )
-#define EMMC_LOWER_FIREWALL     ( 0xDEADFACE )
 
 #define CHECK_DRIVER            if( FW_IF_FALSE == pxThis->iInitialised ) return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
-#define CHECK_FIREWALLS( f )    if( ( f->upperFirewall != EMMC_UPPER_FIREWALL ) &&\
-                                    ( f->lowerFirewall != EMMC_LOWER_FIREWALL ) ) return FW_IF_ERRORS_INVALID_HANDLE
+#define CHECK_FIREWALLS( f )    if( ( f->upperFirewall != UPPER_FIREWALL ) &&\
+                                    ( f->lowerFirewall != LOWER_FIREWALL ) ) return FW_IF_ERRORS_INVALID_HANDLE
 #define CHECK_HDL( f )          if( NULL == f ) return FW_IF_ERRORS_INVALID_HANDLE
 #define CHECK_CFG( f )          if( NULL == ( f )->cfg  ) return FW_IF_ERRORS_INVALID_CFG
 
@@ -39,35 +32,36 @@
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_EMMC_PRIVATE_DATA
+ * @struct  FWIfEmmcPrivateData
  * @brief   Structure to hold this FAL's private data
  */
-typedef struct FW_IF_EMMC_PRIVATE_DATA
+typedef struct
 {
-    uint32_t                ulUpperFirewall;
+    uint32_t        ulUpperFirewall;
 
-    FW_IF_EMMC_INIT_CFG     xLocalCfg;
-    int                     iInitialised;
+    FWIfEmmcInitCfg xLocalCfg;
+    int             iInitialised;
 
-    uint32_t                ulLowerFirewall;
+    uint32_t        ulLowerFirewall;
 
-} FW_IF_EMMC_PRIVATE_DATA;
+} FWIfEmmcPrivateData;
 
 
 /*****************************************************************************/
 /* local variables                                                           */
 /*****************************************************************************/
 
-static FW_IF_EMMC_PRIVATE_DATA xLocalData =
+static FWIfEmmcPrivateData xLocalData =
 {
-    EMMC_UPPER_FIREWALL,    /* ulUpperFirewall */
+    UPPER_FIREWALL, /* ulUpperFirewall */
 
-    { 0 },                  /* xLocalCfg       */
-    FW_IF_FALSE,            /* iInitialised    */
+    { 0 },          /* xLocalCfg       */
+    FW_IF_FALSE,    /* iInitialised    */
 
-    EMMC_LOWER_FIREWALL     /* ulLowerFirewall */
+    LOWER_FIREWALL  /* ulLowerFirewall */
 };
-static FW_IF_EMMC_PRIVATE_DATA *pxThis = &xLocalData;
+
+static FWIfEmmcPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -160,13 +154,13 @@ static uint32_t ulEmmcOpen( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_EMMC_CFG *pxCfg = ( FW_IF_EMMC_CFG* )pxThisIf->cfg;
+    FWIfEmmcCfg *pxCfg = ( FWIfEmmcCfg* )pxThisIf->cfg;
 
     /*
      * This is where the EMMC driver would be initialised, with the device
@@ -186,13 +180,13 @@ static uint32_t ulEmmcClose( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_EMMC_CFG *pxCfg = ( FW_IF_EMMC_CFG* )pxThisIf->cfg;
+    FWIfEmmcCfg *pxCfg = ( FWIfEmmcCfg* )pxThisIf->cfg;
 
     /*
      * This is where the EMMC driver would be de-initialised, with the device
@@ -216,7 +210,7 @@ static uint32_t ulEmmcWrite( void *pvFwIf,
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -247,7 +241,7 @@ static uint32_t ulEmmcRead( void *pvFwIf,
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -274,13 +268,13 @@ static uint32_t ulEmmcIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_EMMC_CFG *pxCfg = ( FW_IF_EMMC_CFG* )pxThisIf->cfg;
+    FWIfEmmcCfg *pxCfg = ( FWIfEmmcCfg* )pxThisIf->cfg;
 
     switch( ulOption )
     {
@@ -322,7 +316,7 @@ static uint32_t ulEmmcBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -334,7 +328,7 @@ static uint32_t ulEmmcBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
          * Binds in callback provided to the FW_IF.
          * Callback will be invoked when by the driver when event occurs.
          */
-        FW_IF_EMMC_CFG *pxCfg = ( FW_IF_EMMC_CFG* )pxThisIf->cfg;
+        FWIfEmmcCfg *pxCfg = ( FWIfEmmcCfg* )pxThisIf->cfg;
         pxThisIf->raiseEvent = pxNewFunc;
 
         PLL_DBG( FW_IF_EMMC_NAME, "FW_IF_bindCallback called for if.%u (%s)\r\n",
@@ -357,7 +351,7 @@ static uint32_t ulEmmcBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 /**
  * @brief   initialisation function for EMMC interfaces (generic across all EMMC interfaces)
  */
-uint32_t ulFW_IF_EMMC_Init( FW_IF_EMMC_INIT_CFG *pxInitCfg )
+uint32_t ulFW_IF_EMMC_Init( FWIfEmmcInitCfg *pxInitCfg )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
@@ -386,7 +380,7 @@ uint32_t ulFW_IF_EMMC_Init( FW_IF_EMMC_INIT_CFG *pxInitCfg )
 /**
  * @brief   opens an instance of the EMMC interface
  */
-uint32_t ulFW_IF_EMMC_Create( FW_IF_CFG *pxFwIf, FW_IF_EMMC_CFG *pxEmmcCfg )
+uint32_t ulFW_IF_EMMC_Create( FWIfCfg *pxFwIf, FWIfEmmcCfg *pxEmmcCfg )
 {
     uint32_t status = FW_IF_ERRORS_NONE;
 
@@ -394,9 +388,9 @@ uint32_t ulFW_IF_EMMC_Create( FW_IF_CFG *pxFwIf, FW_IF_EMMC_CFG *pxEmmcCfg )
 
     if( ( NULL != pxFwIf ) && ( NULL != pxEmmcCfg ) )
     {
-        FW_IF_CFG myLocalIf =
+        FWIfCfg myLocalIf =
         {
-            .upperFirewall  = EMMC_UPPER_FIREWALL,
+            .upperFirewall  = UPPER_FIREWALL,
             .open           = &ulEmmcOpen,
             .close          = &ulEmmcClose,
             .write          = &ulEmmcWrite,
@@ -404,12 +398,12 @@ uint32_t ulFW_IF_EMMC_Create( FW_IF_CFG *pxFwIf, FW_IF_EMMC_CFG *pxEmmcCfg )
             .ioctrl         = &ulEmmcIoCtrl,
             .bindCallback   = &ulEmmcBindCallback,
             .cfg            = ( void* )pxEmmcCfg,
-            .lowerFirewall  = EMMC_LOWER_FIREWALL
+            .lowerFirewall  = LOWER_FIREWALL
         };
 
         pvOSAL_MemCpy( pxFwIf, &myLocalIf, sizeof( *pxFwIf ) );
 
-        FW_IF_EMMC_CFG *pxCfg = ( FW_IF_EMMC_CFG* )pxFwIf->cfg;
+        FWIfEmmcCfg *pxCfg = ( FWIfEmmcCfg* )pxFwIf->cfg;
 
         PLL_DBG( FW_IF_EMMC_NAME, "ulFW_IF_EMMC_Create for if.%u (%s)\r\n",
                  ( unsigned int )pxCfg->ulIfId,

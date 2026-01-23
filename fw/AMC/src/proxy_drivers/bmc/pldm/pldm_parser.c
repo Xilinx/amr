@@ -1,16 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the PLDM parser structs and functions
  *
  * @file pldm_parser.c
  */
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <unistd.h>
 #include "pldm_commands.h"
@@ -50,17 +45,17 @@
 /******************************************************************************/
 
 /**
- * @struct  pldm_packet
+ * @struct  PldmPacket
  * @brief   Structure of the PLDM Packet
  */
-typedef struct pldm_packet
+typedef struct
 {
     unsigned char rq_d_instanceID;
     unsigned char hdr_pldm_type;
     unsigned char pldm_cmd;
     unsigned char PayLoad[ MAX_PAYLOAD_SIZE ];
 
-}pldm_packet;
+} PldmPacket;
 
 
 /******************************************************************************/
@@ -70,10 +65,10 @@ typedef struct pldm_packet
 /**
  * @brief   Clear the PLDM Packet
  */
-void clear_pldm_packet( pldm_packet *pkt )
+void clear_pldm_packet( PldmPacket *pkt )
 {
     /*
-     * mem set 0 to pkt (sizeof pldm_packet)
+     * mem set 0 to pkt (sizeof PldmPacket)
      */
     uint8_t *ptr = ( uint8_t * ) pkt;
     int     i;
@@ -87,7 +82,7 @@ void clear_pldm_packet( pldm_packet *pkt )
 /**
  * @brief   Initialise the data in the PLDM response
  */
-void init_pldm_response( const pldm_packet *RqPkt, pldm_packet *RspPkt )
+void init_pldm_response( const PldmPacket *RqPkt, PldmPacket *RspPkt )
 {
     RspPkt->rq_d_instanceID = RqPkt->rq_d_instanceID & ~( BYTE_1_RQ_MASK | BYTE_1_D_MASK );
     RspPkt->hdr_pldm_type   = RqPkt->hdr_pldm_type;
@@ -105,8 +100,8 @@ int process_pldm_request( void *ReqBuff, void *RespBuff, int request_pkt )
     int type      = 0;
     int cmd       = 0;
 
-    pldm_packet *req  = ReqBuff;
-    pldm_packet *resp = RespBuff;
+    PldmPacket *req  = ReqBuff;
+    PldmPacket *resp = RespBuff;
 
     PldmFunction processor = NULL;
 

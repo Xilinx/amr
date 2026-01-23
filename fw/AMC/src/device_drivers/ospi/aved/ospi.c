@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the OSPI device driver.
@@ -7,14 +7,10 @@
  * @file ospi.c
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "xospipsv.h"                                                          /* OSPIPSV device driver */
+#include "xospipsv.h"   /* OSPIPSV device driver */
 
 #include "ospi.h"
 #include "util.h"
@@ -24,27 +20,49 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
-
 #define OSPI_NAME "OSPI"
 
 /* Stat & Error definitions */
-#define OSPI_STATS( DO ) DO( OSPI_STATS_INIT_COMPLETED ) DO( OSPI_STATS_ERASE_SUCCESS ) DO(            \
-            OSPI_STATS_READ_SUCCESS ) DO( OSPI_STATS_WRITE_SUCCESS ) DO( OSPI_STATS_CREATE_TIMER ) DO( \
-            OSPI_STATS_CREATE_MUTEX ) DO( OSPI_STATS_TAKE_MUTEX ) DO( OSPI_STATS_RELEASE_MUTEX ) DO( OSPI_STATS_MAX )
+#define OSPI_STATS( DO )            \
+    DO( OSPI_STATS_INIT_COMPLETED ) \
+    DO( OSPI_STATS_ERASE_SUCCESS )  \
+    DO( OSPI_STATS_READ_SUCCESS )   \
+    DO( OSPI_STATS_WRITE_SUCCESS )  \
+    DO( OSPI_STATS_CREATE_TIMER )   \
+    DO( OSPI_STATS_CREATE_MUTEX )   \
+    DO( OSPI_STATS_TAKE_MUTEX )     \
+    DO( OSPI_STATS_RELEASE_MUTEX )  \
+    DO( OSPI_STATS_MAX )
 
-#define OSPI_ERRORS( DO ) DO( OSPI_ERRORS_VALIDAION_FAILED ) DO( OSPI_ERRORS_DEVICE_RESET ) DO(                       \
-            OSPI_ERRORS_LOOKUP_CONFIG ) DO( OSPI_ERRORS_CONFIG_INIT ) DO( OSPI_ERRORS_SET_OPTIONS ) DO(               \
-            OSPI_ERRORS_SET_CLK_PRESCALER ) DO( OSPI_ERRORS_SELECT_FLASH ) DO( OSPI_ERRORS_FLASH_READ_ID ) DO(        \
-            OSPI_ERRORS_SET_DDR_MODE_INDEX ) DO( OSPI_ERRORS_4B_ADDRESS_MODE ) DO( OSPI_ERRORS_SET_SDR_DDR_MODE ) DO( \
-            OSPI_ERRORS_PAGE_SIZE ) DO( OSPI_ERRORS_FLASH_ERASE_FAILED ) DO( OSPI_ERRORS_FLASH_READ_FAILED ) DO(      \
-            OSPI_ERRORS_FLASH_LINEAR_WRITE_FAILED ) DO( OSPI_ERRORS_FLASH_WRITE_FAILED ) DO(                          \
-            OSPI_ERRORS_FLASH_READ_MISMATCH ) DO( OSPI_ERRORS_FLASH_POLL_RETRY_FAILED ) DO(                           \
-            OSPI_ERRORS_SET_EDGE_MODE ) DO( OSPI_ERRORS_SET_4B_ADDR_MODE ) DO( OSPI_ERRORS_TIMER_CREATE_FAILED ) DO(  \
-            OSPI_ERRORS_TIMER_START_FAILED ) DO( OSPI_ERRORS_TIMER_STOP_FAILED ) DO(                                  \
-            OSPI_ERRORS_MUTEX_CREATE_FAILED ) DO( OSPI_ERRORS_MUTEX_RELEASE_FAILED ) DO(                              \
-            OSPI_ERRORS_MUTEX_TAKE_FAILED ) DO( OSPI_ERRORS_FLASH_ID_READ ) DO( OSPI_ERRORS_MAX )
+#define OSPI_ERRORS( DO )                       \
+    DO( OSPI_ERRORS_VALIDAION_FAILED )          \
+    DO( OSPI_ERRORS_DEVICE_RESET )              \
+    DO( OSPI_ERRORS_LOOKUP_CONFIG )             \
+    DO( OSPI_ERRORS_CONFIG_INIT )               \
+    DO( OSPI_ERRORS_SET_OPTIONS )               \
+    DO(  OSPI_ERRORS_SET_CLK_PRESCALER )        \
+    DO( OSPI_ERRORS_SELECT_FLASH )              \
+    DO( OSPI_ERRORS_FLASH_READ_ID )             \
+    DO( OSPI_ERRORS_SET_DDR_MODE_INDEX )        \
+    DO( OSPI_ERRORS_4B_ADDRESS_MODE )           \
+    DO( OSPI_ERRORS_SET_SDR_DDR_MODE )          \
+    DO( OSPI_ERRORS_PAGE_SIZE )                 \
+    DO( OSPI_ERRORS_FLASH_ERASE_FAILED )        \
+    DO( OSPI_ERRORS_FLASH_READ_FAILED )         \
+    DO( OSPI_ERRORS_FLASH_LINEAR_WRITE_FAILED ) \
+    DO( OSPI_ERRORS_FLASH_WRITE_FAILED )        \
+    DO( OSPI_ERRORS_FLASH_READ_MISMATCH )       \
+    DO( OSPI_ERRORS_FLASH_POLL_RETRY_FAILED )   \
+    DO( OSPI_ERRORS_SET_EDGE_MODE )             \
+    DO( OSPI_ERRORS_SET_4B_ADDR_MODE )          \
+    DO( OSPI_ERRORS_TIMER_CREATE_FAILED )       \
+    DO( OSPI_ERRORS_TIMER_START_FAILED )        \
+    DO( OSPI_ERRORS_TIMER_STOP_FAILED )         \
+    DO( OSPI_ERRORS_MUTEX_CREATE_FAILED )       \
+    DO( OSPI_ERRORS_MUTEX_RELEASE_FAILED )      \
+    DO( OSPI_ERRORS_MUTEX_TAKE_FAILED )         \
+    DO( OSPI_ERRORS_FLASH_ID_READ )             \
+    DO( OSPI_ERRORS_MAX )
 
 #define PRINT_STAT_COUNTER( x )  PLL_INF( OSPI_NAME,             \
                                           "%50s . . . . %d\r\n", \
@@ -145,10 +163,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( OSPI_ERRORS, OSPI_ERRORS, OSPI_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  OSPI_FLASH_INFO
+ * @struct  OSPIFlashInfo
  * @brief   Structure describing a flash device
  */
-typedef struct OSPI_FLASH_INFO
+typedef struct
 {
     uint32_t ulJedecId;         /* JEDEC ID */
     uint32_t ulSectSize;        /* Individual sector size or
@@ -165,13 +183,13 @@ typedef struct OSPI_FLASH_INFO
     uint8_t  ucStatusCmd;       /* Status Command */
     uint8_t  ucDummyCycles;     /* Number of Dummy cycles for Read operation */
 
-} OSPI_FLASH_INFO;
+} OSPIFlashInfo;
 
 /**
- * @struct  OSPI_PRIVATE_DATA
+ * @struct  OSPIPrivateData
  * @brief   Structure to hold ths driver's private data
  */
-typedef struct OSPI_PRIVATE_DATA
+typedef struct
 {
     uint32_t ulUpperFirewall;
 
@@ -192,7 +210,7 @@ typedef struct OSPI_PRIVATE_DATA
 
     uint32_t ulLowerFirewall;
 
-} OSPI_PRIVATE_DATA;
+} OSPIPrivateData;
 
 
 /******************************************************************************/
@@ -200,7 +218,7 @@ typedef struct OSPI_PRIVATE_DATA
 /******************************************************************************/
 
 /* Note: there are a number of hardcoded values here used to identify and config the flash device */
-static OSPI_FLASH_INFO pxFlashConfigTable[] =
+static OSPIFlashInfo pxFlashConfigTable[] =
 {
     /* Micron */
     {
@@ -243,33 +261,34 @@ static OSPI_FLASH_INFO pxFlashConfigTable[] =
 };
 
 
-static OSPI_PRIVATE_DATA xLocalData =
+static OSPIPrivateData xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    FALSE,                                                                     /* iInitialised */
+    UPPER_FIREWALL, /* ulUpperFirewall */
+    FALSE,          /* iInitialised */
     { {
           0
-      } },                                                                     /* xOspiPsvInstance */
-    0,                                                                         /* ulFlashMake */
-    0,                                                                         /* ulOspiSectorSize */
-    0,                                                                         /* ucFctIndex */
-    0,                                                                         /* ulPageSize */
-    0,                                                                         /* ucOspiFlashPercentage */
-    NULL,                                                                      /* pvOsalMutexHdl */
-    NULL,                                                                      /* pvTimerHandle */
-    FALSE,                                                                     /* iAbortPollWait */
+      } },          /* xOspiPsvInstance */
+    0,              /* ulFlashMake */
+    0,              /* ulOspiSectorSize */
+    0,              /* ucFctIndex */
+    0,              /* ulPageSize */
+    0,              /* ucOspiFlashPercentage */
+    NULL,           /* pvOsalMutexHdl */
+    NULL,           /* pvTimerHandle */
+    FALSE,          /* iAbortPollWait */
     {
         0
-    },                                                                         /* ucReadBfrPtr */
+    },              /* ucReadBfrPtr */
     {
         0
-    },                                                                         /* pulStatCounters */
+    },              /* pulStatCounters */
     {
         0
-    },                                                                         /* pulErrorCounters */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall */
+    },              /* pulErrorCounters */
+    LOWER_FIREWALL  /* ulLowerFirewall */
 };
-static OSPI_PRIVATE_DATA *pxThis = &xLocalData;
+
+static OSPIPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -438,7 +457,7 @@ static void vTimerPollTimeoutCb( void *pvTimerHandle );
 /**
  * @brief   Initializes the OSPI driver.
  */
-int iOSPI_FlashInit( OSPI_CFG_TYPE *pxOspiCfg )
+int iOSPI_FlashInit( OSPICfg *pxOspiCfg )
 {
     int iStatus = ERROR;
 

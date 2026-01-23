@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of ISL68221 sensor read
@@ -7,10 +7,6 @@
  *
  * @file isl68221.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "util.h"
 #include "pll.h"
@@ -22,9 +18,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-
-#define UPPER_FIREWALL                          ( 0xBABECAFE )
-#define LOWER_FIREWALL                          ( 0xDEADFACE )
 
 #define ISL68221_NAME                           "ISL68221"
 
@@ -99,10 +92,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( ISL68221_ERRORS, ISL68221_ERRORS, ISL68221_ERRORS_ST
 /******************************************************************************/
 
 /**
- * @struct  ISL68221_PRIVATE_DATA
+ * @struct  ISL68221PrivateData
  * @brief   Private driver data
  */
-typedef struct ISL68221_PRIVATE_DATA
+typedef struct
 {
     uint32_t    ulUpperFirewall;
 
@@ -111,7 +104,7 @@ typedef struct ISL68221_PRIVATE_DATA
 
     uint32_t    ulLowerFirewall;
 
-} ISL68221_PRIVATE_DATA;
+} ISL68221PrivateData;
 
 
 /******************************************************************************/
@@ -130,7 +123,8 @@ typedef struct ISL68221_PRIVATE_DATA
  *          ERROR               Register not written successfully
  *
  */
-static int iWriteRegister( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegisterAddress, uint8_t *pucRegisterContent );
+static int iWriteRegister( uint8_t ucI2cNum, uint8_t ucSlaveAddr,
+    uint8_t ucRegisterAddress, uint8_t *pucRegisterContent );
 
 /**
  * @brief   Read data from ISL68221 sensor
@@ -144,14 +138,15 @@ static int iWriteRegister( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegi
  *          ERROR               Register not read successfully
  *
  */
-static int iReadRegister( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegisterAddress, uint8_t *pucRegisterContent );
+static int iReadRegister( uint8_t ucI2cNum, uint8_t ucSlaveAddr,
+    uint8_t ucRegisterAddress, uint8_t *pucRegisterContent );
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static ISL68221_PRIVATE_DATA xPrivateData =
+static ISL68221PrivateData xPrivateData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall */
     { 0 },              /* ulStats */
@@ -159,7 +154,7 @@ static ISL68221_PRIVATE_DATA xPrivateData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 };
 
-static ISL68221_PRIVATE_DATA *pxThis = &xPrivateData;
+static ISL68221PrivateData *pxThis = &xPrivateData;
 
 
 /******************************************************************************/
@@ -169,7 +164,8 @@ static ISL68221_PRIVATE_DATA *pxThis = &xPrivateData;
 /**
  * @brief   Read voltage using ISL68221 sensor
  */
-int iISL68221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPageNum, float *pfVoltageInMV )
+int iISL68221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr,
+    uint8_t ucPageNum, float *pfVoltageInMV )
 {
     int      iStatus                              = ERROR;
     uint8_t  pucWriteBuf[ ISL68221_BUFFER_SIZE ]  = { 0 };

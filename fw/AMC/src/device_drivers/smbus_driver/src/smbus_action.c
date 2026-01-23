@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the action functions to either generate new events, determine a protocol
@@ -60,7 +60,7 @@ void vSMBusHandleActionResetAllData( SMBus_Instance* pxSMBusInstance )
         pxSMBusInstance->ucFifoEmptyWhileInDoneCount = 0;
         pxSMBusInstance->ucUDIDMatchedInstance       = SMBUS_INVALID_INSTANCE;
 
-        SMBus_Profile* pxSMBusProfile = pxSMBusInstance->pxSMBusProfile;
+        SMBusProfile* pxSMBusProfile = pxSMBusInstance->pxSMBusProfile;
 
         vLogAddEntry( pxSMBusInstance->pxSMBusProfile, SMBUS_LOG_LEVEL_DEBUG,
                         pxSMBusInstance->ucThisInstanceNum, SMBUS_LOG_EVENT_DEBUG,
@@ -304,7 +304,7 @@ void vSMBusHandleActionGetDataFromApplication( SMBus_Instance* pxSMBusInstance )
  */
 void vSMBusHandleActionWriteDataToApplication( SMBus_Instance* pxSMBusInstance, uint8_t ucTransactionID )
 {
-    SMBus_Profile* pxSMBusProfile = NULL;
+    SMBusProfile* pxSMBusProfile = NULL;
 	uint8_t	ucTempReceivedData[SMBUS_DATA_SIZE_MAX] = { 0 };
 
     if( ( NULL != pxSMBusInstance ) &&
@@ -334,7 +334,7 @@ void vSMBusHandleActionWriteDataToApplication( SMBus_Instance* pxSMBusInstance, 
 void vSMBusHandleActionAnnounceResultToApplication( SMBus_Instance* pxSMBusInstance,
                                                     uint8_t ucTransactionID, uint32_t ulStatus )
 {
-    SMBus_Profile* pxSMBusProfile = NULL;
+    SMBusProfile* pxSMBusProfile = NULL;
 
     if( ( NULL != pxSMBusInstance ) &&
         ( NULL != pxSMBusInstance->pFnAnnounceResult ) )

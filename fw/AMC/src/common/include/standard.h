@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the standard definitions for the AMC
@@ -9,10 +9,6 @@
 
 #ifndef _STANDARD_H_
 #define _STANDARD_H_
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <stdint.h>
 #include <stdio.h>
@@ -49,13 +45,13 @@
  *
  * @brief  Module states
  */
-typedef enum MODULE_STATE
+typedef enum
 {
-	MODULE_STATE_OK = 0,
-	MODULE_STATE_UNINITIALISED,
-	MODULE_STATE_ERROR,
+    MODULE_STATE_OK = 0,
+    MODULE_STATE_UNINITIALISED,
+    MODULE_STATE_ERROR,
 
-	MAX_MODULE_STATE
+    MAX_MODULE_STATE
 
 } MODULE_STATE;
 

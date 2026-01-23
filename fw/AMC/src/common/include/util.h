@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the utility definitions for the AMC
@@ -21,6 +21,19 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
+#define UTIL_MAX_UINT8      ( 0xFF )
+#define UTIL_MAX_UINT16     ( 0xFFFF )
+#define UTIL_MAX_UINT32     ( 0xFFFFFFFF )
+
+#define UTIL_100KHZ         ( 100 * 1000 )
+#define UTIL_400KHZ         ( 400 * 1000 )
+#define UTIL_1MHZ           ( 1000 * 1000 )
+
+#define UPPER_FIREWALL      ( 0xBABECAFE )
+#define LOWER_FIREWALL      ( 0xDEADFACE )
+
+#define UTIL_ELAPSED_TIME_MS( x ) ( ulOSAL_GetUptimeMs() - x );
+
 #define CHECK_RANGE( val, min,  max ) \
     ( ( val ) >= ( min ) && ( val ) < ( max ) && ( min ) < ( max ) ? TRUE : FALSE )
 
@@ -36,15 +49,5 @@
 #define UTIL_MAKE_ENUM_AND_STRINGS( source, enumName, enumStringName )      \
     enum enumName { source( UTIL_MAKE_ENUM ) };                             \
     const char *const enumStringName[] = {  source( UTIL_MAKE_STRINGS ) };
-
-#define UTIL_MAX_UINT8      ( 0xFF )
-#define UTIL_MAX_UINT16     ( 0xFFFF )
-#define UTIL_MAX_UINT32     ( 0xFFFFFFFF )
-
-#define UTIL_100KHZ         ( 100 * 1000 )
-#define UTIL_400KHZ         ( 400 * 1000 )
-#define UTIL_1MHZ           ( 1000 * 1000 )
-
-#define UTIL_ELAPSED_TIME_MS( x ) ( ulOSAL_GetUptimeMs() - x );
 
 #endif /* _UTIL_H_ */

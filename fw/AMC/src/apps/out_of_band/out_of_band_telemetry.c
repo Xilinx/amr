@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the amc oo band telemetry implementation
@@ -7,10 +7,6 @@
  * @file out_of_band_telemetry.c
  *
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 /* common includes */
 #include "standard.h"
@@ -39,33 +35,29 @@
 
 #define OUT_OF_BAND_NAME "AMC_OUT_OF_BAND"
 
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
-
-
 /* Stat & Error definitions */
-#define OUT_OF_BAND_STATS( DO )                           \
-        DO( OUT_OF_BAND_STATS_INIT_OVERALL_COMPLETE )     \
-        DO( OUT_OF_BAND_STATS_TAKE_MUTEX )                \
-        DO( OUT_OF_BAND_STATS_RELEASE_MUTEX )             \
-        DO( OUT_OF_BAND_STATS_BMC_SENSOR_INFO_REQUEST )   \
-        DO( OUT_OF_BAND_STATS_BMC_SENSOR_ENABLE_REQUEST ) \
-        DO( OUT_OF_BAND_STATS_BMC_PDR_REQUEST )           \
-        DO( OUT_OF_BAND_STATS_BMC_PDR_INFO_REQUEST )      \
-        DO( OUT_OF_BAND_STATS_BMC_UNSUPPORTED_REQUEST )   \
+#define OUT_OF_BAND_STATS( DO )                       \
+    DO( OUT_OF_BAND_STATS_INIT_OVERALL_COMPLETE )     \
+    DO( OUT_OF_BAND_STATS_TAKE_MUTEX )                \
+    DO( OUT_OF_BAND_STATS_RELEASE_MUTEX )             \
+    DO( OUT_OF_BAND_STATS_BMC_SENSOR_INFO_REQUEST )   \
+    DO( OUT_OF_BAND_STATS_BMC_SENSOR_ENABLE_REQUEST ) \
+    DO( OUT_OF_BAND_STATS_BMC_PDR_REQUEST )           \
+    DO( OUT_OF_BAND_STATS_BMC_PDR_INFO_REQUEST )      \
+    DO( OUT_OF_BAND_STATS_BMC_UNSUPPORTED_REQUEST )   \
         DO( OUT_OF_BAND_STATS_MAX )
 
-#define OUT_OF_BAND_ERRORS( DO )                                         \
-        DO( OUT_OF_BAND_ERRORS_INIT_MUTEX_FAILED )                       \
-        DO( OUT_OF_BAND_ERRORS_INIT_BIND_BMC_CB_FAILED )                 \
-        DO( OUT_OF_BAND_ERRORS_INIT_OVERALL_FAILED )                     \
-        DO( OUT_OF_BAND_ERRORS_MUTEX_RELEASE_FAILED )                    \
-        DO( OUT_OF_BAND_ERRORS_MUTEX_TAKE_FAILED )                       \
-        DO( OUT_OF_BAND_ERRORS_MALLOC_FAILED )                           \
-        DO( OUT_OF_BAND_ERRORS_BMC_GET_SENSOR_REQUEST_FAILED )           \
-        DO( OUT_OF_BAND_ERRORS_ASC_GET_SENSOR_DATA_FAILED )              \
-        DO( OUT_OF_BAND_ERRORS_ASC_SET_SENSOR_OPERATIONAL_STATE_FAILED ) \
-        DO( OUT_OF_BAND_ERRORS_MAX )
+#define OUT_OF_BAND_ERRORS( DO )                                     \
+    DO( OUT_OF_BAND_ERRORS_INIT_MUTEX_FAILED )                       \
+    DO( OUT_OF_BAND_ERRORS_INIT_BIND_BMC_CB_FAILED )                 \
+    DO( OUT_OF_BAND_ERRORS_INIT_OVERALL_FAILED )                     \
+    DO( OUT_OF_BAND_ERRORS_MUTEX_RELEASE_FAILED )                    \
+    DO( OUT_OF_BAND_ERRORS_MUTEX_TAKE_FAILED )                       \
+    DO( OUT_OF_BAND_ERRORS_MALLOC_FAILED )                           \
+    DO( OUT_OF_BAND_ERRORS_BMC_GET_SENSOR_REQUEST_FAILED )           \
+    DO( OUT_OF_BAND_ERRORS_ASC_GET_SENSOR_DATA_FAILED )              \
+    DO( OUT_OF_BAND_ERRORS_ASC_SET_SENSOR_OPERATIONAL_STATE_FAILED ) \
+    DO( OUT_OF_BAND_ERRORS_MAX )
 
 #define PRINT_STAT_COUNTER( x )  PLL_INF( OUT_OF_BAND_NAME,           \
                                           "%50s . . . . %d\r\n",      \
@@ -102,10 +94,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( OUT_OF_BAND_ERRORS, OUT_OF_BAND_ERRORS, OUT_OF_BAND_
 /******************************************************************************/
 
 /**
- * @struct  OUT_OF_BAND_PRIVATE_DATA
+ * @struct  OUTBandPrivateData
  * @brief   Structure to hold the out of band telemetry private data
  */
-typedef struct OUT_OF_BAND_PRIVATE_DATA
+typedef struct
 {
     uint32_t ulUpperFirewall;
     int      iInitialised;
@@ -114,27 +106,28 @@ typedef struct OUT_OF_BAND_PRIVATE_DATA
     uint32_t pulErrorCounters[ OUT_OF_BAND_ERRORS_MAX ];
     uint32_t ulLowerFirewall;
 
-} OUT_OF_BAND_PRIVATE_DATA;
+} OUTBandPrivateData;
 
 
 /******************************************************************************/
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static OUT_OF_BAND_PRIVATE_DATA xLocalData =
+static OUTBandPrivateData xLocalData =
 {
-    UPPER_FIREWALL,             /* ulUpperFirewall      */
-    FALSE,                      /* iInitialised         */
-    NULL,                       /* pvOsalMutexHdl       */
+    UPPER_FIREWALL,     /* ulUpperFirewall */
+    FALSE,              /* iInitialised */
+    NULL,               /* pvOsalMutexHdl */
     {
         0
-    },                          /* pulStatCounters       */
+    },                  /* pulStatCounters */
     {
         0
-    },                          /* pulErrorCounters      */
-    LOWER_FIREWALL              /* ulLowerFirewall      */
+    },                  /* pulErrorCounters */
+    LOWER_FIREWALL      /* ulLowerFirewall */
 };
-static OUT_OF_BAND_PRIVATE_DATA *pxThis = &xLocalData;
+
+static OUTBandPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -149,7 +142,7 @@ static OUT_OF_BAND_PRIVATE_DATA *pxThis = &xLocalData;
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
  */
-static int iBmcProxyCallback( EVL_SIGNAL *pxSignal );
+static int iBmcProxyCallback( EVLSignal *pxSignal );
 
 
 /******************************************************************************/
@@ -261,7 +254,7 @@ int iOUT_OF_BAND_TELEMETRY_ClearStatistics( void )
 /**
  * @brief   RMI Handler EVL callback
  */
-static int iBmcProxyCallback( EVL_SIGNAL *pxSignal )
+static int iBmcProxyCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
@@ -302,10 +295,7 @@ static int iBmcProxyCallback( EVL_SIGNAL *pxSignal )
                 {
                     uint32_t ulSensorId = 0;
 
-                    ASC_PROXY_DRIVER_SENSOR_DATA xSensorData =
-                    {
-                        0
-                    };
+                    ASCProxyDriverSensorData xSensorData = { 0 };
 
                     /* decode PLDM sensor ID to AMC ID */
                     ulSensorId = ssSensorId & 0xFF;

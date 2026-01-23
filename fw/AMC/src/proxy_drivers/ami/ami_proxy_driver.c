@@ -20,9 +20,6 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL                  ( 0xBABECAFE )
-#define LOWER_FIREWALL                  ( 0xDEADFACE )
-
 #define AMI_TASK_SLEEP_MS               ( 100 )
 
 #define AMI_NAME                        "AMI"
@@ -48,7 +45,7 @@
 #define APC_LOAD_LINK_VER_MINOR( v )    ( ( ( v ) << 24 ) & 0xFF000000 )
 
 /* Stat & Error definitions */
-#define AMI_PROXY_STATS( DO )   \
+#define AMI_PROXY_STATS( DO )                          \
     DO( AMI_PROXY_STATS_INIT_OVERALL_COMPLETE )        \
     DO( AMI_PROXY_STATS_CREATE_MUTEX )                 \
     DO( AMI_PROXY_STATS_CREATE_MBOX )                  \
@@ -83,7 +80,7 @@
     DO( AMI_PROXY_STATS_GET_MODULE_RW_REQUEST )        \
     DO( AMI_PROXY_STATS_MAX )
 
-#define AMI_PROXY_ERRORS( DO )    \
+#define AMI_PROXY_ERRORS( DO )                         \
     DO( AMI_PROXY_ERRORS_MUTEX_RELEASE_FAILED )        \
     DO( AMI_PROXY_ERRORS_MUTEX_TAKE_FAILED )           \
     DO( AMI_PROXY_ERRORS_MAILBOX_POST_FAILED )         \
@@ -253,10 +250,10 @@ typedef struct
     int             iInitialised;
     uint8_t         ucMyId;
 
-    FW_IF_CFG       *pxFwIf;
+    FWIfCfg       *pxFwIf;
     uint32_t        ulFwIfPort;
 
-    EVL_RECORD      *pxEvlRecord;
+    EVLRecord       *pxEvlRecord;
 
     void            *pvOsalMutexHdl;
     void            *pvOsalMBoxHdl;
@@ -591,7 +588,7 @@ static int iHandleFptFlagsRequest( AMI_CMD_REQUEST *pxCmdRequest );
 /**
  * @brief   Main initialisation point for the AMI Proxy Driver
  */
-int iAMI_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxFwIf, uint32_t ulFwIfPort,
+int iAMI_Initialise( uint8_t ucProxyId, FWIfCfg *pxFwIf, uint32_t ulFwIfPort,
                      uint32_t ulTaskPrio, uint32_t ulTaskStack )
 {
     int iStatus = ERROR;
@@ -609,7 +606,7 @@ int iAMI_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxFwIf, uint32_t ulFwIfPort,
         /* initalise evl record*/
         if ( OK != iEVL_CreateRecord( &pxThis->pxEvlRecord ) )
         {
-            PLL_ERR( AMI_NAME, "Error initialising EVL_RECORD\r\n" );
+            PLL_ERR( AMI_NAME, "Error initialising EVLRecord\r\n" );
             INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_ERRORS_INIT_EVL_RECORD_FAILED );
         }
         else
@@ -696,7 +693,7 @@ int iAMI_BindCallback( EVL_CALLBACK *pxCallback )
 /**
  * Set the pdi download response once complete
  */
-int iAMI_SetPdiDownloadCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetPdiDownloadCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -731,7 +728,7 @@ int iAMI_SetPdiDownloadCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT 
 /**
  * Set the pdi copy response once complete
  */
-int iAMI_SetPdiCopyCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetPdiCopyCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -766,7 +763,7 @@ int iAMI_SetPdiCopyCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xRes
 /**
  * Set the pdi program response once complete
  */
-int iAMI_SetPdiProgramCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetPdiProgramCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -801,7 +798,7 @@ int iAMI_SetPdiProgramCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT x
 /**
  * Set the sensor response once the data has been read
  */
-int iAMI_SetSensorCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetSensorCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -836,7 +833,7 @@ int iAMI_SetSensorCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResu
 /**
  * @brief   Set the identity major/minor response
  */
-int iAMI_SetIdentityResponse( EVL_SIGNAL *pxSignal,
+int iAMI_SetIdentityResponse( EVLSignal *pxSignal,
                               AMI_PROXY_RESULT xResult,
                               AMI_PROXY_IDENTITY_RESPONSE *pxIdentityResponse )
 {
@@ -875,7 +872,7 @@ int iAMI_SetIdentityResponse( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Set the boot select response
  */
-int iAMI_SetBootSelectCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetBootSelectCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -910,7 +907,7 @@ int iAMI_SetBootSelectCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT x
 /**
  * @brief   Set the EEPROM read/write response
  */
-int iAMI_SetEepromReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetEepromReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -945,7 +942,7 @@ int iAMI_SetEepromReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RES
 /**
  * @brief   Set the module read/write response
  */
-int iAMI_SetModuleReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetModuleReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -980,7 +977,7 @@ int iAMI_SetModuleReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RES
 /**
  * @brief   Set the debug verbosity response
  */
-int iAMI_SetDebugVerbosityResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult )
+int iAMI_SetDebugVerbosityResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult )
 {
     int iStatus = ERROR;
 
@@ -1015,7 +1012,7 @@ int iAMI_SetDebugVerbosityResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResu
 /**
  * @brief   Set the FPT flags response
  */
-int iAMI_SetFptFlagsResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags )
+int iAMI_SetFptFlagsResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags )
 {
     int iStatus = ERROR;
 
@@ -1053,7 +1050,7 @@ int iAMI_SetFptFlagsResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult, ui
 /**
  * @brief   Get the data associated with the PDI download
  */
-int iAMI_GetPdiDownloadRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
                                 AMI_PROXY_PDI_DOWNLOAD_REQUEST *pxDownloadRequest )
 {
     int iStatus = ERROR;
@@ -1128,7 +1125,7 @@ int iAMI_GetPdiDownloadRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the data associated with the PDI copy
  */
-int iAMI_GetPdiCopyRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
                             AMI_PROXY_PDI_COPY_REQUEST *pxCopyRequest )
 {
     int iStatus = ERROR;
@@ -1197,8 +1194,8 @@ int iAMI_GetPdiCopyRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the data associated with the PDI program
  */
-int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
-                                AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest )
+int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
+                               AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest )
 {
     int iStatus = ERROR;
 
@@ -1272,7 +1269,7 @@ int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the data associated with the sensor
  */
-int iAMI_GetSensorRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetSensorRequest( EVLSignal *pxSignal,
                            AMI_PROXY_SENSOR_REQUEST *pxSensorRequest )
 {
     int iStatus = ERROR;
@@ -1339,7 +1336,7 @@ int iAMI_GetSensorRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the boot selection request
  */
-int iAMI_GetBootSelectRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetBootSelectRequest( EVLSignal *pxSignal,
                                AMI_PROXY_BOOT_SELECT_REQUEST *pxBootSelectRequest )
 {
     int iStatus = ERROR;
@@ -1398,7 +1395,7 @@ int iAMI_GetBootSelectRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the eeprom read write request
  */
-int iAMI_GetEepromReadWriteRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
                                     AMI_PROXY_EEPROM_RW_REQUEST *pxEepromReadWriteRequest )
 {
     int iStatus = ERROR;
@@ -1464,7 +1461,7 @@ int iAMI_GetEepromReadWriteRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the module read write request
  */
-int iAMI_GetModuleReadWriteRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetModuleReadWriteRequest( EVLSignal *pxSignal,
                                     AMI_PROXY_MODULE_RW_REQUEST *pxModuleReadWriteRequest )
 {
     int iStatus = ERROR;
@@ -1534,7 +1531,7 @@ int iAMI_GetModuleReadWriteRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the debug verbosity request
  */
-int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetDebugVerbosityRequest( EVLSignal *pxSignal,
                                    uint8_t *pucDebugVerbosityRequest )
 {
     int iStatus = ERROR;
@@ -1592,7 +1589,7 @@ int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Get the FPT flags request
  */
-int iAMI_GetFptFlagsRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetFptFlagsRequest( EVLSignal *pxSignal,
                              AMI_PROXY_FPT_FLAGS_REQUEST *pxFptFlagsRequest )
 {
     int iStatus = ERROR;
@@ -1828,7 +1825,7 @@ static void vProxyDriverTask( void *pvArgs )
                             INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
 
                             /* Raise event using the index as the method to track the event */
-                            EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
+                            EVLSignal xNewSignal = { pxThis->ucMyId,
                                                     AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START,
                                                     ucIndex,
                                                     0 };
@@ -1887,7 +1884,7 @@ static void vProxyDriverTask( void *pvArgs )
                             INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
 
                             /* Raise event using the index as the method to track the event */
-                            EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
+                            EVLSignal xNewSignal = { pxThis->ucMyId,
                                                     AMI_PROXY_DRIVER_E_PDI_COPY_START,
                                                     ucIndex,
                                                     0 };
@@ -1952,7 +1949,7 @@ static void vProxyDriverTask( void *pvArgs )
                             INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
 
                             /* Raise event using the index as the method to track the event */
-                            EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
+                            EVLSignal xNewSignal = { pxThis->ucMyId,
                                                     AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START,
                                                     ucIndex,
                                                     0 };
@@ -2009,7 +2006,7 @@ static void vProxyDriverTask( void *pvArgs )
                             INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
 
                             /* Raise event using the index as the method to track the event */
-                            EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
+                            EVLSignal xNewSignal = { pxThis->ucMyId,
                                                     AMI_PROXY_DRIVER_E_SENSOR_READ, ucIndex, 0 };
                             iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                             if( ERROR == iStatus )
@@ -2054,10 +2051,10 @@ static void vProxyDriverTask( void *pvArgs )
                             INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
 
                             /* Raise event using the index as the method to track the event */
-                            EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
-                                                    AMI_PROXY_DRIVER_E_GET_IDENTITY,
-                                                    ucIndex,
-                                                    0 };
+                            EVLSignal xNewSignal = { pxThis->ucMyId,
+                                                     AMI_PROXY_DRIVER_E_GET_IDENTITY,
+                                                     ucIndex,
+                                                     0 };
                             iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                             if( ERROR == iStatus )
                             {
@@ -2103,10 +2100,10 @@ static void vProxyDriverTask( void *pvArgs )
                             INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
 
                             /* Raise event using the index as the method to track the event */
-                            EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
-                                                    AMI_PROXY_DRIVER_E_BOOT_SELECT,
-                                                    ucIndex,
-                                                    0 };
+                            EVLSignal xNewSignal = { pxThis->ucMyId,
+                                                     AMI_PROXY_DRIVER_E_BOOT_SELECT,
+                                                     ucIndex,
+                                                     0 };
                             iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                             if( ERROR == iStatus )
                             {
@@ -2353,10 +2350,10 @@ static int iHandleHeartbeatRequest( AMI_CMD_REQUEST *pxCmdRequest )
             {
                 /* raise event with the current heartbeat counter to anyone interested */
                 INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
-                EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
-                                          AMI_PROXY_DRIVER_E_HEARTBEAT,
-                                          pxCmdRequest->xHeartbeatPayload.ucHeartbeatCount,
-                                          0 };
+                EVLSignal xNewSignal = { pxThis->ucMyId,
+                                         AMI_PROXY_DRIVER_E_HEARTBEAT,
+                                         pxCmdRequest->xHeartbeatPayload.ucHeartbeatCount,
+                                         0 };
                 iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                 if( ERROR == iStatus )
                 {
@@ -2446,10 +2443,10 @@ static int iHandleEepromRequest( AMI_CMD_REQUEST *pxCmdRequest )
             {
                 /* raise event with the current heartbeat counter to anyone interested */
                 INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
-                EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
-                                          AMI_PROXY_DRIVER_E_EEPROM_READ_WRITE,
-                                          ucIndex,
-                                          0 };
+                EVLSignal xNewSignal = { pxThis->ucMyId,
+                                         AMI_PROXY_DRIVER_E_EEPROM_READ_WRITE,
+                                         ucIndex,
+                                         0 };
                 iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                 if( ERROR == iStatus )
                 {
@@ -2519,10 +2516,10 @@ static int iHandleModuleRequest( AMI_CMD_REQUEST *pxCmdRequest )
             {
                 /* raise event with the current heartbeat counter to anyone interested */
                 INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
-                EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
-                                          AMI_PROXY_DRIVER_E_MODULE_READ_WRITE,
-                                          ucIndex,
-                                          0 };
+                EVLSignal xNewSignal = { pxThis->ucMyId,
+                                         AMI_PROXY_DRIVER_E_MODULE_READ_WRITE,
+                                         ucIndex,
+                                         0 };
                 iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                 if( ERROR == iStatus )
                 {
@@ -2580,10 +2577,10 @@ static int iHandleDebugVerbosityRequest( AMI_CMD_REQUEST *pxCmdRequest )
             if( ERROR != iStatus )
             {
                 INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
-                EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
-                                          AMI_PROXY_DRIVER_E_DEBUG_VERBOSITY,
-                                          ucIndex,
-                                          0 };
+                EVLSignal xNewSignal = { pxThis->ucMyId,
+                                         AMI_PROXY_DRIVER_E_DEBUG_VERBOSITY,
+                                         ucIndex,
+                                         0 };
                 iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                 if( ERROR == iStatus )
                 {
@@ -2658,10 +2655,10 @@ static int iHandleFptFlagsRequest( AMI_CMD_REQUEST *pxCmdRequest )
             if( ERROR != iStatus )
             {
                 INC_STAT_COUNTER( AMI_PROXY_STATS_RELEASE_MUTEX )
-                EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
-                                          AMI_PROXY_DRIVER_E_FPT_FLAGS,
-                                          ucIndex,
-                                          0 };
+                EVLSignal xNewSignal = { pxThis->ucMyId,
+                                         AMI_PROXY_DRIVER_E_FPT_FLAGS,
+                                         ucIndex,
+                                         0 };
                 iStatus = iEVL_RaiseEvent( pxThis->pxEvlRecord, &xNewSignal );
                 if( ERROR == iStatus )
                 {

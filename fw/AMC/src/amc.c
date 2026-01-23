@@ -114,10 +114,10 @@ typedef enum
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
  */
-static int iApcCallback( EVL_SIGNAL *pxSignal );
-static int iAmiCallback( EVL_SIGNAL *pxSignal );
-static int iAxcCallback( EVL_SIGNAL *pxSignal );
-static int iBmcCallback( EVL_SIGNAL *pxSignal );
+static int iApcCallback( EVLSignal *pxSignal );
+static int iAmiCallback( EVLSignal *pxSignal );
+static int iAxcCallback( EVLSignal *pxSignal );
+static int iBmcCallback( EVLSignal *pxSignal );
 
 
 /******************************************************************************/
@@ -199,7 +199,7 @@ static void vConfigureSharedMemTable( void );
 /******************************************************************************/
 
 /* Note: the default I2C clock frequency isn't used */
-static I2C_CFG_TYPE xI2cCfg[ I2C_NUM_INSTANCES ] =
+static I2CConfig xI2cCfg[ I2C_NUM_INSTANCES ] =
 {
     {
         HAL_I2C_BUS_0_DEVICE_ID,
@@ -225,7 +225,7 @@ static I2C_CFG_TYPE xI2cCfg[ I2C_NUM_INSTANCES ] =
     }
 };
 
-static EEPROM_CFG xEepromCfg =
+static EEPROMCfg xEepromCfg =
 {
     HAL_EEPROM_I2C_BUS,
     HAL_EEPROM_SLAVE_ADDRESS,
@@ -238,27 +238,27 @@ static EEPROM_CFG xEepromCfg =
 };
 
 /* AXC External Device configs */
-static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice1 =
+static AXCProxyDriverExternalDeviceCfg xQsfpDevice1 =
 {
     &xQsfpIf1, 0
 };
 
-static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice2 =
+static AXCProxyDriverExternalDeviceCfg xQsfpDevice2 =
 {
     &xQsfpIf2, 1
 };
 
-static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice3 =
+static AXCProxyDriverExternalDeviceCfg xQsfpDevice3 =
 {
     &xQsfpIf3, 2
 };
 
-static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xQsfpDevice4 =
+static AXCProxyDriverExternalDeviceCfg xQsfpDevice4 =
 {
     &xQsfpIf4, 3
 };
 
-static AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG xDimmDevice =
+static AXCProxyDriverExternalDeviceCfg xDimmDevice =
 {
     &xDimmIf, 4
 };
@@ -465,7 +465,7 @@ int main( void )
 /**
  * @brief   AXC Proxy Driver EVL callback
  */
-static int iAxcCallback( EVL_SIGNAL *pxSignal )
+static int iAxcCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
@@ -491,7 +491,7 @@ static int iAxcCallback( EVL_SIGNAL *pxSignal )
 /**
  * @brief   APC Proxy Driver EVL callback
  */
-static int iApcCallback( EVL_SIGNAL *pxSignal )
+static int iApcCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
@@ -562,7 +562,7 @@ static int iApcCallback( EVL_SIGNAL *pxSignal )
 /**
  * @brief   AMI Proxy Driver EVL callback
  */
-static int iAmiCallback( EVL_SIGNAL *pxSignal )
+static int iAmiCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
@@ -628,7 +628,7 @@ static int iAmiCallback( EVL_SIGNAL *pxSignal )
 /**
  * @brief   BMC Proxy Driver EVL callback
  */
-static int iBmcCallback( EVL_SIGNAL *pxSignal )
+static int iBmcCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 

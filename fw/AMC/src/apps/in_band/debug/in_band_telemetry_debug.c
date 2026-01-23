@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the in band telemetry debug implementation
@@ -56,33 +56,33 @@
 /******************************************************************************/
 
 /**
- * @struct  IN_BAND_DEBUG_PRIVATE_DATA
+ * @struct  INBandDebugPrivateData
  * @brief   Structure to hold ths in band telemetry debug private data
  */
-typedef struct IN_BAND_DEBUG_PRIVATE_DATA
+typedef struct
 {
     int      iIsInitialised;
     uint64_t ullSharedMemBaseAddr;
     int      iInBandTestMode;
     int      iAmiTestCallbackBounded;
 
-} IN_BAND_DEBUG_PRIVATE_DATA;
+} INBandDebugPrivateData;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static IN_BAND_DEBUG_PRIVATE_DATA xLocalData =
+static INBandDebugPrivateData xLocalData =
 {
-    FALSE,                                                                     /* iIsInitialised */
-    0,                                                                         /* ullSharedMemBaseAddr*/
-    FALSE,                                                                     /* iInBandTestMode */
-    FALSE                                                                      /* iAmiTestCallbackBounded*/
+    FALSE,      /* iIsInitialised */
+    0,          /* ullSharedMemBaseAddr*/
+    FALSE,      /* iInBandTestMode */
+    FALSE       /* iAmiTestCallbackBounded*/
 
 };
-static IN_BAND_DEBUG_PRIVATE_DATA *pxThis = &xLocalData;
 
+static INBandDebugPrivateData *pxThis = &xLocalData;
 static DAL_HDL pxInBandTop = NULL;
 
 
@@ -119,7 +119,7 @@ static void vInBandTelemetryTestMode( void );
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
  */
-static int iAmiCallbackTestMode( EVL_SIGNAL *pxSignal );
+static int iAmiCallbackTestMode( EVLSignal *pxSignal );
 
 
 /******************************************************************************/
@@ -209,7 +209,7 @@ static void vInBandTelemetryTestMode( void )
 /**
  * @brief   AMI Proxy Driver Test Mode EVL callback
  */
-static int iAmiCallbackTestMode( EVL_SIGNAL *pxSignal )
+static int iAmiCallbackTestMode( EVLSignal *pxSignal )
 {
     int iStatus = TRUE;
 

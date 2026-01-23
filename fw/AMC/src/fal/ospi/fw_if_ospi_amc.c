@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF OSPI AMC abstraction.
  *
  * @file fw_if_ospi_amc.c
  */
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -27,16 +23,14 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define FW_IF_OSPI_NAME                 "FW_IF_OSPI"
-#define OSPI_UPPER_FIREWALL             ( 0xBEEFCAFE )
-#define OSPI_LOWER_FIREWALL             ( 0xDEADFACE )
+#define FW_IF_OSPI_NAME       "FW_IF_OSPI"
 
-#define CHECK_DRIVER                    ( FW_IF_FALSE == pxThis->iInitialised )
-#define CHECK_FIREWALLS( f )            ( ( f->upperFirewall != OSPI_UPPER_FIREWALL ) && \
-                                          ( f->lowerFirewall != OSPI_LOWER_FIREWALL ) )
+#define CHECK_DRIVER          ( FW_IF_FALSE == pxThis->iInitialised )
+#define CHECK_FIREWALLS( f )  ( ( f->upperFirewall != UPPER_FIREWALL ) && \
+                                ( f->lowerFirewall != LOWER_FIREWALL ) )
 
-#define CHECK_HDL( f )                  ( NULL == f )
-#define CHECK_CFG( f )                  ( NULL == ( f )->cfg )
+#define CHECK_HDL( f )        ( NULL == f )
+#define CHECK_CFG( f )        ( NULL == ( f )->cfg )
 
 /* Stat & Error definitions */
 #define FW_IF_OSPI_STAT_COUNTS( DO )                    \
@@ -64,15 +58,15 @@
     DO( FW_IF_OSPI_ERRORS_INVALID_STATE_COUNT )        \
     DO( FW_IF_OSPI_ERRORS_MAX_COUNT )
 
-#define PRINT_STAT_COUNTER( x )             PLL_INF( FW_IF_OSPI_NAME, "%50s . . . . %d\r\n",          \
-                                                     FW_IF_OSPI_STAT_COUNTS_STR[ x ],       \
-                                                     pxThis->pulStatCounters[ x ] )
-#define PRINT_ERROR_COUNTER( x )            PLL_INF( FW_IF_OSPI_NAME, "%50s . . . . %d\r\n",          \
-                                                     FW_IF_OSPI_ERROR_COUNTS_STR[ x ],      \
-                                                     pxThis->pulErrorCounters[ x ] )
+#define PRINT_STAT_COUNTER( x )     PLL_INF( FW_IF_OSPI_NAME, "%50s . . . . %d\r\n",  \
+                                             FW_IF_OSPI_STAT_COUNTS_STR[ x ],         \
+                                             pxThis->pulStatCounters[ x ] )
+#define PRINT_ERROR_COUNTER( x )    PLL_INF( FW_IF_OSPI_NAME, "%50s . . . . %d\r\n",  \
+                                             FW_IF_OSPI_ERROR_COUNTS_STR[ x ],        \
+                                             pxThis->pulErrorCounters[ x ] )
 
-#define INC_STAT_COUNTER( x )               { if( x < FW_IF_OSPI_STATS_MAX_COUNT )pxThis->pulStatCounters[ x ]++; }
-#define INC_ERROR_COUNTER( x )              { if( x < FW_IF_OSPI_ERRORS_MAX_COUNT )pxThis->pulErrorCounters[ x ]++; }
+#define INC_STAT_COUNTER( x )       { if( x < FW_IF_OSPI_STATS_MAX_COUNT )pxThis->pulStatCounters[ x ]++; }
+#define INC_ERROR_COUNTER( x )      { if( x < FW_IF_OSPI_ERRORS_MAX_COUNT )pxThis->pulErrorCounters[ x ]++; }
 
 
 /*****************************************************************************/
@@ -97,22 +91,22 @@ UTIL_MAKE_ENUM_AND_STRINGS( FW_IF_OSPI_ERROR_COUNTS, FW_IF_OSPI_ERROR_COUNTS, FW
 /******************************************************************************/
 
 /**
- * @struct  FW_IF_OSPI_PRIVATE_DATA
+ * @struct  FWIfOSPIPrivateData
  * @brief   Structure to hold this modules private data
  */
-typedef struct FW_IF_OSPI_PRIVATE_DATA
+typedef struct
 {
-    uint32_t                ulUpperFirewall;
+    uint32_t        ulUpperFirewall;
 
-    FW_IF_OSPI_INIT_CFG     xLocalCfg;
-    int                     iInitialised;
+    FWIfOspiInitCfg xLocalCfg;
+    int             iInitialised;
 
-    uint32_t                pulStatCounters[ FW_IF_OSPI_STATS_MAX_COUNT ];
-    uint32_t                pulErrorCounters[ FW_IF_OSPI_ERRORS_MAX_COUNT ];
+    uint32_t        pulStatCounters[ FW_IF_OSPI_STATS_MAX_COUNT ];
+    uint32_t        pulErrorCounters[ FW_IF_OSPI_ERRORS_MAX_COUNT ];
 
-    uint32_t                ulLowerFirewall;
+    uint32_t        ulLowerFirewall;
 
-} FW_IF_OSPI_PRIVATE_DATA;
+} FWIfOSPIPrivateData;
 
 
 /*****************************************************************************/
@@ -127,19 +121,20 @@ static const char* const pcOspiStateModeStr[ ] =
     FAL_OSPI_STATE_ENTRY( ERROR )
 };
 
-static FW_IF_OSPI_PRIVATE_DATA xLocalData =
+static FWIfOSPIPrivateData xLocalData =
 {
-    OSPI_UPPER_FIREWALL,    /* ulUpperFirewall */
+    UPPER_FIREWALL, /* ulUpperFirewall */
 
-    { 0 },                  /* xLocalCfg */
-    FALSE,                  /* iInitialised */
+    { 0 },          /* xLocalCfg */
+    FALSE,          /* iInitialised */
 
-    { 0 },                  /* pulStatCounters */
-    { 0 },                  /* pulErrorCounters */
+    { 0 },          /* pulStatCounters */
+    { 0 },          /* pulErrorCounters */
 
-    OSPI_LOWER_FIREWALL     /* ulLowerFirewall */
+    UPPER_FIREWALL  /* ulLowerFirewall */
 };
-static FW_IF_OSPI_PRIVATE_DATA *pxThis = &xLocalData;
+
+static FWIfOSPIPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -229,7 +224,7 @@ static uint32_t ulOspiBindCallback( void *vFwIf, FW_IF_callback *pxNewFunc );
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulValidateAddressRange( FW_IF_OSPI_CFG *pxCfg, uint32_t ulAddrOffset, uint32_t ulLength );
+static uint32_t ulValidateAddressRange( FWIfOspiCfg *pxCfg, uint32_t ulAddrOffset, uint32_t ulLength );
 
 
 /******************************************************************************/
@@ -239,12 +234,12 @@ static uint32_t ulValidateAddressRange( FW_IF_OSPI_CFG *pxCfg, uint32_t ulAddrOf
 /**
  * @brief   initialisation function for OSPI interfaces (generic across all OSPI interfaces)
  */
-uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *xInitCfg )
+uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *xInitCfg )
 {
     FW_IF_OSPI_ERRORS xRet = FW_IF_OSPI_ERRORS_DRIVER_FAILURE;
 
-    if( ( OSPI_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( OSPI_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( UPPER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( FALSE == pxThis->iInitialised ) )
     {
         xRet = FW_IF_ERRORS_NONE;
@@ -255,13 +250,13 @@ uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *xInitCfg )
         }
         else if ( NULL != xInitCfg )
         {
-            OSPI_CFG_TYPE pxOspiCfg = { 0 };
+            OSPICfg pxOspiCfg = { 0 };
             int iStatus = ERROR;
 
             /*
              * Initilise config data shared between all instances of OSPI.
              */
-            pvOSAL_MemCpy( &pxThis->xLocalCfg, xInitCfg, sizeof( FW_IF_OSPI_INIT_CFG ) );
+            pvOSAL_MemCpy( &pxThis->xLocalCfg, xInitCfg, sizeof( FWIfOspiInitCfg ) );
 
             /*
              * Initialise the driver based on the device id supplied in the xparameters.h
@@ -296,12 +291,12 @@ uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *xInitCfg )
 /**
  * @brief   opens an instance of the OSPI interface
  */
-uint32_t ulFW_IF_OSPI_Create( FW_IF_CFG *pxFwIf, FW_IF_OSPI_CFG *pxOspiCfg )
+uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFwIf, FWIfOspiCfg *pxOspiCfg )
 {
     FW_IF_OSPI_ERRORS xRet = FW_IF_OSPI_ERRORS_DRIVER_FAILURE;
 
-    if( ( OSPI_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( OSPI_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( UPPER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
         xRet = FW_IF_ERRORS_NONE;
@@ -316,9 +311,9 @@ uint32_t ulFW_IF_OSPI_Create( FW_IF_CFG *pxFwIf, FW_IF_OSPI_CFG *pxOspiCfg )
             ( NULL != pxOspiCfg ) )
         {
 
-            FW_IF_CFG myLocalIf =
+            FWIfCfg myLocalIf =
             {
-                .upperFirewall  = OSPI_UPPER_FIREWALL,
+                .upperFirewall  = UPPER_FIREWALL,
                 .open           = &ulOspiOpen,
                 .close          = &ulOspiClose,
                 .write          = &ulOspiWrite,
@@ -326,12 +321,12 @@ uint32_t ulFW_IF_OSPI_Create( FW_IF_CFG *pxFwIf, FW_IF_OSPI_CFG *pxOspiCfg )
                 .ioctrl         = &ulOspiIoCtrl,
                 .bindCallback   = &ulOspiBindCallback,
                 .cfg            = ( void* )pxOspiCfg,
-                .lowerFirewall  = OSPI_LOWER_FIREWALL
+                .lowerFirewall  = UPPER_FIREWALL
             };
 
-            pvOSAL_MemCpy( pxFwIf, &myLocalIf, sizeof( FW_IF_CFG ) );
+            pvOSAL_MemCpy( pxFwIf, &myLocalIf, sizeof( FWIfCfg ) );
 
-            FW_IF_OSPI_CFG *pxCfg = ( FW_IF_OSPI_CFG* )pxFwIf->cfg;
+            FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxFwIf->cfg;
 
             /* Configuration options, base address will the RPU/APU or SC address within the flash device */
             PLL_DBG( FW_IF_OSPI_NAME, "Start Address: 0x%x\r\n", pxCfg->ulBaseAddress );
@@ -362,7 +357,7 @@ static uint32_t ulOspiOpen( void *pvFwIf )
 {
     FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     if( CHECK_HDL( pxThisIf ) )
     {
         xRet = FW_IF_ERRORS_INVALID_HANDLE;
@@ -387,7 +382,7 @@ static uint32_t ulOspiOpen( void *pvFwIf )
         INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
     }
 
-    FW_IF_OSPI_CFG *pxCfg = ( FW_IF_OSPI_CFG* )pxThisIf->cfg;
+    FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
     if( FW_IF_OSPI_STATE_INIT == pxCfg->xState )
     {
         pxCfg->xState = FW_IF_OSPI_STATE_OPENED;
@@ -410,7 +405,7 @@ static uint32_t ulOspiClose( void *pvFwIf )
 {
     FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     if( CHECK_HDL( pxThisIf ) )
     {
         xRet = FW_IF_ERRORS_INVALID_HANDLE;
@@ -435,7 +430,7 @@ static uint32_t ulOspiClose( void *pvFwIf )
         INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
     }
 
-    FW_IF_OSPI_CFG *pxCfg = ( FW_IF_OSPI_CFG* )pxThisIf->cfg;
+    FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
     if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
     {
         pxCfg->xState = FW_IF_OSPI_STATE_CLOSED;
@@ -464,7 +459,7 @@ static uint32_t ulOspiWrite( void *pvFwIf,
     uint32_t ulAddrOffset = ( uint32_t )ullAddrOffset;
     (void)ulTimeoutMs;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     if( CHECK_HDL( pxThisIf ) )
     {
         xRet = FW_IF_ERRORS_INVALID_HANDLE;
@@ -491,7 +486,7 @@ static uint32_t ulOspiWrite( void *pvFwIf,
 
     if( FW_IF_ERRORS_NONE == xRet )
     {
-        FW_IF_OSPI_CFG *pxCfg = ( FW_IF_OSPI_CFG* )pxThisIf->cfg;
+        FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
 
         if( ( NULL != pucData ) )
         {
@@ -557,7 +552,7 @@ static uint32_t ulOspiRead( void *pvFwIf,
 {
     FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
     uint32_t ulAddrOffset = ( uint32_t )ullAddrOffset;
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     (void)ulTimeoutMs;
 
     if( CHECK_HDL( pxThisIf ) )
@@ -586,7 +581,7 @@ static uint32_t ulOspiRead( void *pvFwIf,
 
     if( FW_IF_ERRORS_NONE == xRet )
     {
-        FW_IF_OSPI_CFG *pxCfg = ( FW_IF_OSPI_CFG* )pxThisIf->cfg;
+        FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
 
         if( ( NULL != pucData ) &&
             ( NULL != pulLength ) )
@@ -633,7 +628,7 @@ static uint32_t ulOspiRead( void *pvFwIf,
 static uint32_t ulOspiIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
 {
     FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
 
     if( CHECK_HDL( pxThisIf ) )
     {
@@ -712,7 +707,7 @@ static uint32_t ulOspiBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 {
     FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     if( CHECK_HDL( pxThisIf ) )
     {
         xRet = FW_IF_ERRORS_INVALID_HANDLE;
@@ -758,7 +753,7 @@ static uint32_t ulOspiBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 /**
  * @brief   Validate the read/write access address is in range
  */
-static uint32_t ulValidateAddressRange( FW_IF_OSPI_CFG *pxCfg, uint32_t ulAddrOffset, uint32_t ulLength )
+static uint32_t ulValidateAddressRange( FWIfOspiCfg *pxCfg, uint32_t ulAddrOffset, uint32_t ulLength )
 {
     FW_IF_OSPI_ERRORS xRet = FW_IF_OSPI_ERRORS_DRIVER_INVALID_ADDRESS;
 
@@ -782,8 +777,8 @@ int iFW_IF_OSPI_PrintStatistics( void )
 {
     int iStatus = ERROR;
 
-    if( ( OSPI_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( OSPI_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( UPPER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         int i = 0;
         PLL_INF( FW_IF_OSPI_NAME, "============================================================\r\n" );
@@ -815,8 +810,8 @@ int iFW_IF_OSPI_ClearStatistics( void )
 {
     int iStatus = ERROR;
 
-    if( ( OSPI_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( OSPI_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( UPPER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
         pvOSAL_MemSet( pxThis->pulStatCounters, 0, sizeof( pxThis->pulStatCounters ) );

@@ -38,9 +38,6 @@
 
 #define IN_BAND_NAME "AMC_IN_BAND"
 
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
-
 #define SENSOR_RESPONSE_VALUES  ( 0x3 )
 #define SENSOR_RESP_BUFFER_SIZE ( 512 )
 #define INVALID_SENSOR_ID       ( 0xFF )
@@ -112,7 +109,7 @@ UTIL_MAKE_ENUM_AND_STRINGS( IN_BAND_ERRORS, IN_BAND_ERRORS, IN_BAND_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  IN_BAND_PRIVATE_DATA
+ * @struct  INBandPrivateData
  * @brief   Structure to hold ths in band telemetry private data
  */
 typedef struct
@@ -126,14 +123,14 @@ typedef struct
     int      iInBandTestMode;
     uint32_t ulLowerFirewall;
 
-} IN_BAND_PRIVATE_DATA;
+} INBandPrivateData;
 
 
 /******************************************************************************/
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static IN_BAND_PRIVATE_DATA xLocalData =
+static INBandPrivateData xLocalData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall */
     NULL,               /* pvOsalMutexHdl */
@@ -149,7 +146,8 @@ static IN_BAND_PRIVATE_DATA xLocalData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 
 };
-static IN_BAND_PRIVATE_DATA *pxThis = &xLocalData;
+
+static INBandPrivateData *pxThis = &xLocalData;
 
 /******************************************************************************/
 /* EVL Callback Declarations                                                  */
@@ -163,7 +161,7 @@ static IN_BAND_PRIVATE_DATA *pxThis = &xLocalData;
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
  */
-static int iAmiCallback( EVL_SIGNAL *pxSignal );
+static int iAmiCallback( EVLSignal *pxSignal );
 
 /**
  * @brief   Map the request repo into the ASDM version
@@ -306,7 +304,7 @@ int iIN_BAND_TELEMETRY_TestMode( int iActivate )
 /**
  * @brief   AMI Proxy Driver EVL callback
  */
-static int iAmiCallback( EVL_SIGNAL *pxSignal )
+static int iAmiCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the public API of the Printing and Logging Library (PLL)
@@ -44,15 +44,15 @@
 /******************************************************************************/
 
 /**
- * @struct PLL_LOG_MSG
+ * @struct PLLLogMsg
  * @brief  Structure to hold the log message.
  */
-typedef struct PLL_LOG_MSG
+typedef struct
 {
 	char	pcBuff[ PLL_LOG_ENTRY_SIZE ];
-} PLL_LOG_MSG;
+} PLLLogMsg;
 
-#define PLL_LOG_BUF_LEN ( sizeof( struct PLL_LOG_MSG ) * PLL_LOG_MAX_RECS )
+#define PLL_LOG_BUF_LEN ( sizeof(PLLLogMsg) * PLL_LOG_MAX_RECS )
 
 
 /******************************************************************************/
@@ -63,7 +63,7 @@ typedef struct PLL_LOG_MSG
  * @enum    PLL_OUTPUT_LEVEL
  * @brief   Output verbosity levels for the PLL
  */
-typedef enum PLL_OUTPUT_LEVEL
+typedef enum
 {
     PLL_OUTPUT_LEVEL_LOGGING = 0, /* used for printing to the log */
     PLL_OUTPUT_LEVEL_INFO,        /* used for stats - always print */

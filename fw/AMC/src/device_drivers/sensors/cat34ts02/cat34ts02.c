@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of CAT34TS02 sensor read
@@ -7,10 +7,6 @@
  *
  * @file cat34ts02.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "util.h"
 #include "pll.h"
@@ -23,21 +19,18 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL                          ( 0xBABECAFE )
-#define LOWER_FIREWALL                          ( 0xDEADFACE )
+#define CAT34TS02_NAME                  "CAT34TS02"
 
-#define CAT34TS02_NAME                          "CAT34TS02"
+#define CAT34TS02_ERROR                 ( 1 )
+#define CAT34TS02_WRITE_BUFFER_SIZE     ( 1 )
+#define CAT34TS02_READ_BUFFER_SIZE      ( 2 )
+#define CAT34TS02_WRITE_LENGTH          ( 1 )
+#define CAT34TS02_READ_LENGTH           ( 2 )
+#define CAT34TS02_BIT_SHIFT             ( 8 )
 
-#define CAT34TS02_ERROR                         ( 1 )
-#define CAT34TS02_WRITE_BUFFER_SIZE             ( 1 )
-#define CAT34TS02_READ_BUFFER_SIZE              ( 2 )
-#define CAT34TS02_WRITE_LENGTH                  ( 1 )
-#define CAT34TS02_READ_LENGTH                   ( 2 )
-#define CAT34TS02_BIT_SHIFT                     ( 8 )
-
-#define CAT34TS02_TEMPERATURE_REGISTER          ( 0x05 )
-#define CAT34TS02_TEMPERATURE_SIGN_BIT          ( 12 )
-#define CAT34TS02_TEMP_NON_WHOLE_BITS           ( 4 )
+#define CAT34TS02_TEMPERATURE_REGISTER  ( 0x05 )
+#define CAT34TS02_TEMPERATURE_SIGN_BIT  ( 12 )
+#define CAT34TS02_TEMP_NON_WHOLE_BITS   ( 4 )
 
 #define CAT34TS02_STATS( DO )                  \
     DO( CAT34TS02_STATS_TEMPERATURE_READ )     \
@@ -81,10 +74,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( CAT34TS02_ERRORS, CAT34TS02_ERRORS, CAT34TS02_ERRORS
 /******************************************************************************/
 
 /**
- * @struct  CAT34TS02_PRIVATE_DATA
+ * @struct  CAT34TS02PrivateData
  * @brief   Private driver data
  */
-typedef struct CAT34TS02_PRIVATE_DATA
+typedef struct
 {
     uint32_t    ulUpperFirewall;
 
@@ -93,14 +86,14 @@ typedef struct CAT34TS02_PRIVATE_DATA
 
     uint32_t    ulLowerFirewall;
 
-} CAT34TS02_PRIVATE_DATA;
+} CAT34TS02PrivateData;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static CAT34TS02_PRIVATE_DATA xPrivateData =
+static CAT34TS02PrivateData xPrivateData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall */
     { 0 },              /* ulStats */
@@ -108,7 +101,7 @@ static CAT34TS02_PRIVATE_DATA xPrivateData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 };
 
-static CAT34TS02_PRIVATE_DATA *pxThis = &xPrivateData;
+static CAT34TS02PrivateData *pxThis = &xPrivateData;
 
 
 /******************************************************************************/
@@ -118,7 +111,8 @@ static CAT34TS02_PRIVATE_DATA *pxThis = &xPrivateData;
 /**
  * @brief   Read temperature using CAT34TS02 sensor
  */
-int iCAT34TS02_ReadTemperature( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfTemperatureValue )
+int iCAT34TS02_ReadTemperature( uint8_t ucI2cNum, uint8_t ucSlaveAddr,
+    uint8_t ucChannelNum, float *pfTemperatureValue )
 {
     UNUSED( ucChannelNum );
 
@@ -131,7 +125,8 @@ int iCAT34TS02_ReadTemperature( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t u
 
     if( NULL != pfTemperatureValue )
     {
-        iStatus = iI2C_SendRecv( ucI2cNum, ucSlaveAddr, &pucWriteBuf[ 0 ], CAT34TS02_WRITE_LENGTH, &pucReadBuf[ 0 ], CAT34TS02_READ_LENGTH );
+        iStatus = iI2C_SendRecv( ucI2cNum, ucSlaveAddr, &pucWriteBuf[ 0 ],
+                        CAT34TS02_WRITE_LENGTH, &pucReadBuf[ 0 ], CAT34TS02_READ_LENGTH );
 
         if( OK == iStatus )
         {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -17,15 +17,15 @@
 /******************************************************************************/
 
 /**
- * @struct  OSPI_CFG_TYPE
+ * @struct  OSPICfg
  * @brief   The OSPI device configuration
  */
-typedef struct OSPI_CFG_TYPE
+typedef struct
 {
     uint32_t ulBaseAddress;
     uint16_t usPageSize;
 
-} OSPI_CFG_TYPE;
+} OSPICfg;
 
 
 /******************************************************************************/
@@ -35,11 +35,11 @@ typedef struct OSPI_CFG_TYPE
 /**
  * @brief   Initialises the OSPI driver.
  *
- * @param   pxOspiCfg           The configuration parameters for the OSPI device
+ * @param   pxOspiCfg The configuration parameters for the OSPI device
  *
  * @return  OK if successful, else ERROR.
  */
-int iOSPI_FlashInit( OSPI_CFG_TYPE *pxOspiCfg );
+int iOSPI_FlashInit( OSPICfg *pxOspiCfg );
 
 /**
  * @brief   Function to erase the flash device.

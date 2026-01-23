@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file containing the FW IF OSPI abstraction definitions.
@@ -9,11 +9,6 @@
 
 #ifndef _FW_IF_OSPI_H_
 #define _FW_IF_OSPI_H_
-
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 
 #include "fw_if.h"
 
@@ -31,7 +26,7 @@
  * @enum FW_IF_OSPI_ERRORS
  * @brief Enumeration of OSPI return values
  */
-typedef enum FW_IF_OSPI_ERRORS
+typedef enum
 {
     FW_IF_OSPI_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
     FW_IF_OSPI_ERRORS_DRIVER_FAILURE,
@@ -45,7 +40,7 @@ typedef enum FW_IF_OSPI_ERRORS
  * @enum FW_IF_OSPI_IOCTL
  * @brief ioctrl options for OSPI interfaces (generic across all OSPI interfaces)
  */
-typedef enum FW_IF_OSPI_IOCTL
+typedef enum
 {
     FW_IF_OSPI_IOCTL_GET_PROGRESS = MAX_FW_IF_COMMON_IOCTRL_OPTION,
 
@@ -58,7 +53,7 @@ typedef enum FW_IF_OSPI_IOCTL
  * @enum FW_IF_OSPI_STATE
  * @brief ioctrl options for OSPI interfaces (generic across all OSPI interfaces)
  */
-typedef enum FW_IF_OSPI_STATE
+typedef enum
 {
     FW_IF_OSPI_STATE_INIT,
     FW_IF_OSPI_STATE_OPENED,
@@ -75,28 +70,28 @@ typedef enum FW_IF_OSPI_STATE
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_OSPI_INIT_CFG
+ * @struct  FWIfOspiInitCfg
  * @brief   config options for OSPI initialisation (generic across all OSPI interfaces)
  */
-typedef struct FW_IF_OSPI_INIT_CFG
+typedef struct
 {
     uint32_t    ulOspiBaseAddress;
     uint16_t    usPageSize;
 
-} FW_IF_OSPI_INIT_CFG;
+} FWIfOspiInitCfg;
 
 /**
- * @struct  FW_IF_OSPI_CFG
+ * @struct  FWIfOspiCfg
  * @brief   config options for OSPI interfaces (generic across all OSPI interfaces)
  */
-typedef struct FW_IF_OSPI_CFG
+typedef struct
 {
-    uint32_t            ulBaseAddress;
-    uint32_t            ulLength;
-    uint8_t             ucEraseBeforeWriteFlag;
-    FW_IF_OSPI_STATE    xState;
+    uint32_t         ulBaseAddress;
+    uint32_t         ulLength;
+    uint8_t          ucEraseBeforeWriteFlag;
+    FW_IF_OSPI_STATE xState;
 
-} FW_IF_OSPI_CFG;
+} FWIfOspiCfg;
 
 
 /*****************************************************************************/
@@ -110,7 +105,7 @@ typedef struct FW_IF_OSPI_CFG
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *pxInitCfg );
+extern uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *pxInitCfg );
 
 /**
  * @brief   creates an instance of the OSPI interface
@@ -120,7 +115,7 @@ extern uint32_t ulFW_IF_OSPI_Init( FW_IF_OSPI_INIT_CFG *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_OSPI_Create( FW_IF_CFG *pxFWIf, FW_IF_OSPI_CFG *pxOspiCfg );
+extern uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFWIf, FWIfOspiCfg *pxOspiCfg );
 
 /**
  *

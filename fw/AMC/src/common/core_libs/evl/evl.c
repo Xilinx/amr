@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implemenation for the Event Library
  *
  * @file evl.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "util.h"
 #include "pll.h"
@@ -21,42 +17,39 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
-
 #define EVL_NAME "EVL"
 
-#define EVL_STATS( DO )                       \
-        DO( EVL_STATS_INITIALISED )           \
-        DO( EVL_STATS_RECORDS )               \
-        DO( EVL_STATS_BINDINGS )              \
-        DO( EVL_STATS_SIGNALS )               \
-        DO ( EVL_STATS_LOG_RETRIEVED )        \
-        DO( EVL_STATS_LOG_MUTEX_CREATED )     \
-        DO( EVL_STATS_LOG_MUTEX_GRABBED )     \
-        DO( EVL_STATS_LOG_MUTEX_RELEASED )    \
-        DO( EVL_STATS_RECORD_MUTEX_CREATED )  \
-        DO( EVL_STATS_RECORD_MUTEX_GRABBED )  \
-        DO( EVL_STATS_RECORD_MUTEX_RELEASED ) \
-        DO( EVL_STATS_VERBOSITY_SET )         \
-        DO( EVL_STATS_MAX )
+#define EVL_STATS( DO )                   \
+    DO( EVL_STATS_INITIALISED )           \
+    DO( EVL_STATS_RECORDS )               \
+    DO( EVL_STATS_BINDINGS )              \
+    DO( EVL_STATS_SIGNALS )               \
+    DO ( EVL_STATS_LOG_RETRIEVED )        \
+    DO( EVL_STATS_LOG_MUTEX_CREATED )     \
+    DO( EVL_STATS_LOG_MUTEX_GRABBED )     \
+    DO( EVL_STATS_LOG_MUTEX_RELEASED )    \
+    DO( EVL_STATS_RECORD_MUTEX_CREATED )  \
+    DO( EVL_STATS_RECORD_MUTEX_GRABBED )  \
+    DO( EVL_STATS_RECORD_MUTEX_RELEASED ) \
+    DO( EVL_STATS_VERBOSITY_SET )         \
+    DO( EVL_STATS_MAX )
 
 
-#define EVL_ERRORS( DO )                       \
-        DO( EVL_ERRORS_BINDINGS )              \
-        DO( EVL_ERRORS_CALLBACKS )             \
-        DO( EVL_ERRORS_VALIDATION )            \
-        DO( EVL_ERRORS_LOG_MUTEX_CREATED )     \
-        DO( EVL_ERRORS_LOG_MUTEX_GRABBED )     \
-        DO( EVL_ERRORS_LOG_MUTEX_RELEASED )    \
-        DO( EVL_ERRORS_RECORD_MUTEX_CREATED )  \
-        DO( EVL_ERRORS_RECORD_MUTEX_GRABBED )  \
-        DO( EVL_ERRORS_RECORD_MUTEX_RELEASED ) \
-        DO( EVL_ERRORS_RECORD_MALLOC )         \
-        DO( EVL_ERRORS_BINDINGS_MALLOC )       \
-        DO( EVL_ERRORS_NO_BINDINGS )           \
-        DO( EVL_ERRORS_VERBOSITY_NOT_SET )     \
-        DO( EVL_ERRORS_MAX )
+#define EVL_ERRORS( DO )                   \
+    DO( EVL_ERRORS_BINDINGS )              \
+    DO( EVL_ERRORS_CALLBACKS )             \
+    DO( EVL_ERRORS_VALIDATION )            \
+    DO( EVL_ERRORS_LOG_MUTEX_CREATED )     \
+    DO( EVL_ERRORS_LOG_MUTEX_GRABBED )     \
+    DO( EVL_ERRORS_LOG_MUTEX_RELEASED )    \
+    DO( EVL_ERRORS_RECORD_MUTEX_CREATED )  \
+    DO( EVL_ERRORS_RECORD_MUTEX_GRABBED )  \
+    DO( EVL_ERRORS_RECORD_MUTEX_RELEASED ) \
+    DO( EVL_ERRORS_RECORD_MALLOC )         \
+    DO( EVL_ERRORS_BINDINGS_MALLOC )       \
+    DO( EVL_ERRORS_NO_BINDINGS )           \
+    DO( EVL_ERRORS_VERBOSITY_NOT_SET )     \
+    DO( EVL_ERRORS_MAX )
 
 #define PRINT_STAT_COUNTER( x )  PLL_INF( EVL_NAME,              \
                                           "%50s . . . . %d\r\n", \
@@ -93,10 +86,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( EVL_ERRORS, EVL_ERRORS, EVL_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  EVL_PRIVATE_DATA
+ * @struct  EVLPrivateData
  * @brief   Local data struct
  */
-typedef struct EVL_PRIVATE_DATA
+typedef struct
 {
     uint32_t   ulUpperFirewall;
 
@@ -104,7 +97,7 @@ typedef struct EVL_PRIVATE_DATA
 
     void       *pxLogMtx;
     int        iLogIdx;
-    EVL_SIGNAL pxEvlLog[ EVL_LOG_LEN ];
+    EVLSignal  pxEvlLog[ EVL_LOG_LEN ];
     uint32_t   pulLogTimes[ EVL_LOG_LEN ];
 
     uint32_t   ulStats[ EVL_STATS_MAX ];
@@ -112,58 +105,58 @@ typedef struct EVL_PRIVATE_DATA
 
     uint32_t   ulLowerFirewall;
 
-} EVL_PRIVATE_DATA;
+} EVLPrivateData;
 
 /**
- * @struct EVL_CALLBACK_NODE
+ * @struct EVLCallbackNode
  * @brief Node for the EVL_CALLBACK Linked List
  */
-typedef struct EVL_CALLBACK_NODE
+typedef struct EVLCallbackNode
 {
-    EVL_CALLBACK             *pxCallback;
-    struct EVL_CALLBACK_NODE *pxNext;
+    EVL_CALLBACK           *pxCallback;
+    struct EVLCallbackNode *pxNext;
 
-} EVL_CALLBACK_NODE;
+} EVLCallbackNode;
 
 /**
- * @struct  EVL_RECORD
+ * @struct  EVLRecord
  * @brief   Record of EVL bindings
  */
-typedef struct EVL_RECORD
+typedef struct EVLRecord
 {
-    EVL_CALLBACK_NODE *pxFirstBinding;
-    int               iNumBindings;
-    void              *pxMtx;
+    EVLCallbackNode *pxFirstBinding;
+    int             iNumBindings;
+    void            *pxMtx;
 
-} EVL_RECORD;
+} EVLRecord;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static EVL_PRIVATE_DATA xLocalData =
+static EVLPrivateData xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    FALSE,                                                                     /* iIsInitialised */
-    NULL,                                                                      /* pxLogMtx */
-    0,                                                                         /* iLogIdx */
+    UPPER_FIREWALL,     /* ulUpperFirewall */
+    FALSE,              /* iIsInitialised */
+    NULL,               /* pxLogMtx */
+    0,                  /* iLogIdx */
     { {
           0
-      } },                                                                     /* pxEvlLog */
+      } },              /* pxEvlLog */
     {
         0
-    },                                                                         /* pulLogTimes */
+    },                  /* pulLogTimes */
     {
         0
-    },                                                                         /* ulStats */
+    },                  /* ulStats */
     {
         0
-    },                                                                         /* ulErrors */
-    LOWER_FIREWALL                                                             /* LOWER_FIREWALL */
+    },                  /* ulErrors */
+    LOWER_FIREWALL      /* LOWER_FIREWALL */
 };
 
-static EVL_PRIVATE_DATA *pxThis = &xLocalData;
+static EVLPrivateData *pxThis = &xLocalData;
 
 static int iEvlVerbosity = FALSE;
 
@@ -206,7 +199,7 @@ int iEVL_Initialise( void )
 /**
  * @brief Initialise the record
  */
-int iEVL_CreateRecord( EVL_RECORD **ppxRecord )
+int iEVL_CreateRecord( EVLRecord **ppxRecord )
 {
     int iStatus = ERROR;
 
@@ -216,7 +209,7 @@ int iEVL_CreateRecord( EVL_RECORD **ppxRecord )
         ( NULL != ppxRecord ) &&
         ( NULL == *ppxRecord ) )
     {
-        EVL_RECORD *pxNewRecord = ( EVL_RECORD * ) pvOSAL_MemAlloc( sizeof( EVL_RECORD ) );
+        EVLRecord *pxNewRecord = ( EVLRecord * ) pvOSAL_MemAlloc( sizeof(EVLRecord) );
         if( NULL != pxNewRecord )
         {
             if( OSAL_ERRORS_NONE == iOSAL_Mutex_Create( &pxNewRecord->pxMtx, "EVL Record Mutex" ) )
@@ -249,7 +242,7 @@ int iEVL_CreateRecord( EVL_RECORD **ppxRecord )
 /**
  * @brief   Bind a callback into a module
  */
-int iEVL_BindCallback( EVL_RECORD *pxRecord, EVL_CALLBACK *pxNewCallback )
+int iEVL_BindCallback( EVLRecord *pxRecord, EVL_CALLBACK *pxNewCallback )
 {
     int iStatus = ERROR;
 
@@ -266,8 +259,8 @@ int iEVL_BindCallback( EVL_RECORD *pxRecord, EVL_CALLBACK *pxNewCallback )
                 INC_STAT_COUNTER( EVL_STATS_RECORD_MUTEX_GRABBED );
                 if( 0 == pxRecord->iNumBindings )
                 {
-                    EVL_CALLBACK_NODE *pxNewNode =
-                        ( EVL_CALLBACK_NODE * ) pvOSAL_MemAlloc( sizeof( EVL_CALLBACK_NODE ) );
+                    EVLCallbackNode *pxNewNode =
+                        ( EVLCallbackNode * ) pvOSAL_MemAlloc( sizeof( EVLCallbackNode ) );
                     if( NULL != pxNewNode )
                     {
                         pxNewNode->pxCallback = pxNewCallback;
@@ -287,14 +280,14 @@ int iEVL_BindCallback( EVL_RECORD *pxRecord, EVL_CALLBACK *pxNewCallback )
                 {
                     if( NULL != pxRecord->pxFirstBinding )
                     {
-                        EVL_CALLBACK_NODE *pxNewNode =
-                            ( EVL_CALLBACK_NODE * ) pvOSAL_MemAlloc( sizeof( EVL_CALLBACK_NODE ) );
+                        EVLCallbackNode *pxNewNode =
+                            ( EVLCallbackNode * ) pvOSAL_MemAlloc( sizeof( EVLCallbackNode ) );
                         if( NULL != pxNewNode )
                         {
                             pxNewNode->pxCallback = pxNewCallback;
                             pxNewNode->pxNext     = NULL;
 
-                            EVL_CALLBACK_NODE *pxLastBinding = pxRecord->pxFirstBinding;
+                            EVLCallbackNode *pxLastBinding = pxRecord->pxFirstBinding;
                             while( NULL != pxLastBinding->pxNext )
                             {
                                 pxLastBinding = pxLastBinding->pxNext;
@@ -344,7 +337,7 @@ int iEVL_BindCallback( EVL_RECORD *pxRecord, EVL_CALLBACK *pxNewCallback )
 /**
  * @brief   Raise an event to each bound-in callback
  */
-int iEVL_RaiseEvent( EVL_RECORD *pxRecord, EVL_SIGNAL *pxSignal )
+int iEVL_RaiseEvent( EVLRecord *pxRecord, EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
@@ -359,7 +352,7 @@ int iEVL_RaiseEvent( EVL_RECORD *pxRecord, EVL_SIGNAL *pxSignal )
             INC_STAT_COUNTER( EVL_STATS_LOG_MUTEX_GRABBED );
 
             pxThis->pulLogTimes[ pxThis->iLogIdx ] = ulOSAL_GetUptimeMs();
-            pvOSAL_MemCpy( &pxThis->pxEvlLog[ pxThis->iLogIdx++ ], pxSignal, sizeof( EVL_SIGNAL ) );
+            pvOSAL_MemCpy( &pxThis->pxEvlLog[ pxThis->iLogIdx++ ], pxSignal, sizeof(EVLSignal) );
 
             if( EVL_LOG_LEN <= pxThis->iLogIdx )
             {
@@ -373,7 +366,7 @@ int iEVL_RaiseEvent( EVL_RECORD *pxRecord, EVL_SIGNAL *pxSignal )
                 {
                     INC_STAT_COUNTER( EVL_STATS_RECORD_MUTEX_GRABBED );
 
-                    EVL_CALLBACK_NODE *pxCurrentNode = pxRecord->pxFirstBinding;
+                    EVLCallbackNode *pxCurrentNode = pxRecord->pxFirstBinding;
                     while( NULL != pxCurrentNode )
                     {
                         INC_STAT_COUNTER( EVL_STATS_SIGNALS );

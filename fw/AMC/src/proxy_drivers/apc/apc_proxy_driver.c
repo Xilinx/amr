@@ -18,9 +18,6 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL      ( 0xBABECAFE )
-#define LOWER_FIREWALL      ( 0xDEADFACE )
-
 #define APC_NAME            "APC"
 
 #define APC_TASK_SLEEP_MS   ( 100 )
@@ -191,10 +188,10 @@ typedef struct
     int         iInitialised;
     uint8_t     ucMyId;
 
-    FW_IF_CFG   *ppxFwIf[ MAX_APC_BOOT_DEVICES ];
+    FWIfCfg   *ppxFwIf[ MAX_APC_BOOT_DEVICES ];
     XLoader_ClientInstance *pXLoaderInst;
 
-    EVL_RECORD  *pxEvlRecord;
+    EVLRecord   *pxEvlRecord;
 
     void        *pvOsalMutexHdl;
     void        *pvOsalFlashLockHdl;
@@ -453,8 +450,8 @@ static APCPrivateData *pxThis = &xLocalData;
  *          and can be set to NULL.
  */
 int iAPC_Initialise( uint8_t ucProxyId,
-                     FW_IF_CFG *pxPrimaryFwIf,
-                     FW_IF_CFG *pxSecondaryFwIf,
+                     FWIfCfg *pxPrimaryFwIf,
+                     FWIfCfg *pxSecondaryFwIf,
                      XLoader_ClientInstance *pXLoaderInst,
                      uint32_t ulTaskPrio,
                      uint32_t ulTaskStack )
@@ -479,7 +476,7 @@ int iAPC_Initialise( uint8_t ucProxyId,
         /* initalise evl record*/
         if ( OK != iEVL_CreateRecord( &pxThis->pxEvlRecord ) )
         {
-            PLL_ERR( APC_NAME, "Error initialising EVL_RECORD\r\n" );
+            PLL_ERR( APC_NAME, "Error initialising EVLRecord\r\n" );
             INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED );
         }
         else
@@ -636,7 +633,7 @@ int iAPC_ClearStatistics( void )
 /**
  * @brief   Download an image to a location in NV memory
  */
-int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
+int iAPC_DownloadImage( EVLSignal *pxSignal,
                         APC_BOOT_DEVICES xBootDevice,
                         int iPartition,
                         uint32_t ulSrcAddr,
@@ -695,7 +692,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Download an image with an FPT
  */
-int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
+int iAPC_UpdateFpt( EVLSignal *pxSignal,
                     APC_BOOT_DEVICES xBootDevice,
                     uint32_t ulSrcAddr,
                     uint32_t ulImageSize,
@@ -748,7 +745,7 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Copy an image from one partition to another
  */
-int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
+int iAPC_CopyImage( EVLSignal *pxSignal,
                     APC_BOOT_DEVICES xSrcBootDevice,
                     int iSrcPartition,
                     APC_BOOT_DEVICES xDestBootDevice,
@@ -808,7 +805,7 @@ int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
 /**
  * @brief Download an image to a location in NV memory
  */
-int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
+int iAPC_PdiProgram( EVLSignal *pxSignal,
                      APC_BOOT_DEVICES xBootDevice,
                      int iPartition,
                      uint32_t ulSrcAddr,
@@ -861,7 +858,7 @@ int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
 /**
  * @brief   Select which partition to boot from
  */
-int iAPC_SetNextPartition( EVL_SIGNAL *pxSignal, int iPartition )
+int iAPC_SetNextPartition( EVLSignal *pxSignal, int iPartition )
 {
     int iStatus = ERROR;
 
@@ -905,7 +902,7 @@ int iAPC_SetNextPartition( EVL_SIGNAL *pxSignal, int iPartition )
 /**
  * @brief   Enable the hot reset capability
  */
-int iAPC_EnableHotReset( EVL_SIGNAL *pxSignal )
+int iAPC_EnableHotReset( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
@@ -1054,7 +1051,7 @@ int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
  * This function updates the partition flags in both the cached copy
  * and writes the updated partition entry back to flash storage.
  */
-int iAPC_SetFptPartitionFlags( EVL_SIGNAL *pxSignal,
+int iAPC_SetFptPartitionFlags( EVLSignal *pxSignal,
                                APC_BOOT_DEVICES xBootDevice,
                                int iPartition,
                                uint32_t ulFlags )
@@ -1164,7 +1161,7 @@ static void vProxyDriverTask( void *pArg )
                                                  ( void* )&xMBoxData,
                                                  OSAL_TIMEOUT_WAIT_FOREVER ) )
         {
-            EVL_SIGNAL xSignal =
+            EVLSignal xSignal =
             {
                 pxThis->ucMyId, 0, xMBoxData.ucRequestId, 0
             };

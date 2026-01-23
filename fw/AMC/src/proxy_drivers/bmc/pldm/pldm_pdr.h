@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains PLDM PDR enums, structures and functions
@@ -32,6 +32,7 @@
 #define HIGH_THRESHOLDS         ( 0x5 << 3 )
 #define LOW_THRESHOLDS          ( 0x5 << 4 )
 #define NOMINAL_VALUE           ( 0x1 )
+
 /* Macros to set bits for 'supportedThresholds' field in PDR */
 #define HAS_LOW_THRESHOLDS      ( 0x7 << 3 )
 #define HAS_HIGH_THRESHOLDS     ( 0x7 )
@@ -39,19 +40,17 @@
 #define CONTAINER_ENTITY_CONTAINER_ID 1
 #define CONTAINED_ENTITY_CONTAINER_ID 1000
 
-#define PLDM_ENTITY_ACCELERATOR_PROCESSOR 149                                  // (DSP2061)
+#define PLDM_ENTITY_ACCELERATOR_PROCESSOR 149        // (DSP2061)
 
 #define TOTAL_PDR_COUNT_TERMINUS ( 1 )
 
 #define TOTAL_PDR_COUNT_STATE_SENSORS ( 0 )
-#define TOTAL_PDR_COUNT_NAME          ( 38 )                                   //TOTAL_PDR_NUMERIC_ASCI_SENSORS
+#define TOTAL_PDR_COUNT_NAME          ( 38 )         //TOTAL_PDR_NUMERIC_ASCI_SENSORS
 
 #define TOTAL_PDR_COUNT_NUMERIC_EFFECTER ( 5 )
 #define TOTAL_PDR_COUNT_EFFECTER_NAME    TOTAL_PDR_COUNT_NUMERIC_EFFECTER
 
-#define TOTAL_PDR_COUNT (              \
-            TOTAL_PDR_COUNT_TERMINUS + \
-            ( TOTAL_PDR_COUNT_NAME * 2 ) )
+#define TOTAL_PDR_COUNT ( TOTAL_PDR_COUNT_TERMINUS + (TOTAL_PDR_COUNT_NAME * 2) )
 
 #define MAX_NAME_SIZE 32
 
@@ -59,17 +58,6 @@
 #define PLDM_TIME_STAMP_MONTH_MASK ( 0x00FF )
 #define PLDM_TIME_STAMP_DAY_MASK   ( 0x00FF )
 
-
-/******************************************************************************/
-/* Typedefs                                                                      */
-/******************************************************************************/
-
-typedef uint8_t enum8_t;
-typedef uint8_t bool8_t;
-typedef float real32_t;
-typedef uint8_t bitfield8_t;
-typedef uint16_t bitfield16_t;
-typedef uint32_t bitfield32_t;
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -84,7 +72,6 @@ enum RepoState
     ERepoStateAvailable,
     ERepoStateUpdateInprogress,
     ERepoStateFailed
-
 };
 
 /**
@@ -97,7 +84,6 @@ enum InitStatus
     eUseInitPDR,
     eEnable,
     eDisable
-
 };
 
 /**
@@ -113,7 +99,6 @@ enum BaseUnit
     eWatts    = 07,
     eHertz    = 20,
     eCounts   = 67
-
 };
 
 /**
@@ -132,7 +117,6 @@ enum RateUnit
     ePerWeek,
     ePerMonth,
     ePerYear
-
 };
 
 /**
@@ -155,7 +139,6 @@ enum PDRTypes
     EPDRTypeStateEffecterInit,
     EPDRTypeEffecterAuxNames,
     EPDRTypeEntityAssociation = 0x0f
-
 };
 
 /**
@@ -166,7 +149,6 @@ enum TerminusValidity
 {
     ETerminusValidityNotValid,
     ETerminusValidityValid
-
 };
 
 /**
@@ -179,7 +161,6 @@ enum TerminusType
     ETerminusTypeMCTP_EID,
     ETerminusTypeSMBusRelative,
     ETerminusTypeSystemSoftware
-
 };
 
 
@@ -191,33 +172,33 @@ enum TerminusType
  * @struct  TimeStamp
  * @brief   Structure to the timestamp
  */
-typedef struct TimeStamp
+typedef struct
 {
-    int16_t  UTC_Offset;                                                       /* UTC offset in minutes as sint16 */
-    uint8_t  uSeconds[ 3 ];                                                    /* microsecond within the second as a 24-bit binary signed integer (starting with 0)
-                                                                                  represent here in 3 bytes unsigned integer, so convert before storing */
+    int16_t  UTC_Offset;         /* UTC offset in minutes as sint16 */
+    uint8_t  uSeconds[ 3 ];      /* microsecond within the second as a 24-bit binary signed integer (starting with 0)
+                                    represent here in 3 bytes unsigned integer, so convert before storing */
     uint8_t  Seconds;
     uint8_t  Minutes;
     uint8_t  Hours;
     uint8_t  Day;
     uint8_t  Month;
     uint16_t Year;
-    uint8_t  UTC_Time_Resolution;                                              /*
-                                                                                   [ 7:4 ] UTC resolution = enum4 {UTCunspecified, minute, 10minute, hour }
-                                                                                   [ 3:0 ] Time resolution = enum4 { microsecond, 10microsecond, 100microsecond,
-                                                                                   millisecond, 10millisecond, 100millisecond, second, 10second, minute, 10minute,
-                                                                                   hour, day, month, year }
-                                                                                */
+    uint8_t  UTC_Time_Resolution;/*
+                                    [ 7:4 ] UTC resolution = enum4 {UTCunspecified, minute, 10minute, hour }
+                                    [ 3:0 ] Time resolution = enum4 { microsecond, 10microsecond, 100microsecond,
+                                    millisecond, 10millisecond, 100millisecond, second, 10second, minute, 10minute,
+                                    hour, day, month, year }
+                                 */
 
-}__attribute__ ( ( __packed__ ) ) TimeStamp;
+} __attribute__ ( ( __packed__ ) ) TimeStamp;
 
 /**
- * @struct  PDR_RespositoryInfo
+ * @struct  PDRRepositoryInfo
  * @brief   Structure to complete PDR repository
  */
-typedef struct PDR_RespositoryInfo
+typedef struct
 {
-    enum8_t   repositoryState;
+    uint8_t   repositoryState;
     TimeStamp updateTimestamp;
     TimeStamp OEMUpdateTimestamp;
     uint32_t  recordCount;
@@ -226,13 +207,13 @@ typedef struct PDR_RespositoryInfo
     uint8_t   dataTransferHandleTimeout;
     void      *PDRRecords[ TOTAL_PDR_COUNT ];
 
-}PDR_RepositoryInfo;
+} PDRRepositoryInfo;
 
 /**
  * @struct  CommonPDRFormat
  * @brief   Structure to hold common PDR format
  */
-typedef struct CommonPDRFormat
+typedef struct
 {
     uint32_t recordHandle;
     uint8_t  PDRHeaderVersion;
@@ -243,32 +224,32 @@ typedef struct CommonPDRFormat
 }__attribute__ ( ( __packed__ ) ) CommonPDRFormat;
 
 /**
- * @struct  TerminusLocatorFormat_UID
+ * @struct  TerminusLocatorFormatUid
  * @brief   Structure to hold Terminus Locator format
  */
-typedef struct TerminusLocatorFormat_UID
+typedef struct
 {
-    const enum8_t terminusLocatorType;                                         /* type will be UID for this structure */
-    const enum8_t terminusLocatorValueSize;                                    /* This will be 1+16 bytes = 17bytes for UID type*/
+    const uint8_t terminusLocatorType;       /* type will be UID for this structure */
+    const uint8_t terminusLocatorValueSize;  /* This will be 1+16 bytes = 17bytes for UID type*/
     uint8_t       terminusInstance;
     uint8_t       deviceUID[ 16 ];
 
-}__attribute__ ( ( __packed__ ) ) TerminusLocatorFormat_UID;
+}__attribute__ ( ( __packed__ ) ) TerminusLocatorFormatUid;
 
 /**
- * @struct  TerminusPDRFormat_UID
+ * @struct  TerminusPDRFormatUid
  * @brief   Structure to hold Terminus PDR format
  */
-typedef struct TerminusPDRFormat_UID
+typedef struct
 {
     CommonPDRFormat           commonHeader;
     uint16_t                  PLDMTerminusHandle;
-    enum8_t                   validity;
+    uint8_t                   validity;
     uint8_t                   TID;
     uint16_t                  containerID;
-    TerminusLocatorFormat_UID locator;
+    TerminusLocatorFormatUid locator;
 
-}__attribute__ ( ( __packed__ ) ) TerminusPDRFormat_UID;
+}__attribute__ ( ( __packed__ ) ) TerminusPDRFormatUid;
 
 
 /******************************************************************************/
@@ -292,7 +273,7 @@ void update_tid( uint8_t tid );
  *
  * @return  The location of the PDR repository
  */
-const PDR_RepositoryInfo *getPDRRepository( void );
+const PDRRepositoryInfo *getPDRRepository( void );
 
 /**
  * @brief   Update the timestamp

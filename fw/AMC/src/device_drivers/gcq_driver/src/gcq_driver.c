@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the sGCQ driver.
@@ -7,6 +7,7 @@
  * @file gcq_driver.c
  */
 
+#include "util.h"
 #include "gcq_internal.h"
 #include "standard.h"
 
@@ -15,12 +16,9 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define GCQ_INSTANCE_UPPER_FIREWALL ( 0xBEEFCAFE )
-#define GCQ_INSTANCE_LOWER_FIREWALL ( 0xDEADFACE )
-
 #define CHECK_FIREWALLS( f )        \
-    ( ( f->ulUpperFirewall != GCQ_INSTANCE_UPPER_FIREWALL ) && \
-      ( f->ulLowerFirewall != GCQ_INSTANCE_LOWER_FIREWALL ) )
+    ( ( f->ulUpperFirewall != UPPER_FIREWALL ) && \
+      ( f->ulLowerFirewall != LOWER_FIREWALL ) )
 
 #define CHECK_32BIT_ALIGNMENT( x )  ( 0 == ( x & 0x3 ) )
 
@@ -55,13 +53,13 @@ typedef struct
 
 static GCQPrivateData xLocalData =
 {
-    GCQ_INSTANCE_UPPER_FIREWALL,     /* ulUpperFirewall */
+    UPPER_FIREWALL, /* ulUpperFirewall */
 
-    FALSE,                           /* ucConsumerAttached */
-    0,                               /* ucInstancesAllocated */
-    { { 0 } },                       /* xGCQInstances */
+    FALSE,          /* ucConsumerAttached */
+    0,              /* ucInstancesAllocated */
+    { { 0 } },      /* xGCQInstances */
 
-    GCQ_INSTANCE_LOWER_FIREWALL      /* ulLowerFirewall */
+    LOWER_FIREWALL  /* ulLowerFirewall */
 };
 
 static GCQPrivateData *pxThis = &xLocalData;
@@ -381,8 +379,8 @@ GCQ_ERRORS_TYPE xGCQInit( GCQInstance **ppxGCQInstance,
     GCQHeader xGCQHeader = { };
     uint32_t ullNumSlots = 0;
 
-    if ( ( GCQ_INSTANCE_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         if ( NULL != *ppxGCQInstance )
         {
@@ -479,8 +477,8 @@ GCQ_ERRORS_TYPE xGCQInit( GCQInstance **ppxGCQInstance,
             pxGCQInstance->ullBaseAddr      = ullBaseAddr;
             pxGCQInstance->ullRingAddr      = ullRingAddr;
             pxGCQInstance->pxGCQIOAccess    = pxGCQIOAccess;
-            pxGCQInstance->ulUpperFirewall  = GCQ_INSTANCE_UPPER_FIREWALL;
-            pxGCQInstance->ulLowerFirewall  = GCQ_INSTANCE_LOWER_FIREWALL;
+            pxGCQInstance->ulUpperFirewall  = UPPER_FIREWALL;
+            pxGCQInstance->ulLowerFirewall  = LOWER_FIREWALL;
 
             /* If producer mode then populate the header onto the ring */
             if ( GCQ_MODE_TYPE_PRODUCER_MODE == xMode )
@@ -520,8 +518,8 @@ GCQ_ERRORS_TYPE xGCQDeinit( GCQInstance *pxGCQInstance )
 {
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_INVALID_ARG;
 
-    if ( ( GCQ_INSTANCE_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         xStatus = GCQ_ERRORS_NONE;
 
@@ -547,8 +545,8 @@ GCQ_ERRORS_TYPE xGCQAttachConsumer( GCQInstance *pxGCQInstance )
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_INVALID_ARG;
     GCQHeader xGCQHeader = { };
 
-    if ( ( GCQ_INSTANCE_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         xStatus = GCQ_ERRORS_NONE;
 
@@ -640,8 +638,8 @@ GCQ_ERRORS_TYPE xGCQConsumeData( GCQInstance *pxGCQInstance,
     GCQ_ERRORS_TYPE xStatus = GCQ_ERRORS_INVALID_ARG;
     uint64_t ullSlotAddr = 0;
 
-    if ( ( GCQ_INSTANCE_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         xStatus = GCQ_ERRORS_NONE;
 
@@ -709,8 +707,8 @@ GCQ_ERRORS_TYPE xGCQProduceData( GCQInstance *pxGCQInstance,
 
     uint64_t ullSlotAddr = 0;
 
-    if ( ( GCQ_INSTANCE_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         xStatus = GCQ_ERRORS_NONE;
 
@@ -770,8 +768,8 @@ int iGCQGetVersion( GCQVersion *pxVersion )
 {
     int iStatus = GCQ_ERRORS_INVALID_ARG;
 
-    if ( ( GCQ_INSTANCE_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( GCQ_INSTANCE_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
          ( NULL != pxVersion ) )
     {
 

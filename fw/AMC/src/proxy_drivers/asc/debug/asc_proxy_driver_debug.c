@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the AVED Sensor Control (ASC) debug implementation
+ * This file contains the AMR Sensor Control (ASC) debug implementation
  *
  * @file asc_proxy_driver_debug.c
  */
@@ -113,7 +113,7 @@ static void vResetSingleSensorByName( void );
  *          ERROR if an error was raised in the callback
  *
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal );
+static int iTestCallback( EVLSignal *pxSignal );
 
 /**
  * @brief   Display the full data of a single sensor
@@ -122,7 +122,7 @@ static int iTestCallback( EVL_SIGNAL *pxSignal );
  *
  * @return  N/A
  */
-static void vPrintSensorData( ASC_PROXY_DRIVER_SENSOR_DATA *pxSensor );
+static void vPrintSensorData( ASCProxyDriverSensorData *pxSensor );
 
 
 /******************************************************************************/
@@ -298,8 +298,8 @@ static void vGetAllSensors( void )
     else
     {
         PLL_DAL( ASC_DBG_NAME, "Allocating memory for %d sensors\r\n", iMaxSensors );
-        ASC_PROXY_DRIVER_SENSOR_DATA *pxSensors = pvOSAL_MemAlloc( iMaxSensors *
-                                                                  sizeof( ASC_PROXY_DRIVER_SENSOR_DATA ) );
+        ASCProxyDriverSensorData *pxSensors = pvOSAL_MemAlloc( iMaxSensors *
+                                                                  sizeof(ASCProxyDriverSensorData) );
 
         if( NULL == pxSensors )
         {
@@ -342,7 +342,7 @@ static void vGetSingleSensorById( void )
     }
     else
     {
-        ASC_PROXY_DRIVER_SENSOR_DATA xSensor = { { 0 } };
+        ASCProxyDriverSensorData xSensor = { { 0 } };
 
         if( OK != iASC_GetSingleSensorDataById( ( uint8_t )iId, &xSensor ) )
         {
@@ -368,7 +368,7 @@ static void vGetSingleSensorByName( void )
     }
     else
     {
-        ASC_PROXY_DRIVER_SENSOR_DATA xSensor = { { 0 } };
+        ASCProxyDriverSensorData xSensor = { { 0 } };
 
         if( OK != iASC_GetSingleSensorDataByName( pcName, &xSensor ) )
         {
@@ -386,7 +386,7 @@ static void vGetSingleSensorByName( void )
 /**
  * @brief   EVL Callback for binding test prints
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal )
+static int iTestCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
@@ -403,7 +403,7 @@ static int iTestCallback( EVL_SIGNAL *pxSignal )
 /**
  * @brief   Display the full data of a single sensor
  */
-static void vPrintSensorData( ASC_PROXY_DRIVER_SENSOR_DATA *pxSensor )
+static void vPrintSensorData( ASCProxyDriverSensorData *pxSensor )
 {
     if( NULL != pxSensor )
     {

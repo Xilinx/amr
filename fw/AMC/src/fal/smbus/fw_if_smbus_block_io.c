@@ -1,12 +1,11 @@
 /**
-* Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This file contains the FW IF SMBus Block IO interface implementation.
 *
 * @file fw_if_smbus_block_io.c
 */
-
 
 #include <stdio.h>
 #include <string.h>
@@ -26,12 +25,10 @@
 /*****************************************************************************/
 
 #define FW_IF_SMBUS_BLOCK_IO_NAME       "FW_IF_SMBUS_BLOCK_IO"
-#define SMBUS_BLOCK_IO_UPPER_FIREWALL   ( 0xBEEFCAFE )
-#define SMBUS_BLOCK_IO_LOWER_FIREWALL   ( 0xDEADFACE )
 
 #define CHECK_DRIVER            if ( FW_IF_FALSE == pxThis->iInitialised ) return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
-#define CHECK_FIREWALLS( f )    if ( ( f->upperFirewall != SMBUS_BLOCK_IO_UPPER_FIREWALL ) && \
-                                     ( f->lowerFirewall != SMBUS_BLOCK_IO_LOWER_FIREWALL ) ) return FW_IF_ERRORS_INVALID_HANDLE
+#define CHECK_FIREWALLS( f )    if ( ( f->upperFirewall != UPPER_FIREWALL ) && \
+                                     ( f->lowerFirewall != LOWER_FIREWALL ) ) return FW_IF_ERRORS_INVALID_HANDLE
 #define CHECK_HDL( f )          if ( NULL == f ) return FW_IF_ERRORS_INVALID_HANDLE
 #define CHECK_CFG( f )          if ( NULL == ( f )->cfg  ) return FW_IF_ERRORS_INVALID_CFG
 
@@ -111,51 +108,52 @@ UTIL_MAKE_ENUM_AND_STRINGS( FW_IF_SMBUS_BLOCK_IO_ERROR_COUNTS, FW_IF_SMBUS_BLOCK
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_SMBusBlockIOPrivateData
+ * @struct  FWIfSMBusBlockIOPrivateData
  * @brief   Structure to hold this FAL's private data
  */
 typedef struct
 {
-    uint32_t              ulUpperFirewall;
+    uint32_t             ulUpperFirewall;
 
-    FW_IF_SMBUS_INIT_CFG  xLocalCfg;
-    int                   iInitialised;
+    FWIfSMBusInitCfg     xLocalCfg;
+    int                  iInitialised;
 
-    struct SMBus_Profile* pxSMBusProfile;
-    uint8_t               pucCallBackWriteData[ FW_IF_SMBUS_MAX_DATA ];
-    uint16_t              usCallBackWriteDataSize;
-    void                  *pvWriteCallbackSem;
+    struct SMBusProfile* pxSMBusProfile;
+    uint8_t              pucCallBackWriteData[ FW_IF_SMBUS_MAX_DATA ];
+    uint16_t             usCallBackWriteDataSize;
+    void                 *pvWriteCallbackSem;
 
-    uint32_t              pulStatCounters[ FW_IF_SMBUS_BLOCK_IO_STATS_MAX ];
-    uint32_t              pulErrorCounters[ FW_IF_SMBUS_BLOCK_IO_ERRORS_MAX ];
+    uint32_t             pulStatCounters[ FW_IF_SMBUS_BLOCK_IO_STATS_MAX ];
+    uint32_t             pulErrorCounters[ FW_IF_SMBUS_BLOCK_IO_ERRORS_MAX ];
 
-    uint32_t              ulLowerFirewall;
+    uint32_t             ulLowerFirewall;
 
-} FW_IF_SMBusBlockIOPrivateData;
+} FWIfSMBusBlockIOPrivateData;
 
 
 /*****************************************************************************/
 /* local variables                                                           */
 /*****************************************************************************/
 
-static FW_IF_SMBusBlockIOPrivateData xLocalData =
+static FWIfSMBusBlockIOPrivateData xLocalData =
 {
-    SMBUS_BLOCK_IO_UPPER_FIREWALL,  /* ulUpperFirewall */
+    UPPER_FIREWALL, /* ulUpperFirewall */
 
-    { 0 },                          /* xLocalCfg       */
-    FW_IF_FALSE,                    /* iInitialised    */
+    { 0 },          /* xLocalCfg       */
+    FW_IF_FALSE,    /* iInitialised    */
 
-    NULL,                           /* pxSMBusProfile */
-    { 0 },                          /* pucCallBackWriteData */
-    0,                              /* usCallBackWriteDataSize */
-    NULL,                           /* pvWriteCallbackSem */
+    NULL,           /* pxSMBusProfile */
+    { 0 },          /* pucCallBackWriteData */
+    0,              /* usCallBackWriteDataSize */
+    NULL,           /* pvWriteCallbackSem */
 
-    { 0 },                          /* pulStatCounters */
-    { 0 },                          /* pulErrorCounters */
+    { 0 },          /* pulStatCounters */
+    { 0 },          /* pulErrorCounters */
 
-    SMBUS_BLOCK_IO_LOWER_FIREWALL   /* ulLowerFirewall */
+    LOWER_FIREWALL  /* ulLowerFirewall */
 };
-static FW_IF_SMBusBlockIOPrivateData *pxThis = &xLocalData;
+
+static FWIfSMBusBlockIOPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -381,12 +379,12 @@ static uint32_t ulSmbusBlockIoOpen( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
-    FW_IF_SMBUS_CFG *pxCfg = ( FW_IF_SMBUS_CFG* )pxThisIf->cfg;
+    FWIfSMBusCfg *pxCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
     if ( ( FW_IF_SMBUS_STATE_CREATED == pxCfg->xState ) || ( FW_IF_SMBUS_STATE_CLOSED == pxCfg->xState ) )
     {
@@ -471,13 +469,13 @@ static uint32_t ulSmbusBlockIoClose( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_SMBUS_CFG *pxCfg = ( FW_IF_SMBUS_CFG* )pxThisIf->cfg;
+    FWIfSMBusCfg *pxCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
     if ( FW_IF_SMBUS_STATE_OPENED == pxCfg->xState )
     {
@@ -518,7 +516,7 @@ static uint32_t ulSmbusBlockIoWrite( void *pvFwIf, uint64_t dstPort, uint8_t *pu
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -526,7 +524,7 @@ static uint32_t ulSmbusBlockIoWrite( void *pvFwIf, uint64_t dstPort, uint8_t *pu
 
     if ( NULL != pucData )
     {
-        FW_IF_SMBUS_CFG *pxCfg = ( FW_IF_SMBUS_CFG* )pxThisIf->cfg;
+        FWIfSMBusCfg *pxCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
         if ( FW_IF_SMBUS_STATE_OPENED == pxCfg->xState )
         {
@@ -608,7 +606,7 @@ static uint32_t ulSmbusBlockIoRead( void *pvFwIf, uint64_t ullSrcPort, uint8_t *
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -616,7 +614,7 @@ static uint32_t ulSmbusBlockIoRead( void *pvFwIf, uint64_t ullSrcPort, uint8_t *
 
     if ( ( NULL != pucData ) && ( NULL != pulSize ) )
     {
-        FW_IF_SMBUS_CFG *pxCfg = ( FW_IF_SMBUS_CFG* )pxThisIf->cfg;
+        FWIfSMBusCfg *pxCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
         if ( FW_IF_SMBUS_STATE_OPENED == pxCfg->xState )
         {
@@ -682,7 +680,7 @@ static uint32_t ulSmbusBlockIoIoctrl( void *pvFwIf, uint32_t ulOption, void *pvV
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -705,7 +703,7 @@ static uint32_t ulSmbusBlockIoBindCallback( void *pvFwIf, FW_IF_callback *pxNewF
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -782,7 +780,7 @@ static int iSmbusSetupInterrupts( void )
 /**
  * @brief initialisation function for smbus interfaces (generic across all smbus interfaces)
  */
-uint32_t ulFW_IF_SMBUS_Init( FW_IF_SMBUS_INIT_CFG *pxInitCfg )
+uint32_t ulFW_IF_SMBUS_Init( FWIfSMBusInitCfg *pxInitCfg )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
@@ -854,7 +852,7 @@ uint32_t ulFW_IF_SMBUS_Init( FW_IF_SMBUS_INIT_CFG *pxInitCfg )
 /**
  * @brief creates an instance of the smbus interface
  */
-uint32_t ulFW_IF_SMBUS_Create( FW_IF_CFG *pxFwIf, FW_IF_SMBUS_CFG *pxSmbusCfg )
+uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pxFwIf, FWIfSMBusCfg *pxSmbusCfg )
 {
     CHECK_DRIVER;
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
@@ -867,9 +865,9 @@ uint32_t ulFW_IF_SMBUS_Create( FW_IF_CFG *pxFwIf, FW_IF_SMBUS_CFG *pxSmbusCfg )
             ( MAX_FW_IF_SMBUS_STATE > pxSmbusCfg->xState ) &&
             ( MAX_FW_IF_SMBUS_PEC > pxSmbusCfg->xPecCapability ) )
         {
-            FW_IF_CFG xLocalIfCfg =
+            FWIfCfg xLocalIfCfg =
             {
-                .upperFirewall = SMBUS_BLOCK_IO_UPPER_FIREWALL,
+                .upperFirewall = UPPER_FIREWALL,
                 .open          = &ulSmbusBlockIoOpen,
                 .close         = &ulSmbusBlockIoClose,
                 .write         = &ulSmbusBlockIoWrite,
@@ -877,12 +875,12 @@ uint32_t ulFW_IF_SMBUS_Create( FW_IF_CFG *pxFwIf, FW_IF_SMBUS_CFG *pxSmbusCfg )
                 .ioctrl        = &ulSmbusBlockIoIoctrl,
                 .bindCallback  = &ulSmbusBlockIoBindCallback,
                 .cfg           = ( void* )pxSmbusCfg,
-                .lowerFirewall = SMBUS_BLOCK_IO_LOWER_FIREWALL
+                .lowerFirewall = LOWER_FIREWALL
             };
 
-            pvOSAL_MemCpy( pxFwIf, &xLocalIfCfg, sizeof( FW_IF_CFG ) );
+            pvOSAL_MemCpy( pxFwIf, &xLocalIfCfg, sizeof( FWIfCfg ) );
 
-            FW_IF_SMBUS_CFG *pxCfg = ( FW_IF_SMBUS_CFG* )pxFwIf->cfg;
+            FWIfSMBusCfg *pxCfg = ( FWIfSMBusCfg* )pxFwIf->cfg;
             pxCfg->xState = FW_IF_SMBUS_STATE_CREATED;
             pxCfg->ucInstance = SMBUS_INVALID_INSTANCE;
             INC_STAT_COUNTER( FW_IF_SMBUS_BLOCK_IO_STATS_INSTANCE_CREATE )
@@ -909,9 +907,9 @@ int iFW_IF_SMBUS_PrintStatistics( void )
 {
     int iStatus = FW_IF_ERRORS_NONE;
 
-    if ( ( SMBUS_BLOCK_IO_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( SMBUS_BLOCK_IO_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( FW_IF_TRUE == pxThis->iInitialised ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( FW_IF_TRUE == pxThis->iInitialised ) )
     {
         int i = 0;
         PLL_INF( FW_IF_SMBUS_BLOCK_IO_NAME, "============================================================\n\r" );
@@ -944,9 +942,9 @@ int iFW_IF_SMBUS_ClearStatistics( void )
 {
     int iStatus = FW_IF_ERRORS_NONE;
 
-    if ( ( SMBUS_BLOCK_IO_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( SMBUS_BLOCK_IO_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( FW_IF_TRUE == pxThis->iInitialised ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( FW_IF_TRUE == pxThis->iInitialised ) )
     {
         pvOSAL_MemSet( pxThis->pulStatCounters, 0, sizeof( pxThis->pulStatCounters ) );
         pvOSAL_MemSet( pxThis->pulErrorCounters, 0, sizeof( pxThis->pulErrorCounters ) );

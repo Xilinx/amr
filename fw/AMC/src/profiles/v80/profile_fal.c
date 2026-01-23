@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the fal profile for the V80
@@ -65,46 +65,23 @@
 /*****************************************************************************/
 
 /* FAL objects */
-FW_IF_CFG xGcqIf =
-{
-    0
-};
-FW_IF_CFG xOspiIf =
-{
-    0
-};
-FW_IF_CFG xEmmcIf =
-{
-    0
-};
-FW_IF_CFG xQsfpIf1 =
-{
-    0
-};
-FW_IF_CFG xQsfpIf2 =
-{
-    0
-};
-FW_IF_CFG xQsfpIf3 =
-{
-    0
-};
-FW_IF_CFG xQsfpIf4 =
-{
-    0
-};
-FW_IF_CFG xDimmIf =
-{
-    0
-};
-FW_IF_CFG xSMBusIf =
-{
-    0
-};
+FWIfCfg xGcqIf   = { 0 };
+FWIfCfg xOspiIf  = { 0 };
+FWIfCfg xEmmcIf  = { 0 };
 
-FW_IF_CFG *pxEmmcIf  = &xEmmcIf;
-FW_IF_CFG *pxOspiIf  = &xOspiIf;
-FW_IF_CFG *pxSMBusIf = &xSMBusIf;
+FWIfCfg xQsfpIf1 = { 0 };
+FWIfCfg xQsfpIf2 = { 0 };
+FWIfCfg xQsfpIf3 = { 0 };
+FWIfCfg xQsfpIf4 = { 0 };
+
+FWIfCfg xDimmIf  = { 0 };
+
+FWIfCfg xSMBusIf = { 0 };
+
+
+FWIfCfg *pxEmmcIf  = &xEmmcIf;
+FWIfCfg *pxOspiIf  = &xOspiIf;
+FWIfCfg *pxSMBusIf = &xSMBusIf;
 
 /*****************************************************************************/
 /* Local variables                                                           */
@@ -190,7 +167,7 @@ static FW_IF_MUXED_DEVICE_CFG xDimmCfg =
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
 };                                                  /* DIMM */
 
-static FW_IF_GCQCfg xGcqCfg =
+static FWIfGCQCfg xGcqCfg =
 {
     ( uint64_t )HAL_GCQ_SHARED_BASEADDR,
     FW_IF_GCQ_MODE_PRODUCER,
@@ -201,12 +178,12 @@ static FW_IF_GCQCfg xGcqCfg =
     ""
 };
 
-static FW_IF_GCQInitCfg myGcqIf =
+static FWIfGCQInitCfg myGcqIf =
 {
     NULL
 };
 
-static FW_IF_OSPI_CFG xOspiCfg =
+static FWIfOspiCfg xOspiCfg =
 {
     HAL_OSPI_RPU_BASE_ADDR,
     HAL_OSPI_RPU_LENGTH,
@@ -214,7 +191,7 @@ static FW_IF_OSPI_CFG xOspiCfg =
     FW_IF_OSPI_STATE_INIT
 };
 
-static FW_IF_EMMC_CFG xEmmcCfg =
+static FWIfEmmcCfg xEmmcCfg =
 {
     0,
     "EmmcCfg",
@@ -223,7 +200,7 @@ static FW_IF_EMMC_CFG xEmmcCfg =
     FW_IF_EMMC_STATE_ERROR
 };
 
-static FW_IF_SMBUS_CFG xSMBusCfg =
+static FWIfSMBusCfg xSMBusCfg =
 {
     HAL_SMBUS_ADDR,                     /* SMBus address */
     FW_IF_SMBUS_ROLE_CONTROLLER,        /* initial SMBus role */
@@ -237,25 +214,25 @@ static FW_IF_SMBUS_CFG xSMBusCfg =
     FW_IF_SMBUS_PEC_ENABLED             /* SMBus PEC capability */
 };
 
-static FW_IF_OSPI_INIT_CFG myOspiIf =
+static FWIfOspiInitCfg myOspiIf =
 {
     HAL_OSPI_0_DEVICE_ID,
     HAL_OSPI_PAGE_SIZE
 };
 
-static FW_IF_EMMC_INIT_CFG myEmmcIf =
+static FWIfEmmcInitCfg myEmmcIf =
 {
     "EmmcIfCfg",
     HAL_EMMC_BASE_ADDR
 };
 
-static FW_IF_MUXED_DEVICE_INIT_CFG myQsfpIf =
+static FWIfMuxedDeviceInitCfg myQsfpIf =
 {
     "QsfpIfCfg",
     HAL_I2C_BUS_1_DEVICE_ID
 };
 
-static FW_IF_SMBUS_INIT_CFG mySMBusIf =
+static FWIfSMBusInitCfg mySMBusIf =
 {
     HAL_SMBUS_BASE_ADDR,
     SMBUS_FREQ_100KHZ,

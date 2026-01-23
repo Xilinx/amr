@@ -132,8 +132,8 @@ extern uint32_t ulUserPdiLoadStatus;    /* User PDI power on load status 0: Succ
  *          and can be set to NULL.
  */
 int iAPC_Initialise( uint8_t ucProxyId,
-                     FW_IF_CFG *pxPrimaryFwIf,
-                     FW_IF_CFG *pxSecondaryFwIf,
+                     FWIfCfg *pxPrimaryFwIf,
+                     FWIfCfg *pxSecondaryFwIf,
                      XLoader_ClientInstance *pXLoaderInst,
                      uint32_t ulTaskPrio, uint32_t ulTaskStack );
 
@@ -161,7 +161,7 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
  * @return  OK    Image downloaded successfully
  *          ERROR Image not downloaded successfully
  */
-int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
+int iAPC_DownloadImage( EVLSignal *pxSignal,
                         APC_BOOT_DEVICES xBootDevice,
                         int iPartition,
                         uint32_t ulSrcAddr,
@@ -183,7 +183,7 @@ int iAPC_DownloadImage( EVL_SIGNAL *pxSignal,
  * @return  OK    Image downloaded successfully
  *          ERROR Image not downloaded successfully
  */
-int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
+int iAPC_UpdateFpt( EVLSignal *pxSignal,
                     APC_BOOT_DEVICES xBootDevice,
                     uint32_t ulSrcAddr,
                     uint32_t ulImageSize,
@@ -205,7 +205,7 @@ int iAPC_UpdateFpt( EVL_SIGNAL *pxSignal,
  * @return  OK       Image copied successfully
  *          ERROR    Image not copied successfully
  */
-int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
+int iAPC_CopyImage( EVLSignal *pxSignal,
                     APC_BOOT_DEVICES xSrcBootDevice,
                     int iSrcPartition,
                     APC_BOOT_DEVICES xDestBootDevice,
@@ -228,7 +228,7 @@ int iAPC_CopyImage( EVL_SIGNAL *pxSignal,
  * @return  OK    Image copied successfully
  *          ERROR Image not copied successfully
  */
-int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
+int iAPC_PdiProgram( EVLSignal *pxSignal,
                      APC_BOOT_DEVICES xBootDevice,
                      int iPartition,
                      uint32_t ulSrcAddr,
@@ -245,7 +245,7 @@ int iAPC_PdiProgram( EVL_SIGNAL *pxSignal,
  * @return  OK    Partition successfully selected
  *          ERROR Partition not selected
  */
-int iAPC_SetNextPartition( EVL_SIGNAL *pxSignal, int iPartition );
+int iAPC_SetNextPartition( EVLSignal *pxSignal, int iPartition );
 
 /**
  * iAPC_EnableHotReset() - Enable the hot reset capability (from primary boot device)
@@ -255,7 +255,7 @@ int iAPC_SetNextPartition( EVL_SIGNAL *pxSignal, int iPartition );
  * @return  OK    Hot reset successfully enabled
  *          ERROR Hot reset not enabled
  */
-int iAPC_EnableHotReset( EVL_SIGNAL *pxSignal );
+int iAPC_EnableHotReset( EVLSignal *pxSignal );
 
 /**
  * iAPC_GetFptHeader() - Get the Flash Partition Table (FPT) Header
@@ -297,7 +297,7 @@ int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
  * @note    This function updates the partition flags in both the cached copy
  *          and the flash storage
  */
-int iAPC_SetFptPartitionFlags( EVL_SIGNAL *pxSignal,
+int iAPC_SetFptPartitionFlags( EVLSignal *pxSignal,
                                APC_BOOT_DEVICES xBootDevice,
                                int iPartition,
                                uint32_t ulFlags );

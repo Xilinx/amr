@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation for the AMR Sensor Control (ASC)
@@ -7,10 +7,6 @@
  *
  * @file asc_proxy_driver.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "util.h"
 #include "pll.h"
@@ -21,9 +17,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
 
 #define ASC_TASK_SLEEP_MS ( 100 )
 
@@ -110,36 +103,36 @@ UTIL_MAKE_ENUM_AND_STRINGS( ASC_PROXY_ERRORS, ASC_PROXY_ERRORS, ASC_PROXY_ERRORS
 /**
  * @brief   Structure to hold ths proxy driver's private data
  */
-typedef struct ASC_PRIVATE_DATA
+typedef struct
 {
-    uint32_t                     ulUpperFirewall;
+    uint32_t                 ulUpperFirewall;
 
-    int                          iInitialised;
-    uint8_t                      ucMyId;
+    int                      iInitialised;
+    uint8_t                  ucMyId;
 
-    EVL_RECORD                   *pxEvlRecord;
+    EVLRecord                *pxEvlRecord;
 
-    void                         *pvOsalMutexHdl;
-    void                         *pvOsalTaskHdl;
+    void                     *pvOsalMutexHdl;
+    void                     *pvOsalTaskHdl;
 
-    ASC_PROXY_DRIVER_SENSOR_DATA *pxSensorData;
-    uint8_t                      ucNumSensors;
+    ASCProxyDriverSensorData *pxSensorData;
+    uint8_t                  ucNumSensors;
 
-    uint32_t                     pulStatCounters[ ASC_PROXY_STATS_MAX ];
-    uint32_t                     pulErrorCounters[ ASC_PROXY_ERRORS_MAX ];
+    uint32_t                 pulStatCounters[ ASC_PROXY_STATS_MAX ];
+    uint32_t                 pulErrorCounters[ ASC_PROXY_ERRORS_MAX ];
 
-    MODULE_STATE                 xState;
+    MODULE_STATE             xState;
 
-    uint32_t                     ulLowerFirewall;
+    uint32_t                 ulLowerFirewall;
 
-} ASC_PRIVATE_DATA;
+} AXCProxyDriverPrivateData;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static ASC_PRIVATE_DATA xLocalData =
+static AXCProxyDriverPrivateData xLocalData =
 {
     UPPER_FIREWALL,             /* ulUpperFirewall */
     FALSE,                      /* iInitialised */
@@ -159,7 +152,7 @@ static ASC_PRIVATE_DATA xLocalData =
     LOWER_FIREWALL              /* ulLowerFirewall */
 };
 
-static ASC_PRIVATE_DATA *pxThis = &xLocalData;
+static AXCProxyDriverPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -189,7 +182,7 @@ static void vProxyDriverTask( void *pvArgs );
 int iASC_Initialise( uint8_t ucProxyId,
                      uint32_t ulTaskPrio,
                      uint32_t ulTaskStack,
-                     ASC_PROXY_DRIVER_SENSOR_DATA *pxSensorData,
+                     ASCProxyDriverSensorData *pxSensorData,
                      uint8_t ucNumSensors )
 {
     int iStatus = ERROR;
@@ -205,7 +198,7 @@ int iASC_Initialise( uint8_t ucProxyId,
         /* initalise evl record*/
         if( OK != iEVL_CreateRecord( &pxThis->pxEvlRecord ) )
         {
-            PLL_ERR( ASC_NAME, "Error initialising EVL_RECORD\r\n" );
+            PLL_ERR( ASC_NAME, "Error initialising EVLRecord\r\n" );
             INC_ERROR_COUNTER_WITH_STATE( ASC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED );
 
         }
@@ -222,14 +215,14 @@ int iASC_Initialise( uint8_t ucProxyId,
                 INC_STAT_COUNTER( ASC_PROXY_STATS_CREATE_MUTEX )
                 INC_STAT_COUNTER( ASC_PROXY_STATS_INIT_OVERALL_COMPLETE )
                 pxThis->pxSensorData =
-                    ( ASC_PROXY_DRIVER_SENSOR_DATA * )pvOSAL_MemAlloc( sizeof(ASC_PROXY_DRIVER_SENSOR_DATA) *
+                    ( ASCProxyDriverSensorData * )pvOSAL_MemAlloc( sizeof(ASCProxyDriverSensorData) *
                                                                        ucNumSensors );
 
                 if( NULL != pxThis->pxSensorData )
                 {
                     pvOSAL_MemCpy( pxThis->pxSensorData,
                                    pxSensorData,
-                                   sizeof( ASC_PROXY_DRIVER_SENSOR_DATA ) * ucNumSensors );
+                                   sizeof(ASCProxyDriverSensorData) * ucNumSensors );
                     pxThis->ucNumSensors = ucNumSensors;
                     if( OSAL_ERRORS_NONE != iOSAL_Task_Create( &pxThis->pvOsalTaskHdl,
                                                                vProxyDriverTask,
@@ -492,7 +485,7 @@ int iASC_ResetSingleSensorDataByName( const char *pcName )
 /**
  * @brief   Get all sensor data
  */
-int iASC_GetAllSensorData( ASC_PROXY_DRIVER_SENSOR_DATA *pxData, uint8_t *pucNumSensors )
+int iASC_GetAllSensorData( ASCProxyDriverSensorData *pxData, uint8_t *pucNumSensors )
 {
     int iStatus = ERROR;
 
@@ -512,7 +505,7 @@ int iASC_GetAllSensorData( ASC_PROXY_DRIVER_SENSOR_DATA *pxData, uint8_t *pucNum
             {
                 pvOSAL_MemCpy( pxData,
                                pxThis->pxSensorData,
-                               sizeof( ASC_PROXY_DRIVER_SENSOR_DATA ) * pxThis->ucNumSensors );
+                               sizeof(ASCProxyDriverSensorData) * pxThis->ucNumSensors );
                 *pucNumSensors = pxThis->ucNumSensors;
                 iStatus        = OK;
             }
@@ -548,7 +541,7 @@ int iASC_GetAllSensorData( ASC_PROXY_DRIVER_SENSOR_DATA *pxData, uint8_t *pucNum
 /**
  * @brief   Get single sensor data by its ID
  */
-int iASC_GetSingleSensorDataById( uint8_t ucId, ASC_PROXY_DRIVER_SENSOR_DATA *pxData )
+int iASC_GetSingleSensorDataById( uint8_t ucId, ASCProxyDriverSensorData *pxData )
 {
     int iStatus = ERROR;
 
@@ -569,7 +562,7 @@ int iASC_GetSingleSensorDataById( uint8_t ucId, ASC_PROXY_DRIVER_SENSOR_DATA *px
             {
                 if( pxThis->pxSensorData[ i ].ucSensorId == ucId )
                 {
-                    pvOSAL_MemCpy( pxData, &pxThis->pxSensorData[ i ], sizeof( ASC_PROXY_DRIVER_SENSOR_DATA ) );
+                    pvOSAL_MemCpy( pxData, &pxThis->pxSensorData[ i ], sizeof(ASCProxyDriverSensorData) );
                     iStatus = OK;
                     break;
                 }
@@ -606,7 +599,7 @@ int iASC_GetSingleSensorDataById( uint8_t ucId, ASC_PROXY_DRIVER_SENSOR_DATA *px
 /**
  * @brief   Get single sensor data by its name
  */
-int iASC_GetSingleSensorDataByName( const char *pcName, ASC_PROXY_DRIVER_SENSOR_DATA *pxData )
+int iASC_GetSingleSensorDataByName( const char *pcName, ASCProxyDriverSensorData *pxData )
 {
     int iStatus = ERROR;
 
@@ -628,7 +621,7 @@ int iASC_GetSingleSensorDataByName( const char *pcName, ASC_PROXY_DRIVER_SENSOR_
             {
                 if( 0 == strncmp( pxThis->pxSensorData[ i ].pcSensorName, pcName, ASC_SENSOR_NAME_MAX ) )
                 {
-                    pvOSAL_MemCpy( pxData, &pxThis->pxSensorData[ i ], sizeof( ASC_PROXY_DRIVER_SENSOR_DATA ) );
+                    pvOSAL_MemCpy( pxData, &pxThis->pxSensorData[ i ], sizeof(ASCProxyDriverSensorData) );
                     iStatus = OK;
                     break;
                 }
@@ -956,7 +949,7 @@ int iASC_GetState( MODULE_STATE *pxState )
  */
 static void vProxyDriverTask( void *pvArgs )
 {
-    EVL_SIGNAL xNewSignal =
+    EVLSignal xNewSignal =
     {
         pxThis->ucMyId,
         MAX_ASC_PROXY_DRIVER_EVENTS,

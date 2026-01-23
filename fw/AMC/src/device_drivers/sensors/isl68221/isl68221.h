@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function declarations for the ISL68221
@@ -11,10 +11,6 @@
 #ifndef _ISL68221_H_
 #define _ISL68221_H_
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "standard.h"
 
 
@@ -23,18 +19,18 @@
 /******************************************************************************/
 
 /**
- * @enum    ISL68221_SENSOR_PAGE_ENUM
+ * @enum    ISL68221_SENSOR_PAGE
  * @brief   Sensor page to read
  */
-typedef enum ISL68821_SENSOR_PAGE_ENUM
+typedef enum
 {
     ISL68221_SENSOR_PAGE_0 = 0,
-    ISL68221_SENSOR_PAGE_1,
-    ISL68221_SENSOR_PAGE_2,
+    ISL68221_SENSOR_PAGE_1 = 1,
+    ISL68221_SENSOR_PAGE_2 = 2,
 
     MAX_ISL68221_SENSOR_PAGE
 
-} ISL68221_SENSOR_PAGE_ENUM;
+} ISL68221_SENSOR_PAGE;
 
 
 /******************************************************************************/

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function declarations for the INA3221
@@ -10,10 +10,6 @@
 
 #ifndef _INA3221_H_
 #define _INA3221_H_
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 

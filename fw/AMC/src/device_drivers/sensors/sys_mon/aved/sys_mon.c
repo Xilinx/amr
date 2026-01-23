@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function implementations for the System Monnitor
@@ -23,9 +23,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-
-#define UPPER_FIREWALL                  ( 0xBABECAFE )
-#define LOWER_FIREWALL                  ( 0xDEADFACE )
 
 #define SYS_MON_NAME                    "SYS_MON"
 
@@ -83,7 +80,7 @@ UTIL_MAKE_ENUM_AND_STRINGS( SYS_MON_ERRORS, SYS_MON_ERRORS, SYS_MON_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  SYS_MON_PrivateData
+ * @struct  SYSMonPrivateData
  * @brief   Private driver data
  */
 typedef struct
@@ -103,14 +100,14 @@ typedef struct
 
     uint32_t    ulLowerFirewall;
 
-} SYS_MON_PrivateData;
+} SYSMonPrivateData;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static SYS_MON_PrivateData xPrivateData =
+static SYSMonPrivateData xPrivateData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall */
     FALSE,              /* iIsInitialised */
@@ -123,7 +120,7 @@ static SYS_MON_PrivateData xPrivateData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 };
 
-static SYS_MON_PrivateData *pxThis = &xPrivateData;
+static SYSMonPrivateData *pxThis = &xPrivateData;
 
 
 /******************************************************************************/

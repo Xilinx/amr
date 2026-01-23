@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the Board Management Controller (BMC) proxy debug implementation
@@ -96,7 +96,7 @@ static void vBindCallbacks( void );
  *          ERROR if an error was raised in the callback
  *
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal );
+static int iTestCallback( EVLSignal *pxSignal );
 
 /**
  * @brief   Debug function to get state of BMC
@@ -343,7 +343,7 @@ static void vGetState( void )
 /**
  * @brief   EVL Callback for binding test prints
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal )
+static int iTestCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 

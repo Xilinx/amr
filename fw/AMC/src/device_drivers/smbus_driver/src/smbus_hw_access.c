@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains functions to read and write to the SMBus IP register map
@@ -154,7 +154,7 @@ static uint8_t prvucSMBusGenericDescriptorIDLookup( SMBUS_HW_DESCRIPTOR_TYPE xDe
  * @return   SMBUS_HW_DESCRIPTOR_WRITE_FAIL      - if write to descriptor fails
  *           SMBUS_HW_DESCRIPTOR_WRITE_SUCCESS   - if write to descriptor succeeds
  */
-static uint8_t prvucSMBusTargetDescriptorApply( SMBus_Profile* pxSMBusProfile, SMBUS_HW_DESCRIPTOR_TYPE xDescriptor,
+static uint8_t prvucSMBusTargetDescriptorApply( SMBusProfile* pxSMBusProfile, SMBUS_HW_DESCRIPTOR_TYPE xDescriptor,
                                                 uint8_t ucPayload, uint8_t ucNoStatusCheck )
 {
     uint8_t  ucReturnCode   = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
@@ -200,7 +200,7 @@ static uint8_t prvucSMBusTargetDescriptorApply( SMBus_Profile* pxSMBusProfile, S
  * @return   SMBUS_HW_DESCRIPTOR_WRITE_FAIL      - if write to descriptor fails
  *           SMBUS_HW_DESCRIPTOR_WRITE_SUCCESS   - if write to descriptor succeeds
  */
-static uint8_t prvucSMBusControllerDescriptorApply( SMBus_Profile* pxSMBusProfile,
+static uint8_t prvucSMBusControllerDescriptorApply( SMBusProfile* pxSMBusProfile,
                                                     SMBUS_HW_DESCRIPTOR_TYPE xDescriptor, uint8_t ucPayload,
                                                     uint8_t ucNoStatusCheck )
 {
@@ -235,7 +235,7 @@ static uint8_t prvucSMBusControllerDescriptorApply( SMBus_Profile* pxSMBusProfil
 /*
  * @brief    Writes a data byte along with a Target Read - Read Descriptor ID to transmit the data byte
  */
-uint8_t ucSMBusTargetReadDescriptorRead( SMBus_Profile* pxSMBusProfile, uint8_t ucData )
+uint8_t ucSMBusTargetReadDescriptorRead( SMBusProfile* pxSMBusProfile, uint8_t ucData )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
 
@@ -250,7 +250,7 @@ uint8_t ucSMBusTargetReadDescriptorRead( SMBus_Profile* pxSMBusProfile, uint8_t 
  * @brief    Writes a Target Read - PEC Descriptor ID to the Target Descriptor FIFO
  * To iform the IP to transmit the PEC byte it has calculated on the data
  */
-uint8_t ucSMBusTargetReadDescriptorPECRead( SMBus_Profile* pxSMBusProfile )
+uint8_t ucSMBusTargetReadDescriptorPECRead( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
 
@@ -265,7 +265,7 @@ uint8_t ucSMBusTargetReadDescriptorPECRead( SMBus_Profile* pxSMBusProfile )
  * @brief    Writes a Target Write - ACK Descriptor ID to the Target Descriptor FIFO
  *           To inform the IP to transmit an ACK
  */
-uint8_t ucSMBusTargetWriteDescriptorACK( SMBus_Profile* pxSMBusProfile, uint8_t ucNoStatusCheck )
+uint8_t ucSMBusTargetWriteDescriptorACK( SMBusProfile* pxSMBusProfile, uint8_t ucNoStatusCheck )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -279,7 +279,7 @@ uint8_t ucSMBusTargetWriteDescriptorACK( SMBus_Profile* pxSMBusProfile, uint8_t 
  * @brief    Writes a Target Write - NACK Descriptor ID to the Target Descriptor FIFO
  *           To inform the IP to transmit a NACK
  */
-uint8_t ucSMBusTargetWriteDescriptorNACK( SMBus_Profile* pxSMBusProfile )
+uint8_t ucSMBusTargetWriteDescriptorNACK( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
 
@@ -294,7 +294,7 @@ uint8_t ucSMBusTargetWriteDescriptorNACK( SMBus_Profile* pxSMBusProfile )
  * @brief    Writes a Target Write - PEC Descriptor ID to the Target Descriptor FIFO
  *           To inform the IP to interpret the previous byte as a PEC
  */
-uint8_t ucSMBusTargetWriteDescriptorPEC( SMBus_Profile* pxSMBusProfile )
+uint8_t ucSMBusTargetWriteDescriptorPEC( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
 
@@ -309,7 +309,7 @@ uint8_t ucSMBusTargetWriteDescriptorPEC( SMBus_Profile* pxSMBusProfile )
 * @brief    Writes a Controller Write - START Descriptor ID to the Controller Descriptor FIFO
 *           To inform the IP to transmit a START condition
 */
-uint8_t ucSMBusControllerWriteDescriptorStartWrite( SMBus_Profile* pxSMBusProfile, uint8_t ucDestination )
+uint8_t ucSMBusControllerWriteDescriptorStartWrite( SMBusProfile* pxSMBusProfile, uint8_t ucDestination )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -326,7 +326,7 @@ uint8_t ucSMBusControllerWriteDescriptorStartWrite( SMBus_Profile* pxSMBusProfil
  * @brief    Writes a Controller Write - QUICK Descriptor ID to the Controller Descriptor FIFO
  *           To inform the IP to transmit a START condition followed by a STOP
  */
-uint8_t ucSMBusControllerWriteDescriptorQuickWrite( SMBus_Profile* pxSMBusProfile, uint8_t ucDestination )
+uint8_t ucSMBusControllerWriteDescriptorQuickWrite( SMBusProfile* pxSMBusProfile, uint8_t ucDestination )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
 
@@ -343,7 +343,7 @@ uint8_t ucSMBusControllerWriteDescriptorQuickWrite( SMBus_Profile* pxSMBusProfil
  * along with a data byte
  *           To inform the IP to transmit the data byte
  */
-uint8_t ucSMBusControllerWriteDescriptorByte( SMBus_Profile* pxSMBusProfile, uint8_t ucData, uint8_t ucNoStatusCheck )
+uint8_t ucSMBusControllerWriteDescriptorByte( SMBusProfile* pxSMBusProfile, uint8_t ucData, uint8_t ucNoStatusCheck )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -358,7 +358,7 @@ uint8_t ucSMBusControllerWriteDescriptorByte( SMBus_Profile* pxSMBusProfile, uin
  * along with a data byte
  *           To inform the IP to transmit the data byte followed by a STOP condition
  */
-uint8_t ucSMBusControllerWriteDescriptorStopWrite( SMBus_Profile* pxSMBusProfile, uint8_t ucData )
+uint8_t ucSMBusControllerWriteDescriptorStopWrite( SMBusProfile* pxSMBusProfile, uint8_t ucData )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -372,7 +372,7 @@ uint8_t ucSMBusControllerWriteDescriptorStopWrite( SMBus_Profile* pxSMBusProfile
  * @brief    Writes a Controller Write - PEC Descriptor ID to the Controller Descriptor FIFO
  *           To inform the IP to transmit the PEC verify an ACK and then transmit a STOP
  */
-uint8_t ucSMBusControllerWriteDescriptorPECWrite( SMBus_Profile* pxSMBusProfile )
+uint8_t ucSMBusControllerWriteDescriptorPECWrite( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -387,7 +387,7 @@ uint8_t ucSMBusControllerWriteDescriptorPECWrite( SMBus_Profile* pxSMBusProfile 
  * along with Target address
  *           To inform the IP to start a new READ transaction
  */
-uint8_t ucSMBusControllerReadDescriptorStart( SMBus_Profile* pxSMBusProfile, uint8_t ucDestination )
+uint8_t ucSMBusControllerReadDescriptorStart( SMBusProfile* pxSMBusProfile, uint8_t ucDestination )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -405,7 +405,7 @@ uint8_t ucSMBusControllerReadDescriptorStart( SMBus_Profile* pxSMBusProfile, uin
  * along with Target address
  *           To inform the IP to start a new READ transaction followed by a STOP
  */
-uint8_t ucSMBusControllerReadDescriptorQuickRead( SMBus_Profile* pxSMBusProfile, uint8_t ucDestination )
+uint8_t ucSMBusControllerReadDescriptorQuickRead( SMBusProfile* pxSMBusProfile, uint8_t ucDestination )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -420,7 +420,7 @@ uint8_t ucSMBusControllerReadDescriptorQuickRead( SMBus_Profile* pxSMBusProfile,
  * @brief    Writes a Controller Read - BYTE Descriptor ID to the Controller Descriptor FIFO
  *           To inform the IP to transmit an ACK for the previous byte received
  */
-uint8_t ucSMBusControllerReadDescriptorByte( SMBus_Profile* pxSMBusProfile, uint8_t ucNoStatusCheck )
+uint8_t ucSMBusControllerReadDescriptorByte( SMBusProfile* pxSMBusProfile, uint8_t ucNoStatusCheck )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -434,7 +434,7 @@ uint8_t ucSMBusControllerReadDescriptorByte( SMBus_Profile* pxSMBusProfile, uint
  * @brief    Writes a Controller Read - STOP Descriptor ID to the Controller Descriptor FIFO
  *           To inform the IP to transmit a NACK followed by a STOP condition
  */
-uint8_t ucSMBusControllerReadDescriptorStop( SMBus_Profile* pxSMBusProfile )
+uint8_t ucSMBusControllerReadDescriptorStop( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -449,7 +449,7 @@ uint8_t ucSMBusControllerReadDescriptorStop( SMBus_Profile* pxSMBusProfile )
  *           To inform the IP to transmit a NACK followed by a STOP and use the last received byte
  *           to perform a PEC check
  */
-uint8_t ucSMBusControllerReadDescriptorPEC( SMBus_Profile* pxSMBusProfile )
+uint8_t ucSMBusControllerReadDescriptorPEC( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucReturnCode = SMBUS_HW_DESCRIPTOR_WRITE_FAIL;
     if ( NULL != pxSMBusProfile )
@@ -548,7 +548,7 @@ char* pcDescriptorToString( SMBUS_HW_DESCRIPTOR_TYPE xDescriptor )
  *
  * @return   uint32_t value read from the register offset location
  */
-static uint32_t prvulSMBusHardwareRead( SMBus_Profile* pxSMBusProfile, uint32_t ulRegisterOffset )
+static uint32_t prvulSMBusHardwareRead( SMBusProfile* pxSMBusProfile, uint32_t ulRegisterOffset )
 {
     uint32_t           ulReadValue = 0;
     volatile uintptr_t xAddress    = 0;
@@ -574,7 +574,7 @@ static uint32_t prvulSMBusHardwareRead( SMBus_Profile* pxSMBusProfile, uint32_t 
  *
  * @return   None
  */
-static void prvvSMBusHardwareWrite( SMBus_Profile* pxSMBusProfile, uint32_t ulRegisterOffset, uint32_t ulValue )
+static void prvvSMBusHardwareWrite( SMBusProfile* pxSMBusProfile, uint32_t ulRegisterOffset, uint32_t ulValue )
 {
     volatile uintptr_t xAddress = 0;
 
@@ -598,7 +598,7 @@ static void prvvSMBusHardwareWrite( SMBus_Profile* pxSMBusProfile, uint32_t ulRe
  *
  * @return   None
  */
-static void prvvSMBusHardwareWriteWithMask( SMBus_Profile* pxSMBusProfile, uint32_t ulRegisterOffset,
+static void prvvSMBusHardwareWriteWithMask( SMBusProfile* pxSMBusProfile, uint32_t ulRegisterOffset,
                                     uint32_t ulMask, uint32_t ulValue )
 {
 
@@ -621,7 +621,7 @@ static void prvvSMBusHardwareWriteWithMask( SMBus_Profile* pxSMBusProfile, uint3
 /**
  * @brief    Reads the hardware register SMBUS_REG_IP_VERSION
  */
-uint32_t ulSMBusHWReadIPVersion( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadIPVersion( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -637,7 +637,7 @@ uint32_t ulSMBusHWReadIPVersion( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_IP_REVISION
  */
-uint32_t ulSMBusHWReadIPRevision( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadIPRevision( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -653,7 +653,7 @@ uint32_t ulSMBusHWReadIPRevision( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_IP_MAGIC_NUM
  */
-uint32_t ulSMBusHWReadIPMagicNum( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadIPMagicNum( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -669,7 +669,7 @@ uint32_t ulSMBusHWReadIPMagicNum( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_BUILD_CONFIG_0
  */
-uint32_t ulSMBusHWReadBuildConfig0( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadBuildConfig0( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -685,7 +685,7 @@ uint32_t ulSMBusHWReadBuildConfig0( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_BUILD_CONFIG_1
  */
-uint32_t ulSMBusHWReadBuildConfig1( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadBuildConfig1( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -701,7 +701,7 @@ uint32_t ulSMBusHWReadBuildConfig1( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_IRQ_GIE
  */
-uint32_t ulSMBusHWReadIRQGIEEnable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadIRQGIEEnable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -717,7 +717,7 @@ uint32_t ulSMBusHWReadIRQGIEEnable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_IRQ_IER
  */
-uint32_t ulSMBusHWReadIRQIER( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadIRQIER( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -733,7 +733,7 @@ uint32_t ulSMBusHWReadIRQIER( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_IRQ_ISR
  */
-uint32_t ulSMBusHWReadIRQISR( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadIRQISR( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -749,7 +749,7 @@ uint32_t ulSMBusHWReadIRQISR( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_IRQ_ERR_IER
  */
-uint32_t ulSMBusHWReadErrIRQIER( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadErrIRQIER( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -765,7 +765,7 @@ uint32_t ulSMBusHWReadErrIRQIER( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_IRQ_ERR_ISR
  */
-uint32_t ulSMBusHWReadErrIRQISR( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadErrIRQISR( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -784,7 +784,7 @@ uint32_t ulSMBusHWReadErrIRQISR( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the SMBUS_PHY_STATUS_SMBDAT_LOW_TIMEOUT bitfield from hardware
  *           register SMBUS_REG_PHY_STATUS
  */
-uint32_t ulSMBusHWReadPHYStatus( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYStatus( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -800,7 +800,7 @@ uint32_t ulSMBusHWReadPHYStatus( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the SMBUS_PHY_STATUS_SMBCLK_LOW_TIMEOUT bitfield from hardware
  *           register SMBUS_REG_PHY_STATUS
  */
-uint32_t ulSMBusHWReadPHYStatusSMBDATLowTimeout( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYStatusSMBDATLowTimeout( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -817,7 +817,7 @@ uint32_t ulSMBusHWReadPHYStatusSMBDATLowTimeout( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the SMBUS_PHY_STATUS_SMBCLK_LOW_TIMEOUT bitfield from hardware
  *           register SMBUS_REG_PHY_STATUS
  */
-uint32_t ulSMBusHWReadPHYStatusSMBClkLowTimeout( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYStatusSMBClkLowTimeout( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -834,7 +834,7 @@ uint32_t ulSMBusHWReadPHYStatusSMBClkLowTimeout( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the SMBUS_PHY_STATUS_BUS_IDLE bitfield from hardware register
  *           SMBUS_REG_PHY_STATUS
  */
-uint32_t ulSMBusHWReadPHYStatusBusIdle( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYStatusBusIdle( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -853,7 +853,7 @@ uint32_t ulSMBusHWReadPHYStatusBusIdle( SMBus_Profile* pxSMBusProfile )
 * @brief    Reads the SMBUS_PHY_FILTER_CONTROL_ENABLE bitfield from hardware
 *           register SMBUS_REG_PHY_FILTER_CONTROL
 */
-uint32_t ulSMBusHWReadPHYFilterControl( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYFilterControl( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -869,7 +869,7 @@ uint32_t ulSMBusHWReadPHYFilterControl( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the SMBUS_PHY_FILTER_CONTROL_ENABLE bitfield from hardware
  *           register SMBUS_REG_PHY_FILTER_CONTROL
  */
-uint32_t ulSMBusHWReadPHYFilterControlEnable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYFilterControlEnable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -886,7 +886,7 @@ uint32_t ulSMBusHWReadPHYFilterControlEnable( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the SMBUS_PHY_FILTER_CONTROL_DURATION bitfield from hardware
  *           register SMBUS_REG_PHY_FILTER_CONTROL
  */
-uint32_t ulSMBusHWReadPHYFilterControlDuration( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYFilterControlDuration( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -904,7 +904,7 @@ uint32_t ulSMBusHWReadPHYFilterControlDuration( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_PHY_BUS_FREE_TIME
  */
-uint32_t ulSMBusHWReadPHYBusFreetime( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYBusFreetime( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -922,7 +922,7 @@ uint32_t ulSMBusHWReadPHYBusFreetime( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the IDLE_THRESHOLD bitfield from hardware register
  *           SMBUS_REG_PHY_IDLE_THRESHOLD
  */
-uint32_t ulSMBusHWReadPHYIdleThresholdIdleThreshold( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYIdleThresholdIdleThreshold( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -940,7 +940,7 @@ uint32_t ulSMBusHWReadPHYIdleThresholdIdleThreshold( SMBus_Profile* pxSMBusProfi
 /**
  * @brief    Reads the hardware register SMBUS_REG_PHY_TIMEOUT_PRESCALER
  */
-uint32_t ulSMBusHWReadPHYTimeoutPrescaler( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTimeoutPrescaler( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -959,7 +959,7 @@ uint32_t ulSMBusHWReadPHYTimeoutPrescaler( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the MIN_TIMEOUT_ENABLE bitfield from hardware register
  *           SMBUS_REG_PHY_TIMEOUT_MIN
  */
-uint32_t ulSMBusHWReadPHYTimeoutMin( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTimeoutMin( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -975,7 +975,7 @@ uint32_t ulSMBusHWReadPHYTimeoutMin( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the MIN_TIMEOUT_MIN bitfield from hardware register
  *           SMBUS_REG_PHY_TIMEOUT_MIN
  */
-uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutEnable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutEnable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -992,7 +992,7 @@ uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutEnable( SMBus_Profile* pxSMBusProfile 
  * @brief    Reads the SMBUS_PHY_FILTER_CONTROL_DURATION bitfield from hardware
  *           register SMBUS_REG_PHY_FILTER_CONTROL
  */
-uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutMin( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutMin( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1011,7 +1011,7 @@ uint32_t ulSMBusHWReadPHYTimeoutMinTimeoutMin( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_PHY_TIMEOUT_MAX
  */
-uint32_t ulSMBusHWReadPHYTimeoutMax( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTimeoutMax( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1030,7 +1030,7 @@ uint32_t ulSMBusHWReadPHYTimeoutMax( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the SMBCLK_FORCE_LOW bitfield from hardware register
  *           SMBUS_REG_PHY_RESET_CONTROL
  */
-uint32_t ulSMBusHWReadPHYResetControlSMBClkForce( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYResetControlSMBClkForce( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1050,7 +1050,7 @@ uint32_t ulSMBusHWReadPHYResetControlSMBClkForce( SMBus_Profile* pxSMBusProfile 
  * @brief    Reads the TGT_DATA_SETUP bitfield from hardware register
  *           SMBUS_REG_PHY_TGT_DATA_SETUP
  */
-uint32_t ulSMBusHWReadPHYTgtDataSetupTgtDataSetup( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTgtDataSetupTgtDataSetup( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1070,7 +1070,7 @@ uint32_t ulSMBusHWReadPHYTgtDataSetupTgtDataSetup( SMBus_Profile* pxSMBusProfile
  * @brief    Reads the TGT_TEXT_PRESCALER bitfield from hardware register
  *           SMBUS_REG_PHY_TGT_TEXT_PRESCALER
  */
-uint32_t ulSMBusHWReadPHYTgtTextPrescaler( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTgtTextPrescaler( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1090,7 +1090,7 @@ uint32_t ulSMBusHWReadPHYTgtTextPrescaler( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TGT_TEXT_TIMEOUT bitfield from hardware register
  *           SMBUS_REG_PHY_TGT_TEXT_TIMEOUT
  */
-uint32_t ulSMBusHWReadPHYTgtTextTimeout( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTgtTextTimeout( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1109,7 +1109,7 @@ uint32_t ulSMBusHWReadPHYTgtTextTimeout( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TGT_TEXT_MAX bitfield from hardware register
  *           SMBUS_REG_PHY_TGT_TEXT_MAX
  */
-uint32_t ulSMBusHWReadPHYTgtTextMax( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTgtTextMax( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1128,7 +1128,7 @@ uint32_t ulSMBusHWReadPHYTgtTextMax( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the DBG_STATE bitfield from hardware register
  *           SMBUS_REG_PHY_TGT_DBG_STATE
  */
-uint32_t ulSMBusHWReadPHYTgtDbgState( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTgtDbgState( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1147,7 +1147,7 @@ uint32_t ulSMBusHWReadPHYTgtDbgState( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the DATA_HOLD bitfield from hardware register
  *           SMBUS_REG_PHY_TGT_DATA_HOLD
  */
-uint32_t ulSMBusHWReadPHYTgtDataHold( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYTgtDataHold( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1165,7 +1165,7 @@ uint32_t ulSMBusHWReadPHYTgtDataHold( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the hardware register SMBUS_REG_TGT_STATUS
  */
-uint32_t ulSMBusHWReadTgtStatus( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtStatus( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1181,7 +1181,7 @@ uint32_t ulSMBusHWReadTgtStatus( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TGT_STATUS_ACTIVE bitfield from hardware register
  *           SMBUS_REG_TGT_STATUS
  */
-uint32_t ulSMBusHWReadTgtStatusActive( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtStatusActive( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1198,7 +1198,7 @@ uint32_t ulSMBusHWReadTgtStatusActive( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TGT_STATUS_ADDRESS bitfield from hardware register
  *           SMBUS_REG_TGT_STATUS
  */
-uint32_t ulSMBusHWReadTgtStatusAddress( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtStatusAddress( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1215,7 +1215,7 @@ uint32_t ulSMBusHWReadTgtStatusAddress( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TGT_STATUS_RW bitfield from hardware register
  *           SMBUS_REG_TGT_STATUS
  */
-uint32_t ulSMBusHWReadTgtStatusRW( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtStatusRW( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1234,7 +1234,7 @@ uint32_t ulSMBusHWReadTgtStatusRW( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the FILL_LEVEL bitfield from hardware register
  *           SMBUS_REG_TGT_DESC_STATUS
  */
-uint32_t ulSMBusHWReadTgtDescStatusFillLevel( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtDescStatusFillLevel( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1251,7 +1251,7 @@ uint32_t ulSMBusHWReadTgtDescStatusFillLevel( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the FULL bitfield from hardware register
  *           SMBUS_REG_TGT_DESC_STATUS
  */
-uint32_t ulSMBusHWReadTgtDescStatusFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtDescStatusFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1267,7 +1267,7 @@ uint32_t ulSMBusHWReadTgtDescStatusFull( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the ALMOST_FULL bitfield from hardware register
  *           SMBUS_REG_TGT_DESC_STATUS
  */
-uint32_t ulSMBusHWReadTgtDescStatusAlmostFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtDescStatusAlmostFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1284,7 +1284,7 @@ uint32_t ulSMBusHWReadTgtDescStatusAlmostFull( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the ALMOST_EMPTY bitfield from hardware register
  *           SMBUS_REG_TGT_DESC_STATUS
  */
-uint32_t ulSMBusHWReadTgtDescStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtDescStatusAlmostEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1301,7 +1301,7 @@ uint32_t ulSMBusHWReadTgtDescStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the EMPTY bitfield from hardware register
  *           SMBUS_REG_TGT_DESC_STATUS
  */
-uint32_t ulSMBusHWReadTgtDescStatusEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtDescStatusEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1319,7 +1319,7 @@ uint32_t ulSMBusHWReadTgtDescStatusEmpty( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the PAYLOAD bitfield from hardware register SMBUS_REG_TGT_RX_FIFO
  */
-uint32_t ulSMBusHWReadTgtRxFifoPayload( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoPayload( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1337,7 +1337,7 @@ uint32_t ulSMBusHWReadTgtRxFifoPayload( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the FILL_LEVEL bitfield from hardware register SMBUS_REG_TGT_RX_FIFO
  */
-uint32_t ulSMBusHWReadTgtRxFifoStatusFillLevel( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoStatusFillLevel( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1353,7 +1353,7 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusFillLevel( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the RESET_BUSY bitfield from hardware register SMBUS_REG_TGT_RX_FIFO
  */
-uint32_t ulSMBusHWReadTgtRxFifoStatusResetBusY( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoStatusResetBusY( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1369,7 +1369,7 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusResetBusY( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the FULL bitfield from hardware register SMBUS_REG_TGT_RX_FIFO
  */
-uint32_t ulSMBusHWReadTgtRxFifoStatusFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoStatusFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1385,7 +1385,7 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusFull( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ALMOST_FULL bitfield from hardware register SMBUS_REG_TGT_RX_FIFO
  */
-uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1401,7 +1401,7 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostFull( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ALMOST_EMPTY bitfield from hardware register SMBUS_REG_TGT_RX_FIFO
  */
-uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1417,7 +1417,7 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile 
 /**
  * @brief    Reads the EMPTY bitfield from hardware register SMBUS_REG_TGT_RX_FIFO
  */
-uint32_t ulSMBusHWReadTgtRxFifoStatusEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoStatusEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1436,7 +1436,7 @@ uint32_t ulSMBusHWReadTgtRxFifoStatusEmpty( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the FILL_THRESHOLD bitfield from hardware register
  *           SMBUS_REG_TGT_RX_FIFO_FILL_THRESHOLD
  */
-uint32_t ulSMBusHWReadTgtRxFifoFillThresholdFillThresh( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtRxFifoFillThresholdFillThresh( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1454,7 +1454,7 @@ uint32_t ulSMBusHWReadTgtRxFifoFillThresholdFillThresh( SMBus_Profile* pxSMBusPr
 /**
  * @brief    Reads the hardware register SMBUS_REG_TGT_DBG
  */
-uint32_t ulSMBusHWReadTgtDbg( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtDbg( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1473,7 +1473,7 @@ uint32_t ulSMBusHWReadTgtDbg( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_0
  */
-uint32_t ulSMBusHWReadTgtControl0Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl0Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1489,7 +1489,7 @@ uint32_t ulSMBusHWReadTgtControl0Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_0
  */
-uint32_t ulSMBusHWReadTgtControl0Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl0Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1506,7 +1506,7 @@ uint32_t ulSMBusHWReadTgtControl0Address( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_1
  */
-uint32_t ulSMBusHWReadTgtControl1Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl1Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1522,7 +1522,7 @@ uint32_t ulSMBusHWReadTgtControl1Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_1
  */
-uint32_t ulSMBusHWReadTgtControl1Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl1Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1539,7 +1539,7 @@ uint32_t ulSMBusHWReadTgtControl1Address( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_2
  */
-uint32_t ulSMBusHWReadTgtControl2Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl2Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1555,7 +1555,7 @@ uint32_t ulSMBusHWReadTgtControl2Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_2
  */
-uint32_t ulSMBusHWReadTgtControl2Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl2Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1572,7 +1572,7 @@ uint32_t ulSMBusHWReadTgtControl2Address( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_3
  */
-uint32_t ulSMBusHWReadTgtControl3Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl3Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1588,7 +1588,7 @@ uint32_t ulSMBusHWReadTgtControl3Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_3
  */
-uint32_t ulSMBusHWReadTgtControl3Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl3Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1605,7 +1605,7 @@ uint32_t ulSMBusHWReadTgtControl3Address( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_4
  */
-uint32_t ulSMBusHWReadTgtControl4Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl4Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1621,7 +1621,7 @@ uint32_t ulSMBusHWReadTgtControl4Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_4
  */
-uint32_t ulSMBusHWReadTgtControl4Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl4Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1638,7 +1638,7 @@ uint32_t ulSMBusHWReadTgtControl4Address( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_5
  */
-uint32_t ulSMBusHWReadTgtControl5Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl5Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1654,7 +1654,7 @@ uint32_t ulSMBusHWReadTgtControl5Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_5
  */
-uint32_t ulSMBusHWReadTgtControl5Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl5Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1671,7 +1671,7 @@ uint32_t ulSMBusHWReadTgtControl5Address( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_6
  */
-uint32_t ulSMBusHWReadTgtControl6Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl6Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1687,7 +1687,7 @@ uint32_t ulSMBusHWReadTgtControl6Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_6
  */
-uint32_t ulSMBusHWReadTgtControl6Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl6Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1704,7 +1704,7 @@ uint32_t ulSMBusHWReadTgtControl6Address( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_TGT_CONTROL_7
  */
-uint32_t ulSMBusHWReadTgtControl7Enable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl7Enable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1720,7 +1720,7 @@ uint32_t ulSMBusHWReadTgtControl7Enable( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ADDRESS bitfield from hardware register SMBUS_REG_TGT_CONTROL_7
  */
-uint32_t ulSMBusHWReadTgtControl7Address( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadTgtControl7Address( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1739,7 +1739,7 @@ uint32_t ulSMBusHWReadTgtControl7Address( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the DATA_HOLD bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_DATA_HOLD
  */
-uint32_t ulSMBusHWReadPHYCtrlDataHold( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlDataHold( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1758,7 +1758,7 @@ uint32_t ulSMBusHWReadPHYCtrlDataHold( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the START_HOLD bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_START_HOLD
  */
-uint32_t ulSMBusHWReadPHYCtrlStartHold( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlStartHold( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1777,7 +1777,7 @@ uint32_t ulSMBusHWReadPHYCtrlStartHold( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the START_SETUP bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_START_SETUP
  */
-uint32_t ulSMBusHWReadPHYCtrlStartSetup( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlStartSetup( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1796,7 +1796,7 @@ uint32_t ulSMBusHWReadPHYCtrlStartSetup( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the STOP_SETUP bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_STOP_SETUP
  */
-uint32_t ulSMBusHWReadPHYCtrlStopSetup( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlStopSetup( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1815,7 +1815,7 @@ uint32_t ulSMBusHWReadPHYCtrlStopSetup( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the CLK_TLOW bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_CLK_TLOW
  */
-uint32_t ulSMBusHWReadPHYCtrlClkTLow( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlClkTLow( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1834,7 +1834,7 @@ uint32_t ulSMBusHWReadPHYCtrlClkTLow( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the CLK_THIGH bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_CLK_THIGH
  */
-uint32_t ulSMBusHWReadPHYCtrlClkTHigh( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlClkTHigh( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1853,7 +1853,7 @@ uint32_t ulSMBusHWReadPHYCtrlClkTHigh( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TEXT_PRESCALER bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_TEXT_PRESCALER
  */
-uint32_t ulSMBusHWReadPHYCtrlTextPrescaler( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlTextPrescaler( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1872,7 +1872,7 @@ uint32_t ulSMBusHWReadPHYCtrlTextPrescaler( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TEXT_TIMEOUT bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_TEXT_TIMEOUT
  */
-uint32_t ulSMBusHWReadPHYCtrlTextTimeout( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlTextTimeout( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1891,7 +1891,7 @@ uint32_t ulSMBusHWReadPHYCtrlTextTimeout( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the TEXT_MAX bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_TEXT_MAX
  */
-uint32_t ulSMBusHWReadPHYCtrlTextMax( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlTextMax( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1910,7 +1910,7 @@ uint32_t ulSMBusHWReadPHYCtrlTextMax( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the CEXT_PRESCALER bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_CEXT_PRESCALER
  */
-uint32_t ulSMBusHWReadPHYCtrlCextPrescaler( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlCextPrescaler( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1929,7 +1929,7 @@ uint32_t ulSMBusHWReadPHYCtrlCextPrescaler( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the CEXT_TIMEOUT bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_CEXT_TIMEOUT
  */
-uint32_t ulSMBusHWReadPHYCtrlCextTimeout( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlCextTimeout( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1948,7 +1948,7 @@ uint32_t ulSMBusHWReadPHYCtrlCextTimeout( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the CEXT_MAX bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_CEXT_MAX
  */
-uint32_t ulSMBusHWReadPHYCtrlCextMax( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlCextMax( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1967,7 +1967,7 @@ uint32_t ulSMBusHWReadPHYCtrlCextMax( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the DBG_STATE bitfield from hardware register
  *           SMBUS_REG_PHY_CTLR_DBG_STATE
  */
-uint32_t ulSMBusHWReadPHYCtrlDbgState( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadPHYCtrlDbgState( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -1985,7 +1985,7 @@ uint32_t ulSMBusHWReadPHYCtrlDbgState( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the ENABLE bitfield from hardware register SMBUS_REG_CTLR_STATUS
  */
-uint32_t ulSMBusHWReadCtrlStatusEnable( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlStatusEnable( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2004,7 +2004,7 @@ uint32_t ulSMBusHWReadCtrlStatusEnable( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the FILL_LEVEL bitfield from hardware register
  *           SMBUS_REG_CTLR_DESC_STATUS
  */
-uint32_t ulSMBusHWReadCtrlDescStatusFillLevel( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlDescStatusFillLevel( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2021,7 +2021,7 @@ uint32_t ulSMBusHWReadCtrlDescStatusFillLevel( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the RESET_BUSY bitfield from hardware register
  *           SMBUS_REG_CTLR_DESC_STATUS
  */
-uint32_t ulSMBusHWReadCtrlDescStatusResetBusy( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlDescStatusResetBusy( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2038,7 +2038,7 @@ uint32_t ulSMBusHWReadCtrlDescStatusResetBusy( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the FULL bitfield from hardware register
  *           SMBUS_REG_CTLR_DESC_STATUS
  */
-uint32_t ulSMBusHWReadCtrlDescStatusFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlDescStatusFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2055,7 +2055,7 @@ uint32_t ulSMBusHWReadCtrlDescStatusFull( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the ALMOST_FULL bitfield from hardware register
  *           SMBUS_REG_CTLR_DESC_STATUS
  */
-uint32_t ulSMBusHWReadCtrlDescStatusAlmostFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlDescStatusAlmostFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2072,7 +2072,7 @@ uint32_t ulSMBusHWReadCtrlDescStatusAlmostFull( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the ALMOST_EMPTY bitfield from hardware register
  *           SMBUS_REG_CTLR_DESC_STATUS
  */
-uint32_t ulSMBusHWReadCtrlDescStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlDescStatusAlmostEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2089,7 +2089,7 @@ uint32_t ulSMBusHWReadCtrlDescStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the EMPTY bitfield from hardware register
  *           SMBUS_REG_CTLR_DESC_STATUS
  */
-uint32_t ulSMBusHWReadCtrlDescStatusEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlDescStatusEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2108,7 +2108,7 @@ uint32_t ulSMBusHWReadCtrlDescStatusEmpty( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the PAYLOAD bitfield from hardware register
  *           SMBUS_REG_CTLR_RX_FIFO
  */
-uint32_t ulSMBusHWReadCtrlRxFifoPayload( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoPayload( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2127,7 +2127,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoPayload( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the FILL_LEVEL bitfield from hardware register
  *           SMBUS_REG_CTLR_RX_FIFO
  */
-uint32_t ulSMBusHWReadCtrlRxFifoStatusFillLevel( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoStatusFillLevel( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2144,7 +2144,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusFillLevel( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the RESET_BUSY bitfield from hardware register
  *           SMBUS_REG_CTLR_RX_FIFO
  */
-uint32_t ulSMBusHWReadCtrlRxFifoStatusResetBusy( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoStatusResetBusy( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2160,7 +2160,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusResetBusy( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Reads the FULL bitfield from hardware register SMBUS_REG_CTLR_RX_FIFO
  */
-uint32_t ulSMBusHWReadCtrlRxFifoStatusFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoStatusFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2177,7 +2177,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusFull( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the ALMOST_FULL bitfield from hardware register
  *           SMBUS_REG_CTLR_RX_FIFO
  */
-uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostFull( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostFull( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2194,7 +2194,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostFull( SMBus_Profile* pxSMBusProfile 
  * @brief    Reads the ALMOST_EMPTY bitfield from hardware register
  *           SMBUS_REG_CTLR_RX_FIFO
  */
-uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2211,7 +2211,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusAlmostEmpty( SMBus_Profile* pxSMBusProfile
  * @brief    Reads the EMPTY bitfield from hardware register
  *           SMBUS_REG_CTLR_RX_FIFO
  */
-uint32_t ulSMBusHWReadCtrlRxFifoStatusEmpty( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoStatusEmpty( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2230,7 +2230,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoStatusEmpty( SMBus_Profile* pxSMBusProfile )
  * @brief    Reads the THRESHOLD bitfield from hardware register
  *           SMBUS_REG_CTLR_RX_FIFO_FILL_THRESHOLD
  */
-uint32_t ulSMBusHWReadCtrlRxFifoFillThresholdFillThresh( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlRxFifoFillThresholdFillThresh( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2249,7 +2249,7 @@ uint32_t ulSMBusHWReadCtrlRxFifoFillThresholdFillThresh( SMBus_Profile* pxSMBusP
  * @brief    Reads the DBG_STATE bitfield from hardware register
  *           SMBUS_REG_CTLR_DBG
  */
-uint32_t ulSMBusHWReadCtrlDbgState( SMBus_Profile* pxSMBusProfile )
+uint32_t ulSMBusHWReadCtrlDbgState( SMBusProfile* pxSMBusProfile )
 {
     uint32_t ulReadValue = 0;
 
@@ -2268,7 +2268,7 @@ uint32_t ulSMBusHWReadCtrlDbgState( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_IRQ_GIE
  */
-void vSMBusHWWriteIRQGIEEnable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteIRQGIEEnable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2281,7 +2281,7 @@ void vSMBusHWWriteIRQGIEEnable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue 
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_IRQ_IER
  */
-void vSMBusHWWriteIRQIER( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteIRQIER( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2294,7 +2294,7 @@ void vSMBusHWWriteIRQIER( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_IRQ_ISR
  */
-void vSMBusHWWriteIRQISR( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteIRQISR( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2307,7 +2307,7 @@ void vSMBusHWWriteIRQISR( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_ERR_IRQ_IER
  */
-void vSMBusHWWriteERRIRQIER( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteERRIRQIER( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2320,7 +2320,7 @@ void vSMBusHWWriteERRIRQIER( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_ERR_IRQ_ISR
  */
-void vSMBusHWWriteERRIRQISR( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteERRIRQISR( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2334,7 +2334,7 @@ void vSMBusHWWriteERRIRQISR( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
  * @brief    Writes ulValue to ENABLE bitfield of hardware register
  *           SMBUS_REG_PHY_FILTER_CONTROL
  */
-void vSMBusHWWritePHYFilterControlEnable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYFilterControlEnable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2347,7 +2347,7 @@ void vSMBusHWWritePHYFilterControlEnable( SMBus_Profile* pxSMBusProfile, uint32_
  * @brief    Writes ulValue to DURATION bitfield of hardware register
  *           SMBUS_REG_PHY_FILTER_CONTROL
  */
-void vSMBusHWWritePHYFilterControlDuration( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYFilterControlDuration( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2360,7 +2360,7 @@ void vSMBusHWWritePHYFilterControlDuration( SMBus_Profile* pxSMBusProfile, uint3
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_BUS_FREE_TIME
  */
-void vSMBusHWWritePHYBusFreetime( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYBusFreetime( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2374,7 +2374,7 @@ void vSMBusHWWritePHYBusFreetime( SMBus_Profile* pxSMBusProfile, uint32_t ulValu
  * @brief    Writes ulValue to IDLE_THRESHOLD bitfield of hardware register
  *           SMBUS_REG_PHY_IDLE_THRESHOLD
  */
-void vSMBusHWWritePHYIdleThresholdIdleThreshold( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYIdleThresholdIdleThreshold( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2388,7 +2388,7 @@ void vSMBusHWWritePHYIdleThresholdIdleThreshold( SMBus_Profile* pxSMBusProfile, 
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_TIMEOUT_PRESCALER
  */
-void vSMBusHWWritePHYTimeoutPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTimeoutPrescaler( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2401,7 +2401,7 @@ void vSMBusHWWritePHYTimeoutPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t u
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_TIMEOUT_MIN
  */
-void vSMBusHWWritePHYTimeoutMin( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTimeoutMin( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2413,7 +2413,7 @@ void vSMBusHWWritePHYTimeoutMin( SMBus_Profile* pxSMBusProfile, uint32_t ulValue
  * @brief    Writes ulValue to ENABLE bitfield of hardware register
  *           SMBUS_REG_PHY_TIMEOUT_MIN
  */
-void vSMBusHWWritePHYTimeoutMinTimeoutEnable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTimeoutMinTimeoutEnable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2426,7 +2426,7 @@ void vSMBusHWWritePHYTimeoutMinTimeoutEnable( SMBus_Profile* pxSMBusProfile, uin
  * @brief    Writes ulValue to TIMEOUT_MIN bitfield of hardware register
  *           SMBUS_REG_PHY_TIMEOUT_MIN
  */
-void vSMBusHWWritePHYTimeoutMinTimeoutMin( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTimeoutMinTimeoutMin( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2439,7 +2439,7 @@ void vSMBusHWWritePHYTimeoutMinTimeoutMin( SMBus_Profile* pxSMBusProfile, uint32
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_TIMEOUT_MAX
  */
-void vSMBusHWWritePHYTimeoutMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTimeoutMax( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2453,7 +2453,7 @@ void vSMBusHWWritePHYTimeoutMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValue
  * @brief    Writes ulValue to SMBCLK_FORCE_TIMEOUT bitfield of hardware register
  *           SMBUS_REG_PHY_RESET_CONTROL
  */
-void vSMBusHWWritePHYResetControlSMBClkForceTimeout( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYResetControlSMBClkForceTimeout( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2467,7 +2467,7 @@ void vSMBusHWWritePHYResetControlSMBClkForceTimeout( SMBus_Profile* pxSMBusProfi
  * @brief    Writes ulValue to SMBCLK_FORCE_LOW bitfield of hardware register
  *           SMBUS_REG_PHY_RESET_CONTROL
  */
-void vSMBusHWWritePHYResetControlSMBClkForceLow( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYResetControlSMBClkForceLow( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2482,7 +2482,7 @@ void vSMBusHWWritePHYResetControlSMBClkForceLow( SMBus_Profile* pxSMBusProfile, 
  * @brief    Writes ulValue to TGT_DATA_SETUP bitfield of hardware register
  *           SMBUS_REG_PHY_TGT_DATA_SETUP
  */
-void vSMBusHWWritePHYTgtDataSetupTgtDataSetup( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTgtDataSetupTgtDataSetup( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2496,7 +2496,7 @@ void vSMBusHWWritePHYTgtDataSetupTgtDataSetup( SMBus_Profile* pxSMBusProfile, ui
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_TGT_TEXT_PRESCALER
  */
-void vSMBusHWWritePHYTgtTextPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTgtTextPrescaler( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2509,7 +2509,7 @@ void vSMBusHWWritePHYTgtTextPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t u
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_TGT_TEXT_TIMEOUT
  */
-void vSMBusHWWritePHYTgtTextTimeout( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTgtTextTimeout( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2522,7 +2522,7 @@ void vSMBusHWWritePHYTgtTextTimeout( SMBus_Profile* pxSMBusProfile, uint32_t ulV
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_TGT_TEXT_MAX
  */
-void vSMBusHWWritePHYTgtTextMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTgtTextMax( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2534,7 +2534,7 @@ void vSMBusHWWritePHYTgtTextMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValue
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_TGT_DATA_HOLD
  */
-void vSMBusHWWritePHYTgtDataHold( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYTgtDataHold( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2547,7 +2547,7 @@ void vSMBusHWWritePHYTgtDataHold( SMBus_Profile* pxSMBusProfile, uint32_t ulValu
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_TGT_DESC_FIFO
  */
-void vSMBusHWWriteTgtDescFifo( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteTgtDescFifo( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2559,7 +2559,7 @@ void vSMBusHWWriteTgtDescFifo( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
  * @brief    Writes ulValue to FIFO_ID bitfield of hardware register
  *           SMBUS_REG_TGT_DESC_FIFO
  */
-void vSMBusHWWriteTgtDescFifoId( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteTgtDescFifoId( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2572,7 +2572,7 @@ void vSMBusHWWriteTgtDescFifoId( SMBus_Profile* pxSMBusProfile, uint32_t ulValue
  * @brief    Writes ulValue to PAYLOAD bitfield of hardware register
  *           SMBUS_REG_TGT_DESC_FIFO
  */
-void vSMBusHWWriteTgtDescFifoPayload( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteTgtDescFifoPayload( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2587,7 +2587,7 @@ void vSMBusHWWriteTgtDescFifoPayload( SMBus_Profile* pxSMBusProfile, uint32_t ul
  * @brief    Writes ulValue to RESET bitfield of hardware register
  *           SMBUS_REG_TGT_RX_FIFO
  */
-void vSMBusHWWriteTgtRxFifoReset( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteTgtRxFifoReset( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2602,7 +2602,7 @@ void vSMBusHWWriteTgtRxFifoReset( SMBus_Profile* pxSMBusProfile, uint32_t ulValu
  * @brief    Writes ulValue to THRESHOLD bitfield of hardware register
  *           SMBUS_REG_TGT_RX_FIFO_FILL_THRESHOLD
  */
-void vSMBusHWWriteRxFifoFillThresholdFillThresh( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteRxFifoFillThresholdFillThresh( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2622,7 +2622,7 @@ void vSMBusHWWriteRxFifoFillThresholdFillThresh( SMBus_Profile* pxSMBusProfile, 
  *
  * @return   None
  **/
-static void prvvSMBusHWWriteTgtControl0Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl0Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2640,7 +2640,7 @@ static void prvvSMBusHWWriteTgtControl0Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl0Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl0Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2659,7 +2659,7 @@ static void prvvSMBusHWWriteTgtControl0Address( SMBus_Profile* pxSMBusProfile, u
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl1Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl1Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2677,7 +2677,7 @@ static void prvvSMBusHWWriteTgtControl1Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl1Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl1Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2696,7 +2696,7 @@ static void prvvSMBusHWWriteTgtControl1Address( SMBus_Profile* pxSMBusProfile, u
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl2Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl2Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2714,7 +2714,7 @@ static void prvvSMBusHWWriteTgtControl2Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl2Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl2Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2733,7 +2733,7 @@ static void prvvSMBusHWWriteTgtControl2Address( SMBus_Profile* pxSMBusProfile, u
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl3Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl3Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2751,7 +2751,7 @@ static void prvvSMBusHWWriteTgtControl3Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl3Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl3Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2770,7 +2770,7 @@ static void prvvSMBusHWWriteTgtControl3Address( SMBus_Profile* pxSMBusProfile, u
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl4Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl4Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2788,7 +2788,7 @@ static void prvvSMBusHWWriteTgtControl4Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl4Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl4Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2807,7 +2807,7 @@ static void prvvSMBusHWWriteTgtControl4Address( SMBus_Profile* pxSMBusProfile, u
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl5Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl5Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2825,7 +2825,7 @@ static void prvvSMBusHWWriteTgtControl5Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl5Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl5Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2844,7 +2844,7 @@ static void prvvSMBusHWWriteTgtControl5Address( SMBus_Profile* pxSMBusProfile, u
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl6Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl6Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2862,7 +2862,7 @@ static void prvvSMBusHWWriteTgtControl6Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl6Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl6Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2881,7 +2881,7 @@ static void prvvSMBusHWWriteTgtControl6Address( SMBus_Profile* pxSMBusProfile, u
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl7Enable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl7Enable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2899,7 +2899,7 @@ static void prvvSMBusHWWriteTgtControl7Enable( SMBus_Profile* pxSMBusProfile, ui
  *
  * @return   None
  */
-static void prvvSMBusHWWriteTgtControl7Address( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+static void prvvSMBusHWWriteTgtControl7Address( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2912,7 +2912,7 @@ static void prvvSMBusHWWriteTgtControl7Address( SMBus_Profile* pxSMBusProfile, u
  * @brief    Passes the ulValue to the desired TgtControl register dependent
  *           on the instance value
  */
-void vSMBusHWWriteTgtControlAddress( SMBus_Profile* pxSMBusProfile, uint8_t ucInstance, uint32_t ulValue )
+void vSMBusHWWriteTgtControlAddress( SMBusProfile* pxSMBusProfile, uint8_t ucInstance, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -2960,7 +2960,7 @@ void vSMBusHWWriteTgtControlAddress( SMBus_Profile* pxSMBusProfile, uint8_t ucIn
  * @brief    Passes the ulValue to the desired TgtControl register dependent
  *           on the instance value
  */
-void vSMBusHWWriteTgtControlEnable( SMBus_Profile* pxSMBusProfile, uint8_t ucInstance, uint32_t ulValue )
+void vSMBusHWWriteTgtControlEnable( SMBusProfile* pxSMBusProfile, uint8_t ucInstance, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3008,7 +3008,7 @@ void vSMBusHWWriteTgtControlEnable( SMBus_Profile* pxSMBusProfile, uint8_t ucIns
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_DATA_HOLD
  */
-void vSMBusHWWritePHYCtrlDataHold( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlDataHold( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3021,7 +3021,7 @@ void vSMBusHWWritePHYCtrlDataHold( SMBus_Profile* pxSMBusProfile, uint32_t ulVal
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_START_HOLD
  */
-void vSMBusHWWritePHYCtrlStartHold( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlStartHold( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3034,7 +3034,7 @@ void vSMBusHWWritePHYCtrlStartHold( SMBus_Profile* pxSMBusProfile, uint32_t ulVa
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_START_SETUP
  */
-void vSMBusHWWritePHYCtrlStartSetup( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlStartSetup( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3047,7 +3047,7 @@ void vSMBusHWWritePHYCtrlStartSetup( SMBus_Profile* pxSMBusProfile, uint32_t ulV
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_STOP_SETUP
  */
-void vSMBusHWWritePHYCtrlStopSetup( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlStopSetup( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3060,7 +3060,7 @@ void vSMBusHWWritePHYCtrlStopSetup( SMBus_Profile* pxSMBusProfile, uint32_t ulVa
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_CLK_TLOW
  */
-void vSMBusHWWritePHYCtrlClkTLow( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlClkTLow( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3073,7 +3073,7 @@ void vSMBusHWWritePHYCtrlClkTLow( SMBus_Profile* pxSMBusProfile, uint32_t ulValu
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_CLK_THIGH
  */
-void vSMBusHWWritePHYCtrlClkTHigh( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlClkTHigh( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3086,7 +3086,7 @@ void vSMBusHWWritePHYCtrlClkTHigh( SMBus_Profile* pxSMBusProfile, uint32_t ulVal
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_TEXT_PRESCALER
  */
-void vSMBusHWWritePHYCtrlTextPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlTextPrescaler( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3099,7 +3099,7 @@ void vSMBusHWWritePHYCtrlTextPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t 
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_TEXT_TIMEOUT
  */
-void vSMBusHWWritePHYCtrlTextTimeout( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlTextTimeout( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3112,7 +3112,7 @@ void vSMBusHWWritePHYCtrlTextTimeout( SMBus_Profile* pxSMBusProfile, uint32_t ul
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_TEXT_MAX
  */
-void vSMBusHWWritePHYCtrlTextMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlTextMax( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3125,7 +3125,7 @@ void vSMBusHWWritePHYCtrlTextMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValu
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_CEXT_PRESCALER
  */
-void vSMBusHWWritePHYCtrlCextPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlCextPrescaler( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3138,7 +3138,7 @@ void vSMBusHWWritePHYCtrlCextPrescaler( SMBus_Profile* pxSMBusProfile, uint32_t 
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_CEXT_TIMEOUT
  */
-void vSMBusHWWritePHYCtrlCextTimeout( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlCextTimeout( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3151,7 +3151,7 @@ void vSMBusHWWritePHYCtrlCextTimeout( SMBus_Profile* pxSMBusProfile, uint32_t ul
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_PHY_CTLR_CEXT_MAX
  */
-void vSMBusHWWritePHYCtrlCextMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWritePHYCtrlCextMax( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3164,7 +3164,7 @@ void vSMBusHWWritePHYCtrlCextMax( SMBus_Profile* pxSMBusProfile, uint32_t ulValu
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_CTLR_CONTROL
  */
-void vSMBusHWWriteCtrlControlEnable( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteCtrlControlEnable( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3177,7 +3177,7 @@ void vSMBusHWWriteCtrlControlEnable( SMBus_Profile* pxSMBusProfile, uint32_t ulV
 /**
  * @brief    Writes ulValue to hardware register SMBUS_REG_CTLR_DESC_FIFO
  */
-void vSMBusHWWriteCtrlDescFifo( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteCtrlDescFifo( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3188,7 +3188,7 @@ void vSMBusHWWriteCtrlDescFifo( SMBus_Profile* pxSMBusProfile, uint32_t ulValue 
 /**
  * @brief    Writes ulValue to RESET bitfield of hardware register SMBUS_REG_CTLR_DESC_FIFO
  */
-void vSMBusHWWriteCtrlDescFifoReset( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteCtrlDescFifoReset( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3203,7 +3203,7 @@ void vSMBusHWWriteCtrlDescFifoReset( SMBus_Profile* pxSMBusProfile, uint32_t ulV
  * @brief    Writes ulValue to RESET bitfield of hardware register
  *           SMBUS_REG_CTLR_RX_FIFO
  */
-void vSMBusHWWriteCtrlRxFifoReset( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteCtrlRxFifoReset( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {
@@ -3218,7 +3218,7 @@ void vSMBusHWWriteCtrlRxFifoReset( SMBus_Profile* pxSMBusProfile, uint32_t ulVal
  * @brief    Writes ulValue to FILL_THRESHOLD bitfield of hardware register
  *           SMBUS_REG_CTLR_RX_FIFO_FILL_THRESHOLD
  */
-void vSMBusHWWriteCtrlRxFifoFillThreshold( SMBus_Profile* pxSMBusProfile, uint32_t ulValue )
+void vSMBusHWWriteCtrlRxFifoFillThreshold( SMBusProfile* pxSMBusProfile, uint32_t ulValue )
 {
     if ( NULL != pxSMBusProfile )
     {

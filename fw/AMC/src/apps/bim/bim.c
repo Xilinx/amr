@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation of the Built in Monitoring (BIM) Application.
@@ -34,9 +34,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
 
 #define BIM_NAME "BIM"
 
@@ -115,16 +112,16 @@ UTIL_MAKE_ENUM_AND_STRINGS( BIM_ERRORS, BIM_ERRORS, BIM_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  BIM_PRIVATE_DATA
+ * @struct  BIMPrivateData
  * @brief   Locally held private data
  */
-typedef struct BIM_PRIVATE_DATA
+typedef struct
 {
     uint32_t     ulUpperFirewall;
 
     int          iIsInitialised;
 
-    BIM_MODULES  *pxModuleData;
+    BIMModule   *pxModuleData;
     BIM_STATUS   xHealthStatus;
     MODULE_STATE pxModuleStates[MAX_AMC_CFG_UNIQUE_ID];
 
@@ -135,16 +132,16 @@ typedef struct BIM_PRIVATE_DATA
 
     uint32_t     ulLowerFirewall;
 
-} BIM_PRIVATE_DATA;
+} BIMPrivateData;
 
 
 /******************************************************************************/
 /* Local data                                                                 */
 /******************************************************************************/
 
-static BIM_PRIVATE_DATA xLocalData =
+static BIMPrivateData xLocalData =
 {
-    UPPER_FIREWALL, /* ulUpperFirewall */
+    UPPER_FIREWALL,  /* ulUpperFirewall */
 
     FALSE,           /* iIsInitialised  */
 
@@ -166,7 +163,7 @@ static BIM_PRIVATE_DATA xLocalData =
     LOWER_FIREWALL    /* ulLowerFirewall */
 };
 
-static BIM_PRIVATE_DATA *pxThis = &xLocalData;
+static BIMPrivateData *pxThis = &xLocalData;
 
 /* BIM_STATUS string mapping */
 static const char *pcBimStatusStr[] =
@@ -209,14 +206,14 @@ static const char *pcBimStatusStr[] =
  * @return  OK if event handled successfully
  *          ERROR if event not handled successfully
  */
- static int iHandleEvent( EVL_SIGNAL *pxSignal )
+ static int iHandleEvent( EVLSignal *pxSignal )
  {
      int iStatus = ERROR;
 
      if ( ( NULL != pxSignal ) &&
           ( NULL != pxThis->pxModuleData ) )
      {
-         BIM_MODULES *pxModule = &pxThis->pxModuleData[pxSignal->ucModule];
+        BIMModule *pxModule = &pxThis->pxModuleData[pxSignal->ucModule];
 
          if ( ( NULL != pxModule ) &&
               ( pxModule->xModuleId == pxSignal->ucModule ) )
@@ -285,7 +282,7 @@ static const char *pcBimStatusStr[] =
  * @return  OK if no errors were raised in the callback
  *          ERROR if an error was raised in the callback
  */
- static int iAxcCallback( EVL_SIGNAL *pxSignal )
+ static int iAxcCallback( EVLSignal *pxSignal )
  {
      int iStatus = ERROR;
 
@@ -367,7 +364,7 @@ static const char *pcBimStatusStr[] =
   * @return  OK if no errors were raised in the callback
   *          ERROR if an error was raised in the callback
   */
- static int iApcCallback( EVL_SIGNAL *pxSignal )
+ static int iApcCallback( EVLSignal *pxSignal )
  {
      int iStatus = ERROR;
 
@@ -441,7 +438,7 @@ static const char *pcBimStatusStr[] =
   * @return  OK if no errors were raised in the callback
   *          ERROR if an error was raised in the callback
   */
- static int iAmiCallback( EVL_SIGNAL *pxSignal )
+ static int iAmiCallback( EVLSignal *pxSignal )
  {
      int iStatus = ERROR;
 
@@ -514,7 +511,7 @@ static const char *pcBimStatusStr[] =
   * @return  OK if no errors were raised in the callback
   *          ERROR if an error was raised in the callback
   */
- static int iAscCallback( EVL_SIGNAL *pxSignal )
+ static int iAscCallback( EVLSignal *pxSignal )
  {
      int iStatus = ERROR;
 
@@ -523,7 +520,7 @@ static const char *pcBimStatusStr[] =
          if ( MAX_ASC_PROXY_DRIVER_EVENTS >= pxSignal->ucEventType )
          {
              INC_STAT_COUNTER( BIM_STATS_ASC_EVENT )
-             ASC_PROXY_DRIVER_SENSOR_DATA xSensorData = { 0 };
+             ASCProxyDriverSensorData xSensorData = { 0 };
 
              switch ( pxSignal->ucEventType )
              {
@@ -688,7 +685,7 @@ static const char *pcBimStatusStr[] =
  /**
   * @brief   BMC Proxy Driver EVL callback
   */
- static int iBmcCallback( EVL_SIGNAL *pxSignal )
+ static int iBmcCallback( EVLSignal *pxSignal )
  {
      int iStatus = ERROR;
 
@@ -760,7 +757,7 @@ static const char *pcBimStatusStr[] =
 /**
  * @brief   Initialise the Built in Monitoring (BIM) Application.
  */
-int iBIM_Initialise( BIM_MODULES *pxModuleData )
+int iBIM_Initialise( BIMModule *pxModuleData )
 {
     int iStatus = ERROR;
 
@@ -836,11 +833,11 @@ int iBIM_Initialise( BIM_MODULES *pxModuleData )
                 }
             }
 
-            pxThis->pxModuleData = ( BIM_MODULES* )pvOSAL_MemAlloc( sizeof ( BIM_MODULES ) * MAX_AMC_CFG_UNIQUE_ID );
+            pxThis->pxModuleData = ( BIMModule* )pvOSAL_MemAlloc( sizeof ( BIMModule ) * MAX_AMC_CFG_UNIQUE_ID );
 
             if ( NULL != pxThis->pxModuleData )
             {
-                pvOSAL_MemCpy( pxThis->pxModuleData, pxModuleData, sizeof( BIM_MODULES ) * MAX_AMC_CFG_UNIQUE_ID );
+                pvOSAL_MemCpy( pxThis->pxModuleData, pxModuleData, sizeof( BIMModule ) * MAX_AMC_CFG_UNIQUE_ID );
 
                 pxThis->iIsInitialised = TRUE;
 

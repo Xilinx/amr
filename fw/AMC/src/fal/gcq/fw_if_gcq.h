@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file containing the FW IF sGCQ abstraction definitions.
@@ -82,7 +82,7 @@ typedef enum
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_GCQInitCfg
+ * @struct  FWIfGCQInitCfg
  * @brief   config options for sGCQ initialisation (generic across all sGCQ
  *          interfaces)
  */
@@ -90,10 +90,10 @@ typedef struct
 {
     void    *pvIOAccess;
 
-} FW_IF_GCQInitCfg;
+} FWIfGCQInitCfg;
 
 /**
- * @struct  FW_IF_GCQCfg
+ * @struct  FWIfGCQCfg
  * @brief   config options for sGCQ interfaces (generic across all sGCQ interfaces)
  */
 typedef struct
@@ -108,7 +108,7 @@ typedef struct
 
     void                *pvProfile;      /* opaque handle to store internal context */
 
-} FW_IF_GCQCfg;
+} FWIfGCQCfg;
 
 
 /*****************************************************************************/
@@ -123,7 +123,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQInitCfg *pxInitCfg );
+extern uint32_t ulFW_IF_GCQ_Init( FWIfGCQInitCfg *pxInitCfg );
 
 /**
  * @brief   creates an instance of the sGCQ interface
@@ -133,7 +133,7 @@ extern uint32_t ulFW_IF_GCQ_Init( FW_IF_GCQInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_GCQ_Create( FW_IF_CFG *pxFwIf, FW_IF_GCQCfg *pxGCQCfg );
+extern uint32_t ulFW_IF_GCQ_Create( FWIfCfg *pxFwIf, FWIfGCQCfg *pxGCQCfg );
 
 /**
  * @brief    Print all the stats gathered by the interface

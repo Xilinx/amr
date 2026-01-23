@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the public API of the Built in Monitoring (BIM) Application.
@@ -11,7 +11,6 @@
 
 #include "standard.h"
 #include "osal.h"
-
 #include "amc_cfg.h"
 
 
@@ -39,7 +38,7 @@ typedef enum
 /******************************************************************************/
 
 /**
- * @struct  BIM_EVENTS
+ * @struct  BIMEvent
  * @brief   Structure to hold individual event info.
  */
 typedef struct
@@ -48,10 +47,10 @@ typedef struct
     uint32_t   ulCallCount;
     BIM_STATUS xContextStatus;
 
-} BIM_EVENTS;
+} BIMEvent;
 
 /**
- * @struct  BIM_MODULES
+ * @struct  BIMModule
  * @brief   Structure to hold individual module health info.
  */
 typedef struct
@@ -59,10 +58,10 @@ typedef struct
     AMC_CFG_UNIQUE_IDS xModuleId;
     BIM_STATUS         xCurrentStatus;
     BIM_STATUS         xContextStatus;
-    BIM_EVENTS         *pxEvents;
+    BIMEvent          *pxEvents;
     uint32_t           ulEventsLen;
 
-} BIM_MODULES;
+} BIMModule;
 
 
 /******************************************************************************/
@@ -77,7 +76,7 @@ typedef struct
  * @return  OK     if the application is initialised and running successfully
  *          ERROR  if the application is not initialised
  */
-int iBIM_Initialise( BIM_MODULES *pxModuleData );
+int iBIM_Initialise( BIMModule *pxModuleData );
 
 /**
  * @brief   Returns the current health status of the AMC.

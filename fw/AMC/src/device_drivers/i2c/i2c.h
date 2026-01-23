@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -27,22 +27,22 @@
 /******************************************************************************/
 
 /**
- * @struct  I2C_CFG_TYPE
+ * @struct  I2CConfig
  * @brief   The I2C device configuration
  */
-typedef struct I2C_CFG_TYPE
+typedef struct
 {
-    uint8_t  ucDeviceId;                                                       /* Unique ID  of device */
-    uint64_t ullBaseAddress;                                                   /* Base address of the device */
-    uint32_t ulInputClockHz;                                                   /* Input clock frequency */
-    uint8_t  ucReTryCount;                                                     /* Retry count in case of any communication failure */
-    uint32_t ulSwResetOffset;                                                  /* Offset from the Base Address of the SW Reset Register */
-    uint8_t  ucResetDuringInit;                                                /* Do software reset during initialisation */
-    uint32_t ulHwResetAddress;                                                 /* Address of the HW Reset Register */
-    uint32_t ulHwResetMask;                                                    /* Bit mask of the bit to toggle in HW Reset Register */
-    uint8_t  ucHwResetDuringInit;                                              /* Do hardware reset during initialisation */
+    uint8_t  ucDeviceId;           /* Unique ID of device */
+    uint64_t ullBaseAddress;       /* Base address of the device */
+    uint32_t ulInputClockHz;       /* Input clock frequency */
+    uint8_t  ucReTryCount;         /* Retry count in case of any communication failure */
+    uint32_t ulSwResetOffset;      /* Offset from the Base Address of the SW Reset Register */
+    uint8_t  ucResetDuringInit;    /* Do software reset during initialisation */
+    uint32_t ulHwResetAddress;     /* Address of the HW Reset Register */
+    uint32_t ulHwResetMask;        /* Bit mask of the bit to toggle in HW Reset Register */
+    uint8_t  ucHwResetDuringInit;  /* Do hardware reset during initialisation */
 
-} I2C_CFG_TYPE;
+} I2CConfig;
 
 
 /******************************************************************************/
@@ -68,7 +68,7 @@ int iI2C_ReInit( uint8_t ucDeviceId );
  * @return  OK                  Driver successfully init
  *          ERROR               Driver init failed
  */
-int iI2C_Init( I2C_CFG_TYPE *pxI2cCfg, uint16_t usBusIdleWaitMs );
+int iI2C_Init( I2CConfig *pxI2cCfg, uint16_t usBusIdleWaitMs );
 
 /**
  * @brief   This function reads data from the I2C device into a specified buffer.

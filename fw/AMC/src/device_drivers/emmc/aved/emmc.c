@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the EMMC driver.
@@ -22,9 +22,6 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL                          ( 0xBABECAFE )
-#define LOWER_FIREWALL                          ( 0xDEADFACE )
-
 #define EMMC_NAME                               "EMMC"
 #define EMMC_WAIT_TIMEOUT_MS                    ( 100 )
 #define EMMC_BLOCK_BITSHIFT                     ( 9 )
@@ -33,37 +30,37 @@
 #define EMMC_FINAL_BLOCK                        ( HAL_EMMC_MAX_BLOCKS - 1 )
 
 /* Stat & Error definitions */
-#define EMMC_STATS( DO )                                     \
-    DO( EMMC_STATS_INIT_COMPLETED )                          \
-    DO( EMMC_STATS_CREATE_MUTEX )                            \
-    DO( EMMC_STATS_TAKE_MUTEX )                              \
-    DO( EMMC_STATS_RELEASE_MUTEX )                           \
-    DO( EMMC_STATS_EMMC_READ )                               \
-    DO( EMMC_STATS_EMMC_WRITE )                              \
-    DO( EMMC_STATS_EMMC_ERASE )                              \
+#define EMMC_STATS( DO )                         \
+    DO( EMMC_STATS_INIT_COMPLETED )              \
+    DO( EMMC_STATS_CREATE_MUTEX )                \
+    DO( EMMC_STATS_TAKE_MUTEX )                  \
+    DO( EMMC_STATS_RELEASE_MUTEX )               \
+    DO( EMMC_STATS_EMMC_READ )                   \
+    DO( EMMC_STATS_EMMC_WRITE )                  \
+    DO( EMMC_STATS_EMMC_ERASE )                  \
     DO( EMMC_STATS_MAX )
 
-#define EMMC_ERRORS( DO )                                    \
-    DO( EMMC_ERRORS_VALIDATION_FAILED )                      \
-    DO( EMMC_ERRORS_XSDPS_CFGINITIALIZE_FAILED )             \
-    DO( EMMC_ERRORS_XSDPS_CARDINIIALIZE_FAILED )             \
-    DO( EMMC_ERRORS_MUTEX_CREATE_FAILED )                    \
-    DO( EMMC_ERRORS_MUTEX_RELEASE_FAILED )                   \
-    DO( EMMC_ERRORS_MUTEX_TAKE_FAILED )                      \
-    DO( EMMC_ERRORS_EMMC_READ_FAILED )                       \
-    DO( EMMC_ERRORS_EMMC_WRITE_FAILED )                      \
-    DO( EMMC_ERRORS_EMMC_ERASE_FAILED )                      \
+#define EMMC_ERRORS( DO )                        \
+    DO( EMMC_ERRORS_VALIDATION_FAILED )          \
+    DO( EMMC_ERRORS_XSDPS_CFGINITIALIZE_FAILED ) \
+    DO( EMMC_ERRORS_XSDPS_CARDINIIALIZE_FAILED ) \
+    DO( EMMC_ERRORS_MUTEX_CREATE_FAILED )        \
+    DO( EMMC_ERRORS_MUTEX_RELEASE_FAILED )       \
+    DO( EMMC_ERRORS_MUTEX_TAKE_FAILED )          \
+    DO( EMMC_ERRORS_EMMC_READ_FAILED )           \
+    DO( EMMC_ERRORS_EMMC_WRITE_FAILED )          \
+    DO( EMMC_ERRORS_EMMC_ERASE_FAILED )          \
     DO( EMMC_ERRORS_MAX )
 
-#define PRINT_STAT_COUNTER( x )         PLL_INF( EMMC_NAME, "%50s . . . . %d\r\n",          \
-                                                 EMMC_STATS_STR[ x ],                       \
-                                                 pxThis->pulStatCounters[ x ] )
-#define PRINT_ERROR_COUNTER( x )        PLL_INF( EMMC_NAME, "%50s . . . . %d\r\n",          \
-                                                 EMMC_ERRORS_STR[ x ],                      \
-                                                 pxThis->pulErrorCounters[ x ] )
+#define PRINT_STAT_COUNTER( x )   PLL_INF( EMMC_NAME, "%50s . . . . %d\r\n", \
+                                           EMMC_STATS_STR[ x ],              \
+                                           pxThis->pulStatCounters[ x ] )
+#define PRINT_ERROR_COUNTER( x )  PLL_INF( EMMC_NAME, "%50s . . . . %d\r\n", \
+                                           EMMC_ERRORS_STR[ x ],             \
+                                           pxThis->pulErrorCounters[ x ] )
 
-#define INC_STAT_COUNTER( x )           { if( x < EMMC_STATS_MAX )pxThis->pulStatCounters[ x ]++; }
-#define INC_ERROR_COUNTER( x )          { if( x < EMMC_ERRORS_MAX )pxThis->pulErrorCounters[ x ]++; }
+#define INC_STAT_COUNTER( x )     { if( x < EMMC_STATS_MAX )pxThis->pulStatCounters[ x ]++; }
+#define INC_ERROR_COUNTER( x )    { if( x < EMMC_ERRORS_MAX )pxThis->pulErrorCounters[ x ]++; }
 
 
 /******************************************************************************/
@@ -88,10 +85,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( EMMC_ERRORS, EMMC_ERRORS, EMMC_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  EMMC_PRIVATE_DATA
+ * @struct  EMMCPrivateData
  * @brief   Structure to hold ths driver's private data
  */
-typedef struct EMMC_PRIVATE_DATA
+typedef struct
 {
     uint32_t        ulUpperFirewall;
 
@@ -107,26 +104,27 @@ typedef struct EMMC_PRIVATE_DATA
 
     uint32_t        ulLowerFirewall;
 
-} EMMC_PRIVATE_DATA;
+} EMMCPrivateData;
 
 
 /******************************************************************************/
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static EMMC_PRIVATE_DATA xLocalData =
+static EMMCPrivateData xLocalData =
 {
-    UPPER_FIREWALL,                         /* ulUpperFirewall */
-    0,                                      /* ucDeviceId */
-    { { 0 } },                              /* xSdInstance */
-    NULL,                                   /* pxEmmcConfig */
-    FALSE,                                  /* iInitialised */
-    NULL,                                   /* pvOsalMutexHdl */
-    { 0 },                                  /* pulStatCounters */
-    { 0 },                                  /* pulErrorCounters */
-    LOWER_FIREWALL                          /* ulLowerFirewall */
+    UPPER_FIREWALL, /* ulUpperFirewall */
+    0,              /* ucDeviceId */
+    { { 0 } },      /* xSdInstance */
+    NULL,           /* pxEmmcConfig */
+    FALSE,          /* iInitialised */
+    NULL,           /* pvOsalMutexHdl */
+    { 0 },          /* pulStatCounters */
+    { 0 },          /* pulErrorCounters */
+    LOWER_FIREWALL  /* ulLowerFirewall */
 };
-static EMMC_PRIVATE_DATA *pxThis = &xLocalData;
+
+static EMMCPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/

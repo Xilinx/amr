@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This file contains the API for a generic Firmware Interface abstraction
@@ -115,7 +115,7 @@ typedef uint32_t ( FW_IF_bindCallback )( void *pvFwIf, FW_IF_callback *pxNewFunc
  *
  * @brief   Return values from an fw_if function
  */
-typedef enum _FW_IF_ERRORS
+typedef enum
 {
     FW_IF_ERRORS_NONE = 0,              /* no errors, call was successful */
     FW_IF_ERRORS_PARAMS,                /* invalid parameters passed in to function */
@@ -142,7 +142,7 @@ typedef enum _FW_IF_ERRORS
  *
  * @brief   IO ctrl options common to all fw_ifs
  */
-typedef enum _FW_IF_COMMON_IOCTRL_OPTIONS
+typedef enum
 {
     FW_IF_COMMON_IOCTRL_FLUSH_TX = 0,
     FW_IF_COMMON_IOCTRL_FLUSH_RX,
@@ -159,7 +159,7 @@ typedef enum _FW_IF_COMMON_IOCTRL_OPTIONS
  *
  * @brief   common events raised in the callback (generic across all interfaces)
  */
-typedef enum _FW_IF_COMMON_EVENTS
+typedef enum
 {
     FW_IF_COMMON_EVENT_NEW_RX_DATA,
     FW_IF_COMMON_EVENT_NEW_TX_COMPLETE,
@@ -175,7 +175,7 @@ typedef enum _FW_IF_COMMON_EVENTS
  *
  *  @brief  Mode of Rx operation
  */
-typedef enum _FW_IF_RX_MODE
+typedef enum
 {
     FW_IF_RX_MODE_POLLING   = 0x01,         /* driver must be polled for new data */
     FW_IF_RX_MODE_EVENT     = 0x02,         /* driver will raise an event to announce new data */
@@ -187,11 +187,11 @@ typedef enum _FW_IF_RX_MODE
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_CFG
+ * @struct  FWIfCfg
  *
  * @brief   Structure to hold a fw_if instance
  */
-typedef struct _FW_IF_CFG
+typedef struct
 {
     uint32_t            upperFirewall;
 
@@ -208,6 +208,6 @@ typedef struct _FW_IF_CFG
 
     uint32_t            lowerFirewall;
 
-} FW_IF_CFG;
+} FWIfCfg;
 
 #endif /* _FW_IF_H_ */

@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+* Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 * SPDX-License-Identifier: MIT
 *
 * This header file containing the FW IF SMBus abstraction definitions.
@@ -9,10 +9,6 @@
 
 #ifndef _FW_IF_SMBUS_H_
 #define _FW_IF_SMBUS_H_
-
-/*****************************************************************************/
-/* includes                                                                  */
-/*****************************************************************************/
 
 #include "fw_if.h"
 
@@ -34,7 +30,7 @@
  * @enum FW_IF_SMBUS_COMMAND_PROTOCOLS
  * @brief List of supported SMBus command protocols.
  */
-typedef enum FW_IF_SMBUS_COMMAND_PROTOCOLS
+typedef enum
 {
     FW_IF_SMBUS_COMMAND_PROTOCOL_QUICK_COMMAND_LO = 0,
     FW_IF_SMBUS_COMMAND_PROTOCOL_QUICK_COMMAND_HI,
@@ -69,7 +65,7 @@ typedef enum FW_IF_SMBUS_COMMAND_PROTOCOLS
  * @enum FW_IF_SMBUS_ERRORS
  * @brief Enumeration of SMBUS return values
  */
-typedef enum FW_IF_SMBUS_ERRORS
+typedef enum
 {
     FW_IF_SMBUS_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
     FW_IF_SMBUS_ERRORS_DRIVER_FAILURE,
@@ -83,7 +79,7 @@ typedef enum FW_IF_SMBUS_ERRORS
  * @enum FW_IF_SMBUS_STATE
  * @brief SMBUS interface states (generic across all SMBUS interfaces)
  */
-typedef enum FW_IF_SMBUS_STATE
+typedef enum
 {
     FW_IF_SMBUS_STATE_CREATED,
     FW_IF_SMBUS_STATE_OPENED,
@@ -98,7 +94,7 @@ typedef enum FW_IF_SMBUS_STATE
  * @enum    FW_IF_SMBUS_IOCTRL_OPTION
  * @brief   ioctrl options for smbus interfaces (generic across all smbus interfaces)
  */
-typedef enum _FW_IF_SMBUS_IOCTRL_OPTIONS
+typedef enum
 {
     FW_IF_SMBUS_IOCTRL_SET_CONTROLLER = MAX_FW_IF_COMMON_IOCTRL_OPTION,
     FW_IF_SMBUS_IOCTRL_SET_TARGET,
@@ -113,7 +109,7 @@ typedef enum _FW_IF_SMBUS_IOCTRL_OPTIONS
  * @enum    FW_IF_SMBUS_EVENTS
  * @brief   smbus events raised in the callback (generic across all smbus interface)
  */
-typedef enum _FW_IF_SMBUS_EVENTS
+typedef enum
 {
     FW_IF_SMBUS_EVENT_ADDRESS_CHANGE = MAX_FW_IF_COMMON_EVENT,
 
@@ -125,7 +121,7 @@ typedef enum _FW_IF_SMBUS_EVENTS
  * @enum    FW_IF_SMBUS_ROLE
  * @brief   Controller or Target
  */
-typedef enum _FW_IF_SMBUS_ROLE
+typedef enum
 {
     FW_IF_SMBUS_ROLE_CONTROLLER = 0,
     FW_IF_SMBUS_ROLE_TARGET,
@@ -138,7 +134,7 @@ typedef enum _FW_IF_SMBUS_ROLE
  * @enum    FW_IF_SMBUS_ARP
  * @brief   ARP Capability
  */
-typedef enum _FW_IF_SMUBUS_ARP
+typedef enum
 {
     FW_IF_SMBUS_ARP_CAPABILITY = 0,
     FW_IF_SMBUS_ARP_FIXED_DISCOVERABLE,
@@ -153,7 +149,7 @@ typedef enum _FW_IF_SMUBUS_ARP
  * @enum    FW_IF_SMBUS_PEC
  * @brief   PEC Capability
  */
-typedef enum _FW_IF_SMBUS_PEC
+typedef enum
 {
     FW_IF_SMBUS_PEC_ENABLED = 0,
     FW_IF_SMBUS_PEC_DISABLED,
@@ -162,51 +158,52 @@ typedef enum _FW_IF_SMBUS_PEC
 
 } FW_IF_SMBUS_PEC;
 
+/**
+ * @enum     FW_IF_SMBUS_PROTOCOL
+ * @brief    Full SMBus protocol or raw i2c
+ */
+ typedef enum
+ {
+     FW_IF_SMBUS_PROTOCOL_SMBUS,
+     FW_IF_SMBUS_PROTOCOL_I2C,
+
+     MAX_FW_IF_SMBUS_PROTOCOL
+
+ } FW_IF_SMBUS_PROTOCOL;
+
+
 /*****************************************************************************/
 /* structs                                                                   */
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_SMBUS_INIT_CFG
+ * @struct  FWIfSMBusInitCfg
  * @brief   config options for smbus initialisation (generic across all smbus interfaces)
  */
-typedef struct _FW_IF_SMBUS_INIT_CFG
+typedef struct
 {
-    uint32_t            ulBaseAddr;
-    uint32_t            ulBaudRate;
-    uint8_t             pucCommandProtocols[ MAX_FW_IF_SMBUS_COMMAND_PROTOCOL ];
+    uint32_t  ulBaseAddr;
+    uint32_t  ulBaudRate;
+    uint8_t   pucCommandProtocols[ MAX_FW_IF_SMBUS_COMMAND_PROTOCOL ];
 
-} FW_IF_SMBUS_INIT_CFG;
+} FWIfSMBusInitCfg;
 
 /**
- * @enum     FW_IF_SMBUS_PROTOCOL
- * @brief    Full SMBus protocol or raw i2c
- */
-typedef enum _FW_IF_SMBUS_PROTOCOL
-{
-    FW_IF_SMBUS_PROTOCOL_SMBUS,
-    FW_IF_SMBUS_PROTOCOL_I2C,
-
-    MAX_FW_IF_SMBUS_PROTOCOL
-
-} FW_IF_SMBUS_PROTOCOL;
-
-/**
- * @struct  FW_IF_SMBUS_CFG
+ * @struct  FWIfSMBusCfg
  * @brief   config options for smbus interfaces (generic across all smbus interfaces)
  */
-typedef struct _FW_IF_SMBUS_CFG
+typedef struct
 {
-    uint32_t                ulPort;
-    FW_IF_SMBUS_ROLE        xRole;
-    FW_IF_SMBUS_ARP         xArpCapability;
-    FW_IF_SMBUS_PROTOCOL    xProtocol;
-    uint8_t                 pucUdid[ FW_IF_SMBUS_UDID_LEN ];
-    FW_IF_SMBUS_STATE       xState;
-    uint8_t                 ucInstance;
-    FW_IF_SMBUS_PEC         xPecCapability;
+    uint32_t             ulPort;
+    FW_IF_SMBUS_ROLE     xRole;
+    FW_IF_SMBUS_ARP      xArpCapability;
+    FW_IF_SMBUS_PROTOCOL xProtocol;
+    uint8_t              pucUdid[ FW_IF_SMBUS_UDID_LEN ];
+    FW_IF_SMBUS_STATE    xState;
+    uint8_t              ucInstance;
+    FW_IF_SMBUS_PEC      xPecCapability;
 
-} FW_IF_SMBUS_CFG;
+} FWIfSMBusCfg;
 
 
 /*****************************************************************************/
@@ -220,7 +217,7 @@ typedef struct _FW_IF_SMBUS_CFG
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_SMBUS_Init( FW_IF_SMBUS_INIT_CFG *pxCfg );
+extern uint32_t ulFW_IF_SMBUS_Init( FWIfSMBusInitCfg *pxCfg );
 
 /**
  * @brief   creates an instance of the smbus interface
@@ -230,7 +227,7 @@ extern uint32_t ulFW_IF_SMBUS_Init( FW_IF_SMBUS_INIT_CFG *pxCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_SMBUS_Create( FW_IF_CFG *pxFwIf, FW_IF_SMBUS_CFG *pxSmbusCfg );
+extern uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pxFwIf, FWIfSMBusCfg *pxSmbusCfg );
 
 /**
  *

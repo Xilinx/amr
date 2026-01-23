@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -282,10 +282,10 @@ typedef struct
 
 
 /*
- * @struct SMBus_Profile
+ * @struct SMBusProfile
  * @brief  Forward Declaration of structure to hold a single SMBus profile
  */
-typedef struct SMBus_Profile SMBus_Profile;
+typedef struct SMBusProfile SMBusProfile;
 
 /******************************************************************************/
 /* Driver External APIs                                                       */
@@ -306,7 +306,7 @@ typedef struct SMBus_Profile SMBus_Profile;
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile,
+SMBUS_ERROR_TYPE xInitSMBus( SMBusProfile** ppxSMBusProfile,
                              SMBUS_FREQ_CLASS xFrequencyClass,
                              void * pvBaseAddr,
                              SMBUS_LOG_LEVEL xLogLevel,
@@ -322,7 +322,7 @@ SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xDeinitSMBus( SMBus_Profile** ppxSMBusProfile );
+SMBUS_ERROR_TYPE xDeinitSMBus( SMBusProfile** ppxSMBusProfile );
 
 
 /**
@@ -347,7 +347,7 @@ SMBUS_ERROR_TYPE xDeinitSMBus( SMBus_Profile** ppxSMBusProfile );
  * @return   - SMBUS_INVALID_INSTANCE ID ( 99 ) if error
  *           - Instance ID ( 0 - 6 ) if successful
  */
-uint8_t ucCreateSMBusInstance( SMBus_Profile* pxSMBusProfile,
+uint8_t ucCreateSMBusInstance( SMBusProfile* pxSMBusProfile,
                                uint8_t ucSMBusAddr,
                                uint8_t ucUDID[SMBUS_UDID_LENGTH],
                                SMBUS_ARP_CAPABILITY xARPCapability,
@@ -373,8 +373,8 @@ uint8_t ucCreateSMBusInstance( SMBus_Profile* pxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBus_Profile* pxSMBusProfile,
-                                         uint8_t ucSMBusInstanceID );
+SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBusProfile* pxSMBusProfile,
+                                        uint8_t ucSMBusInstanceID );
 
 
 /**
@@ -393,22 +393,22 @@ SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBus_Profile* pxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile,
-                                                   uint8_t ucSMBusInstance,
-                                                   uint8_t ucSMBusDestAddr,
-                                                   uint8_t ucCommand,
-                                                   SMBUS_COMMAND_PROTOCOL xProtocol,
-                                                   uint16_t usDataSize,
-                                                   uint8_t* pucData,
-                                                   uint8_t ucPecRequiredForTransaction,
-                                                   uint32_t* pulTransactionID );
+SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBusProfile* pxSMBusProfile,
+                                                  uint8_t ucSMBusInstance,
+                                                  uint8_t ucSMBusDestAddr,
+                                                  uint8_t ucCommand,
+                                                  SMBUS_COMMAND_PROTOCOL xProtocol,
+                                                  uint16_t usDataSize,
+                                                  uint8_t* pucData,
+                                                  uint8_t ucPecRequiredForTransaction,
+                                                  uint32_t* pulTransactionID );
 
 
 /**
  * @brief    Retrieves SMBus log that is stored as a circular buffer in profile struct
  *           as ASCII char array
  *
- * @param    SMBus_Profile is the context to poll log on
+ * @param    SMBusProfile is the context to poll log on
  * @param    pcLogBuffer is the array to put log data must be more than TBD driver events string
  *           separated by '\n'
  * @param    pusLogSizeBytes is a pointer to the number of bytes that are in the log
@@ -417,7 +417,7 @@ SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile,
+SMBUS_ERROR_TYPE xSMBusGetLog( SMBusProfile* pxSMBusProfile,
                                char* pcLogBuffer,
                                uint32_t* pulLogSizeBytes );
 
@@ -425,12 +425,12 @@ SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile,
 /**
  * @brief    Resets SMBus Driver Log
  *
- * @param    SMBus_Profile is the context with log to clear
+ * @param    SMBusProfile is the context with log to clear
  *
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusLogReset( SMBus_Profile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusLogReset( SMBusProfile* pxSMBusProfile );
 
 
 /**
@@ -441,7 +441,7 @@ SMBUS_ERROR_TYPE xSMBusLogReset( SMBus_Profile* pxSMBusProfile );
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBus_Profile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBusProfile* pxSMBusProfile );
 
 
 /**
@@ -452,7 +452,7 @@ SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBus_Profile* pxSMBu
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBus_Profile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBusProfile* pxSMBusProfile );
 
 
 /**
@@ -478,7 +478,7 @@ void vSMBusInterruptHandler( void* pvCallBackRef );
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusGetVersion( SMBus_Profile* pxSMBusProfile,
+SMBUS_ERROR_TYPE xSMBusGetVersion( SMBusProfile* pxSMBusProfile,
     SMBus_Version* pxSMBusVersion );
 
 #ifdef __cplusplus

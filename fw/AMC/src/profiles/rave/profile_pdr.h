@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the PLDM PDR profile for the Rave
@@ -269,7 +269,7 @@
 /* Public data                                                                */
 /******************************************************************************/
 
-PLDM_NUMERIC_SENSOR_PDR pxPdrTemperatureSensors[ TOTAL_PDR_TEMPERATURE ] =
+PLDMNumericSensorPdr pxPdrTemperatureSensors[ TOTAL_PDR_TEMPERATURE ] =
 {
     {
         .ucSensorDataSize                   = EDataTypeSInt16,
@@ -488,7 +488,7 @@ PLDM_NUMERIC_SENSOR_PDR pxPdrTemperatureSensors[ TOTAL_PDR_TEMPERATURE ] =
     }
 };
 
-PLDM_NUMERIC_SENSOR_PDR pxPdrVoltageSensors[ TOTAL_PDR_VOLTAGE ] =
+PLDMNumericSensorPdr pxPdrVoltageSensors[ TOTAL_PDR_VOLTAGE ] =
 {
     {
         .ucSensorDataSize                   = EDataTypeSInt16,
@@ -836,7 +836,7 @@ PLDM_NUMERIC_SENSOR_PDR pxPdrVoltageSensors[ TOTAL_PDR_VOLTAGE ] =
     }
 };
 
-PLDM_NUMERIC_SENSOR_PDR pxPdrCurrentSensors[ TOTAL_PDR_CURRENT ] =
+PLDMNumericSensorPdr pxPdrCurrentSensors[ TOTAL_PDR_CURRENT ] =
 {
     {
         .ucSensorDataSize                   = EDataTypeSInt16,
@@ -1141,7 +1141,7 @@ PLDM_NUMERIC_SENSOR_PDR pxPdrCurrentSensors[ TOTAL_PDR_CURRENT ] =
     }
 };
 
-PLDM_NUMERIC_SENSOR_PDR pxPdrPowerSensors[ TOTAL_PDR_POWER ] =
+PLDMNumericSensorPdr pxPdrPowerSensors[ TOTAL_PDR_POWER ] =
 {
     {
         .ucSensorDataSize                   = EDataTypeSInt16,
@@ -1319,7 +1319,7 @@ PLDM_NUMERIC_SENSOR_PDR pxPdrPowerSensors[ TOTAL_PDR_POWER ] =
 
 /* Numeric sensor names PDRs */
 
-PLDM_NUMERIC_SENSOR_NAME_PDR pxPdrSensorNames[ TOTAL_PDR_NUMERIC_ASCI_SENSORS ] =
+PLDMNumericSensorNamePdr pxPdrSensorNames[ TOTAL_PDR_NUMERIC_ASCI_SENSORS ] =
 {
     {
         .usPldmTerminusHandle = PLDM_TERMINUS_HANDLE,

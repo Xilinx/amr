@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -38,7 +38,7 @@
  * @param   ullMemAddr is the memory address to be read
  *
  * @return  The 32-bit value read from memory
-*******************************************************************************/
+ */
 typedef uint32_t ( *GCQ_READ_MEM_32 )( uint64_t ullMemAddr );
 
 /**
@@ -48,7 +48,7 @@ typedef uint32_t ( *GCQ_READ_MEM_32 )( uint64_t ullMemAddr );
  * @param   ulValue is the 32-bit value to write
  *
  * @return  N/A
-*******************************************************************************/
+ */
 typedef void ( *GCQ_WRITE_MEM_32 )( uint64_t ullMemAddr, uint32_t ulValue );
 
 

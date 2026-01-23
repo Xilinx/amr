@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the fal profile
@@ -73,15 +73,15 @@ typedef enum
 } FW_IF_SMBUS_COMMAND_CODES;
 
 /* FAL objects */
-extern FW_IF_CFG xGcqIf;
-extern FW_IF_CFG *pxOspiIf;
-extern FW_IF_CFG *pxEmmcIf;
-extern FW_IF_CFG xQsfpIf1;
-extern FW_IF_CFG xQsfpIf2;
-extern FW_IF_CFG xQsfpIf3;
-extern FW_IF_CFG xQsfpIf4;
-extern FW_IF_CFG xDimmIf;
-extern FW_IF_CFG *pxSMBusIf;
+extern FWIfCfg xGcqIf;
+extern FWIfCfg *pxOspiIf;
+extern FWIfCfg *pxEmmcIf;
+extern FWIfCfg xQsfpIf1;
+extern FWIfCfg xQsfpIf2;
+extern FWIfCfg xQsfpIf3;
+extern FWIfCfg xQsfpIf4;
+extern FWIfCfg xDimmIf;
+extern FWIfCfg *pxSMBusIf;
 
 /**
  * @brief   Initialise FAL layer

@@ -1,6 +1,6 @@
 # I2C Application APIs (For debug only)
 
-Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: MIT
 
 ## Defines
@@ -91,7 +91,7 @@ typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_WARNING )( uint8_t ucWarning );
  *              xInitSMBus() must have been successfully called before this.
  */
 /******************************************************************************/
-uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CCreateDevice( I2CProfile* pxI2cProfile,
                            uint8_t ucAddr,
                            I2C_USER_ENV_GET_DATA_TYPE     pFnGetData,
                            I2C_USER_ENV_WRITE_DATA_TYPE   pFnWriteData,
@@ -113,7 +113,7 @@ uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
  *  @note   None
  */
 /******************************************************************************/
-uint8_t ucI2CDestroyDevice( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CDestroyDevice( I2CProfile* pxI2cProfile,
                             uint8_t ucDeviceId );
 ```
 ### Initiate an I2C Write command
@@ -133,7 +133,7 @@ uint8_t ucI2CDestroyDevice( I2C_Profile* pxI2cProfile,
  *
  */
 /******************************************************************************/
-uint8_t ucI2CWriteData( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CWriteData( I2CProfile* pxI2cProfile,
                         uint8_t  ucDeviceId,
                         uint8_t  ucAddr,
                         uint8_t* pucData,
@@ -156,7 +156,7 @@ uint8_t ucI2CWriteData( I2C_Profile* pxI2cProfile,
  *
  */
 /******************************************************************************/
-uint8_t ucI2CReadData( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CReadData( I2CProfile* pxI2cProfile,
                        uint8_t   ucDeviceId,
                        uint8_t   ucAddr,
                        uint16_t  usNumBytes );
@@ -179,7 +179,7 @@ uint8_t ucI2CReadData( I2C_Profile* pxI2cProfile,
  *
  */
 /******************************************************************************/
-uint8_t ucI2CWriteReadData( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CWriteReadData( I2CProfile* pxI2cProfile,
                             uint8_t   ucDeviceId,
                             uint8_t   ucAddr,
                             uint8_t*  pucWriteData,

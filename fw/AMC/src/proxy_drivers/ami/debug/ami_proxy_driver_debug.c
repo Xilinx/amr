@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the AVED Management Interface (AMI) debug implementation
+ * This file contains the AMR Management Interface (AMI) debug implementation
  *
  * @file ami_proxy_driver_debug.c
  */
@@ -162,7 +162,7 @@ static void vGetEepromRwRequest( void );
  *          ERROR if an error was raised in the callback
  *
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal );
+static int iTestCallback( EVLSignal *pxSignal );
 
 
 /******************************************************************************/
@@ -291,7 +291,7 @@ static void vSetPdiDownloadResponse( void )
     }
     else
     {
-        EVL_SIGNAL       xEv     = { 0 };
+        EVLSignal        xEv     = { 0 };
         AMI_PROXY_RESULT xRes    = { 0 };
         int              iResult = 0;
         int              i       = 0;
@@ -336,7 +336,7 @@ static void vSetPdiCopyResponse( void )
     }
     else
     {
-        EVL_SIGNAL       xEv     = { 0 };
+        EVLSignal        xEv     = { 0 };
         AMI_PROXY_RESULT xRes    = { 0 };
         int              iResult = 0;
         int              i       = 0;
@@ -381,7 +381,7 @@ static void vSetPdiProgramResponse( void )
     }
     else
     {
-        EVL_SIGNAL       xEv     = { 0 };
+        EVLSignal        xEv     = { 0 };
         AMI_PROXY_RESULT xRes    = { 0 };
         int              iResult = 0;
         int              i       = 0;
@@ -426,7 +426,7 @@ static void vSetSensorResponse( void )
     }
     else
     {
-        EVL_SIGNAL       xEv     = { 0 };
+        EVLSignal        xEv     = { 0 };
         AMI_PROXY_RESULT xRes    = { 0 };
         int              iResult = 0;
         int              i       = 0;
@@ -471,7 +471,7 @@ static void vSetBootSelectResponse( void )
     }
     else
     {
-        EVL_SIGNAL       xEv     = { 0 };
+        EVLSignal        xEv     = { 0 };
         AMI_PROXY_RESULT xRes    = { 0 };
         int              iResult = 0;
         int              i       = 0;
@@ -516,7 +516,7 @@ static void vSetIdentityResponse( void )
     }
     else
     {
-        EVL_SIGNAL       xEv     = { 0 };
+        EVLSignal        xEv     = { 0 };
         AMI_PROXY_RESULT xRes    = { 0 };
         int              iResult = 0;
         int              i       = 0;
@@ -602,7 +602,7 @@ static void vSetEepromRwResponse( void )
     }
     else
     {
-        EVL_SIGNAL       xEv     = { 0 };
+        EVLSignal        xEv     = { 0 };
         AMI_PROXY_RESULT xRes    = { 0 };
         int              iResult = 0;
         int              i       = 0;
@@ -647,7 +647,7 @@ static void vGetPdiDownloadRequest( void )
     }
     else
     {
-        EVL_SIGNAL                     xEv  = { 0 };
+        EVLSignal                      xEv  = { 0 };
         AMI_PROXY_PDI_DOWNLOAD_REQUEST xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
@@ -678,7 +678,7 @@ static void vGetPdiCopyRequest( void )
     }
     else
     {
-        EVL_SIGNAL                 xEv  = { 0 };
+        EVLSignal                  xEv  = { 0 };
         AMI_PROXY_PDI_COPY_REQUEST xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
@@ -708,7 +708,7 @@ static void vGetPdiProgramRequest( void )
     }
     else
     {
-        EVL_SIGNAL                    xEv  = { 0 };
+        EVLSignal                     xEv  = { 0 };
         AMI_PROXY_PDI_PROGRAM_REQUEST xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
@@ -739,7 +739,7 @@ static void vGetSensorRequest( void )
     }
     else
     {
-        EVL_SIGNAL               xEv  = { 0 };
+        EVLSignal                xEv  = { 0 };
         AMI_PROXY_SENSOR_REQUEST xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
@@ -772,7 +772,7 @@ static void vGetBootSelectRequest( void )
     }
     else
     {
-        EVL_SIGNAL                    xEv  = { 0 };
+        EVLSignal                    xEv  = { 0 };
         AMI_PROXY_BOOT_SELECT_REQUEST xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
@@ -801,7 +801,7 @@ static void vGetEepromRwRequest( void )
     }
     else
     {
-        EVL_SIGNAL                  xEv  = { 0 };
+        EVLSignal                   xEv  = { 0 };
         AMI_PROXY_EEPROM_RW_REQUEST xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
@@ -825,7 +825,7 @@ static void vGetEepromRwRequest( void )
 /**
  * @brief   EVL Callback for binding test prints
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal )
+static int iTestCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 

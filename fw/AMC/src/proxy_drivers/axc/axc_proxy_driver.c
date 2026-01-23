@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation for the AMR External Device Control (AXC)
@@ -7,10 +7,6 @@
  *
  * @file axc_proxy_driver.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 #include "util.h"
@@ -22,9 +18,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-
-#define UPPER_FIREWALL                          ( 0xBABECAFE )
-#define LOWER_FIREWALL                          ( 0xDEADFACE )
 
 #define AXC_TASK_SLEEP_MS                       ( 100 )
 #define AXC_TASK_SLEEP_1S                       ( 1*1000 )
@@ -136,33 +129,32 @@ UTIL_MAKE_ENUM_AND_STRINGS( AXC_PROXY_ERRORS, AXC_PROXY_ERRORS, AXC_PROXY_ERRORS
 /******************************************************************************/
 
 /**
- * @struct  AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST
+ * @struct  AXCProxyDriverExternalDeviceLinkedList
  * @brief   Linked List Structure to hold EXTERNAL_DEVICE private data
  */
-typedef struct AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST
+typedef struct AXCProxyDriverExternalDeviceLinkedList
 {
-    AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG         *pxExDevLocalDeviceCfg;
-    AXC_EXTERNAL_DEVICE_STATUS                      xExDevStatus;
-    float                                           fExDevTemperature;
+    AXCProxyDriverExternalDeviceCfg               *pxExDevLocalDeviceCfg;
+    AXC_EXTERNAL_DEVICE_STATUS                    xExDevStatus;
+    float                                         fExDevTemperature;
 
-    struct AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST  *pxNextExDev;
+    struct AXCProxyDriverExternalDeviceLinkedList *pxNextExDev;
 
-
-} AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST;
+} AXCProxyDriverExternalDeviceLinkedList;
 
 /**
- * @struct  AXC_PRIVATE_DATA
+ * @struct  AXCProxyDriverPrivateData
  * @brief   Structure to hold ths proxy driver's private data
  */
-typedef struct AXC_PRIVATE_DATA
+typedef struct
 {
     uint32_t                                ulUpperFirewall;
 
     int                                     iInitialised;
     uint8_t                                 ucMyId;
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *pxLinkedListHead;
+    AXCProxyDriverExternalDeviceLinkedList *pxLinkedListHead;
 
-    EVL_RECORD                              *pxEvlRecord;
+    EVLRecord                               *pxEvlRecord;
 
     void *                                  pvOsalMutexHdl;
     void *                                  pvOsalTaskHdl;
@@ -174,25 +166,25 @@ typedef struct AXC_PRIVATE_DATA
 
     uint32_t                                ulLowerFirewall;
 
-} AXC_PRIVATE_DATA;
+} AXCProxyDriverPrivateData;
 
 /**
- * @struct  AXC_PRIVATE_EXTERNAL_DEVICE_TEMPERATURE_REQUEST
+ * @struct  AXCProxyDriverExternalDeviceTemperatureRequest
  * @brief   Structure to hold External Device temperature request data
  */
-typedef struct AXC_PRIVATE_EXTERNAL_DEVICE_TEMPERATURE_REQUEST
+typedef struct
 {
     uint8_t     ucTemperatureMsb;
     uint8_t     ucTemperatureLsb;
 
-} AXC_PRIVATE_EXTERNAL_DEVICE_TEMPERATURE_REQUEST;
+} AXCProxyDriverExternalDeviceTemperatureRequest;
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static AXC_PRIVATE_DATA xLocalData =
+static AXCProxyDriverPrivateData xLocalData =
 {
     UPPER_FIREWALL,              /* ulUpperFirewall */
     FALSE,                       /* iInitialised */
@@ -206,7 +198,7 @@ static AXC_PRIVATE_DATA xLocalData =
     MODULE_STATE_UNINITIALISED,  /* xState */
     LOWER_FIREWALL               /* ulLowerFirewall */
 };
-static AXC_PRIVATE_DATA *pxThis = &xLocalData;
+static AXCProxyDriverPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -219,7 +211,6 @@ static AXC_PRIVATE_DATA *pxThis = &xLocalData;
  * @param   pvArgs  Pointer to task args (unused)
  *
  * @return  N/A
- *
  */
 static void vProxyDriverTask( void *pvArgs );
 
@@ -230,9 +221,8 @@ static void vProxyDriverTask( void *pvArgs );
  *
  * @return  OK              External Device added to list
  *          ERROR           External Device not added to list
- *
  */
-static int iInsertExDevListBegin( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExDevCfg );
+static int iInsertExDevListBegin( AXCProxyDriverExternalDeviceCfg *pxExDevCfg );
 
 /**
  * @brief   Find External Device handle from link list based on unique ID
@@ -243,9 +233,8 @@ static int iInsertExDevListBegin( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExD
  *
  * @return  OK              External Device handle found to match ID
  *          ERROR           No External Device handle found to match ID
- *
  */
-static int iGetExDevFromList( AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST **ppxCurrentExDev, uint8_t ucExDeviceId );
+static int iGetExDevFromList( AXCProxyDriverExternalDeviceLinkedList **ppxCurrentExDev, uint8_t ucExDeviceId );
 
 /******************************************************************************/
 /* Public Function implementations                                            */
@@ -270,7 +259,7 @@ int iAXC_Initialise( uint8_t ucProxyId, uint32_t ulTaskPrio, uint32_t ulTaskStac
         /* initalise evl record*/
         if ( OK != iEVL_CreateRecord( &pxThis->pxEvlRecord ) )
         {
-            PLL_ERR( AXC_NAME, "Error initialising EVL_RECORD\r\n" );
+            PLL_ERR( AXC_NAME, "Error initialising EVLRecord\r\n" );
             INC_ERROR_COUNTER_WITH_STATE( AXC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED );
         }
         else
@@ -309,7 +298,7 @@ int iAXC_Initialise( uint8_t ucProxyId, uint32_t ulTaskPrio, uint32_t ulTaskStac
  * @brief   Initialise new External Device device. AXC proxy will check status and temperature
  *          of this device.
  */
-int iAXC_AddExternalDevice( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExDeviceCfg )
+int iAXC_AddExternalDevice( AXCProxyDriverExternalDeviceCfg *pxExDeviceCfg )
 {
     int iStatus = ERROR;
 
@@ -363,7 +352,7 @@ int iAXC_BindCallback( EVL_CALLBACK *pxCallback )
 int iAXC_SetByte( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset, uint8_t ucValue )
 {
     int iStatus = ERROR;
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = NULL;
+    AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = NULL;
 
     if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
@@ -495,7 +484,7 @@ int iAXC_GetByte( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset, 
 {
     int iStatus = ERROR;
     uint32_t ulValueSize = EXTERNAL_DEVICE_SINGLE_VALUE_SIZE;
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = NULL;
+    AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = NULL;
 
     if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
@@ -628,10 +617,10 @@ int iAXC_GetByte( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset, 
 /**
  * @brief   Read real-time memory map from desired DEVICE page
  */
-int iAXC_GetPage( uint8_t ucExDeviceId, uint32_t ulPage, AXC_PROXY_DRIVER_PAGE_DATA *pxData )
+int iAXC_GetPage( uint8_t ucExDeviceId, uint32_t ulPage, AXCProxyDriverPageData *pxData )
 {
     int iStatus = ERROR;
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = NULL;
+    AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = NULL;
 
     if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
@@ -762,7 +751,7 @@ int iAXC_GetSingleIoStatus( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO xIoCo
     int iStatus = ERROR;
     uint8_t ucIoExpanderByte = 0;
     uint32_t ucIoExpanderByteSize = sizeof( ucIoExpanderByte );
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = NULL;
+    AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = NULL;
 
     if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
@@ -831,12 +820,12 @@ int iAXC_GetSingleIoStatus( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO xIoCo
 /**
  * @brief   Read all statuses from QSFP IO Expander
  */
-int iAXC_GetAllIoStatuses( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO_STATUSES *pxIoStatuses )
+int iAXC_GetAllIoStatuses( uint8_t ucExDeviceId, AXCProxyDriverQsfpIoStatuses *pxIoStatuses )
 {
     int iStatus = ERROR;
     uint8_t ucIoExpanderByte = 0;
     uint32_t ucIoExpanderByteSize = sizeof( ucIoExpanderByte );
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = NULL;
+    AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = NULL;
 
     if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
@@ -912,7 +901,7 @@ int iAXC_GetAllIoStatuses( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO_STATUS
 int iAXC_GetTemperature( uint8_t ucExDeviceId, float *pfTemperature )
 {
     int iStatus = ERROR;
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = NULL;
+    AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = NULL;
 
     if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
@@ -1052,7 +1041,7 @@ int iAXC_ValidateRequest( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByte
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
-        AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = NULL;
+        AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = NULL;
 
         if( ( OK == iGetExDevFromList( &ppxCurrentExDev, ucExDeviceId ) ) &&
             ( NULL != ppxCurrentExDev ) &&
@@ -1080,9 +1069,9 @@ int iAXC_ValidateRequest( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByte
  */
 static void vProxyDriverTask( void *pvArgs )
 {
-    AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *ppxCurrentExDev = pxThis->pxLinkedListHead;
-    AXC_PRIVATE_EXTERNAL_DEVICE_TEMPERATURE_REQUEST ucTemperatureReq = { 0 };
-    uint32_t ulTemperatureBytes = sizeof( AXC_PRIVATE_EXTERNAL_DEVICE_TEMPERATURE_REQUEST );
+    AXCProxyDriverExternalDeviceLinkedList *ppxCurrentExDev = pxThis->pxLinkedListHead;
+    AXCProxyDriverExternalDeviceTemperatureRequest ucTemperatureReq = { 0 };
+    uint32_t ulTemperatureBytes = sizeof( AXCProxyDriverExternalDeviceTemperatureRequest );
     AXC_EXTERNAL_DEVICE_STATUS xNewExDevStatus = AXC_STATUS_FAILED;
     uint16_t  usTemperatureHexValue = 0;
     uint32_t ulStartMs = 0;
@@ -1228,7 +1217,7 @@ static void vProxyDriverTask( void *pvArgs )
                         ppxCurrentExDev->xExDevStatus = xNewExDevStatus;
 
                         /* Raise event using Device ID as the method to track the event */
-                        EVL_SIGNAL xNewSignal = { pxThis->ucMyId,
+                        EVLSignal xNewSignal = { pxThis->ucMyId,
                                                 MAX_AXC_PROXY_DRIVER_EVENTS,
                                                 ppxCurrentExDev->pxExDevLocalDeviceCfg->ucExDeviceId,
                                                 0 };
@@ -1278,14 +1267,14 @@ static void vProxyDriverTask( void *pvArgs )
 /**
  * @brief   Insert  External Device link into list at beginning
  */
-static int iInsertExDevListBegin( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExDevCfg )
+static int iInsertExDevListBegin( AXCProxyDriverExternalDeviceCfg *pxExDevCfg )
 {
     int iStatus = ERROR;
 
     if( NULL != pxExDevCfg )
     {
         /* create link */
-        AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST *pxLink = ( AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST* )pvOSAL_MemAlloc( sizeof( AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST ) );
+        AXCProxyDriverExternalDeviceLinkedList *pxLink = ( AXCProxyDriverExternalDeviceLinkedList* )pvOSAL_MemAlloc( sizeof( AXCProxyDriverExternalDeviceLinkedList ) );
 
         if( NULL != pxLink )
         {
@@ -1312,7 +1301,7 @@ static int iInsertExDevListBegin( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExD
 /**
  * @brief   Find External Device handle from link list based on unique ID
  */
-static int iGetExDevFromList( AXC_PRIVATE_EXTERNAL_DEVICE_LINKED_LIST **ppxCurrentExDev, uint8_t ucExDeviceId )
+static int iGetExDevFromList( AXCProxyDriverExternalDeviceLinkedList **ppxCurrentExDev, uint8_t ucExDeviceId )
 {
     int iStatus = ERROR;
 

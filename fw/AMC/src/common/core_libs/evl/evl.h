@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the public API for the Event Library
@@ -9,10 +9,6 @@
 
 #ifndef _EVL_H_
 #define _EVL_H_
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 
@@ -33,18 +29,18 @@
 /******************************************************************************/
 
 /**
- * @struct  EVL_SIGNAL
+ * @struct  EVLSignal
  * @brief   Single instance of an event
  */
-typedef struct EVL_SIGNAL
+typedef struct EVLSignal
 {
-    uint8_t ucModule;                                                          /* Unique ID of the module raising the event   */
-    uint8_t ucEventType;                                                       /* Unique ID of the event raised by the module */
-    uint8_t ucInstance;                                                        /* Specific instance of the event raised       */
+    uint8_t ucModule;           /* Unique ID of the module raising the event   */
+    uint8_t ucEventType;        /* Unique ID of the event raised by the module */
+    uint8_t ucInstance;         /* Specific instance of the event raised       */
     /* - for optional tracking                     */
-    uint8_t ucAdditionalData;                                                  /* Additional data if required.                */
+    uint8_t ucAdditionalData;   /* Additional data if required.                */
 
-} EVL_SIGNAL;
+} EVLSignal;
 
 /**
  * @brief   Event signalling callback
@@ -55,13 +51,13 @@ typedef struct EVL_SIGNAL
  *          ERROR if an error was raised in the callback
  *
  */
-typedef int ( EVL_CALLBACK )( EVL_SIGNAL *pxSignal );
+typedef int ( EVL_CALLBACK )( EVLSignal *pxSignal );
 
 /**
- * @struct  EVL_RECORD
+ * @struct  EVLRecord
  * @brief   Record of EVL bindings
  */
-typedef struct EVL_RECORD EVL_RECORD;
+typedef struct EVLRecord EVLRecord;
 
 
 /******************************************************************************/
@@ -85,7 +81,7 @@ int iEVL_Initialise( void );
  * @return OK if record initialised successfully
  *         ERROR if record not initialised
  */
-int iEVL_CreateRecord( EVL_RECORD **ppxRecord );
+int iEVL_CreateRecord( EVLRecord **ppxRecord );
 
 /**
  * @brief   Bind a callback into a module
@@ -98,7 +94,7 @@ int iEVL_CreateRecord( EVL_RECORD **ppxRecord );
  *
  * @note    Only EVL_MAX_BINDINGS may be bound to a single record
  */
-int iEVL_BindCallback( EVL_RECORD *pxRecord, EVL_CALLBACK *pxNewCallback );
+int iEVL_BindCallback( EVLRecord *pxRecord, EVL_CALLBACK *pxNewCallback );
 
 /**
  * @brief   Raise an event to each bound-in callback
@@ -110,7 +106,7 @@ int iEVL_BindCallback( EVL_RECORD *pxRecord, EVL_CALLBACK *pxNewCallback );
  *          ERROR if an error was returned by the callback
  *
  */
-int iEVL_RaiseEvent( EVL_RECORD *pxRecord, EVL_SIGNAL *pxSignal );
+int iEVL_RaiseEvent( EVLRecord *pxRecord, EVLSignal *pxSignal );
 
 /**
  * @brief   Get event stats
@@ -121,7 +117,7 @@ int iEVL_RaiseEvent( EVL_RECORD *pxRecord, EVL_SIGNAL *pxSignal );
  *          ERROR if the stats could not be retrieved
  *
  */
-int iEVL_GetStats( EVL_RECORD *pxRecord );
+int iEVL_GetStats( EVLRecord *pxRecord );
 
 /**
  * @brief   Print all the stats gathered by the library

@@ -10,10 +10,6 @@
 #ifndef _AMI_PROXY_DRIVER_H_
 #define _AMI_PROXY_DRIVER_H_
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "standard.h"
 #include "evl.h"
 #include "fw_if.h"
@@ -292,7 +288,7 @@ typedef struct
  *
  * @note    Proxy drivers can have 0 or more firmware interfaces
  */
-int iAMI_Initialise( uint8_t ucProxyId, FW_IF_CFG *pxFwIf, uint32_t ulFwIfPort,
+int iAMI_Initialise( uint8_t ucProxyId, FWIfCfg *pxFwIf, uint32_t ulFwIfPort,
                      uint32_t ulTaskPrio, uint32_t ulTaskStack );
 
 /**
@@ -317,7 +313,7 @@ int iAMI_BindCallback( EVL_CALLBACK *pxCallback );
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetPdiDownloadCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetPdiDownloadCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the response after the PDI copy has completed
@@ -328,7 +324,7 @@ int iAMI_SetPdiDownloadCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT 
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetPdiCopyCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetPdiCopyCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the response after the PDI program has completed
@@ -339,7 +335,7 @@ int iAMI_SetPdiCopyCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xRes
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetPdiProgramCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetPdiProgramCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the response after the sensor request has completed
@@ -350,7 +346,7 @@ int iAMI_SetPdiProgramCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT x
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetSensorCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetSensorCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the identity response
@@ -362,7 +358,7 @@ int iAMI_SetSensorCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResu
  * @return  OK                      Data passed to proxy driver successfully
  *          ERROR                   Data not passed successfully
  */
-int iAMI_SetIdentityResponse( EVL_SIGNAL *pxSignal,
+int iAMI_SetIdentityResponse( EVLSignal *pxSignal,
                               AMI_PROXY_RESULT xResult,
                               AMI_PROXY_IDENTITY_RESPONSE *pxIdentityResponse );
 
@@ -375,7 +371,7 @@ int iAMI_SetIdentityResponse( EVL_SIGNAL *pxSignal,
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetBootSelectCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetBootSelectCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the response after the EEPROM read/write has completed
@@ -386,7 +382,7 @@ int iAMI_SetBootSelectCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT x
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetEepromReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetEepromReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the response after the module read/write has completed
@@ -397,7 +393,7 @@ int iAMI_SetEepromReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RES
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetModuleReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetModuleReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the response after the debug verbosity request has completed
@@ -408,7 +404,7 @@ int iAMI_SetModuleReadWriteCompleteResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RES
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetDebugVerbosityResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetDebugVerbosityResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
 
 /**
  * @brief   Set the response after the FPT flags request has completed
@@ -420,7 +416,7 @@ int iAMI_SetDebugVerbosityResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResu
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetFptFlagsResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags );
+int iAMI_SetFptFlagsResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags );
 
 /* Get Functions **************************************************************/
 
@@ -433,7 +429,7 @@ int iAMI_SetFptFlagsResponse( EVL_SIGNAL *pxSignal, AMI_PROXY_RESULT xResult, ui
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiDownloadRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
                                 AMI_PROXY_PDI_DOWNLOAD_REQUEST *pxDownloadRequest );
 
 /**
@@ -445,7 +441,7 @@ int iAMI_GetPdiDownloadRequest( EVL_SIGNAL *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiCopyRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
                             AMI_PROXY_PDI_COPY_REQUEST *pxCopyRequest );
 /**
  * @brief   Get the PDI program request
@@ -456,7 +452,7 @@ int iAMI_GetPdiCopyRequest( EVL_SIGNAL *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
 	AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest );
 
 /**
@@ -468,7 +464,7 @@ int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetSensorRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_SENSOR_REQUEST *pxSensorRequest );
+int iAMI_GetSensorRequest( EVLSignal *pxSignal, AMI_PROXY_SENSOR_REQUEST *pxSensorRequest );
 
 /**
  * @brief   Get the PDI program request
@@ -479,7 +475,7 @@ int iAMI_GetSensorRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_SENSOR_REQUEST *pxSen
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
 	AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest );
 
 /**
@@ -491,7 +487,7 @@ int iAMI_GetPdiProgramRequest( EVL_SIGNAL *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetBootSelectRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_BOOT_SELECT_REQUEST *pxBootSelectRequest );
+int iAMI_GetBootSelectRequest( EVLSignal *pxSignal, AMI_PROXY_BOOT_SELECT_REQUEST *pxBootSelectRequest );
 
 /**
  * @brief   Get the eeprom read write request
@@ -502,7 +498,7 @@ int iAMI_GetBootSelectRequest( EVL_SIGNAL *pxSignal, AMI_PROXY_BOOT_SELECT_REQUE
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
  */
-int iAMI_GetEepromReadWriteRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
                                     AMI_PROXY_EEPROM_RW_REQUEST *pxEepromReadWriteRequest );
 
 /**
@@ -514,7 +510,7 @@ int iAMI_GetEepromReadWriteRequest( EVL_SIGNAL *pxSignal,
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
  */
-int iAMI_GetModuleReadWriteRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetModuleReadWriteRequest( EVLSignal *pxSignal,
                                     AMI_PROXY_MODULE_RW_REQUEST *pxModuleReadWriteRequest );
 
 /**
@@ -526,7 +522,7 @@ int iAMI_GetModuleReadWriteRequest( EVL_SIGNAL *pxSignal,
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
  */
-int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetDebugVerbosityRequest( EVLSignal *pxSignal,
                                    uint8_t *pucDebugVerbosityRequest );
 
 /**
@@ -538,7 +534,7 @@ int iAMI_GetDebugVerbosityRequest( EVL_SIGNAL *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetFptFlagsRequest( EVL_SIGNAL *pxSignal,
+int iAMI_GetFptFlagsRequest( EVLSignal *pxSignal,
                              AMI_PROXY_FPT_FLAGS_REQUEST *pxFptFlagsRequest );
 
 /**

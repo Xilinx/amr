@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the API for the Board Management Controller (BMC) proxy driver
@@ -10,24 +10,11 @@
 #ifndef _BMC_PROXY_DRIVER_H_
 #define _BMC_PROXY_DRIVER_H_
 
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-
 #include "standard.h"
 #include "evl.h"
 #include "fw_if.h"
 #include "pldm.h"
 #include "pldm_pdr.h"
-
-/******************************************************************************/
-/* Defines                                                                    */
-/******************************************************************************/
-
-/******************************************************************************/
-/* Structs                                                                    */
-/******************************************************************************/
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -37,7 +24,7 @@
  * @enum    BMC_PROXY_DRIVER_EVENTS
  * @brief   Events raised by this proxy driver
  */
-typedef enum BMC_PROXY_DRIVER_EVENTS
+typedef enum
 {
     BMC_PROXY_DRIVER_E_MSG_ARRIVAL = 0,
     BMC_PROXY_DRIVER_E_GET_PDR,
@@ -53,7 +40,7 @@ typedef enum BMC_PROXY_DRIVER_EVENTS
  * @enum    BMC_PROXY_RESPONSE_RESULT
  * @brief   The response result
  */
-typedef enum BMC_PROXY_RESULT
+typedef enum
 {
     BMC_PROXY_RESULT_SUCCESS = 0,
     BMC_PROXY_RESULT_FAILURE,
@@ -66,7 +53,7 @@ typedef enum BMC_PROXY_RESULT
  * @enum    BMC_SENSOR_RESPONSE
  * @brief   The response
  */
-typedef enum BMC_SENSOR_RESPONSE
+typedef enum
 {
     BMC_RESPONSE_OK = 0,
     BMC_RESPONSE_ERROR,
@@ -79,7 +66,7 @@ typedef enum BMC_SENSOR_RESPONSE
  * @enum    BMC_SET_NUMERIC_SENSOR_ENABLE_RESPONSE
  * @brief   The response
  */
-typedef enum BMC_SET_NUMERIC_SENSOR_ENABLE_RESPONSE
+typedef enum
 {
     BMC_SENSOR_ENABLE_RESP_OK = 0,
     BMC_SENSOR_ENABLE_RESP_INVALID_SENSOR_ID,
@@ -94,7 +81,7 @@ typedef enum BMC_SET_NUMERIC_SENSOR_ENABLE_RESPONSE
  * @enum    BMC_GET_SENSOR_RESPONSE
  * @brief   The response
  */
-typedef enum BMC_GET_SENSOR_RESPONSE
+typedef enum
 {
     BMC_GET_SENSOR_RESP_OK = 0,
     BMC_GET_SENSOR_RESP_INVALID_SENSOR_ID,
@@ -135,19 +122,19 @@ typedef enum BMC_GET_SENSOR_RESPONSE
  * @note    Proxy drivers can have 0 or more firmware interfaces
  */
 int iBMC_Initialise( uint8_t ucProxyId,
-                     FW_IF_CFG *pxFwIf,
+                     FWIfCfg *pxFwIf,
                      uint32_t ulFwIfPort,
                      uint32_t ulTaskPrio,
                      uint32_t ulTaskStack,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrTemperatureSensors,
+                     PLDMNumericSensorPdr *pxPdrTemperatureSensors,
                      int iTotalPdrTemperature,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrVoltageSensors,
+                     PLDMNumericSensorPdr *pxPdrVoltageSensors,
                      int iTotalPdrVoltage,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrCurrentSensors,
+                     PLDMNumericSensorPdr *pxPdrCurrentSensors,
                      int iTotalPdrCurrent,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrPowerSensors,
+                     PLDMNumericSensorPdr *pxPdrPowerSensors,
                      int iTotalPdrPower,
-                     PLDM_NUMERIC_SENSOR_NAME_PDR *pxPdrSensorNames,
+                     PLDMNumericSensorNamePdr *pxPdrSensorNames,
                      int iTotalPdrName,
                      uint8_t *pucUuid );
 
@@ -173,7 +160,7 @@ int iBMC_BindCallback( EVL_CALLBACK *pxCallback );
  * @return  OK          Command was successful
  *          ERROR       Command failed
  */
-int iBMC_SendResponseForGetSensor( EVL_SIGNAL *pxSignal,
+int iBMC_SendResponseForGetSensor( EVLSignal *pxSignal,
                                    uint16_t usSensorId,
                                    int16_t ssSensorInfo,
                                    uint8_t ucSensorState,
@@ -187,7 +174,7 @@ int iBMC_SendResponseForGetSensor( EVL_SIGNAL *pxSignal,
  * @return  OK          Command was successful
  *          ERROR       Command failed
  */
-int iBMC_SetResponse( EVL_SIGNAL *pxSignal, uint16_t usSensorId, BMC_SENSOR_RESPONSE xBmcResponse );
+int iBMC_SetResponse( EVLSignal *pxSignal, uint16_t usSensorId, BMC_SENSOR_RESPONSE xBmcResponse );
 
 /**
  * @brief   Print all the stats gathered by the application
@@ -216,7 +203,7 @@ int iBMC_ClearStatistics( void );
  *
  * @return  OK or ERROR
  */
-int iBMC_GetSensorIdRequest( EVL_SIGNAL *pxSignal, int16_t *pssSensorId, uint8_t *pucOperationalState );
+int iBMC_GetSensorIdRequest( EVLSignal *pxSignal, int16_t *pssSensorId, uint8_t *pucOperationalState );
 
 /**
  * @brief   Gets the current state of the proxy driver

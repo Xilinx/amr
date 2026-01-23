@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the interrupt handler function which must be bound by
@@ -25,7 +25,7 @@
  *
  * @return   uint8_t instance number 0-7
  */
-static uint8_t ucSMBusDetermineInstanceFromTargetAddress( SMBus_Profile* pxSMBusProfile )
+static uint8_t ucSMBusDetermineInstanceFromTargetAddress( SMBusProfile* pxSMBusProfile )
 {
     uint8_t ucInstance = SMBUS_INVALID_INSTANCE;
     uint8_t ucAddress  = 0;
@@ -59,7 +59,7 @@ static uint8_t ucSMBusDetermineInstanceFromTargetAddress( SMBus_Profile* pxSMBus
  *
  * @return   None
  */
-static void prvvSMBusClearInterrupts( SMBus_Profile* pxSMBusProfile, uint32_t ulISR_RegisterValue,
+static void prvvSMBusClearInterrupts( SMBusProfile* pxSMBusProfile, uint32_t ulISR_RegisterValue,
                                     uint32_t ulERR_ISR_RegisterValue )
 {
     if ( NULL != pxSMBusProfile )
@@ -90,7 +90,7 @@ void vSMBusInterruptHandler( void* pvCallBackRef )
 
     if ( NULL != pvCallBackRef )
     {
-        SMBus_Profile* pxSMBusProfile = ( SMBus_Profile* )pvCallBackRef;
+        SMBusProfile* pxSMBusProfile = ( SMBusProfile* )pvCallBackRef;
 
         /* check clk/dat status */
         if ( ( SMBUS_SMBCLK_LOW_TIMEOUT_DETECTED != ulSMBusHWReadPHYStatusSMBClkLowTimeout( pxSMBusProfile ) ) &&

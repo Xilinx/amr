@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  *  This header file contains structures, type definitions and function declarations
@@ -35,10 +35,10 @@ extern "C"
 
 
 /*
- * @struct I2C_Profile
+ * @struct I2CProfile
  * @brief  Forward Declaration of structure to hold a single i2c profile
  */
-typedef struct I2C_Profile I2C_Profile;
+typedef struct I2CProfile I2CProfile;
 
 /******************************************************************************/
 /* typedefs                                                                   */
@@ -119,7 +119,7 @@ typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_WARNING )( uint8_t ucWarning );
  *              See ucCreateSMBusInstance() in smbus.h for more information.
  *              xInitSMBus() must have been successfully called before this.
  */
-uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CCreateDevice( I2CProfile* pxI2cProfile,
                            uint8_t ucAddr,
                            I2C_USER_ENV_GET_DATA_TYPE     pFnGetData,
                            I2C_USER_ENV_WRITE_DATA_TYPE   pFnWriteData,
@@ -137,7 +137,7 @@ uint8_t ucI2CCreateDevice( I2C_Profile* pxI2cProfile,
  *  @return I2C_SUCCESS - the device has been successfully destroyed
  *          I2C_ERROR   - the device has not been destroyed
  */
-uint8_t ucI2CDestroyDevice( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CDestroyDevice( I2CProfile* pxI2cProfile,
                             uint8_t ucDeviceId );
 
 
@@ -154,7 +154,7 @@ uint8_t ucI2CDestroyDevice( I2C_Profile* pxI2cProfile,
  *          I2C_ERROR   - an error occurred attempting to write
  *
  */
-uint8_t ucI2CWriteData( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CWriteData( I2CProfile* pxI2cProfile,
                         uint8_t  ucDeviceId,
                         uint8_t  ucAddr,
                         uint8_t* pucData,
@@ -173,7 +173,7 @@ uint8_t ucI2CWriteData( I2C_Profile* pxI2cProfile,
  *          I2C_ERROR   - an error occurred attempting to read
  *
  */
-uint8_t ucI2CReadData( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CReadData( I2CProfile* pxI2cProfile,
                        uint8_t   ucDeviceId,
                        uint8_t   ucAddr,
                        uint16_t  usNumBytes );
@@ -192,7 +192,7 @@ uint8_t ucI2CReadData( I2C_Profile* pxI2cProfile,
  *          I2C_ERROR   - an error occurred attempting to write
  *
  */
-uint8_t ucI2CWriteReadData( I2C_Profile* pxI2cProfile,
+uint8_t ucI2CWriteReadData( I2CProfile* pxI2cProfile,
                             uint8_t   ucDeviceId,
                             uint8_t   ucAddr,
                             uint8_t*  pucWriteData,

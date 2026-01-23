@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains functions to initialize and to add log entries to the SMBus Driver circular log
@@ -77,7 +77,7 @@ static char* prvpcConvertEventTypeToText( SMBUS_LOG_EVENT xEvent )
  *
  * @return   None
  */
-static void prvvFormatLine( SMBus_Profile* pxSMBusProfile, int entry, char* pcLogBuffer,
+static void prvvFormatLine( SMBusProfile* pxSMBusProfile, int entry, char* pcLogBuffer,
                             int* pslLineSize )
 {
     char* pcState    = NULL;
@@ -142,7 +142,7 @@ static void prvvFormatLine( SMBus_Profile* pxSMBusProfile, int entry, char* pcLo
 /**
  * @brief    Will retreive the log as a character string
  */
-void vLogDisplayLog( SMBus_Profile* pxSMBusProfile, char* pcLogBuffer, uint32_t* usLogSizeBytes )
+void vLogDisplayLog( SMBusProfile* pxSMBusProfile, char* pcLogBuffer, uint32_t* usLogSizeBytes )
 {
     int slStart        = 0;
     int i              = 0;
@@ -180,7 +180,7 @@ void vLogDisplayLog( SMBus_Profile* pxSMBusProfile, char* pcLogBuffer, uint32_t*
 /**
  * @brief    Initializes the debug log. Setting its pointer to zero
  */
-void vLogInitialize( SMBus_Profile* pxSMBusProfile )
+void vLogInitialize( SMBusProfile* pxSMBusProfile )
 {
     uint32_t i = 0;
 
@@ -202,7 +202,7 @@ void vLogInitialize( SMBus_Profile* pxSMBusProfile )
 /**
  * @brief    Will add a log entry into the debug log
  */
-void vLogAddEntry( SMBus_Profile* pxSMBusProfile, SMBUS_LOG_LEVEL xLogLevel, uint32_t ulInstance,
+void vLogAddEntry( SMBusProfile* pxSMBusProfile, SMBUS_LOG_LEVEL xLogLevel, uint32_t ulInstance,
                    SMBUS_LOG_EVENT  Log_Event, uint32_t ulEntry1, uint32_t ulEntry2 )
 {
     uint32_t ulTicks = 0;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains MCTP enums and structs
@@ -17,7 +17,7 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define MCTP_MAX_PAYLOAD_SIZE  ( 64 )                                          // Max MCTP payload size allowed; segment anything larger than this
+#define MCTP_MAX_PAYLOAD_SIZE  ( 64 )        // Max MCTP payload size allowed; segment anything larger than this
 #define MCTP_COMMAND_CODE      ( 0x0F )
 #define PLDM_HDR_BYTE1_REQ_MSG ( 0x80 )
 #define MCTP_MIN_NUM_BYTES     ( 10 )
@@ -28,12 +28,12 @@
  * MCTP Control Messages Completion code
  */
 #define RESP_MCTP_CTRL_MSG_SUCCESS            ( 0x00 )
-#define RESP_MCTP_CTRL_MSG_ERROR_GENERIC      ( 0x01 )                         /* Generic failure message */
-#define RESP_MCTP_CTRL_MSG_ERROR_INVALID_DATA ( 0x02 )                         /* Payload contains invalid data */
-#define RESP_MCTP_CTRL_MSG_ERROR_INVALID_LEN  ( 0x03 )                         /* Commad specific message lenght invalid */
-#define RESP_MCTP_CTRL_MSG_ERROR_NOT_READY    ( 0x04 )                         /* BUSY */
-#define RESP_MCTP_CTRL_MSG_ERROR_MCTP_CMD_NS  ( 0x05 )                         /* Not supported MCTP command */
-#define RESP_MCTP_CTRL_MSG_TYPE_UNSUPPORTED   ( 0x80 )                         /* Not supported MCTP command */
+#define RESP_MCTP_CTRL_MSG_ERROR_GENERIC      ( 0x01 )  /* Generic failure message */
+#define RESP_MCTP_CTRL_MSG_ERROR_INVALID_DATA ( 0x02 )  /* Payload contains invalid data */
+#define RESP_MCTP_CTRL_MSG_ERROR_INVALID_LEN  ( 0x03 )  /* Commad specific message lenght invalid */
+#define RESP_MCTP_CTRL_MSG_ERROR_NOT_READY    ( 0x04 )  /* BUSY */
+#define RESP_MCTP_CTRL_MSG_ERROR_MCTP_CMD_NS  ( 0x05 )  /* Not supported MCTP command */
+#define RESP_MCTP_CTRL_MSG_TYPE_UNSUPPORTED   ( 0x80 )  /* Not supported MCTP command */
 
 /*
  * Command specific completion code
@@ -61,7 +61,7 @@
  * @enum    MCTP_Msg_Type
  * @brief   MCTP Message Types
  */
-typedef enum MCTP_Msg_Type
+typedef enum
 {
     MCTP_MSG_MCTP_CONTROL       = 0x00,
     MCTP_MSG_MCTP_PLDM          = 0x01,
@@ -72,7 +72,7 @@ typedef enum MCTP_Msg_Type
     MCTP_MSG_VENDOR_PCI         = 0x7e,
     MCTP_MSG_VENDOR_IANA        = 0x7f
 
-} MCTP_Msg_Type_e;
+} MCTP_Msg_Type;
 
 
 /******************************************************************************/

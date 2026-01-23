@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the I2C driver.
@@ -22,8 +22,6 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
 
 #define I2C_NAME "I2C"
 
@@ -41,35 +39,35 @@
 #define I2C_RESET_TIMEOUT_MS ( 100 )
 
 /* Stat & Error definitions */
-#define I2C_STATS( DO )                   \
-        DO( I2C_STATS_INIT_COMPLETED )    \
-        DO( I2C_STATS_SEND_COMPLETED )    \
-        DO( I2C_STATS_RECEIVE_COMPLETED ) \
-        DO( I2C_STATS_CREATE_TIMER )      \
-        DO( I2C_STATS_CREATE_MUTEX )      \
-        DO( I2C_STATS_TAKE_MUTEX )        \
-        DO( I2C_STATS_RELEASE_MUTEX )     \
-        DO( I2C_STATS_REINIT_SUCCESSFUL ) \
-        DO( I2C_STATS_MAX )
+#define I2C_STATS( DO )               \
+    DO( I2C_STATS_INIT_COMPLETED )    \
+    DO( I2C_STATS_SEND_COMPLETED )    \
+    DO( I2C_STATS_RECEIVE_COMPLETED ) \
+    DO( I2C_STATS_CREATE_TIMER )      \
+    DO( I2C_STATS_CREATE_MUTEX )      \
+    DO( I2C_STATS_TAKE_MUTEX )        \
+    DO( I2C_STATS_RELEASE_MUTEX )     \
+    DO( I2C_STATS_REINIT_SUCCESSFUL ) \
+    DO( I2C_STATS_MAX )
 
-#define I2C_ERRORS( DO )                                      \
-        DO( I2C_ERRORS_VALIDATION_FAILED )                    \
-        DO( I2C_ERRORS_XIIC_PS_CONFIG_FAILED )                \
-        DO( I2C_ERRORS_XIIC_PS_SET_CLK_FAILED )               \
-        DO( I2C_ERRORS_XIIC_PS_MASTER_SEND_POLLED_FAILED )    \
-        DO( I2C_ERRORS_XIIC_PS_MASTER_RECEIVE_POLLED_FAILED ) \
-        DO( I2C_ERRORS_XIIC_PS_SET_OPTIONS_FAILED )           \
-        DO( I2C_ERRORS_XIIC_PS_CLEAR_OPTIONS_FAILED )         \
-        DO( I2C_ERRORS_TIMER_CREATE_FAILED )                  \
-        DO( I2C_ERRORS_TIMER_START_FAILED )                   \
-        DO( I2C_ERRORS_TIMER_STOP_FAILED )                    \
-        DO( I2C_ERRORS_MUTEX_CREATE_FAILED )                  \
-        DO( I2C_ERRORS_MUTEX_RELEASE_FAILED )                 \
-        DO( I2C_ERRORS_MUTEX_TAKE_FAILED )                    \
-        DO( I2C_ERRORS_WAIT_FOR_BUS_IDLE_FAILED )             \
-        DO( I2C_ERRORS_WAIT_FOR_BUS_IDLE_TIMED_OUT )          \
-        DO( I2C_ERRORS_REINIT_FAILED )                        \
-        DO( I2C_ERRORS_MAX )
+#define I2C_ERRORS( DO )                                  \
+    DO( I2C_ERRORS_VALIDATION_FAILED )                    \
+    DO( I2C_ERRORS_XIIC_PS_CONFIG_FAILED )                \
+    DO( I2C_ERRORS_XIIC_PS_SET_CLK_FAILED )               \
+    DO( I2C_ERRORS_XIIC_PS_MASTER_SEND_POLLED_FAILED )    \
+    DO( I2C_ERRORS_XIIC_PS_MASTER_RECEIVE_POLLED_FAILED ) \
+    DO( I2C_ERRORS_XIIC_PS_SET_OPTIONS_FAILED )           \
+    DO( I2C_ERRORS_XIIC_PS_CLEAR_OPTIONS_FAILED )         \
+    DO( I2C_ERRORS_TIMER_CREATE_FAILED )                  \
+    DO( I2C_ERRORS_TIMER_START_FAILED )                   \
+    DO( I2C_ERRORS_TIMER_STOP_FAILED )                    \
+    DO( I2C_ERRORS_MUTEX_CREATE_FAILED )                  \
+    DO( I2C_ERRORS_MUTEX_RELEASE_FAILED )                 \
+    DO( I2C_ERRORS_MUTEX_TAKE_FAILED )                    \
+    DO( I2C_ERRORS_WAIT_FOR_BUS_IDLE_FAILED )             \
+    DO( I2C_ERRORS_WAIT_FOR_BUS_IDLE_TIMED_OUT )          \
+    DO( I2C_ERRORS_REINIT_FAILED )                        \
+    DO( I2C_ERRORS_MAX )
 
 #define PRINT_STAT_COUNTER( x )  PLL_INF( I2C_NAME,              \
                                           "%50s . . . . %d\r\n", \
@@ -106,20 +104,20 @@ UTIL_MAKE_ENUM_AND_STRINGS( I2C_ERRORS, I2C_ERRORS, I2C_ERRORS_STR )
 /******************************************************************************/
 
 /**
- * @struct  I2C_LOG
+ * @struct  I2CLog
  * @brief   Structure to hold a log string
  */
-typedef struct I2C_LOG
+typedef struct
 {
     char cLogEntry[ I2C_LOG_STRING_LENGTH ];
 
-} I2C_LOG;
+} I2CLog;
 
 /**
- * @struct  I2C_PROFILE
+ * @struct  I2CProfile
  * @brief   Structure to hold the instance, timer & mutex pointers
  */
-typedef struct I2C_PROFILE
+typedef struct
 {
     XIicPs  xIicInstance;
 
@@ -127,59 +125,60 @@ typedef struct I2C_PROFILE
     int     iAbortBusWait;
     void    *pvOsalMutexHdl;
 
-    I2C_LOG xCircularLog[ I2C_LOG_DEPTH ];
+    I2CLog  xCircularLog[ I2C_LOG_DEPTH ];
     int     iLogIndex;
     int     iI2cEnabled;
 
-} I2C_PROFILE;
+} I2CProfile;
 
 /**
- * @struct  I2C_PRIVATE_DATA
+ * @struct  I2CPrivateData
  * @brief   Structure to hold ths driver's private data
  */
-typedef struct I2C_PRIVATE_DATA
+typedef struct
 {
     uint32_t     ulUpperFirewall;
 
     int          iInitialised;
 
-    I2C_PROFILE  xIicProfile[ I2C_NUM_INSTANCES ];
+    I2CProfile   xIicProfile[ I2C_NUM_INSTANCES ];
 
     uint16_t     usBusIdleWaitMs;
-    I2C_CFG_TYPE pxI2cCfg[ I2C_NUM_INSTANCES ];
+    I2CConfig    pxI2cCfg[ I2C_NUM_INSTANCES ];
 
     uint32_t     pulStatCounters[ I2C_STATS_MAX ];
     uint32_t     pulErrorCounters[ I2C_ERRORS_MAX ];
 
     uint32_t     ulLowerFirewall;
 
-} I2C_PRIVATE_DATA;
+} I2CPrivateData;
 
 
 /******************************************************************************/
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static I2C_PRIVATE_DATA xLocalData =
+static I2CPrivateData xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    FALSE,                                                                     /* iInitialised */
+    UPPER_FIREWALL,     /* ulUpperFirewall */
+    FALSE,              /* iInitialised */
     { { { {
               0
-          } } } },                                                             /* xIicProfile */
-    0,                                                                         /* usBusIdleWaitMs */
+          } } } },      /* xIicProfile */
+    0,                  /* usBusIdleWaitMs */
     { {
           0
-      } },                                                                     /* *pxI2cCfg */
+      } },              /* *pxI2cCfg */
     {
         0
-    },                                                                         /* pulStatCounters */
+    },                  /* pulStatCounters */
     {
         0
-    },                                                                         /* pulErrorCounters */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall */
+    },                  /* pulErrorCounters */
+    LOWER_FIREWALL      /* ulLowerFirewall */
 };
-static I2C_PRIVATE_DATA *pxThis = &xLocalData;
+
+static I2CPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -260,8 +259,8 @@ int iI2C_ReInit( uint8_t ucDeviceId )
     {
         int iI2cStatus = XST_FAILURE;
 
-        I2C_PROFILE *pxIicProfile  = &( pxThis->xIicProfile[ ucDeviceId ] );
-        XIicPs      *pxIicInstance = &( pxThis->xIicProfile[ ucDeviceId ].xIicInstance );
+        I2CProfile *pxIicProfile  = &pxThis->xIicProfile[ ucDeviceId ];
+        XIicPs     *pxIicInstance = &pxThis->xIicProfile[ ucDeviceId ].xIicInstance;
 
         /*
          * Initial clk value set and used to test if Fscl input is out of range
@@ -308,7 +307,7 @@ int iI2C_ReInit( uint8_t ucDeviceId )
 /**
  * @brief   Initializes the I2C driver.
  */
-int iI2C_Init( I2C_CFG_TYPE *pxI2cCfg, uint16_t usBusIdleWaitMs )
+int iI2C_Init( I2CConfig *pxI2cCfg, uint16_t usBusIdleWaitMs )
 {
     int iStatus = ERROR;
 
@@ -330,8 +329,8 @@ int iI2C_Init( I2C_CFG_TYPE *pxI2cCfg, uint16_t usBusIdleWaitMs )
             /* Revert to error at start of loop */
             iStatus = ERROR;
 
-            I2C_PROFILE *pxIicProfile  = &( pxThis->xIicProfile[ i ] );
-            XIicPs      *pxIicInstance = &( pxThis->xIicProfile[ i ].xIicInstance );
+            I2CProfile *pxIicProfile  = &pxThis->xIicProfile[ i ];
+            XIicPs     *pxIicInstance = &pxThis->xIicProfile[ i ].xIicInstance;
 
             if( TRUE == pxI2cCfg[ i ].ucHwResetDuringInit )
             {
@@ -467,12 +466,12 @@ int iI2C_Send( uint8_t ucDeviceId,
         ( NULL != pucDataBuff ) &&
         ( ucDeviceId < I2C_NUM_INSTANCES ) )
     {
-        I2C_PROFILE *pxIicProfile      = &( pxThis->xIicProfile[ ucDeviceId ] );
-        XIicPs      *pxIicInstance     = &( pxThis->xIicProfile[ ucDeviceId ].xIicInstance );
-        int         iI2cStatus         = XST_FAILURE;
-        int         iWaitBusIdleStatus = ERROR;
-        int         iReInitStatus      = OK;
-        uint8_t     ucTryCount         = 0;
+        I2CProfile *pxIicProfile      = &pxThis->xIicProfile[ ucDeviceId ];
+        XIicPs     *pxIicInstance     = &pxThis->xIicProfile[ ucDeviceId ].xIicInstance;
+        int        iI2cStatus         = XST_FAILURE;
+        int        iWaitBusIdleStatus = ERROR;
+        int        iReInitStatus      = OK;
+        uint8_t    ucTryCount         = 0;
 
         while( ( ( XST_SUCCESS != iI2cStatus ) ||
                  ( OK != iWaitBusIdleStatus ) ||
@@ -520,7 +519,7 @@ int iI2C_Send( uint8_t ucDeviceId,
                         }
                         else
                         {
-                            I2C_PROFILE *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
+                            I2CProfile *pxProfile  = &pxThis->xIicProfile[ ucDeviceId ];
                             pxProfile->iI2cEnabled = FALSE;
                             PLL_ERR( I2C_NAME, "Error XIicPs_MasterSendPolled() failed: %d\r\n", iI2cStatus );
                             INC_ERROR_COUNTER( I2C_ERRORS_XIIC_PS_MASTER_SEND_POLLED_FAILED )
@@ -595,12 +594,12 @@ int iI2C_Recv( uint8_t ucDeviceId,
         ( NULL != pucDataBuff ) &&
         ( ucDeviceId < I2C_NUM_INSTANCES ) )
     {
-        I2C_PROFILE *pxIicProfile      = &( pxThis->xIicProfile[ ucDeviceId ] );
-        XIicPs      *pxIicInstance     = &( pxThis->xIicProfile[ ucDeviceId ].xIicInstance );
-        int         iI2cStatus         = XST_FAILURE;
-        int         iWaitBusIdleStatus = ERROR;
-        int         iReInitStatus      = OK;
-        uint8_t     ucTryCount         = 0;
+        I2CProfile *pxIicProfile      = &pxThis->xIicProfile[ ucDeviceId ];
+        XIicPs     *pxIicInstance     = &pxThis->xIicProfile[ ucDeviceId ].xIicInstance;
+        int        iI2cStatus         = XST_FAILURE;
+        int        iWaitBusIdleStatus = ERROR;
+        int        iReInitStatus      = OK;
+        uint8_t    ucTryCount         = 0;
 
         while( ( ( XST_SUCCESS != iI2cStatus ) ||
                  ( OK != iWaitBusIdleStatus ) ||
@@ -650,7 +649,7 @@ int iI2C_Recv( uint8_t ucDeviceId,
                         }
                         else
                         {
-                            I2C_PROFILE *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
+                            I2CProfile *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
                             pxProfile->iI2cEnabled = FALSE;
                             PLL_ERR( I2C_NAME, "Error XIicPs_MasterRecvPolled( ) failed: %d\r\n", iI2cStatus );
                             INC_ERROR_COUNTER( I2C_ERRORS_XIIC_PS_MASTER_RECEIVE_POLLED_FAILED )
@@ -729,12 +728,12 @@ int iI2C_SendRecv( uint8_t ucDeviceId,
         ( NULL != pucReadDataBuff ) &&
         ( ucDeviceId < I2C_NUM_INSTANCES ) )
     {
-        I2C_PROFILE *pxIicProfile      = &( pxThis->xIicProfile[ ucDeviceId ] );
-        XIicPs      *pxIicInstance     = &( pxThis->xIicProfile[ ucDeviceId ].xIicInstance );
-        int         iI2cStatus         = XST_FAILURE;
-        int         iWaitBusIdleStatus = ERROR;
-        int         iReInitStatus      = OK;
-        uint8_t     ucTryCount         = 0;
+        I2CProfile *pxIicProfile      = &pxThis->xIicProfile[ ucDeviceId ];
+        XIicPs     *pxIicInstance     = &pxThis->xIicProfile[ ucDeviceId ].xIicInstance;
+        int        iI2cStatus         = XST_FAILURE;
+        int        iWaitBusIdleStatus = ERROR;
+        int        iReInitStatus      = OK;
+        uint8_t    ucTryCount         = 0;
 
         while( ( ( XST_SUCCESS != iI2cStatus ) ||
                  ( OK != iWaitBusIdleStatus ) ||
@@ -846,7 +845,7 @@ int iI2C_SendRecv( uint8_t ucDeviceId,
                                     }
                                     else
                                     {
-                                        I2C_PROFILE *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
+                                        I2CProfile *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
                                         pxProfile->iI2cEnabled = FALSE;
                                         PLL_ERR( I2C_NAME,
                                                  "Error XIicPs_MasterRecvPolled() failed: %d\r\n",
@@ -873,7 +872,7 @@ int iI2C_SendRecv( uint8_t ucDeviceId,
                             }
                             else
                             {
-                                I2C_PROFILE *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
+                                I2CProfile *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
                                 pxProfile->iI2cEnabled = FALSE;
                                 PLL_ERR( I2C_NAME, "Error XIicPs_MasterSendPolled() failed: %d\r\n", iI2cStatus );
                                 INC_ERROR_COUNTER( I2C_ERRORS_XIIC_PS_MASTER_SEND_POLLED_FAILED )
@@ -1008,7 +1007,7 @@ int iI2C_PrintLog( int iDevice )
     {
         int i = 0;
 
-        I2C_PROFILE *pxProfile = &pxThis->xIicProfile[ iDevice ];
+        I2CProfile *pxProfile = &pxThis->xIicProfile[ iDevice ];
         for( i = 0; i < I2C_LOG_DEPTH; i++ )
         {
             if( i == ( pxProfile->iLogIndex - 1 ) )
@@ -1101,7 +1100,7 @@ static void vLogI2cTransaction( uint8_t ucReadWrite,
     uint8_t  ucMaxStrBuff    = I2C_DEBUG_DATA_LOG_BUFF_MAX / I2C_DEBUG_CHAR_PER_VALUE;
     uint32_t ulIntrStatusReg = 0;
 
-    I2C_PROFILE *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
+    I2CProfile *pxProfile = &pxThis->xIicProfile[ ucDeviceId ];
 
     if( TRUE == pxProfile->iI2cEnabled )
     {
@@ -1204,8 +1203,8 @@ static int iWaitForBusIdle( uint8_t ucDeviceId )
         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
-        I2C_PROFILE *pxIicProfile  = &( pxThis->xIicProfile[ ucDeviceId ] );
-        XIicPs      *pxIicInstance = &( pxThis->xIicProfile[ ucDeviceId ].xIicInstance );
+        I2CProfile *pxIicProfile  = &pxThis->xIicProfile[ ucDeviceId ];
+        XIicPs     *pxIicInstance = &pxThis->xIicProfile[ ucDeviceId ].xIicInstance;
 
         /* Clear the flag before starting the timer */
         pxIicProfile->iAbortBusWait = FALSE;

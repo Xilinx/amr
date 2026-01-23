@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the state machine implementation
@@ -254,7 +254,7 @@ static void vSMBusSendNACK( SMBus_Instance* pxSMBusInstance )
  */
 static void vDefaultSMBusFSMSMBusStateInitial( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
+    SMBusProfile* pxTheProfile = NULL;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -473,7 +473,8 @@ static void vInstanceSwap( uint8_t* pucInstanceA, uint8_t* pucInstanceB )
  *
  * @return   None
  */
-static void vUDIDInstanceSort( SMBus_Profile* pxTheProfile, uint8_t pucInstanceIDArray[], uint8_t ucArraySize , uint8_t ucUDIDByteIndex )
+static void vUDIDInstanceSort( SMBusProfile* pxTheProfile, uint8_t pucInstanceIDArray[],
+    uint8_t ucArraySize , uint8_t ucUDIDByteIndex )
 {
     uint8_t ucOuterArrayElement = 0;
     uint8_t ucInnerArrayElement = 0;
@@ -511,7 +512,7 @@ static void vUDIDInstanceSort( SMBus_Profile* pxTheProfile, uint8_t pucInstanceI
 static void vDefaultSMBusFSMSMBusStateAwaitingCommandByte( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
     SMBus_Instance* pxMatchedInstance                       = NULL;
-    SMBus_Profile*  pxTheProfile                            = NULL;
+    SMBusProfile*  pxTheProfile                             = NULL;
     uint8_t         ucOKToACK                               = SMBUS_FALSE;
     int             i                                       = 0;
     int             j                                       = 0;
@@ -1041,7 +1042,7 @@ static void vDefaultSMBusFSMSMBusStateAwaitingCommandByte( SMBus_Instance* pxSMB
  */
 static void vDefaultSMBusFSMSMBusStateAwaitingRead( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
+    SMBusProfile* pxTheProfile  = NULL;
     uint8_t       ucCurrentFill = 0;
     int           i             = 0;
 
@@ -1155,7 +1156,7 @@ static void vDefaultSMBusFSMSMBusStateAwaitingRead( SMBus_Instance* pxSMBusInsta
  */
 static void vDefaultSMBusFSMSMBusStateReadyToSendByte( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile  = NULL;
+    SMBusProfile* pxTheProfile   = NULL;
     uint8_t        ucCurrentFill = 0;
     int            i             = 0;
 
@@ -1271,7 +1272,7 @@ static void vDefaultSMBusFSMSMBusStateReadyToSendByte( SMBus_Instance* pxSMBusIn
  */
 static void vDefaultSMBusFSMSMBusStateCheckIfPECRequired( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
+    SMBusProfile* pxTheProfile = NULL;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -1387,10 +1388,10 @@ static void vDefaultSMBusFSMSMBusStateCheckIfPECRequired( SMBus_Instance* pxSMBu
  */
 static void vDefaultSMBusFSMSMBusStateAwaitingDone( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Instance* pMatched_Instance = NULL;
-    SMBus_Profile*  pxTheProfile      = NULL;
-    uint8_t              ucCurrentFill     = 0;
-    int                  i                 = 0;
+    SMBus_Instance* pMatched_Instance  = NULL;
+    SMBusProfile*  pxTheProfile        = NULL;
+    uint8_t              ucCurrentFill = 0;
+    int                  i             = 0;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -1800,7 +1801,7 @@ static void vDefaultSMBusFSMSMBusStateAwaitingDone( SMBus_Instance* pxSMBusInsta
  * @return   SMBUS_FALSE If no match is found
  *           SMBUS_TRUE  If a match is found
  */
-static uint8_t ucCheckAtLeastOneMatchFound( SMBus_Profile* pxSMBusProfile, SMBus_Instance* pxSMBusInstance )
+static uint8_t ucCheckAtLeastOneMatchFound( SMBusProfile* pxSMBusProfile, SMBus_Instance* pxSMBusInstance )
 {
     uint8_t ucAtLeastOneMatchFound = SMBUS_FALSE;
     int     i                      = 0;
@@ -1848,7 +1849,7 @@ static uint8_t ucCheckAtLeastOneMatchFound( SMBus_Profile* pxSMBusProfile, SMBus
  */
 static void vDefaultSMBusFSMSMBusStateAwaitingData( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile    = NULL;
+    SMBusProfile* pxTheProfile     = NULL;
     uint8_t        ucNoStatusCheck = SMBUS_TRUE;
     uint8_t        ucCurrentFill   = 0;
     int            i               = 0;
@@ -2177,7 +2178,7 @@ static void vDefaultSMBusFSMSMBusStateAwaitingData( SMBus_Instance* pxSMBusInsta
  */
 static void vDefaultSMBusFSMSMBusStateAwaitingBlockSize( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
+    SMBusProfile* pxTheProfile = NULL;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -2314,7 +2315,7 @@ static void vDefaultSMBusFSMSMBusStateAwaitingBlockSize( SMBus_Instance* pxSMBus
  */
 static void vDefaultSMBusFSMSMBusStateControllerSendCommand( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
+    SMBusProfile* pxTheProfile = NULL;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -2434,7 +2435,7 @@ static void vDefaultSMBusFSMSMBusStateControllerSendCommand( SMBus_Instance* pxS
  */
 static void vDefaultSMBusFSMSMBusStateControllerWriteByte( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile    = NULL;
+    SMBusProfile* pxTheProfile     = NULL;
     uint8_t        ucNoStatusCheck = SMBUS_TRUE;
     uint8_t        ucCurrentFill   = 0;
     int            i               = 0;
@@ -2691,8 +2692,8 @@ static void vDefaultSMBusFSMSMBusStateControllerWriteByte( SMBus_Instance* pxSMB
   */
 static void vDefaultSMBusFSMSMBusStateControllerSendReadStart( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
-    int            i            = 0;
+    SMBusProfile* pxTheProfile = NULL;
+    int            i           = 0;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -2895,7 +2896,7 @@ static void vDefaultSMBusFSMSMBusStateControllerSendReadStart( SMBus_Instance* p
  */
 static void vDefaultSMBusFSMSMBusStateControllerReadBlockSize( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
+    SMBusProfile* pxTheProfile = NULL;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -3031,7 +3032,7 @@ static void vDefaultSMBusFSMSMBusStateControllerReadBlockSize( SMBus_Instance* p
   */
 static void vDefaultSMBusFSMSMBusStateControllerReadByte( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile    = NULL;
+    SMBusProfile* pxTheProfile     = NULL;
     int            i               = 0;
     uint8_t        ucCurrentFill   = 0;
     uint8_t        ucNoStatusCheck = SMBUS_TRUE;
@@ -3259,7 +3260,7 @@ static void vDefaultSMBusFSMSMBusStateControllerReadByte( SMBus_Instance* pxSMBu
  */
 static void vDefaultSMBusFSMSMBusStateControllerReadPEC( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile = NULL;
+    SMBusProfile* pxTheProfile = NULL;
 
     if ( NULL != pxSMBusInstance )
     {
@@ -3346,10 +3347,10 @@ static void vDefaultSMBusFSMSMBusStateControllerReadPEC( SMBus_Instance* pxSMBus
  */
 static void vDefaultSMBusFSMSMBusStateControllerReadDone( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent )
 {
-    SMBus_Profile* pxTheProfile         = NULL;
-    uint8_t             ucNoStatusCheck = SMBUS_TRUE;
-    uint8_t             ucCurrentFill   = 0;
-    int                 i               = 0;
+    SMBusProfile* pxTheProfile    = NULL;
+    uint8_t       ucNoStatusCheck = SMBUS_TRUE;
+    uint8_t       ucCurrentFill   = 0;
+    int           i               = 0;
 
     if ( NULL != pxSMBusInstance )
     {

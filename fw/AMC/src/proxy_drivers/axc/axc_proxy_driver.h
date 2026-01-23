@@ -1,18 +1,14 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the API for the AVED EXternal Device Control (AXC) proxy driver
+ * This file contains the API for the AMR EXternal Device Control (AXC) proxy driver
  *
  * @file axc_proxy_driver.h
  */
 
 #ifndef _AXC_PROXY_DRIVER_H_
 #define _AXC_PROXY_DRIVER_H_
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 #include "evl.h"
@@ -30,7 +26,7 @@
  * @enum    AXC_PROXY_DRIVER_EVENTS
  * @brief   Events raised by this proxy driver
  */
-typedef enum AXC_PROXY_DRIVER_EVENTS
+typedef enum
 {
     AXC_PROXY_DRIVER_E_QSFP_PRESENT  = 0x00,
     AXC_PROXY_DRIVER_E_QSFP_NOT_PRESENT,
@@ -43,7 +39,7 @@ typedef enum AXC_PROXY_DRIVER_EVENTS
  * @enum    AXC_PROXY_DRIVER_QSFP_IO
  * @brief   IO control lines of a QSFP module
  */
-typedef enum AXC_PROXY_DRIVER_QSFP_IO
+typedef enum
 {
     AXC_PROXY_DRIVER_QSFP_IO_MODSEL = 0,
     AXC_PROXY_DRIVER_QSFP_IO_RESET,
@@ -61,21 +57,21 @@ typedef enum AXC_PROXY_DRIVER_QSFP_IO
 /******************************************************************************/
 
 /**
- * @struct  AXC_PROXY_DRIVER_PAGE_DATA
+ * @struct  AXCProxyDriverPageData
  * @brief   Structure to hold device memory map data
  */
-typedef struct AXC_PROXY_DRIVER_PAGE_DATA
+typedef struct
 {
     uint8_t     pucPageData[ AXC_UPPER_PAGE_SIZE ];
     uint32_t    ulPageDataSize;
 
-} AXC_PROXY_DRIVER_PAGE_DATA;
+} AXCProxyDriverPageData;
 
 /**
- * @struct  AXC_PROXY_DRIVER_QSFP_IO_STATUSES
+ * @struct  AXCProxyDriverQsfpIoStatuses
  * @brief   Structure to hold QSFP IO statuses
  */
-typedef struct AXC_PROXY_DRIVER_QSFP_IO_STATUSES
+typedef struct
 {
     uint8_t    ucModSel;
     uint8_t    ucReset;
@@ -83,18 +79,18 @@ typedef struct AXC_PROXY_DRIVER_QSFP_IO_STATUSES
     uint8_t    ucModPrs;
     uint8_t    ucInterrupt;
 
-} AXC_PROXY_DRIVER_QSFP_IO_STATUSES;
+} AXCProxyDriverQsfpIoStatuses;
 
 /**
- * @struct  AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG
+ * @struct  AXCProxyDriverExternalDeviceCfg
  * @brief   Structure to hold unique ID for each External Device
  */
-typedef struct AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG
+typedef struct
 {
-    FW_IF_CFG   *pxExDevIf;
-    uint8_t     ucExDeviceId;
+    FWIfCfg   *pxExDevIf;
+    uint8_t   ucExDeviceId;
 
-} AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG;
+} AXCProxyDriverExternalDeviceCfg;
 
 
 /******************************************************************************/
@@ -125,9 +121,8 @@ int iAXC_Initialise( uint8_t ucProxyId, uint32_t ulTaskPrio, uint32_t ulTaskStac
  *
  * @return  OK               Callback successfully bound
  *          ERROR            Callback not bound
- *
  */
-int iAXC_AddExternalDevice( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExDeviceCfg );
+int iAXC_AddExternalDevice( AXCProxyDriverExternalDeviceCfg *pxExDeviceCfg );
 
 /**
  * @brief   Bind into this proxy driver
@@ -136,7 +131,6 @@ int iAXC_AddExternalDevice( AXC_PROXY_DRIVER_EXTERNAL_DEVICE_CONFIG *pxExDeviceC
  *
  * @return  OK          Callback successfully bound
  *          ERROR       Callback not bound
- *
  */
 int iAXC_BindCallback( EVL_CALLBACK *pxCallback );
 
@@ -159,7 +153,6 @@ int iAXC_BindCallback( EVL_CALLBACK *pxCallback );
  *
  *          Byte offset range 127-255 will write a byte value to the upper page.
  *          Use ulPage to specify which upper-page to be used.
- *
  */
 int iAXC_SetByte( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset, uint8_t ucValue );
 
@@ -197,7 +190,7 @@ int iAXC_GetByte( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset, 
  *
  * @note    This API will return the specified upper page from QSFP memory map
  */
-int iAXC_GetPage( uint8_t ucExDeviceId, uint32_t ulPage, AXC_PROXY_DRIVER_PAGE_DATA *pxData );
+int iAXC_GetPage( uint8_t ucExDeviceId, uint32_t ulPage, AXCProxyDriverPageData *pxData );
 
 /**
  * @brief   Read single status from QSFP IO Expander
@@ -208,7 +201,6 @@ int iAXC_GetPage( uint8_t ucExDeviceId, uint32_t ulPage, AXC_PROXY_DRIVER_PAGE_D
  *
  * @return  OK              Data retrieved from proxy driver successfully
  *          ERROR           Data not retrieved successfully
- *
  */
 int iAXC_GetSingleIoStatus( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO xIoControlLine, uint8_t *pucIoStatus );
 
@@ -220,9 +212,8 @@ int iAXC_GetSingleIoStatus( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO xIoCo
  *
  * @return  OK              Data retrieved from proxy driver successfully
  *          ERROR           Data not retrieved successfully
- *
  */
-int iAXC_GetAllIoStatuses( uint8_t ucExDeviceId, AXC_PROXY_DRIVER_QSFP_IO_STATUSES *pxIoStatuses );
+int iAXC_GetAllIoStatuses( uint8_t ucExDeviceId, AXCProxyDriverQsfpIoStatuses *pxIoStatuses );
 
 /**
  * @brief   Read real-time temperature value from desired External Device memory map
@@ -254,7 +245,6 @@ int iAXC_GetState( MODULE_STATE *pxState );
  *
  * @return  OK          Stats retrieved from proxy driver successfully
  *          ERROR       Stats not retrieved successfully
- *
  */
 int iAXC_PrintStatistics( void );
 
@@ -263,7 +253,6 @@ int iAXC_PrintStatistics( void );
  *
  * @return  OK          Stats cleared successfully
  *          ERROR       Stats not cleared successfully
- *
  */
 int iAXC_ClearStatistics( void );
 
@@ -272,7 +261,6 @@ int iAXC_ClearStatistics( void );
  *
  * @return  OK          Provided values are valid
  *          ERROR       Device does not exist or values are invalid
- *
  */
 int iAXC_ValidateRequest( uint8_t ucExDeviceId, uint32_t ulPage, uint32_t ulByteOffset );
 

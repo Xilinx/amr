@@ -1,16 +1,11 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF UART AMC abstraction.
  *
  * @file fw_if_uart_amc.c
  */
-
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -32,11 +27,8 @@
 #define FW_IF_UART_NAME             "FW_IF_UART"
 #define BUFFER_SIZE                 ( 64 )
 
-#define UART_UPPER_FIREWALL         ( 0xBEEFCAFE )
-#define UART_LOWER_FIREWALL         ( 0xDEADFACE )
-
 #define CHECK_DRIVER                if( FW_IF_FALSE == pxThis->iInitialised ) { INC_ERROR_COUNTER( FW_IF_UART_ERRORS_DRIVER_NOT_INITIALISED_COUNT ); return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
-#define CHECK_FIREWALLS( f )        if( ( f->upperFirewall != UART_UPPER_FIREWALL ) && ( f->lowerFirewall != UART_LOWER_FIREWALL ) ) { INC_ERROR_COUNTER( FW_IF_UART_ERRORS_INVALID_HANDLE_COUNT ); return FW_IF_ERRORS_INVALID_HANDLE; }
+#define CHECK_FIREWALLS( f )        if( ( f->upperFirewall != UPPER_FIREWALL ) && ( f->lowerFirewall != LOWER_FIREWALL ) ) { INC_ERROR_COUNTER( FW_IF_UART_ERRORS_INVALID_HANDLE_COUNT ); return FW_IF_ERRORS_INVALID_HANDLE; }
 #define CHECK_HDL( f )              if( NULL == f ) { INC_ERROR_COUNTER( FW_IF_UART_ERRORS_INVALID_HANDLE_COUNT ); return FW_IF_ERRORS_INVALID_HANDLE; }
 #define CHECK_CFG( f )              if( NULL == ( f )->cfg ) { INC_ERROR_COUNTER( FW_IF_UART_ERRORS_INVALID_CFG_COUNT ); return FW_IF_ERRORS_INVALID_CFG; }
 
@@ -59,25 +51,25 @@
     DO( FW_IF_UART_STATS_WRITE_COUNT )                  \
     DO( FW_IF_UART_STATS_MAX_COUNT )
 
-#define FW_IF_UART_ERROR_COUNTS( DO )                       \
-    DO( FW_IF_UART_ERRORS_PARAMS_COUNT )                    \
-    DO( FW_IF_UART_ERRORS_DRIVER_NOT_INITIALISED_COUNT )    \
-    DO( FW_IF_UART_ERRORS_DRIVER_FAILURE_COUNT )            \
-    DO( FW_IF_UART_ERRORS_INVALID_CFG_COUNT )               \
-    DO( FW_IF_UART_ERRORS_INVALID_HANDLE_COUNT )            \
-    DO( FW_IF_UART_ERRORS_VALIDATION_FAILED_COUNT )         \
-    DO( FW_IF_UART_ERRORS_INVALID_STATE_COUNT )             \
+#define FW_IF_UART_ERROR_COUNTS( DO )                    \
+    DO( FW_IF_UART_ERRORS_PARAMS_COUNT )                 \
+    DO( FW_IF_UART_ERRORS_DRIVER_NOT_INITIALISED_COUNT ) \
+    DO( FW_IF_UART_ERRORS_DRIVER_FAILURE_COUNT )         \
+    DO( FW_IF_UART_ERRORS_INVALID_CFG_COUNT )            \
+    DO( FW_IF_UART_ERRORS_INVALID_HANDLE_COUNT )         \
+    DO( FW_IF_UART_ERRORS_VALIDATION_FAILED_COUNT )      \
+    DO( FW_IF_UART_ERRORS_INVALID_STATE_COUNT )          \
     DO( FW_IF_UART_ERRORS_MAX_COUNT )
 
-#define PRINT_STAT_COUNTER( x )             PLL_INF( FW_IF_UART_NAME, "%50s . . . . %d\r\n",    \
-                                                     FW_IF_UART_STAT_COUNTS_STR[ x ],           \
-                                                     pxThis->pulStatCounters[ x ] )
-#define PRINT_ERROR_COUNTER( x )            PLL_INF( FW_IF_UART_NAME, "%50s . . . . %d\r\n",    \
-                                                     FW_IF_UART_ERROR_COUNTS_STR[ x ],          \
-                                                     pxThis->pulErrorCounters[ x ] )
+#define PRINT_STAT_COUNTER( x )   PLL_INF( FW_IF_UART_NAME, "%50s . . . . %d\r\n",    \
+                                           FW_IF_UART_STAT_COUNTS_STR[ x ],           \
+                                           pxThis->pulStatCounters[ x ] )
+#define PRINT_ERROR_COUNTER( x )  PLL_INF( FW_IF_UART_NAME, "%50s . . . . %d\r\n",    \
+                                           FW_IF_UART_ERROR_COUNTS_STR[ x ],          \
+                                           pxThis->pulErrorCounters[ x ] )
 
-#define INC_STAT_COUNTER( x )               { if( x < FW_IF_UART_STATS_MAX_COUNT )pxThis->pulStatCounters[ x ]++; }
-#define INC_ERROR_COUNTER( x )              { if( x < FW_IF_UART_ERRORS_MAX_COUNT )pxThis->pulErrorCounters[ x ]++; }
+#define INC_STAT_COUNTER( x )     { if( x < FW_IF_UART_STATS_MAX_COUNT )pxThis->pulStatCounters[ x ]++; }
+#define INC_ERROR_COUNTER( x )    { if( x < FW_IF_UART_ERRORS_MAX_COUNT )pxThis->pulErrorCounters[ x ]++; }
 
 
 /*****************************************************************************/
@@ -102,22 +94,22 @@ UTIL_MAKE_ENUM_AND_STRINGS( FW_IF_UART_ERROR_COUNTS, FW_IF_UART_ERROR_COUNTS, FW
 /******************************************************************************/
 
 /**
- * @struct  FW_IF_UART_PRIVATE_DATA
+ * @struct  FWIfUartPrivateData
  * @brief   Structure to hold this modules private data
  */
-typedef struct FW_IF_UART_PRIVATE_DATA
+typedef struct
 {
-    uint32_t                ulUpperFirewall;
+    uint32_t        ulUpperFirewall;
 
-    FW_IF_UART_INIT_CFG     xLocalCfg;
-    int                     iInitialised;
+    FWIfUartInitCfg xLocalCfg;
+    int             iInitialised;
 
-    uint32_t                pulStatCounters[ FW_IF_UART_STATS_MAX_COUNT ];
-    uint32_t                pulErrorCounters[ FW_IF_UART_ERRORS_MAX_COUNT ];
+    uint32_t        pulStatCounters[ FW_IF_UART_STATS_MAX_COUNT ];
+    uint32_t        pulErrorCounters[ FW_IF_UART_ERRORS_MAX_COUNT ];
 
-    uint32_t                ulLowerFirewall;
+    uint32_t        ulLowerFirewall;
 
-} FW_IF_UART_PRIVATE_DATA;
+} FWIfUartPrivateData;
 
 
 /*****************************************************************************/
@@ -129,19 +121,20 @@ static const char* const pcUartStateModeStr[ ] = { FW_IF_UART_STATE_ENTRY( INIT 
                                                    FW_IF_UART_STATE_ENTRY( CLOSED ),
                                                    FW_IF_UART_STATE_ENTRY( ERROR ) };
 
-static FW_IF_UART_PRIVATE_DATA xLocalData =
+static FWIfUartPrivateData xLocalData =
 {
-    UART_UPPER_FIREWALL,    /* ulUpperFirewall */
+    UPPER_FIREWALL, /* ulUpperFirewall */
 
-    { 0 },                  /* xLocalCfg */
-    FW_IF_FALSE,            /* iInitialised */
+    { 0 },          /* xLocalCfg */
+    FW_IF_FALSE,    /* iInitialised */
 
-    { 0 },                  /* pulStatCounters */
-    { 0 },                  /* pulErrorCounters */
+    { 0 },          /* pulStatCounters */
+    { 0 },          /* pulErrorCounters */
 
-    UART_LOWER_FIREWALL     /* ulLowerFirewall */
+    LOWER_FIREWALL  /* ulLowerFirewall */
 };
-static FW_IF_UART_PRIVATE_DATA *pxThis = &xLocalData;
+
+static FWIfUartPrivateData *pxThis = &xLocalData;
 
 XUartPsv xUartInstance = { 0 };
 XUartPsv_Config *pxUartCfg = { 0 };
@@ -263,13 +256,13 @@ static uint32_t ulFW_IF_UART_Open( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
+    FWIfUartCfg *pxThisUartCfg = ( FWIfUartCfg* )pxThisIf->cfg;
 
     switch( pxThisUartCfg->xState )
     {
@@ -299,13 +292,13 @@ static uint32_t ulFW_IF_UART_Close( void *pvFwIf )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
+    FWIfUartCfg *pxThisUartCfg = ( FWIfUartCfg* )pxThisIf->cfg;
 
     switch( pxThisUartCfg->xState )
     {
@@ -336,13 +329,13 @@ static uint32_t ulFW_IF_UART_Write( void *pvFwIf, uint64_t ullDstPort, uint8_t *
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
     uint32_t ulBytesWritten = 0;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
+    FWIfUartCfg *pxThisUartCfg = ( FWIfUartCfg* )pxThisIf->cfg;
 
     if( ( NULL != pucData ) )
     {
@@ -387,13 +380,13 @@ static uint32_t ulFW_IF_UART_Read( void *pvFwIf, uint64_t ullSrcPort, uint8_t *p
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
     uint32_t ulReadData = FW_IF_FALSE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
+    FWIfUartCfg *pxThisUartCfg = ( FWIfUartCfg* )pxThisIf->cfg;
     if( ( NULL != pucData ) && ( NULL != pulLength ) )
     {
         if( FW_IF_UART_STATE_OPENED == pxThisUartCfg->xState )
@@ -444,13 +437,13 @@ static uint32_t ulFW_IF_UART_Ioctrl( void *pvFwIf, uint32_t ulOption, void *pvVa
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
+    FWIfUartCfg *pxThisUartCfg = ( FWIfUartCfg* )pxThisIf->cfg;
 
     switch( ulOption )
     {
@@ -484,7 +477,7 @@ static uint32_t ulFW_IF_UART_BindCallback( void *pvFwIf, FW_IF_callback *pxNewFu
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
 
-    FW_IF_CFG *pxThisIf = ( FW_IF_CFG* )pvFwIf;
+    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     CHECK_HDL( pxThisIf );
     CHECK_CFG( pxThisIf );
     CHECK_FIREWALLS( pxThisIf );
@@ -492,7 +485,7 @@ static uint32_t ulFW_IF_UART_BindCallback( void *pvFwIf, FW_IF_callback *pxNewFu
 
     if( NULL != pxNewFunc )
     {
-        FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxThisIf->cfg;
+        FWIfUartCfg *pxThisUartCfg = ( FWIfUartCfg* )pxThisIf->cfg;
 
         pxThisIf->raiseEvent = pxNewFunc;
 
@@ -588,13 +581,13 @@ static uint32_t ulUART_PollRead( uint64_t ullSrcPort, uint8_t *pucData, uint32_t
 /**
  * @brief   Initialisation function for UART interfaces (generic across all UART unterfaces)
  */
-uint32_t ulFW_IF_UART_Init( FW_IF_UART_INIT_CFG *pxInitCfg )
+uint32_t ulFW_IF_UART_Init( FWIfUartInitCfg *pxInitCfg )
 {
     uint32_t ulStatus = FW_IF_UART_ERRORS_DRIVER_FAILURE;
     pxUartCfg = &xUartInstance.Config;
 
-    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
         ( FW_IF_FALSE == pxThis->iInitialised ) )
     {
         ulStatus = FW_IF_ERRORS_NONE;
@@ -605,7 +598,7 @@ uint32_t ulFW_IF_UART_Init( FW_IF_UART_INIT_CFG *pxInitCfg )
         }
         else if ( NULL != pxInitCfg )
         {
-            pvOSAL_MemCpy( &pxThis->xLocalCfg, pxInitCfg, sizeof( FW_IF_UART_INIT_CFG ) );
+            pvOSAL_MemCpy( &pxThis->xLocalCfg, pxInitCfg, sizeof(FWIfUartInitCfg) );
 
             pxUartCfg = XUartPsv_LookupConfig( pxThis->xLocalCfg.ucUartDeviceId );
 
@@ -644,7 +637,7 @@ uint32_t ulFW_IF_UART_Init( FW_IF_UART_INIT_CFG *pxInitCfg )
 /**
  * @brief   Creates an instance of the UART interface
 */
-uint32_t ulFW_IF_UART_Create( FW_IF_CFG *pxFwIf, FW_IF_UART_CFG *pxUartCfg )
+uint32_t ulFW_IF_UART_Create( FWIfCfg *pxFwIf, FWIfUartCfg *pxUartCfg )
 {
     uint32_t ulStatus = FW_IF_ERRORS_NONE;
     uint32_t ulBaudRate = 0;
@@ -654,14 +647,14 @@ uint32_t ulFW_IF_UART_Create( FW_IF_CFG *pxFwIf, FW_IF_UART_CFG *pxUartCfg )
 
     CHECK_DRIVER;
 
-    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         if( ( NULL != pxFwIf ) && ( NULL != pxUartCfg ) )
         {
-            FW_IF_CFG xLocalIf =
+            FWIfCfg xLocalIf =
             {
-                .upperFirewall  = UART_UPPER_FIREWALL,
+                .upperFirewall  = UPPER_FIREWALL,
                 .open           = &ulFW_IF_UART_Open,
                 .close          = &ulFW_IF_UART_Close,
                 .write          = &ulFW_IF_UART_Write,
@@ -669,12 +662,12 @@ uint32_t ulFW_IF_UART_Create( FW_IF_CFG *pxFwIf, FW_IF_UART_CFG *pxUartCfg )
                 .ioctrl         = &ulFW_IF_UART_Ioctrl,
                 .bindCallback   = &ulFW_IF_UART_BindCallback,
                 .cfg            = ( void* )pxUartCfg,
-                .lowerFirewall  = UART_LOWER_FIREWALL
+                .lowerFirewall  = LOWER_FIREWALL
             };
 
-            pvOSAL_MemCpy( pxFwIf, &xLocalIf, sizeof( FW_IF_CFG ) );
+            pvOSAL_MemCpy( pxFwIf, &xLocalIf, sizeof( FWIfCfg ) );
 
-            FW_IF_UART_CFG *pxThisUartCfg = ( FW_IF_UART_CFG* )pxFwIf->cfg;
+            FWIfUartCfg *pxThisUartCfg = ( FWIfUartCfg* )pxFwIf->cfg;
 
             if( ( pxThisUartCfg->ulBaudRate < XUARTPSV_MIN_RATE ) || ( pxThisUartCfg->ulBaudRate > XUARTPSV_MAX_RATE ) )
             {
@@ -759,8 +752,8 @@ int iFW_IF_UART_PrintStatistics( void )
 
     CHECK_DRIVER;
 
-    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         int i = 0;
         PLL_INF( FW_IF_UART_NAME, "============================================================\r\n" );
@@ -795,8 +788,8 @@ int iFW_IF_UART_ClearStatistics( void )
 
     CHECK_DRIVER;
 
-    if( ( UART_UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( UART_LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
+    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
     {
         PLL_INF( FW_IF_UART_NAME, "Stats have been cleared.\r\n");
         pvOSAL_MemSet( pxThis->pulStatCounters, 0, sizeof( pxThis->pulStatCounters ) );

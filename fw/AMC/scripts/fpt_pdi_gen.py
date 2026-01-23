@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # E.g. Build PDI with FPT:
@@ -82,7 +82,7 @@ def do_fpt_pdi_generation(fpt_file, pdi_file, output_file_name):
 # Script main entry point
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Generate AVED FPT Setup PDI')
+        description='Generate AMR FPT Setup PDI')
     parser.add_argument('--fpt', dest='fpt_file', metavar=('fpt_file'),
                         help='Pass an FPT Binary file to be combined with PDI')
     parser.add_argument('--pdi', dest='pdi_file', metavar=('pdi_file'),

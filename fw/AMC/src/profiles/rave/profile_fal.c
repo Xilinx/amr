@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the fal profile for the Rave
@@ -48,45 +48,24 @@
 /*****************************************************************************/
 
 /* FAL objects */
-FW_IF_CFG xGcqIf =
-{
-    0
-};
-FW_IF_CFG xOspiIf =
-{
-    0
-};
-FW_IF_CFG xQsfpIf1 =
-{
-    0
-};
-FW_IF_CFG xQsfpIf2 =
-{
-    0
-};
-FW_IF_CFG xQsfpIf3 =
-{
-    0
-};
-FW_IF_CFG xQsfpIf4 =
-{
-    0
-};
-FW_IF_CFG xDimmIf =
-{
-    0
-};
+FWIfCfg xGcqIf   = { 0 };
+FWIfCfg xOspiIf  = { 0 };
+FWIfCfg xQsfpIf1 = { 0 };
+FWIfCfg xQsfpIf2 = { 0 };
+FWIfCfg xQsfpIf3 = { 0 };
+FWIfCfg xQsfpIf4 = { 0 };
+FWIfCfg xDimmIf  = { 0 };
 
 
-FW_IF_CFG *pxEmmcIf  = NULL;
-FW_IF_CFG *pxOspiIf  = &xOspiIf;
-FW_IF_CFG *pxSMBusIf = NULL;
+FWIfCfg *pxEmmcIf  = NULL;
+FWIfCfg *pxOspiIf  = &xOspiIf;
+FWIfCfg *pxSMBusIf = NULL;
 
 /*****************************************************************************/
 /* Local variables                                                           */
 /*****************************************************************************/
 
-static FW_IF_GCQCfg xGcqCfg =
+static FWIfGCQCfg xGcqCfg =
 {
     ( uint64_t )HAL_GCQ_SHARED_BASEADDR,
     FW_IF_GCQ_MODE_PRODUCER,
@@ -97,12 +76,12 @@ static FW_IF_GCQCfg xGcqCfg =
     ""
 };
 
-static FW_IF_GCQInitCfg myGcqIf =
+static FWIfGCQInitCfg myGcqIf =
 {
     NULL
 };
 
-static FW_IF_OSPI_CFG xOspiCfg =
+static FWIfOspiCfg xOspiCfg =
 {
     HAL_OSPI_RPU_BASE_ADDR,
     HAL_OSPI_RPU_LENGTH,
@@ -110,7 +89,7 @@ static FW_IF_OSPI_CFG xOspiCfg =
     FW_IF_OSPI_STATE_INIT
 };
 
-static FW_IF_OSPI_INIT_CFG myOspiIf =
+static FWIfOspiInitCfg myOspiIf =
 {
     HAL_OSPI_0_DEVICE_ID,
     HAL_OSPI_PAGE_SIZE

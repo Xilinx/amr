@@ -2,7 +2,7 @@
  * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the AVED Programming Control (APC) debug implementation
+ * This file contains the AMR Programming Control (APC) debug implementation
  *
  * @file apc_proxy_driver_debug.c
  */
@@ -114,7 +114,7 @@ static void vGetFptHeader( void );
  *          ERROR if an error was raised in the callback
  *
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal );
+static int iTestCallback( EVLSignal *pxSignal );
 
 
 /******************************************************************************/
@@ -244,7 +244,7 @@ static void vSetDownloadImage( void )
 
     else
     {
-        EVL_SIGNAL xSignal = { 0 };
+        EVLSignal xSignal = { 0 };
         xSignal.ucInstance = iInstance;
 
         if( OK != iAPC_DownloadImage( &xSignal, ( APC_BOOT_DEVICES )xBootDevice, iPartition, ulSrcAddr, ( uint32_t )iImageSize,
@@ -303,7 +303,7 @@ static void vSetCopyImage( void )
     }
     else
     {
-        EVL_SIGNAL xSignal = { 0 };
+        EVLSignal xSignal  = { 0 };
         xSignal.ucInstance = iInstance;
 
         if( OK != iAPC_CopyImage( &xSignal, ( APC_BOOT_DEVICES )xSrcBootDevice, iSrcPartition, ( APC_BOOT_DEVICES )xDestBootDevice, iDestPartition, ulSrcAddr, ( uint32_t )iImageSize ) )
@@ -335,7 +335,7 @@ static void vSetNextPartition( void )
     }
     else
     {
-        EVL_SIGNAL xSignal = { 0 };
+        EVLSignal xSignal  = { 0 };
         xSignal.ucInstance = iInstance;
 
         if( OK != iAPC_SetNextPartition( &xSignal, iPartition ) )
@@ -362,7 +362,7 @@ static void vSetEnableHotReset( void )
     }
     else
     {
-        EVL_SIGNAL xSignal = { 0 };
+        EVLSignal xSignal  = { 0 };
         xSignal.ucInstance = iInstance;
 
         if( OK != iAPC_EnableHotReset( &xSignal ) )
@@ -452,7 +452,7 @@ static void vGetFptPartition( void )
 /**
  * @brief   EVL Callback for binding test prints
  */
-static int iTestCallback( EVL_SIGNAL *pxSignal )
+static int iTestCallback( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 

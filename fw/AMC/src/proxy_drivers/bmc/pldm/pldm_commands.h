@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains PLDM functions for processing specific message types
@@ -9,11 +9,6 @@
 
 #ifndef PLDM_COMMANDS_H_
 #define PLDM_COMMANDS_H_
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "pldm.h"
 #include "standard.h"

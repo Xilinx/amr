@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the implementation for the Board Management Controller (BMC) proxy driver
  *
  * @file bmc_proxy_driver.c
  */
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include <string.h>
 #include "util.h"
@@ -28,49 +24,46 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define UPPER_FIREWALL ( 0xBABECAFE )
-#define LOWER_FIREWALL ( 0xDEADFACE )
-
 #define BMC_TASK_SLEEP_MS               ( 10 )
 #define MAX_RX_DATA_SIZE                ( 256 )
 #define BMC_TERMINUS_LOCATOR_VALUE_SIZE ( 17 )
 #define BMC_TERMINUS_INSTANCE_1         ( 1 )
 
 /* Stat & Error definitions */
-#define BMC_PROXY_STATS( DO )                       \
-        DO( BMC_PROXY_STATS_INIT_OVERALL_COMPLETE ) \
-        DO( BMC_PROXY_STATS_CREATE_MUTEX )          \
-        DO( BMC_PROXY_STATS_CREATE_SEMAPHORE )      \
-        DO( BMC_PROXY_STATS_PEND_SEMAPHORE )        \
-        DO( BMC_PROXY_STATS_POST_SEMAPHORE )        \
-        DO( BMC_PROXY_STATS_TAKE_MUTEX )            \
-        DO( BMC_PROXY_STATS_RELEASE_MUTEX )         \
-        DO( BMC_PROXY_STATS_TASK_TIME_MS )          \
-        DO( BMC_PROXY_STATS_STATUS_RETRIEVAL )      \
-        DO( BMC_PROXY_STATS_GET_SENSOR_ID_REQUEST ) \
-        DO( BMC_PROXY_STATS_MAX )
+#define BMC_PROXY_STATS( DO )                   \
+    DO( BMC_PROXY_STATS_INIT_OVERALL_COMPLETE ) \
+    DO( BMC_PROXY_STATS_CREATE_MUTEX )          \
+    DO( BMC_PROXY_STATS_CREATE_SEMAPHORE )      \
+    DO( BMC_PROXY_STATS_PEND_SEMAPHORE )        \
+    DO( BMC_PROXY_STATS_POST_SEMAPHORE )        \
+    DO( BMC_PROXY_STATS_TAKE_MUTEX )            \
+    DO( BMC_PROXY_STATS_RELEASE_MUTEX )         \
+    DO( BMC_PROXY_STATS_TASK_TIME_MS )          \
+    DO( BMC_PROXY_STATS_STATUS_RETRIEVAL )      \
+    DO( BMC_PROXY_STATS_GET_SENSOR_ID_REQUEST ) \
+    DO( BMC_PROXY_STATS_MAX )
 
-#define BMC_PROXY_ERRORS( DO )                        \
-        DO( BMC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )   \
-        DO( BMC_PROXY_ERRORS_MUTEX_TAKE_FAILED )      \
-        DO( BMC_PROXY_ERRORS_CREATE_SEMAPHORE )       \
-        DO( BMC_PROXY_ERRORS_PEND_SEMAPHORE )         \
-        DO( BMC_PROXY_ERRORS_POST_SEMAPHORE )         \
-        DO( BMC_PROXY_ERRORS_FW_IF_OPEN_FAILED )      \
-        DO( BMC_PROXY_ERRORS_FW_IF_READ_FAILED )      \
-        DO( BMC_PROXY_ERRORS_MEM_ALLOC_FAILED )       \
-        DO( BMC_PROXY_ERRORS_VALIDATION_FAILED )      \
-        DO( BMC_PROXY_INIT_MUTEX_CREATE_FAILED )      \
-        DO( BMC_PROXY_INIT_TASK_CREATE_FAILED )       \
-        DO( BMC_PROXY_VALIDATION_FAILED )             \
-        DO( BMC_PROXY_UNSUPPORTED_OPCODE_RX )         \
-        DO( BMC_PROXY_FW_IF_WRITE_FAILED )            \
-        DO( BMC_PROXY_BIND_CB_FAILED )                \
-        DO( BMC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED ) \
-        DO( BMC_PROXY_RAISE_EVENT_FAIL )              \
-        DO( BMC_UNEXPECTED_SENSOR_ID )                \
-        DO( BMC_UNEXPECTED_FLAG )                     \
-        DO( BMC_PROXY_ERRORS_MAX )
+#define BMC_PROXY_ERRORS( DO )                    \
+    DO( BMC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )   \
+    DO( BMC_PROXY_ERRORS_MUTEX_TAKE_FAILED )      \
+    DO( BMC_PROXY_ERRORS_CREATE_SEMAPHORE )       \
+    DO( BMC_PROXY_ERRORS_PEND_SEMAPHORE )         \
+    DO( BMC_PROXY_ERRORS_POST_SEMAPHORE )         \
+    DO( BMC_PROXY_ERRORS_FW_IF_OPEN_FAILED )      \
+    DO( BMC_PROXY_ERRORS_FW_IF_READ_FAILED )      \
+    DO( BMC_PROXY_ERRORS_MEM_ALLOC_FAILED )       \
+    DO( BMC_PROXY_ERRORS_VALIDATION_FAILED )      \
+    DO( BMC_PROXY_INIT_MUTEX_CREATE_FAILED )      \
+    DO( BMC_PROXY_INIT_TASK_CREATE_FAILED )       \
+    DO( BMC_PROXY_VALIDATION_FAILED )             \
+    DO( BMC_PROXY_UNSUPPORTED_OPCODE_RX )         \
+    DO( BMC_PROXY_FW_IF_WRITE_FAILED )            \
+    DO( BMC_PROXY_BIND_CB_FAILED )                \
+    DO( BMC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED ) \
+    DO( BMC_PROXY_RAISE_EVENT_FAIL )              \
+    DO( BMC_UNEXPECTED_SENSOR_ID )                \
+    DO( BMC_UNEXPECTED_FLAG )                     \
+    DO( BMC_PROXY_ERRORS_MAX )
 
 #define PRINT_STAT_COUNTER( x )  PLL_INF( BMC_NAME,                 \
                                           "%50s . . . . %d\r\n",    \
@@ -101,7 +94,7 @@
  * @enum    BMC_MSG_TYPES
  * @brief   Enumeration of mbox message types for this proxy
  */
-typedef enum BMC_MSG_TYPES
+typedef enum
 {
     MAX_BMC_MSG_TYPE = 0
 
@@ -111,7 +104,7 @@ typedef enum BMC_MSG_TYPES
  * @enum    BMC_CMD_OPCODE_REQ
  * @brief   Internal message opcode
  */
-typedef enum BMC_CMD_OPCODE_REQ
+typedef enum
 {
     BMC_CMD_OPCODE_MSG_ARRIVED_REQ = 0,
     MAX_BMC_CMD_OPCODE
@@ -122,7 +115,7 @@ typedef enum BMC_CMD_OPCODE_REQ
  * @enum    BMC_CMD_STATE
  * @brief   Internal command state
  */
-typedef enum BMC_CMD_STATE
+typedef enum
 {
     BMC_CMD_STATE_COMPLETED = 0,
     BMC_CMD_STATE_ABORTED,
@@ -151,61 +144,61 @@ UTIL_MAKE_ENUM_AND_STRINGS( BMC_PROXY_ERRORS, BMC_PROXY_ERRORS, BMC_PROXY_ERRORS
 /******************************************************************************/
 
 /**
- * @struct  BMC_PRIVATE_DATA
+ * @struct  BMCProxyDriverPrivateData
  * @brief   Structure to hold ths proxy driver's private data
  */
-typedef struct BMC_PRIVATE_DATA
+typedef struct
 {
-    uint32_t                     ulUpperFirewall;
+    uint32_t                 ulUpperFirewall;
 
-    int                          iInitialised;
-    uint8_t                      ucMyId;
+    int                      iInitialised;
+    uint8_t                  ucMyId;
 
-    FW_IF_CFG                    *pxFwIf;
-    uint32_t                     ulFwIfPort;
+    FWIfCfg                  *pxFwIf;
+    uint32_t                 ulFwIfPort;
 
-    EVL_RECORD                   *pxEvlRecord;
+    EVLRecord                *pxEvlRecord;
 
-    void                         *pvOsalMutexHdl;
-    void                         *pvOsalMBoxHdl;
-    void                         *pvOsalTaskHdl;
-    void                         *pvOsalSemHdl;
+    void                     *pvOsalMutexHdl;
+    void                     *pvOsalMBoxHdl;
+    void                     *pvOsalTaskHdl;
+    void                     *pvOsalSemHdl;
 
-    uint8_t                      pucRxData[ MAX_RX_DATA_SIZE ];
-    uint32_t                     ulRxDataSize;
-    uint8_t                      ucProcessRxData;
+    uint8_t                  pucRxData[ MAX_RX_DATA_SIZE ];
+    uint32_t                 ulRxDataSize;
+    uint8_t                  ucProcessRxData;
 
-    uint8_t                      ucAwaitingSensorData;
-    uint16_t                     usRequestedSensorId;
-    uint8_t                      ucRequestedSensorOperationalState;
-    uint8_t                      ucRequestedSensorEventMessageEnable;
-    uint8_t                      ucSetNumericSensorEnableResponse;
-    uint8_t                      ucGetNumericSensorResponse;
-    uint8_t                      ucGetNumericSensorState;
-    int16_t                      ssSensorInfo;
+    uint8_t                  ucAwaitingSensorData;
+    uint16_t                 usRequestedSensorId;
+    uint8_t                  ucRequestedSensorOperationalState;
+    uint8_t                  ucRequestedSensorEventMessageEnable;
+    uint8_t                  ucSetNumericSensorEnableResponse;
+    uint8_t                  ucGetNumericSensorResponse;
+    uint8_t                  ucGetNumericSensorState;
+    int16_t                  ssSensorInfo;
 
-    PLDM_NUMERIC_SENSOR_PDR      *pxPdrTemperatureSensors;
-    PLDM_NUMERIC_SENSOR_PDR      *pxPdrVoltageSensors;
-    PLDM_NUMERIC_SENSOR_PDR      *pxPdrCurrentSensors;
-    PLDM_NUMERIC_SENSOR_PDR      *pxPdrPowerSensors;
-    PLDM_NUMERIC_SENSOR_NAME_PDR *pxPdrSensorNames;
+    PLDMNumericSensorPdr     *pxPdrTemperatureSensors;
+    PLDMNumericSensorPdr     *pxPdrVoltageSensors;
+    PLDMNumericSensorPdr     *pxPdrCurrentSensors;
+    PLDMNumericSensorPdr     *pxPdrPowerSensors;
+    PLDMNumericSensorNamePdr *pxPdrSensorNames;
 
-    int                          iTotalPdrTemperature;
-    int                          iTotalPdrVoltage;
-    int                          iTotalPdrCurrent;
-    int                          iTotalPdrPower;
-    int                          iTotalPdrName;
+    int                      iTotalPdrTemperature;
+    int                      iTotalPdrVoltage;
+    int                      iTotalPdrCurrent;
+    int                      iTotalPdrPower;
+    int                      iTotalPdrName;
 
-    uint8_t                      pucUuid[ HAL_UUID_SIZE ];
+    uint8_t                  pucUuid[ HAL_UUID_SIZE ];
 
-    uint32_t                     pulStatCounters[ BMC_PROXY_STATS_MAX ];
-    uint32_t                     pulErrorCounters[ BMC_PROXY_ERRORS_MAX ];
+    uint32_t                 pulStatCounters[ BMC_PROXY_STATS_MAX ];
+    uint32_t                 pulErrorCounters[ BMC_PROXY_ERRORS_MAX ];
 
-    MODULE_STATE                 xState;
+    MODULE_STATE             xState;
 
-    uint32_t                     ulLowerFirewall;
+    uint32_t                 ulLowerFirewall;
 
-} BMC_PRIVATE_DATA;
+} BMCProxyDriverPrivateData;
 
 
 /******************************************************************************/
@@ -221,7 +214,7 @@ uint8_t RespBuffer[ MAX_BUFFER_SIZE ] =
     0
 };
 
-TerminusPDRFormat_UID xPdrTerminusLocator[ TOTAL_PDR_COUNT_TERMINUS ] =
+TerminusPDRFormatUid xPdrTerminusLocator[ TOTAL_PDR_COUNT_TERMINUS ] =
 {
     {
         .PLDMTerminusHandle               = PLDM_TERMINUS_HANDLE,
@@ -242,59 +235,59 @@ TerminusPDRFormat_UID xPdrTerminusLocator[ TOTAL_PDR_COUNT_TERMINUS ] =
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static BMC_PRIVATE_DATA xLocalData =
+static BMCProxyDriverPrivateData xLocalData =
 {
-    UPPER_FIREWALL,                                                            /* ulUpperFirewall */
-    FALSE,                                                                     /* iInitialised */
-    0,                                                                         /* ucMyId */
-    NULL,                                                                      /* pxFwIf */
-    0,                                                                         /* ulFwIfPort */
-    NULL,                                                                      /* pxEvlRecord */
-    NULL,                                                                      /* pvOsalMutexHdl */
-    NULL,                                                                      /* pvOsalMBoxHdl */
-    NULL,                                                                      /* pvOsalTaskHdl */
-    NULL,                                                                      /* pvOsalSemaphoreHdl */
+    UPPER_FIREWALL,             /* ulUpperFirewall */
+    FALSE,                      /* iInitialised */
+    0,                          /* ucMyId */
+    NULL,                       /* pxFwIf */
+    0,                          /* ulFwIfPort */
+    NULL,                       /* pxEvlRecord */
+    NULL,                       /* pvOsalMutexHdl */
+    NULL,                       /* pvOsalMBoxHdl */
+    NULL,                       /* pvOsalTaskHdl */
+    NULL,                       /* pvOsalSemaphoreHdl */
     {
         0
-    },                                                                         /* pucRxData */
-    0,                                                                         /* ulRxDataSize */
-    FALSE,                                                                     /* ucProcessRxData */
-    FALSE,                                                                     /* ucAwaitingSensorData */
-    0,                                                                         /* usRequestedSensorId */
-    0,                                                                         /* ucRequestedSensorOperationalState */
-    0,                                                                         /* ucRequestedSensorEventMessageEnable */
-    BMC_SENSOR_ENABLE_RESP_NONE,                                               /* ucSetNumericSensorEnableResponse */
-    BMC_GET_SENSOR_RESP_NONE,                                                  /* ucGetNumericSensorResponse */
-    0,                                                                         /* ucGetNumericSensorState */
-    0,                                                                         /* ssSensorInfo */
+    },                          /* pucRxData */
+    0,                          /* ulRxDataSize */
+    FALSE,                      /* ucProcessRxData */
+    FALSE,                      /* ucAwaitingSensorData */
+    0,                          /* usRequestedSensorId */
+    0,                          /* ucRequestedSensorOperationalState */
+    0,                          /* ucRequestedSensorEventMessageEnable */
+    BMC_SENSOR_ENABLE_RESP_NONE,/* ucSetNumericSensorEnableResponse */
+    BMC_GET_SENSOR_RESP_NONE,   /* ucGetNumericSensorResponse */
+    0,                          /* ucGetNumericSensorState */
+    0,                          /* ssSensorInfo */
 
-    NULL,                                                                      /* PLDM_NUMERIC_SENSOR_PDR *pxPdrTemperatureSensors */
-    NULL,                                                                      /* PLDM_NUMERIC_SENSOR_PDR *pxPdrVoltageSensors */
-    NULL,                                                                      /* PLDM_NUMERIC_SENSOR_PDR *pxPdrCurrentSensors */
-    NULL,                                                                      /* PLDM_NUMERIC_SENSOR_PDR *pxPdrPowerSensors */
-    NULL,                                                                      /* PLDM_NUMERIC_SENSOR_PDR *pxPdrSensorNames */
-    0,                                                                         /* int iTotalPdrTemperature */
-    0,                                                                         /* int iTotalPdrVoltage */
-    0,                                                                         /* int iTotalPdrCurrent */
-    0,                                                                         /* int iTotalPdrPower */
-    0,                                                                         /* int iTotalPdrName */
+    NULL,                       /* PLDMNumericSensorPdr *pxPdrTemperatureSensors */
+    NULL,                       /* PLDMNumericSensorPdr *pxPdrVoltageSensors */
+    NULL,                       /* PLDMNumericSensorPdr *pxPdrCurrentSensors */
+    NULL,                       /* PLDMNumericSensorPdr *pxPdrPowerSensors */
+    NULL,                       /* PLDMNumericSensorPdr *pxPdrSensorNames */
+    0,                          /* int iTotalPdrTemperature */
+    0,                          /* int iTotalPdrVoltage */
+    0,                          /* int iTotalPdrCurrent */
+    0,                          /* int iTotalPdrPower */
+    0,                          /* int iTotalPdrName */
 
     {
         0
-    },                                                                         /* pucUuid */
+    },                          /* pucUuid */
     {
         0
-    },                                                                         /* pulStatCounters */
+    },                          /* pulStatCounters */
     {
         0
-    },                                                                         /* pulErrorCounters */
-    MODULE_STATE_UNINITIALISED,                                                /* xState */
-    LOWER_FIREWALL                                                             /* ulLowerFirewall */
+    },                          /* pulErrorCounters */
+    MODULE_STATE_UNINITIALISED, /* xState */
+    LOWER_FIREWALL              /* ulLowerFirewall */
 };
 
-static BMC_PRIVATE_DATA *pxThis = &xLocalData;
+static BMCProxyDriverPrivateData *pxThis = &xLocalData;
 
-extern PDR_RepositoryInfo MSP432_PDR_Repository;
+extern PDRRepositoryInfo MSP432_PDR_Repository;
 
 /******************************************************************************/
 /* Local Function Declarations                                                */
@@ -409,9 +402,9 @@ void vEmulateReceivedMessage( uint8_t *pucData, uint16_t usDatasize );
  *
  * @return  OK or ERROR
  */
-static int iAllocateNumericSensorPDR( PLDM_NUMERIC_SENSOR_PDR *pxIncomingSensorPDR,
+static int iAllocateNumericSensorPDR( PLDMNumericSensorPdr *pxIncomingSensorPDR,
                                       int iTotalPdr,
-                                      PLDM_NUMERIC_SENSOR_PDR **ppxLocalSensorPDR,
+                                      PLDMNumericSensorPdr **ppxLocalSensorPDR,
                                       int *piLocalTotalPdr );
 
 /**
@@ -451,19 +444,19 @@ static int iCheckSensorValid( uint16_t usSensorId );
  * @brief   Main initialisation point for the BMC Proxy Driver
  */
 int iBMC_Initialise( uint8_t ucProxyId,
-                     FW_IF_CFG *pxFwIf,
+                     FWIfCfg *pxFwIf,
                      uint32_t ulFwIfPort,
                      uint32_t ulTaskPrio,
                      uint32_t ulTaskStack,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrTemperatureSensors,
+                     PLDMNumericSensorPdr *pxPdrTemperatureSensors,
                      int iTotalPdrTemperature,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrVoltageSensors,
+                     PLDMNumericSensorPdr *pxPdrVoltageSensors,
                      int iTotalPdrVoltage,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrCurrentSensors,
+                     PLDMNumericSensorPdr *pxPdrCurrentSensors,
                      int iTotalPdrCurrent,
-                     PLDM_NUMERIC_SENSOR_PDR *pxPdrPowerSensors,
+                     PLDMNumericSensorPdr *pxPdrPowerSensors,
                      int iTotalPdrPower,
-                     PLDM_NUMERIC_SENSOR_NAME_PDR *pxPdrSensorNames,
+                     PLDMNumericSensorNamePdr *pxPdrSensorNames,
                      int iTotalPdrName,
                      uint8_t *pucUuid )
 {
@@ -488,7 +481,7 @@ int iBMC_Initialise( uint8_t ucProxyId,
         /* initalise evl record*/
         if( OK != iEVL_CreateRecord( &pxThis->pxEvlRecord ) )
         {
-            PLL_ERR( BMC_NAME, "Error initialising EVL_RECORD\r\n" );
+            PLL_ERR( BMC_NAME, "Error initialising EVLRecord\r\n" );
             INC_ERROR_COUNTER_WITH_STATE( BMC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED );
         }
         else if( OSAL_ERRORS_NONE != iOSAL_Mutex_Create( &pxThis->pvOsalMutexHdl,
@@ -558,13 +551,13 @@ int iBMC_Initialise( uint8_t ucProxyId,
             {
                 /* Names PDR */
                 pxThis->pxPdrSensorNames =
-                    ( PLDM_NUMERIC_SENSOR_NAME_PDR * )pvOSAL_MemAlloc( sizeof ( PLDM_NUMERIC_SENSOR_NAME_PDR ) *
+                    ( PLDMNumericSensorNamePdr * )pvOSAL_MemAlloc( sizeof (PLDMNumericSensorNamePdr) *
                                                                        iTotalPdrName );
                 if( NULL != pxThis->pxPdrSensorNames )
                 {
                     pvOSAL_MemCpy( pxThis->pxPdrSensorNames,
                                    pxPdrSensorNames,
-                                   sizeof( PLDM_NUMERIC_SENSOR_NAME_PDR ) * iTotalPdrName );
+                                   sizeof(PLDMNumericSensorNamePdr) * iTotalPdrName );
                     pxThis->iTotalPdrName = iTotalPdrName;
                 }
                 else
@@ -638,7 +631,7 @@ int iBMC_BindCallback( EVL_CALLBACK *pxCallback )
 /**
  * @brief   Response to a Sensor Info request
  */
-int iBMC_SendResponseForGetSensor( EVL_SIGNAL *pxSignal,
+int iBMC_SendResponseForGetSensor( EVLSignal *pxSignal,
                                    uint16_t usSensorId,
                                    int16_t ssSensorInfo,
                                    uint8_t ucSensorState,
@@ -691,7 +684,7 @@ int iBMC_SendResponseForGetSensor( EVL_SIGNAL *pxSignal,
  * @brief   Response to an enable sensor request
  *
  */
-int iBMC_SetResponse( EVL_SIGNAL *pxSignal, uint16_t usSensorId, BMC_SENSOR_RESPONSE xBmcResponse )
+int iBMC_SetResponse( EVLSignal *pxSignal, uint16_t usSensorId, BMC_SENSOR_RESPONSE xBmcResponse )
 {
     int iStatus = ERROR;
 
@@ -788,7 +781,7 @@ int iBMC_ClearStatistics( void )
  *
  * @return  OK or ERROR
  */
-int iBMC_GetSensorIdRequest( EVL_SIGNAL *pxSignal, int16_t *pssSensorId, uint8_t *pucOperationalState )
+int iBMC_GetSensorIdRequest( EVLSignal *pxSignal, int16_t *pssSensorId, uint8_t *pucOperationalState )
 {
     int iStatus = ERROR;
 
@@ -898,9 +891,9 @@ static int iCheckSensorValid( uint16_t usSensorId )
 /**
  * @brief   Allocate memory for a Numeric Sensor PDR and fill it
  */
-static int iAllocateNumericSensorPDR( PLDM_NUMERIC_SENSOR_PDR *pxIncomingSensorPDR,
+static int iAllocateNumericSensorPDR( PLDMNumericSensorPdr *pxIncomingSensorPDR,
                                       int iTotalPdr,
-                                      PLDM_NUMERIC_SENSOR_PDR **ppxLocalSensorPDR,
+                                      PLDMNumericSensorPdr **ppxLocalSensorPDR,
                                       int *piLocalTotalPdr )
 {
     int iStatus = OK;
@@ -909,13 +902,13 @@ static int iAllocateNumericSensorPDR( PLDM_NUMERIC_SENSOR_PDR *pxIncomingSensorP
         ( NULL != ppxLocalSensorPDR ) )
     {
         *ppxLocalSensorPDR =
-            ( PLDM_NUMERIC_SENSOR_PDR * )pvOSAL_MemAlloc( sizeof ( PLDM_NUMERIC_SENSOR_PDR ) *
+            ( PLDMNumericSensorPdr * )pvOSAL_MemAlloc( sizeof (PLDMNumericSensorPdr) *
                                                           iTotalPdr );
         if( NULL != *ppxLocalSensorPDR )
         {
             pvOSAL_MemCpy( *ppxLocalSensorPDR,
                            pxIncomingSensorPDR,
-                           sizeof( PLDM_NUMERIC_SENSOR_PDR ) * iTotalPdr );
+                           sizeof(PLDMNumericSensorPdr) * iTotalPdr );
             *piLocalTotalPdr = iTotalPdr;
         }
         else
@@ -1012,7 +1005,7 @@ static void vProcessRxMessage( void )
             INC_STAT_COUNTER( BMC_PROXY_STATS_TAKE_MUTEX )
 
             /* raise event that  message arrived to anyone interested */
-            EVL_SIGNAL xNewSignal =
+            EVLSignal xNewSignal =
             {
                 pxThis->ucMyId,
                 BMC_PROXY_DRIVER_E_MSG_ARRIVAL,
@@ -1084,7 +1077,7 @@ static int iRaiseBmcEvent( BMC_PROXY_DRIVER_EVENTS xBmcEventId )
 {
     int iStatus = ERROR;
 
-    EVL_SIGNAL xNewSignal =
+    EVLSignal xNewSignal =
     {
         pxThis->ucMyId,
         xBmcEventId,
@@ -1109,7 +1102,6 @@ static int iRaiseBmcEvent( BMC_PROXY_DRIVER_EVENTS xBmcEventId )
     }
     return iStatus;
 }
-
 
 /**
  * @brief   Set the enable for a Sensor
@@ -1162,7 +1154,6 @@ int iSetNumericSensorEnable( uint16_t usSensorId,
                         pucResponseMessage[ ( *piResponseSize )++ ] = RESP_PLDM_ERROR_GENERIC;
                         break;
                 }
-
             }
             else
             {
@@ -1339,17 +1330,12 @@ int iGetNumNameSensors( void )
  */
 void vPdrRepoInit( void )
 {
-    static int         iIsRepoInitialized = 0;
-    PDR_RepositoryInfo *pxRepo            =
-    {
-        0
-    };
+    static int iIsRepoInitialized = 0;
+
+    PDRRepositoryInfo *pxRepo     = NULL;
     int             i             = 0;
     int             iRecordHandle = 0;
-    CommonPDRFormat *pxHeader     =
-    {
-        0
-    };
+    CommonPDRFormat *pxHeader     = NULL;
     int iCurrRecordSize = 0;
     int iNumSensors     = 0;
 

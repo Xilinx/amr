@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the function declarations for accessing the
@@ -27,7 +27,7 @@
 /******************************************************************************/
 
 /**
- * @struct  EEPROM_CFG_TYPE
+ * @struct  EEPROMCfg
  * @brief   The EEPROM device configuration
  */
 typedef struct
@@ -41,7 +41,7 @@ typedef struct
     uint8_t  ucEepromDeviceIdRegister;  /* Device ID register */
     uint16_t usEepromDeviceId;          /* The device id of eeprom */
 
-} EEPROM_CFG;
+} EEPROMCfg;
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -51,7 +51,7 @@ typedef struct
  * @enum    EEPROM_VERSION
  * @brief   enumeration for all the supported EEPROM versions
  */
-typedef enum EEPROM_VERSION
+typedef enum
 {
     EEPROM_VERSION_1_0 = 1,
     EEPROM_VERSION_3_0 = 30,
@@ -75,7 +75,7 @@ typedef enum EEPROM_VERSION
  *
  * @return  OK if successful, else ERROR.
  */
-int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROM_CFG *pxEepromCfg );
+int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROMCfg *pxEepromCfg );
 
 /**
  * @brief   Read the EEPROM Version

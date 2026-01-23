@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This implenents the functions for accessing the
@@ -33,8 +33,7 @@
 #define EEPROM_DATA_SINGLE_BYTE           (  1U )
 #define EEPROM_ONE_BYTE                   (  1U )
 #define EEPROM_TWO_BYTES                  (  2U )
-#define UPPER_FIREWALL                    ( 0xBABECAFEU )
-#define LOWER_FIREWALL                    ( 0xDEADFACEU )
+
 /* Current EEPROM versions supported */
 #define EEPROM_V1_0                      ( 0x01U )
 
@@ -50,7 +49,7 @@
 #define EEPROM_VERSION_OFFSET            ( 0x00U )
 #define EEPROM_VERSION_SIZE              (    1U )
 #define EEPROM_BUF_SIZE                  (  128U )
-#define EEPROM_FIELD_NA_SIZE             (    0U )              /* For non-existent fields */
+#define EEPROM_FIELD_NA_SIZE             (    0U )          /* For non-existent fields */
 #define EEPROM_DEVICE_ID_CHECK_TRY_COUNT (    3U )
 
 /* Verbose data log - disabled by default */
@@ -61,23 +60,23 @@
 #define EEPROM_V1_0_HEADER_CHECKSUM_OFFSET    ( 0x07U )
 #define EEPROM_V1_0_BOARD_CHECKSUM_SIZE       ( 0x60U )
 #define EEPROM_V1_0_BOARD_LENGTH_OFFSET       ( 0x09U )
-#define EEPROM_V1_0_PRODUCT_NAME_OFFSET       ( 0x16U )         /* Board Product Name  */
+#define EEPROM_V1_0_PRODUCT_NAME_OFFSET       ( 0x16U )     /* Board Product Name  */
 #define EEPROM_V1_0_PRODUCT_NAME_SIZE         (   16U )
-#define EEPROM_V1_0_PRODUCT_PART_NUM_OFFSET   ( 0x38U )         /* Board Part Number  */
+#define EEPROM_V1_0_PRODUCT_PART_NUM_OFFSET   ( 0x38U )     /* Board Part Number  */
 #define EEPROM_V1_0_PRODUCT_PART_NUM_SIZE     (    9U )
-#define EEPROM_V1_0_MFG_PART_NUM_OFFSET       ( 0x38U )         /* Manufacturing Part Number */
+#define EEPROM_V1_0_MFG_PART_NUM_OFFSET       ( 0x38U )     /* Manufacturing Part Number */
 #define EEPROM_V1_0_MFG_PART_NUM_SIZE         (    9U )
-#define EEPROM_V1_0_MFG_PART_REV_OFFSET       ( 0x44U )         /* Manufacturing Part Revision */
+#define EEPROM_V1_0_MFG_PART_REV_OFFSET       ( 0x44U )     /* Manufacturing Part Revision */
 #define EEPROM_V1_0_MFG_PART_REV_SIZE         (    8U )
-#define EEPROM_V1_0_PRODUCT_SERIAL_OFFSET     ( 0x27U )         /* Product Serial Number */
+#define EEPROM_V1_0_PRODUCT_SERIAL_OFFSET     ( 0x27U )     /* Product Serial Number */
 #define EEPROM_V1_0_PRODUCT_SERIAL_SIZE       (   16U )
-#define EEPROM_V1_0_MFG_DATE_OFFSET           ( 0x0BU )         /* Manufacturing Date  */
+#define EEPROM_V1_0_MFG_DATE_OFFSET           ( 0x0BU )     /* Manufacturing Date  */
 #define EEPROM_V1_0_MFG_DATE_SIZE             (    3U )
-#define EEPROM_V1_0_TOT_MAC_ID_OFFSET         ( 0x7CU )         /* Number of MAC IDs Length */
+#define EEPROM_V1_0_TOT_MAC_ID_OFFSET         ( 0x7CU )     /* Number of MAC IDs Length */
 #define EEPROM_V1_0_TOT_MAC_ID_SIZE           (    1U )
-#define EEPROM_V1_0_MAC_OFFSET                ( 0x83U )         /* MAC ID 1 */
+#define EEPROM_V1_0_MAC_OFFSET                ( 0x83U )     /* MAC ID 1 */
 #define EEPROM_V1_0_MAC_SIZE                  (    6U )
-#define EEPROM_V1_0_UUID_OFFSET               ( 0x56U )         /* UUID */
+#define EEPROM_V1_0_UUID_OFFSET               ( 0x56U )     /* UUID */
 #define EEPROM_V1_0_UUID_SIZE                 (   16U )
 #define EEPROM_V1_0_CHECKSUM_START            (    6U )
 #define EEPROM_V1_0_CHECKSUM_END              (  127U )
@@ -121,13 +120,13 @@ STATIC_ASSERT( EEPROM_V1_0_UUID_SIZE             < EEPROM_MAX_FIELD_SIZE );
     DO( EEPROM_ERROR_MAX )
 
 #define PRINT_STAT( x )       PLL_INF( EEPROM_NAME,           \
-                       "%30s. . . .%d\r\n",   \
-                       EEPROM_STATS_STR[ x ], \
-                       pxThis->pulStatCounters[ x ] )
+                                       "%30s. . . .%d\r\n",   \
+                                       EEPROM_STATS_STR[ x ], \
+                                       pxThis->pulStatCounters[ x ] )
 #define PRINT_ERROR_STAT( x ) PLL_INF( EEPROM_NAME,           \
-                       "%30s. . . .%d\r\n",   \
-                       EEPROM_ERROR_STR[ x ], \
-                       pxThis->pulStatErrorCounters[ x ] )
+                                       "%30s. . . .%d\r\n",   \
+                                       EEPROM_ERROR_STR[ x ], \
+                                       pxThis->pulStatErrorCounters[ x ] )
 
 #define INC_STAT_COUNTER( x )  { if ( x < EEPROM_STATS_MAX ) pxThis->pulStatCounters[ x ]++; }
 #define INC_ERROR_COUNTER( x ) { if ( x < EEPROM_ERROR_MAX ) pxThis->pulStatErrorCounters[ x ]++; }
@@ -154,7 +153,7 @@ UTIL_MAKE_ENUM_AND_STRINGS( EEPROM_ERROR, EEPROM_ERROR, EEPROM_ERROR_STR )
 /******************************************************************************/
 
 /**
- * @struct  EEPROM_V1_0_BOARDINFO
+ * @struct  EEPROMBoardInfoV1_0
  * @brief   Structure to hold the fields for version 4.0 EEPROM data
  */
 typedef struct
@@ -170,31 +169,31 @@ typedef struct
     uint8_t ucMac[ EEPROM_ASCII_VAR( EEPROM_V1_0_MAC_SIZE ) ];
     uint8_t ucUuid[ EEPROM_ASCII_VAR( EEPROM_V1_0_UUID_SIZE ) ];
 
-} EEPROM_V1_0_BOARDINFO;
+} EEPROMBoardInfoV1_0;
 
 
 /**
- * @union  EEPROM_BOARDINFO
+ * @union  EEPROMBoardInfo
  * @brief   Structure to hold the fields for EEPROM data, version depends on the product
  */
-typedef union EEPROM_BOARDINFO
+typedef union
 {
-    EEPROM_V1_0_BOARDINFO xBoardInfoV1_0;
+    EEPROMBoardInfoV1_0 xBoardInfoV1_0;
 
-} EEPROM_BOARDINFO;
+} EEPROMBoardInfo;
 
 /**
- * @struct  EEPROM_PRIVATE_DATA
+ * @struct  EEPROMPrivateData
  * @brief   Structure to hold ths driver's private data
  */
-typedef struct EEPROM_PRIVATE_DATA
+typedef struct
 {
     uint32_t ulUpperFirewall;
     int iEepromInitialised;
-    EEPROM_CFG xEepromCfg;
+    EEPROMCfg xEepromCfg;
     EEPROM_VERSION xEepromExpectedVersion;
     EEPROM_VERSION xEepromActualVersion;
-    union EEPROM_BOARDINFO xBoardInfo;
+    EEPROMBoardInfo xBoardInfo;
     uint8_t *pucEepromVersion;
     uint8_t *pucProductName;
     uint8_t *pucBoardRev;
@@ -259,14 +258,14 @@ typedef struct EEPROM_PRIVATE_DATA
 
     uint32_t ulLowerFirewall;
 
-} EEPROM_PRIVATE_DATA;
+} EEPROMPrivateData;
 
 
 /******************************************************************************/
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static EEPROM_PRIVATE_DATA xLocalData =
+static EEPROMPrivateData xLocalData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall       */
     FALSE,              /* iEepromInitialised    */
@@ -347,7 +346,7 @@ static EEPROM_PRIVATE_DATA xLocalData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 };
 
-static EEPROM_PRIVATE_DATA *pxThis = &xLocalData;
+static EEPROMPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -452,7 +451,7 @@ static int iEepromDumpContents( void );
 /**
  * @brief   Initialises the EEPROM driver.
  */
-int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROM_CFG *pxEepromCfg )
+int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROMCfg *pxEepromCfg )
 {
     int iStatus = ERROR;
 

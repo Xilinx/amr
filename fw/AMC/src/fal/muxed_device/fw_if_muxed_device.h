@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the FW IF Muxed Device abstraction definitions.
@@ -10,15 +10,7 @@
 #ifndef _FW_IF_MUXED_DEVICE_H_
 #define _FW_IF_MUXED_DEVICE_H_
 
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
-
 #include "fw_if.h"
-
-/*****************************************************************************/
-/* Defines                                                                   */
-/*****************************************************************************/
 
 /*****************************************************************************/
 /* Enums                                                                     */
@@ -29,7 +21,7 @@
  * @brief Enumeration of hw level for read/write functionality
  *        QSFP IO expander control lines, or QSFP or DIMM mem map registers
  */
-typedef enum _FW_IF_MUXED_DEVICE_HW_LEVEL_TYPE
+typedef enum
 {
     FW_IF_MUXED_DEVICE_HW_LEVEL_IO_EXPANDER = 0,
     FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
@@ -42,7 +34,7 @@ typedef enum _FW_IF_MUXED_DEVICE_HW_LEVEL_TYPE
  * @enum _FW_IF_MUXED_DEVICE_IOCTL_TYPE
  * @brief ioctrl options for Muxed Device interfaces (generic across all Muxed Device interfaces)
  */
-typedef enum _FW_IF_MUXED_DEVICE_IOCTL_TYPE
+typedef enum
 {
     FW_IF_MUXED_DEVICE_IOCTL_SET_IO_EXPANDER = MAX_FW_IF_COMMON_IOCTRL_OPTION,
     FW_IF_MUXED_DEVICE_IOCTL_SET_MEMORY_MAP,
@@ -56,7 +48,7 @@ typedef enum _FW_IF_MUXED_DEVICE_IOCTL_TYPE
  * @enum FW_IF_DEVICE_TYPE
  * @brief Device type for FW_IF Mux interface
  */
-typedef enum FW_IF_DEVICE_TYPE
+typedef enum
 {
     FW_IF_DEVICE_QSFP = 0,
     FW_IF_DEVICE_DIMM,
@@ -69,7 +61,7 @@ typedef enum FW_IF_DEVICE_TYPE
  * @enum FW_IF_MUX_ADDRESS_TYPE
  * @brief Enumeration for non selected mux addresses
  */
-typedef enum FW_IF_MUX_ADDRESS_TYPE
+typedef enum
 {
     FW_IF_MUX_ADDRESS_0 = 0,
     FW_IF_MUX_ADDRESS_1,
@@ -84,34 +76,34 @@ typedef enum FW_IF_MUX_ADDRESS_TYPE
 /*****************************************************************************/
 
 /**
- * @struct  FW_IF_MUXED_DEVICE_INIT_CFG
+ * @struct  FWIfMuxedDeviceInitCfg
  * @brief   config options for Muxed Device initialisation
  *          (generic across all Muxed Device interfaces)
  */
-typedef struct _FW_IF_MUXED_DEVICE_INIT_CFG
+typedef struct
 {
     char            *pcDriverName;
     uint8_t         ulI2CBusNum;
 
-} FW_IF_MUXED_DEVICE_INIT_CFG;
+} FWIfMuxedDeviceInitCfg;
 
 /**
  * @struct  FW_IF_MUXED_DEVICE_CFG
  * @brief   config options for Muxed Device interfaces
  *          (generic across all Muxed Device interfaces)
  */
-typedef struct _FW_IF_MUXED_DEVICE_CFG
+typedef struct
 {
-    FW_IF_DEVICE_TYPE                   xDevice;
-    uint8_t                             ucPowerIoExpanderAddr;
-    uint8_t                             ucPowerIoExpanderRegBit;
-    uint8_t                             ucSelectedMuxAddr;
-    uint8_t                             pucUnselectedMuxAddr[ MAX_FW_IF_MUX_ADDRESS ];
-    uint32_t                            ulMuxRegBitIoExpander;
-    uint32_t                            ulMuxRegBit;
-    uint8_t                             ucIoExpanderAddr;
-    uint8_t                             ucDeviceI2cAddr;
-    FW_IF_MUXED_DEVICE_HW_LEVEL_TYPE    xHwLevel;
+    FW_IF_DEVICE_TYPE                xDevice;
+    uint8_t                          ucPowerIoExpanderAddr;
+    uint8_t                          ucPowerIoExpanderRegBit;
+    uint8_t                          ucSelectedMuxAddr;
+    uint8_t                          pucUnselectedMuxAddr[ MAX_FW_IF_MUX_ADDRESS ];
+    uint32_t                         ulMuxRegBitIoExpander;
+    uint32_t                         ulMuxRegBit;
+    uint8_t                          ucIoExpanderAddr;
+    uint8_t                          ucDeviceI2cAddr;
+    FW_IF_MUXED_DEVICE_HW_LEVEL_TYPE xHwLevel;
 
 } FW_IF_MUXED_DEVICE_CFG;
 
@@ -127,7 +119,7 @@ typedef struct _FW_IF_MUXED_DEVICE_CFG
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_MUXED_DEVICE_Init( FW_IF_MUXED_DEVICE_INIT_CFG *pxInitCfg );
+extern uint32_t ulFW_IF_MUXED_DEVICE_Init( FWIfMuxedDeviceInitCfg *pxInitCfg );
 
 /**
  * @brief   creates an instance of the MUXED_DEVICE interface
@@ -137,7 +129,7 @@ extern uint32_t ulFW_IF_MUXED_DEVICE_Init( FW_IF_MUXED_DEVICE_INIT_CFG *pxInitCf
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_MUXED_DEVICE_Create( FW_IF_CFG *pxFwIf, FW_IF_MUXED_DEVICE_CFG *pxQsfpCfg );
+extern uint32_t ulFW_IF_MUXED_DEVICE_Create( FWIfCfg *pxFwIf, FW_IF_MUXED_DEVICE_CFG *pxQsfpCfg );
 
 /**
  * @brief   Print all the stats gathered by the application

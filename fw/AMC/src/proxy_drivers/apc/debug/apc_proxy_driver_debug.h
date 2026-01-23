@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
- * This file contains the AVED Programming Control (APC) debug access
+ * This file contains the AMR Programming Control (APC) debug access
  *
  * @file apc_proxy_driver_debug.h
  */

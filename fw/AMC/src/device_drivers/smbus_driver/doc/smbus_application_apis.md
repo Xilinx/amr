@@ -1,6 +1,6 @@
 # SMBus Application APIs
 
-Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: MIT
 
 ## Defines
@@ -113,7 +113,7 @@ typedef enum
  * @enum SMBUS_LOG_LEVEL
  * @brief Enumeration of SMBUS logging levels
  */
-typedef enum SMBUS_LOG_LEVEL
+typedef enum
 {
     SMBUS_LOG_LEVEL_NONE = 0,
     SMBUS_LOG_LEVEL_ERROR,
@@ -267,7 +267,7 @@ typedef struct
 * @note     None.
 *
 *****************************************************************************/
-SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile,
+SMBUS_ERROR_TYPE xInitSMBus( SMBusProfile** ppxSMBusProfile,
                              SMBUS_FREQ_CLASS xFrequencyClass,
                              void * pvBaseAddr,
                              SMBUS_LOG_LEVEL xLogLevel,
@@ -288,7 +288,7 @@ SMBUS_ERROR_TYPE xInitSMBus( SMBus_Profile** ppxSMBusProfile,
 * @note     None.
 *
 *****************************************************************************/
-SMBUS_ERROR_TYPE xDeinitSMBus( SMBus_Profile** ppxSMBusProfile );
+SMBUS_ERROR_TYPE xDeinitSMBus( SMBusProfile** ppxSMBusProfile );
 ```
 
 ### Create / Destroy an SMBus instance
@@ -319,7 +319,7 @@ SMBUS_ERROR_TYPE xDeinitSMBus( SMBus_Profile** ppxSMBusProfile );
 * @note     None.
 *
 *******************************************************************************/
-uint8_t ucCreateSMBusInstance( SMBus_Profile* pxSMBusProfile,
+uint8_t ucCreateSMBusInstance( SMBusProfile* pxSMBusProfile,
                                uint8_t ucSMBusAddr,
                                uint8_t ucUDID[SMBUS_UDID_LENGTH],
                                SMBUS_ARP_CAPABILITY xARPCapability,
@@ -351,7 +351,7 @@ uint8_t ucCreateSMBusInstance( SMBus_Profile* pxSMBusProfile,
 * @note     None.
 *
 *****************************************************************************/
-SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBus_Profile* pxSMBusProfile,
+SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBusProfile* pxSMBusProfile,
                                          uint8_t ucSMBusInstanceID );
 ```
 ### Initiate an SMBus command
@@ -376,7 +376,7 @@ SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBus_Profile* pxSMBusProfile,
 * @note     None.
 *
 *******************************************************************************/
-SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile,
+SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBusProfile* pxSMBusProfile,
                                                    uint8_t ucSMBusInstance,
                                                    uint8_t ucSMBusDestAddr,
                                                    uint8_t ucCommand,
@@ -393,7 +393,7 @@ SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile,
 * @brief    Retrieves SMBus log that is stored as a circular buffer in profile struct
 *           as ASCII char array
 *
-* @param    SMBus_Profile is the context to poll log on
+* @param    SMBusProfile is the context to poll log on
 * @param    pcLogBuffer is the array to put log data must be more than TBD driver events string
 *           separated by '\n'
 * @param    pusLogSizeBytes is a pointer to the number of bytes that are in the log
@@ -405,7 +405,7 @@ SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBus_Profile* pxSMBusProfile,
 * @note     None.
 *
 *******************************************************************************/
-SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile,
+SMBUS_ERROR_TYPE xSMBusGetLog( SMBusProfile* pxSMBusProfile,
                                char* pcLogBuffer,
                                uint32_t* pulLogSizeBytes );
 
@@ -416,7 +416,7 @@ SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile,
 *
 * @brief    Resets SMBus Driver Log
 *
-* @param    SMBus_Profile is the context with log to clear
+* @param    SMBusProfile is the context with log to clear
 *
 * @return   - SMBUS_ERROR if error
 *           - SMBUS_SUCCESS if successful
@@ -424,7 +424,7 @@ SMBUS_ERROR_TYPE xSMBusGetLog( SMBus_Profile* pxSMBusProfile,
 * @note     None.
 *
 *******************************************************************************/
-SMBUS_ERROR_TYPE xSMBusLogReset( SMBus_Profile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusLogReset( SMBusProfile* pxSMBusProfile );
 ```
 ### Disable / Enable Interrupts
 ```sh
@@ -440,7 +440,7 @@ SMBUS_ERROR_TYPE xSMBusLogReset( SMBus_Profile* pxSMBusProfile );
 * @note     None.
 *
 *******************************************************************************/
-SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBus_Profile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBusProfile* pxSMBusProfile );
 
 /*******************************************************************************
 *
@@ -454,7 +454,7 @@ SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBus_Profile* pxSMBu
 * @note     None.
 *
 *******************************************************************************/
-SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBus_Profile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBusProfile* pxSMBusProfile );
 ```
 ### Interrupt Handler
 ```sh
@@ -490,6 +490,6 @@ void vSMBusInterruptHandler( void* pvCallBackRef );
 * @note     None.
 *
 *******************************************************************************/
-SMBUS_ERROR_TYPE xSMBusGetVersion( SMBus_Profile* pxSMBusProfile,
+SMBUS_ERROR_TYPE xSMBusGetVersion( SMBusProfile* pxSMBusProfile,
                        SMBus_Version* pxSMBusVersion );
 ```

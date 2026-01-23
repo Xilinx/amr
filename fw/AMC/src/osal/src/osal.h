@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains the Operating System Abstraction Layer (OSAL)
@@ -10,10 +10,6 @@
 
 #ifndef _OSAL_H_
 #define _OSAL_H_
-
-/*****************************************************************************/
-/* Includes                                                                  */
-/*****************************************************************************/
 
 /* Standard includes */
 #include <stdint.h>
@@ -39,7 +35,7 @@
  * @enum    OSAL_ERRORS
  * @brief   Return values from an OSAL function
  */
-typedef enum _OSAL_ERRORS
+typedef enum
 {
     OSAL_ERRORS_NONE = 0,           /* no errors, call was successful */
     OSAL_ERRORS_PARAMS,             /* invalid parameters passed in to function */
@@ -56,7 +52,7 @@ typedef enum _OSAL_ERRORS
  * @enum    OSAL_TIMER_CONFIG
  * @brief   Return values from an OSAL function
  */
-typedef enum _OSAL_TIMER_CONFIG
+typedef enum
 {
     OSAL_TIMER_CONFIG_ONE_SHOT = 0,	/* timer will be a one-shot, entering dormant state after it expires */
     OSAL_TIMER_CONFIG_PERIODIC,		/* timer will expire repeatedly */
@@ -69,7 +65,7 @@ typedef enum _OSAL_TIMER_CONFIG
  * @enum    OSAL_STATS_VERBOSITY
  * @brief   Debug stats verbosity levels
  */
-typedef enum _OSAL_STATS_VERBOSITY
+typedef enum
 {
     OSAL_STATS_VERBOSITY_COUNT_ONLY = 0,
     OSAL_STATS_VERBOSITY_ACTIVE_ONLY,
@@ -83,7 +79,7 @@ typedef enum _OSAL_STATS_VERBOSITY
  * @enum    OSAL_STATS_TYPE
  * @brief   Debug stat types
  */
-typedef enum _OSAL_STATS_TYPE
+typedef enum
 {
     OSAL_STATS_TYPE_OS = 0,
     OSAL_STATS_TYPE_TASK,

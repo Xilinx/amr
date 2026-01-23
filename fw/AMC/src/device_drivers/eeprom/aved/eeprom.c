@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This implenents the functions for accessing the
@@ -32,8 +32,6 @@
 #define EEPROM_DATA_SINGLE_BYTE           ( 1 )
 #define EEPROM_ONE_BYTE                   ( 1 )
 #define EEPROM_TWO_BYTES                  ( 2 )
-#define UPPER_FIREWALL                    ( 0xBABECAFE )
-#define LOWER_FIREWALL                    ( 0xDEADFACE )
 
 /* Current EEPROM versions supported */
 #define EEPROM_V4_0                       ( 0x342E3000u )
@@ -52,7 +50,7 @@
 #define EEPROM_VERSION_OFFSET            ( 0x00 )
 #define EEPROM_VERSION_SIZE              ( 4 )
 #define EEPROM_BUF_SIZE                  ( 128 )
-#define EEPROM_FIELD_NA_SIZE             ( 0 )                                 /* For non-existent fields */
+#define EEPROM_FIELD_NA_SIZE             ( 0 )          /* For non-existent fields */
 #define EEPROM_DEVICE_ID_CHECK_TRY_COUNT ( 3 )
 
 /* Verbose data log - disabled by default */
@@ -61,23 +59,23 @@
 /* Version 4.0 field positions */
 #define EEPROM_V4_0_DATA_CHECKSUM_LSB_OFFSET  ( 0x04 )
 #define EEPROM_V4_0_DATA_CHECKSUM_MSB_OFFSET  ( 0x05 )
-#define EEPROM_V4_0_ALVEO_PRODUCT_NAME_OFFSET ( 0x06 )                         /* Alveo Product Name  */
+#define EEPROM_V4_0_ALVEO_PRODUCT_NAME_OFFSET ( 0x06 )  /* Alveo Product Name  */
 #define EEPROM_V4_0_ALVEO_PRODUCT_NAME_SIZE   ( 36 )
-#define EEPROM_V4_0_ALVEO_PART_NUM_OFFSET     ( 0x2A )                         /* Alveo Part Number  */
+#define EEPROM_V4_0_ALVEO_PART_NUM_OFFSET     ( 0x2A )  /* Alveo Part Number  */
 #define EEPROM_V4_0_ALVEO_PART_NUM_SIZE       ( 24 )
-#define EEPROM_V4_0_MFG_ALVEO_PART_NUM_OFFSET ( 0x42 )                         /* Manufacturing Alveo Part Number */
+#define EEPROM_V4_0_MFG_ALVEO_PART_NUM_OFFSET ( 0x42 )  /* Manufacturing Alveo Part Number */
 #define EEPROM_V4_0_MFG_ALVEO_PART_NUM_SIZE   ( 16 )
-#define EEPROM_V4_0_MFG_ALVEO_PART_REV_OFFSET ( 0x52 )                         /* Manufacturing Alveo Part Revision */
+#define EEPROM_V4_0_MFG_ALVEO_PART_REV_OFFSET ( 0x52 )  /* Manufacturing Alveo Part Revision */
 #define EEPROM_V4_0_MFG_ALVEO_PART_REV_SIZE   ( 5 )
-#define EEPROM_V4_0_PRODUCT_SERIAL_OFFSET     ( 0x57 )                         /* Product Serial Number */
+#define EEPROM_V4_0_PRODUCT_SERIAL_OFFSET     ( 0x57 )  /* Product Serial Number */
 #define EEPROM_V4_0_PRODUCT_SERIAL_SIZE       ( 14 )
-#define EEPROM_V4_0_MFG_DATE_OFFSET           ( 0x65 )                         /* Manufacturing Date  */
+#define EEPROM_V4_0_MFG_DATE_OFFSET           ( 0x65 )  /* Manufacturing Date  */
 #define EEPROM_V4_0_MFG_DATE_SIZE             ( 4 )
-#define EEPROM_V4_0_TOT_MAC_ID_OFFSET         ( 0x69 )                         /* Number of MAC IDs */
+#define EEPROM_V4_0_TOT_MAC_ID_OFFSET         ( 0x69 )  /* Number of MAC IDs */
 #define EEPROM_V4_0_TOT_MAC_ID_SIZE           ( 1 )
-#define EEPROM_V4_0_MAC_OFFSET                ( 0x6A )                         /* MAC ID 1 */
+#define EEPROM_V4_0_MAC_OFFSET                ( 0x6A )  /* MAC ID 1 */
 #define EEPROM_V4_0_MAC_SIZE                  ( 6 )
-#define EEPROM_V4_0_UUID_OFFSET               ( 0x70 )                         /* UUID */
+#define EEPROM_V4_0_UUID_OFFSET               ( 0x70 )  /* UUID */
 #define EEPROM_V4_0_UUID_SIZE                 ( 16 )
 #define EEPROM_V4_0_CHECKSUM_START            ( 6 )
 #define EEPROM_V4_0_CHECKSUM_END              ( 127 )
@@ -166,38 +164,6 @@ STATIC_ASSERT( EEPROM_V4_0_TOT_MAC_ID_SIZE          < EEPROM_MAX_FIELD_SIZE );
 STATIC_ASSERT( EEPROM_V4_0_MAC_SIZE                 < EEPROM_MAX_FIELD_SIZE );
 STATIC_ASSERT( EEPROM_V4_0_UUID_SIZE                < EEPROM_MAX_FIELD_SIZE );
 
-STATIC_ASSERT( EEPROM_V3_0_PRODUCT_NAME_SIZE        < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_REV_SIZE           < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_SERIAL_SIZE        < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_TOT_MAC_ID_SIZE    < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_MAC_SIZE           < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_ACT_PAS_SIZE       < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_CONFIG_MODE_SIZE   < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_MFG_DATE_SIZE            < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_PART_NUM_SIZE            < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_UUID_SIZE                < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_PCIE_INFO_SIZE           < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_MAX_POWER_MODE_SIZE      < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_MEM_SIZE_SIZE            < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_OEMID_SIZE               < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_CAPABILITY_SIZE          < EEPROM_MAX_FIELD_SIZE );
-
-STATIC_ASSERT( EEPROM_V3_0_PRODUCT_NAME_SIZE        < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_REV_SIZE           < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_SERIAL_SIZE        < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_TOT_MAC_ID_SIZE    < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_MAC_SIZE           < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_ACT_PAS_SIZE       < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_BOARD_CONFIG_MODE_SIZE   < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_MFG_DATE_SIZE            < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_PART_NUM_SIZE            < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_UUID_SIZE                < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_PCIE_INFO_SIZE           < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_MAX_POWER_MODE_SIZE      < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_MEM_SIZE_SIZE            < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_OEMID_SIZE               < EEPROM_MAX_FIELD_SIZE );
-STATIC_ASSERT( EEPROM_V3_0_CAPABILITY_SIZE          < EEPROM_MAX_FIELD_SIZE );
-
 STATIC_ASSERT( EEPROM_V3_1_PRODUCT_NAME_SIZE        < EEPROM_MAX_FIELD_SIZE );
 STATIC_ASSERT( EEPROM_V3_1_BOARD_REV_SIZE           < EEPROM_MAX_FIELD_SIZE );
 STATIC_ASSERT( EEPROM_V3_1_BOARD_SERIAL_SIZE        < EEPROM_MAX_FIELD_SIZE );
@@ -213,6 +179,24 @@ STATIC_ASSERT( EEPROM_V3_1_MAX_POWER_MODE_SIZE      < EEPROM_MAX_FIELD_SIZE );
 STATIC_ASSERT( EEPROM_V3_1_MEM_SIZE_SIZE            < EEPROM_MAX_FIELD_SIZE );
 STATIC_ASSERT( EEPROM_V3_1_OEMID_SIZE               < EEPROM_MAX_FIELD_SIZE );
 STATIC_ASSERT( EEPROM_V3_1_CAPABILITY_SIZE          < EEPROM_MAX_FIELD_SIZE );
+
+
+STATIC_ASSERT( EEPROM_V3_0_PRODUCT_NAME_SIZE        < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_BOARD_REV_SIZE           < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_BOARD_SERIAL_SIZE        < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_BOARD_TOT_MAC_ID_SIZE    < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_BOARD_MAC_SIZE           < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_BOARD_ACT_PAS_SIZE       < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_BOARD_CONFIG_MODE_SIZE   < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_MFG_DATE_SIZE            < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_PART_NUM_SIZE            < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_UUID_SIZE                < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_PCIE_INFO_SIZE           < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_MAX_POWER_MODE_SIZE      < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_MEM_SIZE_SIZE            < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_OEMID_SIZE               < EEPROM_MAX_FIELD_SIZE );
+STATIC_ASSERT( EEPROM_V3_0_CAPABILITY_SIZE          < EEPROM_MAX_FIELD_SIZE );
+
 
 #define EEPROM_STATS( DO )              \
     DO( EEPROM_STATS_INITIALISATION )   \
@@ -241,13 +225,13 @@ STATIC_ASSERT( EEPROM_V3_1_CAPABILITY_SIZE          < EEPROM_MAX_FIELD_SIZE );
     DO( EEPROM_ERROR_MAX )
 
 #define PRINT_STAT( x )       PLL_INF( EEPROM_NAME,           \
-                       "%30s. . . .%d\r\n",   \
-                       EEPROM_STATS_STR[ x ], \
-                       pxThis->pulStatCounters[ x ] )
+                                       "%30s. . . .%d\r\n",   \
+                                       EEPROM_STATS_STR[ x ], \
+                                       pxThis->pulStatCounters[ x ] )
 #define PRINT_ERROR_STAT( x ) PLL_INF( EEPROM_NAME,           \
-                       "%30s. . . .%d\r\n",   \
-                       EEPROM_ERROR_STR[ x ], \
-                       pxThis->pulStatErrorCounters[ x ] )
+                                       "%30s. . . .%d\r\n",   \
+                                       EEPROM_ERROR_STR[ x ], \
+                                       pxThis->pulStatErrorCounters[ x ] )
 
 #define INC_STAT_COUNTER( x )  { if ( x < EEPROM_STATS_MAX ) pxThis->pulStatCounters[ x ]++; }
 #define INC_ERROR_COUNTER( x ) { if ( x < EEPROM_ERROR_MAX ) pxThis->pulStatErrorCounters[ x ]++; }
@@ -274,10 +258,10 @@ UTIL_MAKE_ENUM_AND_STRINGS( EEPROM_ERROR, EEPROM_ERROR, EEPROM_ERROR_STR )
 /******************************************************************************/
 
 /**
- * @struct  EEPROM_V4_0_BOARDINFO
+ * @struct  EEPROMBoardInfoV4_0
  * @brief   Structure to hold the fields for version 4.0 EEPROM data
  */
-typedef struct EEPROM_V4_0_BOARDINFO
+typedef struct
 {
     uint8_t ucEepromVersion[ EEPROM_ASCII_VAR( EEPROM_VERSION_SIZE ) ];
     uint8_t ucProductName[ EEPROM_ASCII_VAR( EEPROM_V4_0_ALVEO_PRODUCT_NAME_SIZE ) ];
@@ -290,13 +274,13 @@ typedef struct EEPROM_V4_0_BOARDINFO
     uint8_t ucMac[ EEPROM_ASCII_VAR( EEPROM_V4_0_MAC_SIZE ) ];
     uint8_t ucUuid[ EEPROM_ASCII_VAR( EEPROM_V4_0_UUID_SIZE ) ];
 
-} EEPROM_V4_0_BOARDINFO;
+} EEPROMBoardInfoV4_0;
 
 /**
- * @struct  EEPROM_V3_1_BOARDINFO
+ * @struct  EEPROMBoardInfoV3_1
  * @brief   Structure to hold the fields for version 3.1 EEPROM data
  */
-typedef struct EEPROM_V3_1_BOARDINFO
+typedef struct
 {
     uint8_t ucEepromVersion[ EEPROM_ASCII_VAR( EEPROM_VERSION_SIZE ) ];
     uint8_t ucProductName[ EEPROM_ASCII_VAR( EEPROM_V3_1_PRODUCT_NAME_SIZE ) ];
@@ -315,10 +299,10 @@ typedef struct EEPROM_V3_1_BOARDINFO
     uint8_t ucOemId[ EEPROM_ASCII_VAR( EEPROM_V3_1_OEMID_SIZE ) ];
     uint8_t ucCapability[ EEPROM_ASCII_VAR( EEPROM_V3_1_CAPABILITY_SIZE ) ];
 
-} EEPROM_V3_1_BOARDINFO;
+} EEPROMBoardInfoV3_1;
 
 /**
- * @struct  EEPROM_V3_0_BOARDINFO
+ * @struct  EEPROMBoardInfoV3_0
  * @brief   Structure to hold the fields for version 3.0 EEPROM data
  */
 typedef struct
@@ -340,33 +324,33 @@ typedef struct
     uint8_t ucOemId[ EEPROM_ASCII_VAR( EEPROM_V3_0_OEMID_SIZE ) ];
     uint8_t ucCapability[ EEPROM_ASCII_VAR( EEPROM_V3_0_CAPABILITY_SIZE ) ];
 
-} EEPROM_V3_0_BOARDINFO;
+} EEPROMBoardInfoV3_0;
 
 
 /**
- * @union  EEPROM_BOARDINFO
+ * @union  EEPROMBoardInfo
  * @brief   Structure to hold the fields for EEPROM data, version depends on the product
  */
-typedef union EEPROM_BOARDINFO
+typedef union
 {
-    EEPROM_V4_0_BOARDINFO xBoardInfoV4_0;
-    EEPROM_V3_1_BOARDINFO xBoardInfoV3_1;
-    EEPROM_V3_0_BOARDINFO xBoardInfoV3_0;
+    EEPROMBoardInfoV4_0 xBoardInfoV4_0;
+    EEPROMBoardInfoV3_1 xBoardInfoV3_1;
+    EEPROMBoardInfoV3_0 xBoardInfoV3_0;
 
-} EEPROM_BOARDINFO;
+} EEPROMBoardInfo;
 
 /**
- * @struct  EEPROM_PRIVATE_DATA
+ * @struct  EEPROMPrivateData
  * @brief   Structure to hold ths driver's private data
  */
-typedef struct EEPROM_PRIVATE_DATA
+typedef struct
 {
     uint32_t ulUpperFirewall;
     int iEepromInitialised;
-    EEPROM_CFG xEepromCfg;
+    EEPROMCfg xEepromCfg;
     EEPROM_VERSION xEepromExpectedVersion;
     EEPROM_VERSION xEepromActualVersion;
-    union EEPROM_BOARDINFO xBoardInfo;
+    EEPROMBoardInfo xBoardInfo;
     uint8_t *pucEepromVersion;
     uint8_t *pucProductName;
     uint8_t *pucBoardRev;
@@ -431,14 +415,14 @@ typedef struct EEPROM_PRIVATE_DATA
 
     uint32_t ulLowerFirewall;
 
-} EEPROM_PRIVATE_DATA;
+} EEPROMPrivateData;
 
 
 /******************************************************************************/
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static EEPROM_PRIVATE_DATA xLocalData =
+static EEPROMPrivateData xLocalData =
 {
     UPPER_FIREWALL,     /* ulUpperFirewall       */
     FALSE,              /* iEepromInitialised    */
@@ -519,7 +503,7 @@ static EEPROM_PRIVATE_DATA xLocalData =
     LOWER_FIREWALL      /* ulLowerFirewall */
 };
 
-static EEPROM_PRIVATE_DATA *pxThis = &xLocalData;
+static EEPROMPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -624,7 +608,7 @@ static int iEepromDumpContents( void );
 /**
  * @brief   Initialises the EEPROM driver.
  */
-int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROM_CFG *pxEepromCfg )
+int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROMCfg *pxEepromCfg )
 {
     int iStatus = ERROR;
 

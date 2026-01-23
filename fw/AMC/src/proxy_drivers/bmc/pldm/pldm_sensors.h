@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains PLDM sensor enums
@@ -9,11 +9,6 @@
 
 #ifndef SRC_PLDM_SENSORS_H_
 #define SRC_PLDM_SENSORS_H_
-
-
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
 
 #include "standard.h"
 
@@ -57,7 +52,7 @@ typedef enum
     eSensorOpStateShuttingDown,
     eSensorOpStateInTest
 
-}sensor_operational_state;
+} sensor_operational_state;
 
 /**
  * @enum    sensor_event
@@ -71,7 +66,6 @@ typedef enum
     eSensorOpEventsOnlyEnabled,
     eSensorStateEventsOnlyEnabled
 
-}sensor_event;
-
+} sensor_event;
 
 #endif /* SRC_PLDM_SENSORS_H_ */
