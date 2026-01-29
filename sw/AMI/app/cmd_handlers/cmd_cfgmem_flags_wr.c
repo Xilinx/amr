@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * cmd_partition_flag_rd.c - This file contains the implementation for the command "partition_flag_rd"
+ * cmd_cfgmem_flags_wr.c - This file contains the implementation for
+                             the command "cfgmem_flags_wr"
  *
  * Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
@@ -11,8 +12,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <getopt.h>
-#include <string.h>
+#include <unistd.h>
 #include <inttypes.h>
+#include <string.h>
 
 /* API include */
 #include "ami_module_access.h"
@@ -30,7 +32,7 @@
 /*****************************************************************************/
 
 /**
- * do_cmd_partition_flag_rd() - "partition_flag_rd" command callback.
+ * do_cmd_cfgmem_flags_wr() - "cfgmem_flags_wr" command callback.
  * @options:  Ordered list of options passed in at the command line
  * @num_args:  Number of non-option arguments (excluding command)
  * @args:  List of non-option arguments (excluding command)
@@ -40,7 +42,8 @@
  *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
-static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, char **args);
+static int do_cmd_cfgmem_flags_wr(struct app_option *options,
+	int num_args, char **args);
 
 /*****************************************************************************/
 /* Global variables                                                          */
@@ -51,8 +54,9 @@ static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, ch
  * d: Device
  * t: Boot device type
  * p: Partition number
+ * i: Flags value <on|off>
  */
-static const char short_options[] = "hd:t:p:";
+static const char short_options[] = "hd:t:p:i:";
 
 static const struct option long_options[] = {
 	{ "help", no_argument, NULL, 'h' },  /* help screen */
@@ -60,18 +64,22 @@ static const struct option long_options[] = {
 };
 
 static const char help_msg[] = \
-	"partition_flag_rd - Read partition flags\r\n"
+	"cfgmem_flags_wr - Write partition flags\r\n"
 	"\r\nUsage:\r\n"
-	"\t" APP_NAME " partition_flag_rd -d <bdf> -t <type> -p <n>\r\n"
+	"\t" APP_NAME " cfgmem_flags_wr -d <bdf> -t <type> -p <n> -i <flags>\r\n"
 	"\r\nOptions:\r\n"
 	"\t-h --help             Show this screen\r\n"
 	"\t-d <b>:[d].[f]        Specify the device BDF\r\n"
 	"\t-t <type>             Specify the boot device type (primary or secondary)\r\n"
-	"\t-p <partition>        Partition number to read\r\n"
+	"\t-p <partition>        Partition number to write\r\n"
+	"\t-i <flags>            Powerup autoload flag to write\r\n"
+	"\t                      Possible values are:\r\n"
+	"\t                        on=power on load user partition\r\n"
+	"\t                        off=do not power on load user partition\r\n"
 ;
 
-struct app_cmd cmd_partition_flag_rd = {
-	.callback      = &do_cmd_partition_flag_rd,
+struct app_cmd cmd_cfgmem_flags_wr = {
+	.callback      = &do_cmd_cfgmem_flags_wr,
 	.short_options = short_options,
 	.long_options  = long_options,
 	.root_required = false,
@@ -83,7 +91,7 @@ struct app_cmd cmd_partition_flag_rd = {
 /*****************************************************************************/
 
 /**
- * "partition_flag_rd" command callback.
+ * "cfgmem_flags_wr" command callback.
  * @options:  Ordered list of options passed in at the command line
  * @num_args:  Number of non-option arguments (excluding command)
  * @args:  List of non-option arguments (excluding command)
@@ -93,7 +101,7 @@ struct app_cmd cmd_partition_flag_rd = {
  *
  * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
-static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, char **args)
+static int do_cmd_cfgmem_flags_wr(struct app_option *options, int num_args, char **args)
 {
 	int ret = AMI_STATUS_ERROR;
 
@@ -101,6 +109,7 @@ static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, ch
 	struct app_option *device = NULL;
 	struct app_option *boot_device_type = NULL;
 	struct app_option *partition = NULL;
+	struct app_option *partition_flags = NULL;
 
 	/* Required data */
 	uint16_t bdf = 0;
@@ -108,6 +117,7 @@ static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, ch
 	int selected_boot_device = 0;
 	uint32_t partition_number = 0;
 	struct ami_fpt_partition fpt_partition = { 0 };
+	uint32_t flags = 0;
 
 	/* Must have at least a device, boot device type, and partition number. */
 	if (!options) {
@@ -119,8 +129,9 @@ static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, ch
 	device = find_app_option('d', options);
 	boot_device_type = find_app_option('t', options);
 	partition = find_app_option('p', options);
+	partition_flags = find_app_option('i', options);
 
-	if (!device || !boot_device_type || !partition) {
+	if (!device || !boot_device_type || !partition || !partition_flags) {
 		APP_USER_ERROR("not enough arguments", help_msg);
 		return AMI_STATUS_ERROR;
 	}
@@ -143,6 +154,16 @@ static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, ch
 		return AMI_STATUS_ERROR;
 	}
 
+	/* Parition flags */
+	if (strcmp(partition_flags->arg, "on") == 0) {
+		flags = 1;
+	} else if (strcmp(partition_flags->arg, "off") == 0) {
+		flags = 0;
+	} else {
+		APP_USER_ERROR("Invalid partition flag value", help_msg);
+		return AMI_STATUS_ERROR;
+	}
+
 	/* Find device */
 	if (ami_dev_find(device->arg, &dev) != AMI_STATUS_OK) {
 		APP_API_ERROR("could not find the requested device");
@@ -152,35 +173,25 @@ static int do_cmd_partition_flag_rd(struct app_option *options, int num_args, ch
 	ami_dev_get_pci_bdf(dev, &bdf);
 
 	printf(
-		"Reading partition flags from (device %02x:%02x.%01x, partition %u)\r\n",
-		AMI_PCI_BUS(bdf), AMI_PCI_DEV(bdf), AMI_PCI_FUNC(bdf), partition_number
+		"Writing partition flags to (device %02x:%02x.%01x, partition %u flags 0x%08X)\r\n",
+		AMI_PCI_BUS(bdf), AMI_PCI_DEV(bdf), AMI_PCI_FUNC(bdf), partition_number, flags
 	);
 
 	if (ami_prog_get_fpt_partition(dev, selected_boot_device, partition_number, &fpt_partition) != AMI_STATUS_OK) {
-		APP_API_ERROR("could not read partition flags");
+		APP_API_ERROR("could not write partition flags");
+		goto fail;
+	}
+
+	fpt_partition.flags = flags;
+
+	if (ami_prog_set_fpt_partition(dev, selected_boot_device, partition_number, &fpt_partition) != AMI_STATUS_OK) {
+		APP_API_ERROR("could not write partition flags");
 	} else {
 		ret = AMI_STATUS_OK;
-		printf("Flags: 0x%08x\r\n", fpt_partition.flags);
+		printf("OK - Partition flags written successfully\r\n");
 	}
 
-	if (fpt_partition.type == AMI_FPT_TYPE_PDI_USER) {
-		printf("Power-up load: %s\r\n",
-			fpt_partition.user.powerup_flag ? "On" : "Off");
-	} else {
-		printf("Power-up load: %s\r\n", "N/A");
-	}
-
-	if (fpt_partition.type == AMI_FPT_TYPE_PDI_USER) {
-		if (fpt_partition.user.powerup_error == 0)
-			printf("Power-up load status: %s\r\n", "Not Loaded");
-		else if (fpt_partition.user.powerup_error == 1)
-			printf("Power-up load status: %s\r\n", "Loaded");
-		else
-			printf("Power-up load status: %s\r\n", "Error");
-	} else {
-		printf("Power-up load status: %s\r\n", "N/A");
-	}
-
+fail:
 	ami_dev_delete(&dev);
 	return ret;
 }

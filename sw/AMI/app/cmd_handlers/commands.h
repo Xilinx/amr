@@ -32,11 +32,11 @@ extern struct app_cmd cmd_cfgmem_program;
 /* "program" handler */
 extern struct app_cmd cmd_pdi_program;
 
-/* "partition_flag_rd" handler */
-extern struct app_cmd cmd_partition_flag_rd;
+/* "cfgmem_flags_rd" handler */
+extern struct app_cmd cmd_cfgmem_flags_rd;
 
-/* "partition_flag_wr" handler */
-extern struct app_cmd cmd_partition_flag_wr;
+/* "cfgmem_flags_wr" handler */
+extern struct app_cmd cmd_cfgmem_flags_wr;
 
 /* "sensors" handler */
 extern struct app_cmd cmd_sensors;

@@ -84,14 +84,14 @@ struct ami_fpt_partition {
 	uint32_t base_addr;
 	uint32_t size;		/* in bytes */
 	union {
-	uint32_t flags;		/* User defined flags */
-	struct {
-		uint32_t powerup_flag:1;	/* Power on load user partition flag
-						0: Disabled, 1: Enabled */
-		uint32_t reserved1:15;		/* Reserved for future use */
-		uint32_t powerup_error:2;	/* Power on load user partition error flag
-						0: Not Loaded, 1: Loaded, 2: Error */
-		uint32_t reserved2:15;		/* Reserved for future use */
+		uint32_t flags;		/* User defined flags */
+		struct {
+			uint32_t powerup_flag:1;	/* Power on load user partition flag
+							0: Disabled, 1: Enabled */
+			uint32_t reserved1:15;		/* Reserved for future use */
+			uint32_t powerup_error:2;	/* Power on load user partition error flag
+							0: Not Loaded, 1: Loaded, 2: Error */
+			uint32_t reserved2:14;		/* Reserved for future use */
 		} user;
 	};
 };

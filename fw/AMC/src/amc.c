@@ -589,7 +589,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
                     .ucVerMajor     = ( uint8_t )GIT_TAG_VER_MAJOR,
                     .ucVerMinor     = ( uint8_t )GIT_TAG_VER_MINOR,
                     .ucVerPatch     = ( uint8_t )GIT_TAG_VER_PATCH,
-                    .ucLocalChanges = ( uint8_t )( GIT_STATUS )?( 1 ):( 0 ),
+                    .ucLocalChanges = ( uint8_t )(GIT_STATUS ? 1 : 0),
                     .usDevCommits   = ( uint16_t )GIT_TAG_VER_DEV_COMMITS,
                     .ucLinkVerMajor = xGcqVersion.ucVerMajor,
                     .ucLinkVerMinor = xGcqVersion.ucVerMinor
@@ -1183,7 +1183,8 @@ static int iLoadPdiOnPowerUp( void )
     }
 
     /* Validate partition index */
-    if ( USER_PDI_POWERUP_PARTITION >= xFptHeader.ucNumEntries )
+    if ( ( USER_PDI_POWERUP_PARTITION >= xFptHeader.ucNumEntries ) &&
+         ( APC_FPT_TYPE_PDI_USER != ( APC_FPT_TYPE )xFptPartition.ulPartitionType ) )
     {
         PLL_ERR( AMC_NAME, "Error: Invalid partition %d (max %d)\r\n",
                 USER_PDI_POWERUP_PARTITION, xFptHeader.ucNumEntries );

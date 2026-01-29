@@ -316,7 +316,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
         {
         case AMI_PROXY_DRIVER_E_SENSOR_READ:
         {
-            AMI_PROXY_SENSOR_REQUEST xSensorRequest = { 0 };
+            AMIProxySensorRequest xSensorRequest = { 0 };
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_SENSOR_REQUEST )
 
             iStatus = iAMI_GetSensorRequest( pxSignal, &xSensorRequest );
@@ -352,7 +352,8 @@ static int iAmiCallback( EVLSignal *pxSignal )
                         switch (xSensorRequest.xRequest)
                         {
                             case AMI_PROXY_CMD_SENSOR_REQUEST_GET_SIZE:
-                                /* Return the size of the SDR, including Header, Sensor Records and End of Repo marker */
+                                /* Return the size of the SDR, including Header, Sensor Records
+                                   and End of Repo marker */
                                 iStatus = iASDM_PopulateResponse( ASDM_API_ID_TYPE_GET_SDR_SIZE,
                                                                 xRepo,
                                                                 INVALID_SENSOR_ID,
@@ -426,10 +427,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_EEPROM_READ_WRITE:
         {
-            AMI_PROXY_EEPROM_RW_REQUEST xEepromReadWriteRequest =
-            {
-                0
-            };
+            AMIProxyEepromRWRequest xEepromReadWriteRequest = { 0 };
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_EEPROM_RW_REQUEST )
 
             iStatus = iAMI_GetEepromReadWriteRequest( pxSignal, &xEepromReadWriteRequest );
@@ -455,8 +453,8 @@ static int iAmiCallback( EVLSignal *pxSignal )
                         HAL_FLUSH_CACHE_DATA( ullDestAddr, xEepromReadWriteRequest.ulLength );
 
                         iStatus = iEEPROM_WriteRawValue( pucDestAddr,
-                                                        xEepromReadWriteRequest.ulLength,
-                                                        xEepromReadWriteRequest.ulOffset );
+                                                         xEepromReadWriteRequest.ulLength,
+                                                         xEepromReadWriteRequest.ulOffset );
                         break;
 
                     default:
@@ -476,7 +474,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_MODULE_READ_WRITE:
         {
-            AMI_PROXY_MODULE_RW_REQUEST xModuleReadWriteRequest = { 0 };
+            AMIProxyModuleRWRequest xModuleReadWriteRequest = { 0 };
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_MODULE_RW_REQUEST )
 
             iStatus = iAMI_GetModuleReadWriteRequest( pxSignal, &xModuleReadWriteRequest );
@@ -555,10 +553,8 @@ static int iAmiCallback( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START:
         {
-            AMI_PROXY_PDI_DOWNLOAD_REQUEST xDownloadRequest =
-            {
-                0
-            };
+            AMIProxyPdiDownloadRequest xDownloadRequest = { 0 };
+
             PLL_DBG( IN_BAND_NAME, "PDI downloading...\r\n" );
 
             if (OK == iAMI_GetPdiDownloadRequest( pxSignal, &xDownloadRequest ))
@@ -628,7 +624,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_PDI_COPY_START:
         {
-            AMI_PROXY_PDI_COPY_REQUEST xCopyRequest = { 0 };
+            AMIProxyPdiCopyRequest xCopyRequest = { 0 };
             PLL_LOG( IN_BAND_NAME, "PDI copy has started\r\n" );
 
             if (OK == iAMI_GetPdiCopyRequest( pxSignal, &xCopyRequest ))
@@ -672,7 +668,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_PDI_PROGRAM_START:
         {
-            AMI_PROXY_PDI_PROGRAM_REQUEST xProgramRequest = { 0 };
+            AMIProxyPdiProgramRequest xProgramRequest = { 0 };
             PLL_LOG( IN_BAND_NAME, "PDI progress has started\r\n" );
 
             if (OK == iAMI_GetPdiProgramRequest( pxSignal, &xProgramRequest ))
@@ -715,7 +711,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_BOOT_SELECT:
         {
-            AMI_PROXY_BOOT_SELECT_REQUEST xBootSelRequest = { 0 };
+            AMIProxyBootSelectRequest xBootSelRequest = { 0 };
             PLL_DBG( IN_BAND_NAME, "Event Boot Select Request (0x%02X)\r\n", pxSignal->ucEventType );
 
             if (OK == iAMI_GetBootSelectRequest( pxSignal, &xBootSelRequest ))
@@ -772,7 +768,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_FPT_FLAGS:
         {
-            AMI_PROXY_FPT_FLAGS_REQUEST xFptFlagsRequest = { 0 };
+            AMIProxyFptFlagsRequest xFptFlagsRequest = { 0 };
             INC_STAT_COUNTER( IN_BAND_STATS_AMI_FPT_FLAGS_REQUEST )
             PLL_DBG( IN_BAND_NAME, "Event FPT Flags Request (0x%02X)\r\n", pxSignal->ucEventType );
 
@@ -786,11 +782,15 @@ static int iAmiCallback( EVLSignal *pxSignal )
                     /* Read FPT partition flags */
                     APCProxyDriverFptPartition xPartition = { 0 };
                     if (OK == iAPC_GetFptPartition(
-                            (APC_BOOT_DEVICES)xFptFlagsRequest.ulBootDevice,
-                            (int)xFptFlagsRequest.ulPartitionId,
-                            &xPartition ))
+                                (APC_BOOT_DEVICES)xFptFlagsRequest.ulBootDevice,
+                                (int)xFptFlagsRequest.ulPartitionId,
+                                 &xPartition ))
                     {
-                        ulFlagsValue = xPartition.ulPartitionFlags | ulUserPdiLoadStatus;
+                        ulFlagsValue = xPartition.ulPartitionFlags;
+                        if (xFptFlagsRequest.ulType == APC_FPT_TYPE_PDI_USER)
+                        {
+                            ulFlagsValue |= ulUserPdiLoadStatus;
+                        }
                         PLL_DBG( IN_BAND_NAME, "FPT Partition %d flags read: 0x%08X\r\n",
                                  xFptFlagsRequest.ulPartitionId, ulFlagsValue );
                     }
@@ -805,10 +805,10 @@ static int iAmiCallback( EVLSignal *pxSignal )
                 {
                     /* Write FPT partition flags */
                     if (OK == iAPC_SetFptPartitionFlags(
-                            pxSignal,
-                            (APC_BOOT_DEVICES)xFptFlagsRequest.ulBootDevice,
-                            (int)xFptFlagsRequest.ulPartitionId,
-                            xFptFlagsRequest.ulFlags ))
+                                pxSignal,
+                                (APC_BOOT_DEVICES)xFptFlagsRequest.ulBootDevice,
+                                (int)xFptFlagsRequest.ulPartitionId,
+                                xFptFlagsRequest.ulFlags ))
                     {
                         ulFlagsValue = xFptFlagsRequest.ulFlags;
                         PLL_DBG( IN_BAND_NAME, "FPT Partition %d flags updated to 0x%08X\r\n",

@@ -976,8 +976,8 @@ static int iGetFptData( void )
      int iStatus = ERROR;
 
      if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( pusByteCount != NULL ) )
+          ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+          ( pusByteCount != NULL ) )
      {
          int      iRepoIndex     = AMC_ASDM_SUPPORTED_REPO_FPT;
          uint16_t usByteCount    = 0;
@@ -1014,12 +1014,26 @@ static int iGetFptData( void )
               ( NULL != pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY] ) )
          {
              int i = 0;
+             uint32_t ulOspiBootAddr = 0;
 
              INC_STAT_COUNTER( ASDM_STATS_MALLOC )
              pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][USER_PDI_POWERUP_PARTITION].ulPartitionFlags |= ulUserPdiLoadStatus;
+             ulOspiBootAddr = ( HAL_IO_READ32( HAL_APC_PMC_BOOT_REG ) * ( 32 * 1024 ));
 
              for ( i = 0; i < pxThis->pxFptHeader[APC_BOOT_DEVICE_PRIMARY].ucNumEntries; i++ )
              {
+                if (APC_FPT_TYPE_PDI_BOOT == ( APC_FPT_TYPE )pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionType)
+                {
+                    if (ulOspiBootAddr == pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionBaseAddr)
+                    {
+                        pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionFlags |= 0x1 << 16;
+                    }
+                    else
+                    {
+                        pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionFlags &= ~(0x1 << 16);
+                    }
+                }
+
                  pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulType =
                      pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionType;
                  pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulBaseAddr =
@@ -3893,72 +3907,76 @@ int iASDM_PrintAsdmRepoData( int iRepoIndex )
         case AMC_ASDM_SUPPORTED_REPO_FPT:
         {
             uint8_t i = 0;
+            ASDMFptHeader *pxFptHdr = &pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrPrimary;
+            ASDMFptEntry  *pxFptEntry = NULL;
+
             PLL_INF( ASDM_NAME, "Primary Boot Device:\r\n" );
             PLL_INF( ASDM_NAME,
-                     "Version: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrPrimary.ucFptVersion );
+                     "Version: 0x%x\r\n", pxFptHdr->ucFptVersion );
             PLL_INF( ASDM_NAME,
-                     "Num enteries: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrPrimary.ucNumEntries );
+                     "Num enteries: 0x%x\r\n", pxFptHdr->ucNumEntries );
             PLL_INF( ASDM_NAME,
-                     "Entry size: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrPrimary.ucFptEntrySize );
+                     "Entry size: 0x%x\r\n", pxFptHdr->ucFptEntrySize );
             PLL_INF( ASDM_NAME,
-                     "Header size: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrPrimary.ucFptHeaderSize );
-            for ( i = 0; i < pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrPrimary.ucNumEntries; i++ )
+                     "Header size: 0x%x\r\n", pxFptHdr->ucFptHeaderSize );
+            for ( i = 0; i < pxFptHdr->ucNumEntries; i++ )
             {
+                pxFptEntry = &pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i];
+
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Type: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulType );
+                         pxFptEntry->ulType );
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Base Address: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulBaseAddr );
+                         pxFptEntry->ulBaseAddr );
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Partition size: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulPartitionSize );
+                         pxFptEntry->ulPartitionSize );
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Partition flags: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulPartitionFlags |
-                         ulUserPdiLoadStatus);
+                         pxFptEntry->ulPartitionFlags |
+                         ( APC_FPT_TYPE_PDI_USER == ( APC_FPT_TYPE )pxFptEntry->ulType ) ?
+                         ulUserPdiLoadStatus : 0 );
             }
             PLL_INF( ASDM_NAME, "\r\n" );
 
+            pxFptHdr = &pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrSecondary;
             PLL_INF( ASDM_NAME, "Secondary Boot Device:\r\n" );
             PLL_INF( ASDM_NAME,
                      "Version: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrSecondary.ucFptVersion );
+                     pxFptHdr->ucFptVersion );
             PLL_INF( ASDM_NAME,
                      "Num enteries: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrSecondary.ucNumEntries );
+                     pxFptHdr->ucNumEntries );
             PLL_INF( ASDM_NAME,
                      "Entry size: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrSecondary.ucFptEntrySize );
+                     pxFptHdr->ucFptEntrySize );
             PLL_INF( ASDM_NAME,
                      "Header size: 0x%x\r\n",
-                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrSecondary.ucFptHeaderSize );
-            for ( i = 0; i < pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.xFptHdrSecondary.ucNumEntries; i++ )
+                     pxFptHdr->ucFptHeaderSize );
+            for ( i = 0; i < pxFptHdr->ucNumEntries; i++ )
             {
+                pxFptEntry = &pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i];
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Type: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].ulType );
+                         pxFptEntry->ulType );
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Base Address: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].ulBaseAddr );
+                         pxFptEntry->ulBaseAddr );
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Partition size: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].ulPartitionSize );
+                         pxFptEntry->ulPartitionSize );
                 PLL_INF( ASDM_NAME,
                          "\t[%d] Partition flags: 0x%x\r\n",
                          i,
-                         pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].ulPartitionFlags );
+                         pxFptEntry->ulPartitionFlags );
             }
             break;
         }

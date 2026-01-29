@@ -29,51 +29,54 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define META_MAX_STR_LEN		(64)
+#define META_MAX_STR_LEN	(64)
 
 /* Version table information. */
-#define NUM_VERSION_ROWS		(5)
-#define NUM_VERSION_COLS		(2)
-#define VERSION_ROW_VER			(0)
-#define VERSION_ROW_BRANCH		(1)
-#define VERSION_ROW_HASH		(2)
-#define VERSION_ROW_DATE		(3)
-#define VERSION_ROW_DRV			(4)
-#define VERSION_HEADER_AMI		(0)
+#define NUM_VERSION_COLS	(2)
 
-/* Device overview table information */
-#define NUM_OVERVIEW_COLS		(5)
-#define NUM_OVERVIEW_COLS_V		(7)
+#define VERSION_ROW_VER		(0)
+#define VERSION_ROW_BRANCH	(1)
+#define VERSION_ROW_HASH	(2)
+#define VERSION_ROW_DATE	(3)
+#define VERSION_ROW_DRV		(4)
+#define NUM_VERSION_ROWS	(5)
+
+#define VERSION_HEADER_AMI	(0)
+
 /* Default fields */
-#define OVERVIEW_COL_BDF		(0)
-#define OVERVIEW_COL_NAME		(1)
-#define OVERVIEW_COL_UUID		(2)
-#define OVERVIEW_COL_AMC		(3)
-#define OVERVIEW_COL_STATE		(4)
+#define OVERVIEW_COL_BDF	(0)
+#define OVERVIEW_COL_NAME	(1)
+#define OVERVIEW_COL_UUID	(2)
+#define OVERVIEW_COL_AMC	(3)
+#define OVERVIEW_COL_STATE	(4)
+#define NUM_OVERVIEW_COLS	(5)
+
 /* Verbose only fields */
-#define OVERVIEW_COL_HWMON		(5)
-#define OVERVIEW_COL_CDEV		(6)
+#define OVERVIEW_COL_HWMON	(5)
+#define OVERVIEW_COL_CDEV	(6)
+/* Device overview table information */
+#define NUM_OVERVIEW_COLS_V	(7)
 
 /* PCI info */
-#define NUM_PCIEINFO_ROWS		(6)
-#define NUM_PCIEINFO_COLS		(2)
+#define NUM_PCIEINFO_COLS	(2)
 #define PCIEINFO_HEADER_INFO	(0)
-#define PCIEINFO_ROW_VENDOR		(0)
-#define PCIEINFO_ROW_DEVICE		(1)
+#define PCIEINFO_ROW_VENDOR	(0)
+#define PCIEINFO_ROW_DEVICE	(1)
 #define PCIEINFO_ROW_LINK_SPEED	(2)
 #define PCIEINFO_ROW_LINK_WIDTH	(3)
 #define PCIEINFO_ROW_NUMA_NODE	(4)
 #define PCIEINFO_ROW_CPULIST	(5)
+#define NUM_PCIEINFO_ROWS	(6)
 
 /* FPT header information */
 #define PARTITION_ID_STR_LEN		(20)
-#define NUM_FPT_HEADER_ROWS			(4)
-#define NUM_FPT_HEADER_COLS			(2)
-#define FPT_HEADER_INFO				(0)
+#define NUM_FPT_HEADER_COLS		(2)
+#define FPT_HEADER_INFO			(0)
 #define FPT_HEADER_ROW_VERSION		(0)
-#define FPT_HEADER_ROW_SIZE			(1)
+#define FPT_HEADER_ROW_SIZE		(1)
 #define FPT_HEADER_ROW_ENTRY_SIZE	(2)
 #define FPT_HEADER_ROW_NUM_ENTRIES	(3)
+#define NUM_FPT_HEADER_ROWS		(4)
 
 /* FPT partition information */
 #define PARTITION_COL_ID		(0)
@@ -607,8 +610,10 @@ static int construct_partition_row(struct ami_fpt_partition *part, int part_num,
 						sprintf(row[col], "%s", "Loaded");
 					else
 						sprintf(row[col], "%s", "Error");
+				} else if (part->user.powerup_error) {
+					sprintf(row[col], "%s", "Active");
 				} else {
-					sprintf(row[col], "%s", "N/A");
+					sprintf(row[col], "%s", "In-Active");
 				}
 				break;
 
@@ -684,8 +689,10 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 						json_append_member(row, "status", json_mkstring("Loaded"));
 					else
 						json_append_member(row, "status", json_mkstring("Error"));
+				} else if (part->user.powerup_error) {
+					json_append_member(row, "status", json_mkstring("Active"));
 				} else {
-					json_append_member(row, "status", json_mkstring("N/A"));
+					json_append_member(row, "status", json_mkstring("In-Active"));
 				}
 				break;
 

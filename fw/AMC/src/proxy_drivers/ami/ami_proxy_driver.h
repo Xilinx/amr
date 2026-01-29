@@ -122,7 +122,7 @@ typedef enum
 /******************************************************************************/
 
 /**
- * @struct  AMI_PROXY_SENSOR_REQUEST
+ * @struct  AMIProxySensorRequest
  * @brief   Sensor request
  */
 typedef struct
@@ -133,10 +133,10 @@ typedef struct
     uint32_t ulLength;
     uint64_t ullAddress;
 
-} AMI_PROXY_SENSOR_REQUEST;
+} AMIProxySensorRequest;
 
 /**
- * @struct  AMI_PROXY_PDI_DOWNLOAD_REQUEST
+ * @struct  AMIProxyPdiDownloadRequest
  * @brief   PDI download request
  */
 typedef struct
@@ -151,10 +151,10 @@ typedef struct
     uint16_t usPacketNum;
     uint32_t ulPacketSize;
 
-} AMI_PROXY_PDI_DOWNLOAD_REQUEST;
+} AMIProxyPdiDownloadRequest;
 
 /**
- * @struct  AMI_PROXY_PDI_PROGRAM_REQUEST
+ * @struct  AMIProxyPdiProgramRequest
  * @brief   PDI program request
  */
 typedef struct
@@ -169,10 +169,10 @@ typedef struct
     uint16_t usPacketNum;
     uint32_t ulPacketSize;
 
-} AMI_PROXY_PDI_PROGRAM_REQUEST;
+} AMIProxyPdiProgramRequest;
 
 /**
- * @struct  AMI_PROXY_PDI_COPY_REQUEST
+ * @struct  AMIProxyPdiCopyRequest
  * @brief   PDI copy request
  */
 typedef struct
@@ -184,20 +184,20 @@ typedef struct
     uint32_t ulDestDevice;
     uint32_t ulDestPartition;
 
-} AMI_PROXY_PDI_COPY_REQUEST;
+} AMIProxyPdiCopyRequest;
 
 /**
- * @struct  AMI_PROXY_BOOT_SELECT_REQUEST
+ * @struct  AMIProxyBootSelectRequest
  * @brief   Boot select request
  */
 typedef struct
 {
     uint32_t ulPartitionSel;
 
-} AMI_PROXY_BOOT_SELECT_REQUEST;
+} AMIProxyBootSelectRequest;
 
 /**
- * @struct  AMI_PROXY_EEPROM_RW_REQUEST
+ * @struct  AMIProxyEepromRWRequest
  * @brief   Read from or write to the eeprom
  */
 typedef struct
@@ -207,10 +207,10 @@ typedef struct
     uint32_t ulLength;
     uint32_t ulOffset;
 
-} AMI_PROXY_EEPROM_RW_REQUEST;
+} AMIProxyEepromRWRequest;
 
 /**
- * @struct  AMI_PROXY_MODULE_RW_REQUEST
+ * @struct  AMIProxyModuleRWRequest
  * @brief   Read from or write to a QSFP module
  */
 typedef struct
@@ -222,23 +222,23 @@ typedef struct
     uint8_t  ucByteOffset;
     uint8_t  ucLength;
 
-} AMI_PROXY_MODULE_RW_REQUEST;
+} AMIProxyModuleRWRequest;
 
 /**
- * @struct  AMI_PROXY_FPT_FLAGS_REQUEST
+ * @struct  AMIProxyFptFlagsRequest
  * @brief   Read or write FPT partition flags
  */
 typedef struct
 {
-    AMI_PROXY_CMD_RW_REQUEST xRequest;      /* Read or Write */
-    uint32_t ulBootDevice;                  /* Primary or Secondary boot device */
-    uint32_t ulPartitionId;                 /* Partition index */
-    uint32_t ulType;                        /* Partition type */
-    uint32_t ulBaseAddr;                    /* Partition base address */
-    uint32_t ulSize;                        /* Partition size */
-    uint32_t ulFlags;                       /* Flags value (for write) */
+    AMI_PROXY_CMD_RW_REQUEST xRequest;  /* Read or Write */
+    uint32_t ulBootDevice;              /* Primary or Secondary boot device */
+    uint32_t ulPartitionId;             /* Partition index */
+    uint32_t ulType;                    /* Partition type */
+    uint32_t ulBaseAddr;                /* Partition base address */
+    uint32_t ulSize;                    /* Partition size */
+    uint32_t ulFlags;                   /* Flags value (for write) */
 
-} AMI_PROXY_FPT_FLAGS_REQUEST;
+} AMIProxyFptFlagsRequest;
 
 /**
  * @struct  AMI_PROXY_IDENTITY_RESPONSE
@@ -430,7 +430,7 @@ int iAMI_SetFptFlagsResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult, uin
  *          ERROR                   Data not retrieved successfully
  */
 int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
-                                AMI_PROXY_PDI_DOWNLOAD_REQUEST *pxDownloadRequest );
+    AMIProxyPdiDownloadRequest *pxDownloadRequest );
 
 /**
  * @brief   Get the PDI copy request
@@ -442,7 +442,7 @@ int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
  *          ERROR                   Data not retrieved successfully
  */
 int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
-                            AMI_PROXY_PDI_COPY_REQUEST *pxCopyRequest );
+    AMIProxyPdiCopyRequest *pxCopyRequest );
 /**
  * @brief   Get the PDI program request
  *
@@ -453,7 +453,7 @@ int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
  *          ERROR                   Data not retrieved successfully
  */
 int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
-	AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest );
+	AMIProxyPdiProgramRequest *pxProgramRequest );
 
 /**
  * @brief   Get the Sensor request
@@ -464,7 +464,8 @@ int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetSensorRequest( EVLSignal *pxSignal, AMI_PROXY_SENSOR_REQUEST *pxSensorRequest );
+int iAMI_GetSensorRequest( EVLSignal *pxSignal,
+    AMIProxySensorRequest *pxSensorRequest );
 
 /**
  * @brief   Get the PDI program request
@@ -476,7 +477,7 @@ int iAMI_GetSensorRequest( EVLSignal *pxSignal, AMI_PROXY_SENSOR_REQUEST *pxSens
  *          ERROR                   Data not retrieved successfully
  */
 int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
-	AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest );
+	AMIProxyPdiProgramRequest *pxProgramRequest );
 
 /**
  * @brief   Get the Boot Select request
@@ -487,7 +488,8 @@ int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetBootSelectRequest( EVLSignal *pxSignal, AMI_PROXY_BOOT_SELECT_REQUEST *pxBootSelectRequest );
+int iAMI_GetBootSelectRequest( EVLSignal *pxSignal,
+    AMIProxyBootSelectRequest *pxBootSelectRequest );
 
 /**
  * @brief   Get the eeprom read write request
@@ -499,7 +501,7 @@ int iAMI_GetBootSelectRequest( EVLSignal *pxSignal, AMI_PROXY_BOOT_SELECT_REQUES
  *          ERROR                       Data not retrieved successfully
  */
 int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
-                                    AMI_PROXY_EEPROM_RW_REQUEST *pxEepromReadWriteRequest );
+    AMIProxyEepromRWRequest *pxEepromReadWriteRequest );
 
 /**
  * @brief   Get the module read write request
@@ -511,7 +513,7 @@ int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
  *          ERROR                       Data not retrieved successfully
  */
 int iAMI_GetModuleReadWriteRequest( EVLSignal *pxSignal,
-                                    AMI_PROXY_MODULE_RW_REQUEST *pxModuleReadWriteRequest );
+    AMIProxyModuleRWRequest *pxModuleReadWriteRequest );
 
 /**
  * @brief   Get the debug verbosity request
@@ -535,7 +537,7 @@ int iAMI_GetDebugVerbosityRequest( EVLSignal *pxSignal,
  *          ERROR                   Data not retrieved successfully
  */
 int iAMI_GetFptFlagsRequest( EVLSignal *pxSignal,
-                             AMI_PROXY_FPT_FLAGS_REQUEST *pxFptFlagsRequest );
+    AMIProxyFptFlagsRequest *pxFptFlagsRequest );
 
 /**
  * @brief   Print all the stats gathered by the application

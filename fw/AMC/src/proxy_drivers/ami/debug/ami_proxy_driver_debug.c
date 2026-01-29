@@ -647,8 +647,8 @@ static void vGetPdiDownloadRequest( void )
     }
     else
     {
-        EVLSignal                      xEv  = { 0 };
-        AMI_PROXY_PDI_DOWNLOAD_REQUEST xReq = { 0 };
+        EVLSignal                  xEv  = { 0 };
+        AMIProxyPdiDownloadRequest xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
 
@@ -678,8 +678,8 @@ static void vGetPdiCopyRequest( void )
     }
     else
     {
-        EVLSignal                  xEv  = { 0 };
-        AMI_PROXY_PDI_COPY_REQUEST xReq = { 0 };
+        EVLSignal              xEv  = { 0 };
+        AMIProxyPdiCopyRequest xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
 
@@ -708,8 +708,8 @@ static void vGetPdiProgramRequest( void )
     }
     else
     {
-        EVLSignal                     xEv  = { 0 };
-        AMI_PROXY_PDI_PROGRAM_REQUEST xReq = { 0 };
+        EVLSignal                 xEv  = { 0 };
+        AMIProxyPdiProgramRequest xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
 
@@ -739,8 +739,8 @@ static void vGetSensorRequest( void )
     }
     else
     {
-        EVLSignal                xEv  = { 0 };
-        AMI_PROXY_SENSOR_REQUEST xReq = { 0 };
+        EVLSignal             xEv  = { 0 };
+        AMIProxySensorRequest xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
 
@@ -772,8 +772,8 @@ static void vGetBootSelectRequest( void )
     }
     else
     {
-        EVLSignal                    xEv  = { 0 };
-        AMI_PROXY_BOOT_SELECT_REQUEST xReq = { 0 };
+        EVLSignal                 xEv  = { 0 };
+        AMIProxyBootSelectRequest xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
 
@@ -801,8 +801,8 @@ static void vGetEepromRwRequest( void )
     }
     else
     {
-        EVLSignal                   xEv  = { 0 };
-        AMI_PROXY_EEPROM_RW_REQUEST xReq = { 0 };
+        EVLSignal               xEv  = { 0 };
+        AMIProxyEepromRWRequest xReq = { 0 };
 
         xEv.ucInstance = ( uint8_t )iInstance;
         if( OK != iAMI_GetEepromReadWriteRequest( &xEv, &xReq ) )

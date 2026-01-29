@@ -66,6 +66,25 @@ typedef enum
 
 } APC_BOOT_DEVICES;
 
+/**
+ * @enum    APC_FPT_TYPE
+ * @brief   FPT partition types
+ */
+typedef enum
+{
+	APC_FPT_TYPE_FPT             = 0xFFFF,
+	APC_FPT_TYPE_RECOVERY_FPT    = 0xFFFE,
+	APC_FPT_TYPE_EXTENSION_FPT   = 0xFFFD,
+	APC_FPT_TYPE_PDI_BOOT        = 0x0E00,
+	APC_FPT_TYPE_PDI_BOOT_BACKUP = 0x0E01,
+	APC_FPT_TYPE_PDI_XSABIN_META = 0x0E02,
+	APC_FPT_TYPE_PDI_GOLDEN      = 0x0E03,
+	APC_FPT_TYPE_PDI_SYS_DTB     = 0x0E04,
+	APC_FPT_TYPE_PDI_META        = 0x0E05,
+	APC_FPT_TYPE_PDI_META_BACKUP = 0x0E06,
+	APC_FPT_TYPE_PDI_USER        = 0x0F00,
+	APC_FPT_TYPE_SC_FW           = 0x0C00,
+} APC_FPT_TYPE;
 
 /******************************************************************************/
 /* Structs                                                                    */

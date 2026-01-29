@@ -907,18 +907,18 @@ int iAPC_EnableHotReset( EVLSignal *pxSignal )
     int iStatus = ERROR;
 
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( TRUE == pxThis->piValidFpt[ APC_BOOT_DEVICE_PRIMARY ] ) &&
-        ( NULL != pxSignal ) )
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( TRUE == pxThis->iInitialised ) &&
+         ( TRUE == pxThis->piValidFpt[ APC_BOOT_DEVICE_PRIMARY ] ) &&
+         ( NULL != pxSignal ) )
     {
-        APCMboxMsg xMsg = { 0 };
+        APCMboxMsg xMsg  = { 0 };
         xMsg.eMsgType    = APC_MSG_TYPE_ENABLE_HOT_RESET;
         xMsg.ucRequestId = pxSignal->ucInstance;
 
         if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                 ( void* )&xMsg,
-                                                 OSAL_TIMEOUT_NO_WAIT ) )
+                                                  ( void* )&xMsg,
+                                                  OSAL_TIMEOUT_NO_WAIT ) )
         {
             INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_POST )
             iStatus = OK;

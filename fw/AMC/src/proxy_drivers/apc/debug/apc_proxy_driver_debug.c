@@ -158,7 +158,6 @@ void vAPC_DebugInit( DAL_HDL pxParentHandle )
                 pxDAL_NewDebugFunction( "get_fpt_partition", pxGetDir, vGetFptPartition );
             }
         }
-
         iIsInitialised = TRUE;
     }
 }
@@ -241,7 +240,6 @@ static void vSetDownloadImage( void )
     {
         PLL_DAL( APC_DBG_NAME, "Error retrieving packet size\r\n" );
     }
-
     else
     {
         EVLSignal xSignal = { 0 };
@@ -441,7 +439,7 @@ static void vGetFptPartition( void )
             PLL_DAL( APC_DBG_NAME, "\tPartition base address : 0x%08X\r\n", xFptPartition.ulPartitionBaseAddr );
             PLL_DAL( APC_DBG_NAME, "\tPartition size . . . . : 0x%08X\r\n", xFptPartition.ulPartitionSize );
             PLL_DAL( APC_DBG_NAME, "\tPartition flags . . .  : 0x%08X\r\n", xFptPartition.ulPartitionFlags |
-                                                                                          ulUserPdiLoadStatus);
+                          (xFptPartition.ulPartitionType == APC_FPT_TYPE_PDI_USER) ? ulUserPdiLoadStatus : 0);
             PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
         }
     }

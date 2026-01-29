@@ -146,7 +146,7 @@ void vIN_BAND_TELEMETRY_DebugInit( DAL_HDL pxParentHandle, uint64_t ullSharedMem
         {
             pxDAL_NewDebugFunction( "print_stats", pxInBandTop, vPrintStats );
             pxDAL_NewDebugFunction( "clear_stats", pxInBandTop, vClearStats );
-            pxDAL_NewDebugFunction( "test_mode", pxInBandTop, vInBandTelemetryTestMode );
+            pxDAL_NewDebugFunction( "test_mode",   pxInBandTop, vInBandTelemetryTestMode );
         }
 
         pxThis->ullSharedMemBaseAddr = ullSharedMemBaseAddr;
@@ -317,19 +317,13 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
         {
         case AMI_PROXY_DRIVER_E_SENSOR_READ:
         {
-            AMI_PROXY_SENSOR_REQUEST xSensorRequest =
-            {
-                0
-            };
+            AMIProxySensorRequest xSensorRequest = { 0 };
 
             if( OK == iAMI_GetSensorRequest( pxSignal, &xSensorRequest ) )
             {
                 AMI_PROXY_RESULT xResult        = AMI_PROXY_RESULT_INVALID_VALUE;
                 uint16_t         usResponseSize = 0;
-                uint8_t          pucRespBuffer[ SENSOR_RESP_BUFFER_SIZE ] =
-                {
-                    0
-                };
+                uint8_t pucRespBuffer[ SENSOR_RESP_BUFFER_SIZE ] = { 0 };
                 uintptr_t ullDestAddr = ( pxThis->ullSharedMemBaseAddr + xSensorRequest.ullAddress );
                 uint8_t   *pucDestAdd = ( uint8_t* )( ullDestAddr );
 
@@ -350,55 +344,45 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
                     {
                         switch( xSensorRequest.xRepo )
                         {
-                        case AMI_PROXY_CMD_SENSOR_REPO_TEMP:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer, pucMockedTempSensorData, sizeof( pucMockedTempSensorData ) );
-                            usResponseSize = sizeof( pucMockedTempSensorData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_TEMP:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedTempSensorData,
+                                               sizeof( pucMockedTempSensorData ) );
+                                usResponseSize = sizeof( pucMockedTempSensorData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedVoltageSensorData,
-                                           sizeof( pucMockedVoltageSensorData ) );
-                            usResponseSize = sizeof( pucMockedVoltageSensorData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedVoltageSensorData,
+                                               sizeof( pucMockedVoltageSensorData ) );
+                                usResponseSize = sizeof( pucMockedVoltageSensorData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_CURRENT:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedCurrentSensorData,
-                                           sizeof( pucMockedCurrentSensorData ) );
-                            usResponseSize = sizeof( pucMockedCurrentSensorData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_CURRENT:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedCurrentSensorData,
+                                               sizeof( pucMockedCurrentSensorData ) );
+                                usResponseSize = sizeof( pucMockedCurrentSensorData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_POWER:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedPowerSensorData,
-                                           sizeof( pucMockedPowerSensorData ) );
-                            usResponseSize = sizeof( pucMockedPowerSensorData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_POWER:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedPowerSensorData,
+                                               sizeof( pucMockedPowerSensorData ) );
+                                usResponseSize = sizeof( pucMockedPowerSensorData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedTotalPowerSensorData,
-                                           sizeof( pucMockedTotalPowerSensorData ) );
-                            usResponseSize = sizeof( pucMockedTotalPowerSensorData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedTotalPowerSensorData,
+                                               sizeof( pucMockedTotalPowerSensorData ) );
+                                usResponseSize = sizeof( pucMockedTotalPowerSensorData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_BDINFO:
-                        case AMI_PROXY_CMD_SENSOR_REPO_FPT:
-                        default:
-                        {
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_BDINFO:
+                            case AMI_PROXY_CMD_SENSOR_REPO_FPT:
+                            default:
+                                break;
                         }
 
                         iStatus = OK;
@@ -407,69 +391,55 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
                     {
                         switch( xSensorRequest.xRepo )
                         {
-                        case AMI_PROXY_CMD_SENSOR_REPO_BDINFO:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer, pucMockedBoardInfo, sizeof( pucMockedBoardInfo ) );
-                            usResponseSize = sizeof( pucMockedBoardInfo );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_BDINFO:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedBoardInfo,
+                                               sizeof( pucMockedBoardInfo ) );
+                                usResponseSize = sizeof( pucMockedBoardInfo );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_TEMP:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedTempSensorSdrData,
-                                           sizeof( pucMockedTempSensorSdrData ) );
-                            usResponseSize = sizeof( pucMockedTempSensorSdrData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_TEMP:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedTempSensorSdrData,
+                                               sizeof( pucMockedTempSensorSdrData ) );
+                                usResponseSize = sizeof( pucMockedTempSensorSdrData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedVoltageSensorSdrData,
-                                           sizeof( pucMockedVoltageSensorSdrData ) );
-                            usResponseSize = sizeof( pucMockedVoltageSensorSdrData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedVoltageSensorSdrData,
+                                               sizeof( pucMockedVoltageSensorSdrData ) );
+                                usResponseSize = sizeof( pucMockedVoltageSensorSdrData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_CURRENT:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedCurrentSensorSdrData,
-                                           sizeof( pucMockedCurrentSensorSdrData ) );
-                            usResponseSize = sizeof( pucMockedCurrentSensorSdrData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_CURRENT:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedCurrentSensorSdrData,
+                                               sizeof( pucMockedCurrentSensorSdrData ) );
+                                usResponseSize = sizeof( pucMockedCurrentSensorSdrData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_POWER:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedPowerSensorSdrData,
-                                           sizeof( pucMockedPowerSensorSdrData ) );
-                            usResponseSize = sizeof( pucMockedPowerSensorSdrData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_POWER:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedPowerSensorSdrData,
+                                               sizeof( pucMockedPowerSensorSdrData ) );
+                                usResponseSize = sizeof( pucMockedPowerSensorSdrData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer,
-                                           pucMockedTotalPowerSensorSdrData,
-                                           sizeof( pucMockedTotalPowerSensorSdrData ) );
-                            usResponseSize = sizeof( pucMockedTotalPowerSensorSdrData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER:
+                                pvOSAL_MemCpy( pucRespBuffer,
+                                               pucMockedTotalPowerSensorSdrData,
+                                               sizeof( pucMockedTotalPowerSensorSdrData ) );
+                                usResponseSize = sizeof( pucMockedTotalPowerSensorSdrData );
+                                break;
 
-                        case AMI_PROXY_CMD_SENSOR_REPO_FPT:
-                        {
-                            pvOSAL_MemCpy( pucRespBuffer, &pucMockedFptData, sizeof( pucMockedFptData ) );
-                            usResponseSize = sizeof( pucMockedFptData );
-                            break;
-                        }
+                            case AMI_PROXY_CMD_SENSOR_REPO_FPT:
+                                pvOSAL_MemCpy( pucRespBuffer, &pucMockedFptData, sizeof( pucMockedFptData ) );
+                                usResponseSize = sizeof( pucMockedFptData );
+                                break;
 
-                        default:
-                        {
-                            break;
-                        }
+                            default:
+                                break;
                         }
 
                         iStatus = OK;
@@ -504,10 +474,7 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_EEPROM_READ_WRITE:
         {
-            AMI_PROXY_EEPROM_RW_REQUEST xEepromReadWriteRequest =
-            {
-                0
-            };
+            AMIProxyEepromRWRequest xEepromReadWriteRequest = { 0 };
 
             if( OK == iAMI_GetEepromReadWriteRequest( pxSignal, &xEepromReadWriteRequest ) )
             {
@@ -522,10 +489,7 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_MODULE_READ_WRITE:
         {
-            AMI_PROXY_MODULE_RW_REQUEST xModuleReadWriteRequest =
-            {
-                0
-            };
+            AMIProxyModuleRWRequest xModuleReadWriteRequest = { 0 };
 
             if( OK == iAMI_GetModuleReadWriteRequest( pxSignal, &xModuleReadWriteRequest ) )
             {
@@ -542,10 +506,8 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START:
         {
-            AMI_PROXY_PDI_DOWNLOAD_REQUEST xDownloadRequest =
-            {
-                0
-            };
+            AMIProxyPdiDownloadRequest xDownloadRequest = { 0 };
+
             PLL_DBG( AMC_IN_BAND_DBG_NAME, "Event PDI Download Start (0x%02X)\r\n", pxSignal->ucEventType );
 
             if( OK == iAMI_GetPdiDownloadRequest( pxSignal, &xDownloadRequest ) )
@@ -577,10 +539,7 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_PDI_COPY_START:
         {
-            AMI_PROXY_PDI_COPY_REQUEST xCopyRequest =
-            {
-                0
-            };
+            AMIProxyPdiCopyRequest xCopyRequest = { 0 };
             PLL_DBG( AMC_IN_BAND_DBG_NAME, "Event PDI Copy Start (0x%02X)\r\n", pxSignal->ucEventType );
 
             if( OK == iAMI_GetPdiCopyRequest( pxSignal, &xCopyRequest ) )
@@ -608,10 +567,8 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_PDI_PROGRAM_START:
         {
-            AMI_PROXY_PDI_PROGRAM_REQUEST xProgramRequest =
-            {
-                0
-            };
+            AMIProxyPdiProgramRequest xProgramRequest = { 0 };
+
             PLL_DBG( AMC_IN_BAND_DBG_NAME, "Event PDI Program Start (0x%02X)\r\n", pxSignal->ucEventType );
 
             if( OK == iAMI_GetPdiProgramRequest( pxSignal, &xProgramRequest ) )
@@ -642,10 +599,7 @@ static int iAmiCallbackTestMode( EVLSignal *pxSignal )
 
         case AMI_PROXY_DRIVER_E_BOOT_SELECT:
         {
-            AMI_PROXY_BOOT_SELECT_REQUEST xBootSelRequest =
-            {
-                0
-            };
+            AMIProxyBootSelectRequest xBootSelRequest = { 0 };
             PLL_DBG( AMC_IN_BAND_DBG_NAME, "Event Boot Select Request (0x%02X)\r\n", pxSignal->ucEventType );
 
             if( OK == iAMI_GetBootSelectRequest( pxSignal, &xBootSelRequest ) )

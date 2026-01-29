@@ -216,7 +216,7 @@ UTIL_MAKE_ENUM_AND_STRINGS( AMI_PROXY_ERRORS, AMI_PROXY_ERRORS, AMI_PROXY_ERRORS
 /******************************************************************************/
 
 /**
- * @struct  AMI_RX_DATA
+ * @struct  AMIProxyRxData
  * @brief   Structure to hold rx'd data received from FW_IF
  */
 typedef struct
@@ -226,21 +226,21 @@ typedef struct
     uint16_t			usCid;
     union
     {
-        AMI_PROXY_PDI_DOWNLOAD_REQUEST xDownloadRequest;
-        AMI_PROXY_PDI_COPY_REQUEST     xCopyRequest;
-        AMI_PROXY_PDI_PROGRAM_REQUEST  xProgramRequest;
-        AMI_PROXY_SENSOR_REQUEST       xSensorRequest;
-        AMI_PROXY_BOOT_SELECT_REQUEST  xBootSelectRequest;
-        AMI_PROXY_EEPROM_RW_REQUEST    xEepromReadWriteRequest;
-        AMI_PROXY_MODULE_RW_REQUEST    xModuleReadWriteRequest;
-        AMI_PROXY_FPT_FLAGS_REQUEST    xFptFlagsRequest;
-        uint8_t                        ucDebugVerbosityRequest;
+        AMIProxyPdiDownloadRequest  xDownloadRequest;
+        AMIProxyPdiCopyRequest      xCopyRequest;
+        AMIProxyPdiProgramRequest   xProgramRequest;
+        AMIProxySensorRequest       xSensorRequest;
+        AMIProxyBootSelectRequest   xBootSelectRequest;
+        AMIProxyEepromRWRequest     xEepromReadWriteRequest;
+        AMIProxyModuleRWRequest     xModuleReadWriteRequest;
+        AMIProxyFptFlagsRequest     xFptFlagsRequest;
+        uint8_t                     ucDebugVerbosityRequest;
     };
 
-} AMI_RX_DATA;
+} AMIProxyRxData;
 
 /**
- * @struct  AMI_PRIVATE_DATA
+ * @struct  AMIProxyPrivateData
  * @brief   Structure to hold ths proxy driver's private data
  */
 typedef struct
@@ -250,7 +250,7 @@ typedef struct
     int             iInitialised;
     uint8_t         ucMyId;
 
-    FWIfCfg       *pxFwIf;
+    FWIfCfg         *pxFwIf;
     uint32_t        ulFwIfPort;
 
     EVLRecord       *pxEvlRecord;
@@ -259,19 +259,19 @@ typedef struct
     void            *pvOsalMBoxHdl;
     void            *pvOsalTaskHdl;
 
-    AMI_RX_DATA     xRxData[ AMI_RXDATA_SIZE ];
+    AMIProxyRxData  xRxData[ AMI_RXDATA_SIZE ];
 
     uint32_t        pulStatCounters[ AMI_PROXY_STATS_MAX ];
     uint32_t        pulErrorCounters[ AMI_PROXY_ERRORS_MAX ];
 
-    MODULE_STATE	xState;
+    MODULE_STATE    xState;
 
     uint32_t        ulLowerFirewall;
 
-} AMI_PRIVATE_DATA;
+} AMIProxyPrivateData;
 
 /**
- * @struct  AMI_MBOX_MSG
+ * @struct  AMIProxyMboxMsg
  * @brief   Data posted via the AMI Proxy driver mailbox
  */
 typedef struct
@@ -286,10 +286,10 @@ typedef struct
         uint32_t                     ulFptFlags;
     };
 
-} AMI_MBOX_MSG;
+} AMIProxyMboxMsg;
 
 /**
- * @struct  AMI_CMD_RESPONSE_HDR
+ * @struct  AMIProxyCmdRespHdr
  * @brief   The command response header
  */
 typedef struct
@@ -306,10 +306,10 @@ typedef struct
         uint32_t ulHeader[ AMI_RESPONSE_HDR_SIZE ];
     };
 
-} AMI_CMD_RESPONSE_HDR;
+} AMIProxyCmdRespHdr;
 
 /**
- * @struct  AMI_CMD_RESPONSE
+ * @struct  AMIProxyCmdResp
  * @brief   The command response header and payload
  */
 typedef struct
@@ -318,18 +318,19 @@ typedef struct
     {
         struct
         {
-            AMI_CMD_RESPONSE_HDR xHdr;
+            AMIProxyCmdRespHdr xHdr;
             uint32_t ulPayload[ AMI_RESPONSE_PAYLOAD_SIZE ];
             uint32_t ulRCode;
         };
         uint32_t ulData[ AMI_RESPONSE_SIZE ];
     };
 
-} AMI_CMD_RESPONSE;
-STATIC_ASSERT( sizeof( AMI_CMD_RESPONSE ) == AMI_PROXY_RESPONSE_SIZE );
+} AMIProxyCmdResp;
+
+STATIC_ASSERT( sizeof( AMIProxyCmdResp ) == AMI_PROXY_RESPONSE_SIZE );
 
 /**
- * @struct  AMI_CMD_REQUEST_HDR
+ * @struct  AMIProxyCmdReqHdr
  * @brief   The request header
  */
 typedef struct
@@ -355,10 +356,10 @@ typedef struct
         uint32_t ulHeader[ AMI_REQUEST_HDR_SIZE ];
     };
 
-} AMI_CMD_REQUEST_HDR;
+} AMIProxyCmdReqHdr;
 
 /**
- * @struct  AMI_CMD_REQ_SENSOR_PAYLOAD
+ * @struct  AMIProxyCmdReqSensorPayload
  * @brief   The sensor request payload
  */
 typedef struct
@@ -373,10 +374,10 @@ typedef struct
     uint32_t ulResvd:5;
     uint32_t ulPad;
 
-} AMI_CMD_REQ_SENSOR_PAYLOAD;
+} AMIProxyCmdReqSensorPayload;
 
 /**
- * @struct  AMI_CMD_DATA_PAYLOAD
+ * @struct  AMIProxyCmdDataPayload
  * @brief   The data request payload
  */
 typedef struct
@@ -398,20 +399,20 @@ typedef struct
     uint32_t ulPacketSize; /* packet size in KB */
     uint32_t ulPad;
 
-} AMI_CMD_DATA_PAYLOAD;
+} AMIProxyCmdDataPayload;
 
 /**
- * @struct  AMI_CMD_HEARTBEAT_PAYLOAD
+ * @struct  AMIProxyCmdHeartbeatPayload
  * @brief   The heartbeat payload
  */
 typedef struct
 {
     uint8_t ucHeartbeatCount;
 
-} AMI_CMD_HEARTBEAT_PAYLOAD;
+} AMIProxyCmdHeartbeatPayload;
 
 /**
- * @struct  AMI_CMD_EEPROM_PAYLOAD
+ * @struct  AMIProxyCmdEepromPayload
  * @brief   The eeprom payload
  */
 typedef struct
@@ -422,10 +423,10 @@ typedef struct
     uint32_t ucOffset:8;
     uint32_t ucReserved:15;
 
-} AMI_CMD_EEPROM_PAYLOAD;
+} AMIProxyCmdEepromPayload;
 
 /**
- * @struct  AMI_CMD_MODULE_PAYLOAD
+ * @struct  AMIProxyCmdModulePayload
  * @brief   The module payload
  */
 typedef struct
@@ -438,10 +439,10 @@ typedef struct
     uint32_t ulReqType:1;
     uint32_t ulReserved:31;
 
-} AMI_CMD_MODULE_PAYLOAD;
+} AMIProxyCmdModulePayload;
 
 /**
- * @struct  AMI_CMD_FPT_FLAGS_PAYLOAD
+ * @struct  AMIProxyCmdFptFlagsPayload
  * @brief   The FPT flags request payload
  */
 typedef struct
@@ -454,7 +455,7 @@ typedef struct
     uint32_t ulSize;          /* Partition size */
     uint32_t ulFlags;         /* Flags value (for write) */
 
-} AMI_CMD_FPT_FLAGS_PAYLOAD;
+} AMIProxyCmdFptFlagsPayload;
 
 /**
  * @struct  AMI_CMD_REQUEST
@@ -462,29 +463,30 @@ typedef struct
  */
 typedef struct
 {
-    AMI_CMD_REQUEST_HDR xHdr;
+    AMIProxyCmdReqHdr xHdr;
     union
     {
-        AMI_CMD_REQ_SENSOR_PAYLOAD  xSensorPayload;
-        AMI_CMD_DATA_PAYLOAD        xPdiDownloadPayload;
-        AMI_CMD_DATA_PAYLOAD        xPdiCopyPayload;
-        AMI_CMD_DATA_PAYLOAD        xBootSelect;
-        AMI_CMD_HEARTBEAT_PAYLOAD   xHeartbeatPayload;
-        AMI_CMD_EEPROM_PAYLOAD      xEepromPayload;
-        AMI_CMD_MODULE_PAYLOAD      xModulePayload;
-        AMI_CMD_FPT_FLAGS_PAYLOAD   xFptFlagsPayload;
+        AMIProxyCmdReqSensorPayload xSensorPayload;
+        AMIProxyCmdDataPayload      xPdiDownloadPayload;
+        AMIProxyCmdDataPayload      xPdiCopyPayload;
+        AMIProxyCmdDataPayload      xBootSelectPayload;
+        AMIProxyCmdHeartbeatPayload xHeartbeatPayload;
+        AMIProxyCmdEepromPayload    xEepromPayload;
+        AMIProxyCmdModulePayload    xModulePayload;
+        AMIProxyCmdFptFlagsPayload  xFptFlagsPayload;
         uint8_t                     ucDebugVerbosityPayload;
     };
 
 } AMI_CMD_REQUEST;
-STATIC_ASSERT( sizeof( AMI_CMD_RESPONSE ) < AMI_PROXY_REQUEST_SIZE );
+
+STATIC_ASSERT( sizeof( AMIProxyCmdResp ) < AMI_PROXY_REQUEST_SIZE );
 
 
 /******************************************************************************/
 /* Local Variables                                                            */
 /******************************************************************************/
 
-static AMI_PRIVATE_DATA xLocalData =
+static AMIProxyPrivateData xLocalData =
 {
     UPPER_FIREWALL,             /* ulUpperFirewall */
     FALSE,                      /* iInitialised */
@@ -502,7 +504,7 @@ static AMI_PRIVATE_DATA xLocalData =
     LOWER_FIREWALL              /* ulLowerFirewall */
 };
 
-static AMI_PRIVATE_DATA *pxThis = &xLocalData;
+static AMIProxyPrivateData *pxThis = &xLocalData;
 
 
 /******************************************************************************/
@@ -627,7 +629,7 @@ int iAMI_Initialise( uint8_t ucProxyId, FWIfCfg *pxFwIf, uint32_t ulFwIfPort,
                     INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_INIT_MUTEX_CREATE_FAILED )
                 }
                 else if( OSAL_ERRORS_NONE != iOSAL_MBox_Create( &pxThis->pvOsalMBoxHdl, AMI_MBOX_SIZE,
-                                                    sizeof( AMI_MBOX_MSG ), "ami_proxy mbox" ) )
+                                                    sizeof( AMIProxyMboxMsg ), "ami_proxy mbox" ) )
                 {
                     PLL_ERR( AMI_NAME, "Error initialising mbox\r\n" );
                     INC_ERROR_COUNTER_WITH_STATE( AMI_PROXY_INIT_MBOX_CREATE_FAILED )
@@ -702,7 +704,7 @@ int iAMI_SetPdiDownloadCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT x
         ( NULL != pxSignal ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_PDI_DOWNLOAD_COMPLETE;
         xMsg.xResult = xResult;
@@ -737,7 +739,7 @@ int iAMI_SetPdiCopyCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResu
         ( NULL != pxSignal ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_PDI_COPY_COMPLETE;
         xMsg.xResult = xResult;
@@ -772,7 +774,7 @@ int iAMI_SetPdiProgramCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xR
         ( NULL != pxSignal ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_PDI_PROGRAM_COMPLETE;
         xMsg.xResult = xResult;
@@ -807,7 +809,7 @@ int iAMI_SetSensorCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResul
         ( NULL != pxSignal ) &&
         ( TRUE == pxThis->iInitialised ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_SENSOR_COMPLETE;
         xMsg.xResult = xResult;
@@ -845,7 +847,7 @@ int iAMI_SetIdentityResponse( EVLSignal *pxSignal,
         ( NULL != pxSignal ) &&
         ( NULL != pxIdentityResponse ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_IDENTITY_COMPLETE;
         xMsg.xResult = xResult;
@@ -881,7 +883,7 @@ int iAMI_SetBootSelectCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xR
         ( TRUE == pxThis->iInitialised ) &&
         ( NULL != pxSignal ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_BOOT_SELECT_COMPLETE;
         xMsg.xResult = xResult;
@@ -916,7 +918,7 @@ int iAMI_SetEepromReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESU
         ( TRUE == pxThis->iInitialised ) &&
         ( NULL != pxSignal ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_EEPROM_RW_COMPLETE;
         xMsg.xResult = xResult;
@@ -951,7 +953,7 @@ int iAMI_SetModuleReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESU
         ( TRUE == pxThis->iInitialised ) &&
         ( NULL != pxSignal ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_MODULE_RW_COMPLETE;
         xMsg.xResult = xResult;
@@ -986,7 +988,7 @@ int iAMI_SetDebugVerbosityResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResul
         ( TRUE == pxThis->iInitialised ) &&
         ( NULL != pxSignal ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_DEBUG_VERBOSITY_COMPLETE;
         xMsg.xResult = xResult;
@@ -1021,7 +1023,7 @@ int iAMI_SetFptFlagsResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult, uin
         ( TRUE == pxThis->iInitialised ) &&
         ( NULL != pxSignal ) )
     {
-        AMI_MBOX_MSG xMsg = { 0 };
+        AMIProxyMboxMsg xMsg = { 0 };
         xMsg.ucRxDataIndex = pxSignal->ucInstance;
         xMsg.eMsgType = AMI_MSG_TYPE_FPT_FLAGS_COMPLETE;
         xMsg.xResult = xResult;
@@ -1051,7 +1053,7 @@ int iAMI_SetFptFlagsResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult, uin
  * @brief   Get the data associated with the PDI download
  */
 int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
-                                AMI_PROXY_PDI_DOWNLOAD_REQUEST *pxDownloadRequest )
+    AMIProxyPdiDownloadRequest *pxDownloadRequest )
 {
     int iStatus = ERROR;
 
@@ -1126,7 +1128,7 @@ int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
  * @brief   Get the data associated with the PDI copy
  */
 int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
-                            AMI_PROXY_PDI_COPY_REQUEST *pxCopyRequest )
+    AMIProxyPdiCopyRequest *pxCopyRequest )
 {
     int iStatus = ERROR;
 
@@ -1195,7 +1197,7 @@ int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
  * @brief   Get the data associated with the PDI program
  */
 int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
-                               AMI_PROXY_PDI_PROGRAM_REQUEST *pxProgramRequest )
+    AMIProxyPdiProgramRequest *pxProgramRequest )
 {
     int iStatus = ERROR;
 
@@ -1270,7 +1272,7 @@ int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
  * @brief   Get the data associated with the sensor
  */
 int iAMI_GetSensorRequest( EVLSignal *pxSignal,
-                           AMI_PROXY_SENSOR_REQUEST *pxSensorRequest )
+    AMIProxySensorRequest *pxSensorRequest )
 {
     int iStatus = ERROR;
 
@@ -1337,7 +1339,7 @@ int iAMI_GetSensorRequest( EVLSignal *pxSignal,
  * @brief   Get the boot selection request
  */
 int iAMI_GetBootSelectRequest( EVLSignal *pxSignal,
-                               AMI_PROXY_BOOT_SELECT_REQUEST *pxBootSelectRequest )
+    AMIProxyBootSelectRequest *pxBootSelectRequest )
 {
     int iStatus = ERROR;
 
@@ -1396,7 +1398,7 @@ int iAMI_GetBootSelectRequest( EVLSignal *pxSignal,
  * @brief   Get the eeprom read write request
  */
 int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
-                                    AMI_PROXY_EEPROM_RW_REQUEST *pxEepromReadWriteRequest )
+    AMIProxyEepromRWRequest *pxEepromReadWriteRequest )
 {
     int iStatus = ERROR;
 
@@ -1462,7 +1464,7 @@ int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
  * @brief   Get the module read write request
  */
 int iAMI_GetModuleReadWriteRequest( EVLSignal *pxSignal,
-                                    AMI_PROXY_MODULE_RW_REQUEST *pxModuleReadWriteRequest )
+    AMIProxyModuleRWRequest *pxModuleReadWriteRequest )
 {
     int iStatus = ERROR;
 
@@ -1590,7 +1592,7 @@ int iAMI_GetDebugVerbosityRequest( EVLSignal *pxSignal,
  * @brief   Get the FPT flags request
  */
 int iAMI_GetFptFlagsRequest( EVLSignal *pxSignal,
-                             AMI_PROXY_FPT_FLAGS_REQUEST *pxFptFlagsRequest )
+    AMIProxyFptFlagsRequest *pxFptFlagsRequest )
 {
     int iStatus = ERROR;
 
@@ -1759,7 +1761,7 @@ int iAMI_GetState( MODULE_STATE *pxState )
  */
 static void vProxyDriverTask( void *pvArgs )
 {
-    AMI_MBOX_MSG xMBoxData = { 0 };
+    AMIProxyMboxMsg xMBoxData   = { 0 };
     AMI_CMD_REQUEST xCmdRequest = { { { { 0 } } } };
     uint32_t ulStartMs = 0;
 
@@ -2082,7 +2084,7 @@ static void vProxyDriverTask( void *pvArgs )
                             pxThis->xRxData[ ucIndex ].usCid = xCmdRequest.xHdr.usCid;
                             pxThis->xRxData[ ucIndex ].xOpCode = xCmdRequest.xHdr.ulOpCode;
                             pxThis->xRxData[ ucIndex ].xBootSelectRequest.ulPartitionSel =
-                                                            xCmdRequest.xBootSelect.ulPartitionSel;
+                                                    xCmdRequest.xBootSelectPayload.ulPartitionSel;
                             pxThis->xRxData[ ucIndex ].ucInUse = TRUE;
                         }
                         else
@@ -2171,8 +2173,8 @@ static void vProxyDriverTask( void *pvArgs )
                                                  ( void* )&xMBoxData,
                                                  OSAL_TIMEOUT_NO_WAIT ) )
         {
-            AMI_CMD_RESPONSE xCmdResponse = { { { { { { 0 } } } } } };
-            uint32_t xCmdResponseSize = sizeof( AMI_CMD_RESPONSE );
+            AMIProxyCmdResp xCmdResponse = { { { { { { 0 } } } } } };
+            uint32_t xCmdResponseSize = sizeof( AMIProxyCmdResp );
             uint32_t ulValidMsg = TRUE;
             uint8_t ucIndex = xMBoxData.ucRxDataIndex;
 
@@ -2371,7 +2373,7 @@ static int iHandleHeartbeatRequest( AMI_CMD_REQUEST *pxCmdRequest )
         /* Respond to heartbeat request via the mailbox */
         if( OK == iStatus )
         {
-            AMI_MBOX_MSG xMsg = { 0 };
+            AMIProxyMboxMsg xMsg = { 0 };
             AMI_PROXY_HEARTBEAT_RESPONSE xHeartbeatResponse = { 0 };
 
             xMsg.ucRxDataIndex = ucIndex;
@@ -2620,7 +2622,7 @@ static int iHandleFptFlagsRequest( AMI_CMD_REQUEST *pxCmdRequest )
             iStatus = iFindNextFreeRxDataIndex( &ucIndex );
             if( ERROR != iStatus )
             {
-                AMI_RX_DATA *pxRxData = &pxThis->xRxData[ucIndex];
+                AMIProxyRxData *pxRxData = &pxThis->xRxData[ucIndex];
                 pxRxData->usCid = pxCmdRequest->xHdr.usCid;
                 pxRxData->xOpCode = pxCmdRequest->xHdr.ulOpCode;
                 pxRxData->xFptFlagsRequest.xRequest = pxCmdRequest->xFptFlagsPayload.ulReqType;
