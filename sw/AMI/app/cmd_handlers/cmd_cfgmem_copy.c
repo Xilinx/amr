@@ -24,7 +24,7 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define COPY_CHUNK_DUR_MS       (47625) /* Est duration for partition chunk copy (ms) */
+#define COPY_CHUNK_DUR_MS       (3532) /* Est duration for partition chunk copy (ms) */
 #define SECOND_IN_MS            (1000)
 
 /*****************************************************************************/
