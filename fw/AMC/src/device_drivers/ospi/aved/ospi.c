@@ -120,8 +120,8 @@
 #define OSPI_CMD_BUFFER_SIZE        ( 8 )
 #define OSPI_STATUS_BUFFER_SIZE     ( 2 )
 
-#define OSPI_POLL_OVERALL_TIMEOUT_MS  ( 1000 )
-#define OSPI_POLL_INTERVAL_TIMEOUT_MS ( 100 )
+#define OSPI_POLL_OVERALL_TIMEOUT_MS  ( 100 )
+#define OSPI_POLL_INTERVAL_TIMEOUT_MS ( 10 )
 
 #define BITSHIFT_1B ( 8 )
 #define BITSHIFT_2B ( 16 )
@@ -320,7 +320,7 @@ static int iFlashErase( XOspiPsv *pxOspiPsvPtr,
                         uint8_t *pucWriteBfrPtr );
 
 /**
- * @brief   Writes to the serial Flash connected to the OSPIPSV interface
+ * @brief   Page writes to the serial Flash connected to the OSPIPSV interface
  *
  * @param   pxOspiPsvPtr        The XOspiPsv driver instance
  * @param   ulAddress           Contains the address to write data to in the Flash
@@ -552,7 +552,7 @@ int iOSPI_FlashInit( OSPICfg *pxOspiCfg )
         /* Set the prescaler for OSPIPSV clock */
         if( OK == iStatus )
         {
-            iOspiStatus = XOspiPsv_SetClkPrescaler( &pxThis->xOspiPsvInstance, XOSPIPSV_CLK_PRESCALE_12 );
+            iOspiStatus = XOspiPsv_SetClkPrescaler( &pxThis->xOspiPsvInstance, XOSPIPSV_CLK_PRESCALE_6);
             if( XST_SUCCESS != iOspiStatus )
             {
                 PLL_ERR( OSPI_NAME, "Error: XOspiPsv_SetClkPrescaler failed:%d\r\n", iOspiStatus );
@@ -1810,7 +1810,7 @@ static int iFlashErase( XOspiPsv *pxOspiPsvPtr,
 }
 
 /**
- * @brief   Writes to the serial Flash connected to the OSPIPSV interface
+ * @brief   Page writes to the serial Flash connected to the OSPIPSV interface
  */
 static int iFlashWrite( XOspiPsv *pxOspiPsvPtr,
                         uint32_t ulAddress,
@@ -1819,133 +1819,113 @@ static int iFlashWrite( XOspiPsv *pxOspiPsvPtr,
 {
     int iOspiStatus = XST_FAILURE;
 
-    if( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( NULL != pxOspiPsvPtr ) &&
-        ( NULL != pucWriteBfrPtr ) )
+    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( TRUE == pxThis->iInitialised ) &&
+         ( NULL != pxOspiPsvPtr ) &&
+         ( NULL != pucWriteBfrPtr ) )
     {
-        XOspiPsv_Msg xFlashMsg =
-        {
-            0
-        };
+        XOspiPsv_Msg xFlashMsg = { 0 };
         uint8_t ucFlashStatus[ OSPI_STATUS_BUFFER_SIZE ] __attribute__ ( ( aligned( OSPI_WRITE_BUFFER_ALIGNMENT ) ) ) =
         {
             0
         };
-        uint32_t ulBytesToWrite = 0;
         uint32_t ulRealAddr     = 0;
-        uint8_t  ucNumLines     = 0;
 
-        while( 0 != ulByteCount )
+        /*
+         * Translate address based on type of connection
+         * If stacked assert the slave select based on address
+         */
+        iOspiStatus = iGetRealAddr( pxOspiPsvPtr, ulAddress, &ulRealAddr );
+        if ( XST_SUCCESS != iOspiStatus )
         {
-            /*
-             * Translate address based on type of connection
-             * If stacked assert the slave select based on address
-             */
-            iOspiStatus = iGetRealAddr( pxOspiPsvPtr, ulAddress, &ulRealAddr );
-            if( XST_SUCCESS != iOspiStatus )
-            {
-                PLL_ERR( OSPI_NAME, "Error: iGetRealAddr failed: %d\r\n", iOspiStatus );
-                break;
-            }
+            PLL_ERR( OSPI_NAME, "Error: iGetRealAddr failed: %d\r\n", iOspiStatus );
+            return iOspiStatus;
+        }
 
-            xFlashMsg.Opcode      = WRITE_ENABLE_CMD;
+        xFlashMsg.Opcode      = WRITE_ENABLE_CMD;
+        xFlashMsg.Addrsize    = 0;
+        xFlashMsg.Addrvalid   = 0;
+        xFlashMsg.TxBfrPtr    = NULL;
+        xFlashMsg.RxBfrPtr    = NULL;
+        xFlashMsg.ByteCount   = 0;
+        xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_TX;
+        xFlashMsg.IsDDROpCode = 0;
+        xFlashMsg.Proto       = 0;
+        xFlashMsg.Dummy       = 0;
+        if ( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
+        {
+            xFlashMsg.Proto = XOSPIPSV_WRITE_8_0_0;
+        }
+
+        if ( 0U != pxOspiPsvPtr->DualByteOpcodeEn )
+            xFlashMsg.ExtendedOpcode = (u8)(~xFlashMsg.Opcode);
+
+        iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
+        if ( XST_SUCCESS != iOspiStatus )
+        {
+            PLL_ERR( OSPI_NAME, "Error: poll transfer failed: %d\r\n", iOspiStatus );
+            return iOspiStatus;
+        }
+
+        xFlashMsg.Opcode      = ( uint8_t )(pxFlashConfigTable[ pxThis->ucFctIndex ].ulWriteCmd >> BITSHIFT_1B);
+        xFlashMsg.Addrvalid   = TRUE;
+        xFlashMsg.TxBfrPtr    = pucWriteBfrPtr;
+        xFlashMsg.RxBfrPtr    = NULL;
+        xFlashMsg.ByteCount   = ulByteCount;
+        xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_TX;
+        xFlashMsg.Proto       = XOSPIPSV_WRITE_1_1_8;
+        xFlashMsg.Dummy       = 0;
+        xFlashMsg.Addrsize    = XFLASH_CMD_ADDRSIZE_4;
+        xFlashMsg.IsDDROpCode = 0;
+        xFlashMsg.Addr        = ulRealAddr;
+        if ( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
+        {
+            xFlashMsg.Proto = XOSPIPSV_WRITE_8_8_8;
+        }
+
+        if ( 0U != pxOspiPsvPtr->DualByteOpcodeEn )
+            xFlashMsg.ExtendedOpcode = (u8)(~xFlashMsg.Opcode);
+
+        iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
+        if ( XST_SUCCESS != iOspiStatus )
+        {
+            PLL_ERR( OSPI_NAME, "Error: poll transfer failed: %d\r\n", iOspiStatus );
+            return iOspiStatus;
+        }
+
+        for ( ;; )
+        {
+            xFlashMsg.Opcode      = pxFlashConfigTable[ pxThis->ucFctIndex ].ucStatusCmd;
             xFlashMsg.Addrsize    = 0;
             xFlashMsg.Addrvalid   = 0;
             xFlashMsg.TxBfrPtr    = NULL;
-            xFlashMsg.RxBfrPtr    = NULL;
-            xFlashMsg.ByteCount   = 0;
-            xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_TX;
+            xFlashMsg.RxBfrPtr    = ucFlashStatus;
+            xFlashMsg.ByteCount   = XFLASH_BYTE_COUNT_1;
+            xFlashMsg.Dummy       = pxOspiPsvPtr->Extra_DummyCycle;
+            xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_RX;
             xFlashMsg.IsDDROpCode = 0;
             xFlashMsg.Proto       = 0;
-            xFlashMsg.Dummy       = 0;
-            if( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
+            if ( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
             {
-                xFlashMsg.Proto = XOSPIPSV_WRITE_8_0_0;
+                xFlashMsg.Proto     = XOSPIPSV_READ_8_0_8;
+                xFlashMsg.ByteCount = XFLASH_BYTE_COUNT_2;
+                xFlashMsg.Dummy    += XFLASH_OPCODE_DUMMY_CYCLES;
             }
 
+            if ( 0U != pxOspiPsvPtr->DualByteOpcodeEn )
+                xFlashMsg.ExtendedOpcode = (u8)(~xFlashMsg.Opcode);
+
             iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
-            if( XST_SUCCESS != iOspiStatus )
+            if ( XST_SUCCESS != iOspiStatus )
             {
                 PLL_ERR( OSPI_NAME, "Error: poll transfer failed: %d\r\n", iOspiStatus );
                 break;
             }
 
-            /* Each write is 8 bytes in length or less */
-            if( ulByteCount <= FLASH_WRITE_BYTE_SIZE )
+            if ( ( 0U != ( ucFlashStatus[ 0 ] & XFLASH_STATUS_BYTE ) ) )
             {
-                ulBytesToWrite = ulByteCount;
-                ulByteCount    = 0;
-            }
-            else
-            {
-                ulBytesToWrite = FLASH_WRITE_BYTE_SIZE;
-                ulByteCount   -= FLASH_WRITE_BYTE_SIZE;
-            }
-
-            iOspiStatus = iGetProtoType( pxOspiPsvPtr, FALSE, &ucNumLines );
-            if( XST_SUCCESS != iOspiStatus )
-            {
-                PLL_ERR( OSPI_NAME, "Error: iGetProtoType failed: %d\r\n", iOspiStatus );
                 break;
-            }
-
-            xFlashMsg.Opcode      = ( uint8_t )pxFlashConfigTable[ pxThis->ucFctIndex ].ulWriteCmd;
-            xFlashMsg.Addrvalid   = TRUE;
-            xFlashMsg.TxBfrPtr    = pucWriteBfrPtr;
-            xFlashMsg.RxBfrPtr    = NULL;
-            xFlashMsg.ByteCount   = ulBytesToWrite;
-            xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_TX;
-            xFlashMsg.Proto       = ucNumLines;
-            xFlashMsg.Dummy       = 0;
-            xFlashMsg.Addrsize    = XFLASH_CMD_ADDRSIZE_4;
-            xFlashMsg.IsDDROpCode = 0;
-            xFlashMsg.Addr        = ulRealAddr;
-            if( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
-            {
-                xFlashMsg.Proto = XOSPIPSV_WRITE_8_8_8;
-            }
-            iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
-            if( XST_SUCCESS != iOspiStatus )
-            {
-                PLL_ERR( OSPI_NAME, "Error: poll transfer failed: %d\r\n", iOspiStatus );
-                break;
-            }
-
-            pucWriteBfrPtr += FLASH_WRITE_BYTE_SIZE;
-            ulAddress      += FLASH_WRITE_BYTE_SIZE;
-
-            for( ;; )
-            {
-                xFlashMsg.Opcode      = pxFlashConfigTable[ pxThis->ucFctIndex ].ucStatusCmd;
-                xFlashMsg.Addrsize    = 0;
-                xFlashMsg.Addrvalid   = 0;
-                xFlashMsg.TxBfrPtr    = NULL;
-                xFlashMsg.RxBfrPtr    = ucFlashStatus;
-                xFlashMsg.ByteCount   = XFLASH_BYTE_COUNT_1;
-                xFlashMsg.Dummy       = pxOspiPsvPtr->Extra_DummyCycle;
-                xFlashMsg.Flags       = XOSPIPSV_MSG_FLAG_RX;
-                xFlashMsg.IsDDROpCode = 0;
-                xFlashMsg.Proto       = 0;
-                if( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
-                {
-                    xFlashMsg.Proto     = XOSPIPSV_READ_8_0_8;
-                    xFlashMsg.ByteCount = XFLASH_BYTE_COUNT_2;
-                    xFlashMsg.Dummy    += XFLASH_OPCODE_DUMMY_CYCLES;
-                }
-
-                iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
-                if( XST_SUCCESS != iOspiStatus )
-                {
-                    PLL_ERR( OSPI_NAME, "Error: poll transfer failed: %d\r\n", iOspiStatus );
-                    break;
-                }
-
-                if( ( 0 != ( ucFlashStatus[ 0 ] & XFLASH_STATUS_BYTE ) ) )
-                {
-                    break;
-                }
             }
         }
     }
