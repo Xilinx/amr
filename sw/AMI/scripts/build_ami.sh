@@ -11,7 +11,7 @@
 
 set -Eeuo pipefail
 BUILD_DIR="build"
-BUILD_VERSION="1.0.0"
+BUILD_VERSION="2.0.0"
 
 
 ## Build packages

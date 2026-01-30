@@ -2,7 +2,7 @@
 /*
  * ami_top.h - This file contains common AMI driver definitions.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_TOP_H
@@ -23,8 +23,8 @@
 
 
 /* Driver version numbers */
-#define AMI_VER			"1.0.0"
-#define AMI_VER_MAJOR	(1)
+#define AMI_VER			"2.0.0"
+#define AMI_VER_MAJOR	(2)
 #define AMI_VER_MINOR	(0)
 #define AMI_VER_PATCH	(0)
 
