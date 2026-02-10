@@ -1554,6 +1554,12 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 		pdi_download_request.last_chunk = PDI_CHUNK_IS_LAST(flags);
 		pdi_download_request.chunk = PDI_CHUNK(flags);
 		pdi_download_request.chunk_size = PDI_CHUNK_SIZE;
+
+		/* Copy PDI metadata from context */
+		memcpy(&pdi_download_request.pdi_md5, &amc_ctrl_ctxt->pdi_md5,
+			sizeof(pdi_download_request.pdi_md5));
+		pdi_download_request.pdi_size = amc_ctrl_ctxt->pdi_size;
+
 		/* Set longer timeout for the PDI download */
 		amc_proxy_cmd->cmd_timeout_jiffies = jiffies + REQUEST_DOWNLOAD_TIMEOUT;
 		ret = amc_proxy_request_pdi_download(amc_proxy_cmd, &pdi_download_request);
@@ -1638,6 +1644,9 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 		fpt_partition.type = fpt_partition_data->type;
 		fpt_partition.base_addr = fpt_partition_data->base_addr;
 		fpt_partition.size = fpt_partition_data->size;
+		memcpy(&fpt_partition.pdi_md5, &fpt_partition_data->pdi_md5,
+			sizeof(fpt_partition.pdi_md5));
+		fpt_partition.pdi_size = fpt_partition_data->pdi_size;
 		fpt_partition.flags = fpt_partition_data->flags;
 
 		AMI_DBG(amc_ctrl_ctxt, "AMI AMC Control: Set FPT partition 0x%X boot_device 0x%X type 0x%08X, base_addr 0x%08X, size 0x%08X flags 0x%08X",
@@ -1898,7 +1907,7 @@ int setup_amc(struct pci_dev		*dev,
 
 	/* Getting sGCQ Version, Check the sGCQ Version so that we don't
 	 * send unsupported commands to AMC firmware */
-	version_buf = vzalloc(sizeof(char) * VERSION_BUF_SIZE);
+	version_buf = kvzalloc(VERSION_BUF_SIZE, GFP_KERNEL);
 	if (!version_buf) {
 		DEV_ERR(dev, "Failed to allocate memory for sGCQ version buffer");
 		ret = -ENOMEM;
@@ -1986,12 +1995,12 @@ int setup_amc(struct pci_dev		*dev,
 	if (ret)
 		goto fail;
 
-	vfree(version_buf);
+	kvfree(version_buf);
 	return SUCCESS;
 
 fail:
 	if (version_buf)
-		vfree(version_buf);
+		kvfree(version_buf);
 
 	unset_amc(dev, *amc_ctrl_ctxt);
 	release_amc_mem(amc_ctrl_ctxt);

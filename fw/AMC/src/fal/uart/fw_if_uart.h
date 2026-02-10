@@ -152,7 +152,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_UART_Init( FWIfUartInitCfg *pxInitCfg );
+uint32_t ulFW_IF_UART_Init( FWIfUartInitCfg *pxInitCfg );
 
 /**
  * @brief   Creates an instance of the UART interface
@@ -162,7 +162,7 @@ extern uint32_t ulFW_IF_UART_Init( FWIfUartInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
 */
-extern uint32_t ulFW_IF_UART_Create( FWIfCfg *pxFwIf, FWIfUartCfg *pxUartCfg );
+uint32_t ulFW_IF_UART_Create( FWIfCfg *pxFwIf, FWIfUartCfg *pxUartCfg );
 
 /**
  *
@@ -171,7 +171,7 @@ extern uint32_t ulFW_IF_UART_Create( FWIfCfg *pxFwIf, FWIfUartCfg *pxUartCfg );
  * @return   OK                  Stats retrieved from interface successfully
  *           ERROR               Stats not retrieved successfully
  */
-extern int iFW_IF_UART_PrintStatistics( void );
+int iFW_IF_UART_PrintStatistics( void );
 
 /**
  *
@@ -180,6 +180,6 @@ extern int iFW_IF_UART_PrintStatistics( void );
  * @return   OK                  Stats cleared successfully
  *           ERROR               Stats not cleared successfully
  */
-extern int iFW_IF_UART_ClearStatistics( void );
+int iFW_IF_UART_ClearStatistics( void );
 
 #endif /* _FW_IF_UART_H_ */

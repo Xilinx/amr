@@ -83,9 +83,11 @@
 #define PARTITION_COL_TYPE		(1)
 #define PARTITION_COL_ADDR		(2)
 #define PARTITION_COL_SIZE		(3)
-#define PARTITION_COL_LOAD		(4) /* Power on load user partition */
-#define PARTITION_COL_STATUS		(5) /* Power on load user partition status */
-#define NUM_PARTITION_COLS		(6)
+#define PARTITION_COL_PDI_SIZE		(4)
+#define PARTITION_COL_PDI_MD5		(5)
+#define PARTITION_COL_LOAD		(6) /* Power on load user partition */
+#define PARTITION_COL_STATUS		(7) /* Power on load user partition status */
+#define NUM_PARTITION_COLS		(8)
 
 /* Manufacturing info */
 #define NUM_MFG_INFO_COLS		(2)
@@ -541,6 +543,14 @@ static int populate_partition_header(ami_device *dev, char **header,
 				sprintf(header[i], "%s", "Size");
 				break;
 
+			case PARTITION_COL_PDI_MD5:
+				sprintf(header[i], "%s", "PDI MD5");
+				break;
+
+			case PARTITION_COL_PDI_SIZE:
+				sprintf(header[i], "%s", "PDI Size");
+				break;
+
 			case PARTITION_COL_LOAD:
 				sprintf(header[i], "%s", "Power-up Load");
 				break;
@@ -593,6 +603,18 @@ static int construct_partition_row(struct ami_fpt_partition *part, int part_num,
 				sprintf(row[col], "0x%08x", part->size);
 				break;
 
+			case PARTITION_COL_PDI_MD5:
+				sprintf(row[col], "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+					part->pdi_md5[0], part->pdi_md5[1], part->pdi_md5[2], part->pdi_md5[3],
+					part->pdi_md5[4], part->pdi_md5[5], part->pdi_md5[6], part->pdi_md5[7],
+					part->pdi_md5[8], part->pdi_md5[9], part->pdi_md5[10], part->pdi_md5[11],
+					part->pdi_md5[12], part->pdi_md5[13], part->pdi_md5[14], part->pdi_md5[15]);
+				break;
+
+			case PARTITION_COL_PDI_SIZE:
+				sprintf(row[col], "0x%08x", part->pdi_size);
+				break;
+
 			case PARTITION_COL_LOAD:
 				if (part->type == AMI_FPT_TYPE_PDI_USER) {
 					sprintf(row[col], "%s",
@@ -640,6 +662,7 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 	int col = 0;
 	char id_string[PARTITION_ID_STR_LEN] = { 0 };
 	JsonNode *row = NULL;
+	char pdi_md5_string[33] = { 0 };
 
 	if (!part || !parent)
 		return EXIT_FAILURE;
@@ -670,6 +693,19 @@ static int construct_partition_node(struct ami_fpt_partition *part, int part_num
 					"size",
 					json_mknumber(part->size)
 				);
+				break;
+
+			case PARTITION_COL_PDI_MD5:
+				sprintf(pdi_md5_string, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+					part->pdi_md5[0], part->pdi_md5[1], part->pdi_md5[2], part->pdi_md5[3],
+					part->pdi_md5[4], part->pdi_md5[5], part->pdi_md5[6], part->pdi_md5[7],
+					part->pdi_md5[8], part->pdi_md5[9], part->pdi_md5[10], part->pdi_md5[11],
+					part->pdi_md5[12], part->pdi_md5[13], part->pdi_md5[14], part->pdi_md5[15]);
+				json_append_member(row, "pdi_md5", json_mkstring(pdi_md5_string));
+				break;
+
+			case PARTITION_COL_PDI_SIZE:
+				json_append_member(row, "pdi_size", json_mknumber(part->pdi_size));
 				break;
 
 			case PARTITION_COL_LOAD:

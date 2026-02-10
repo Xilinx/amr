@@ -150,6 +150,8 @@ typedef struct
     uint32_t ulPartitionSel;
     uint16_t usPacketNum;
     uint32_t ulPacketSize;
+    uint8_t  pucPdiMd5[MD5_SIZE];
+    uint32_t ulPdiSize;
 
 } AMIProxyPdiDownloadRequest;
 
@@ -236,6 +238,8 @@ typedef struct
     uint32_t ulType;                    /* Partition type */
     uint32_t ulBaseAddr;                /* Partition base address */
     uint32_t ulSize;                    /* Partition size */
+    uint8_t  pdi_md5[MD5_SIZE];         /* MD5 checksum of the pdi file (16 bytes). Populated by the driver. */
+    uint32_t ulPdiSize;                 /* Size of the pdi file (in bytes). Populated by the driver. */
     uint32_t ulFlags;                   /* Flags value (for write) */
 
 } AMIProxyFptFlagsRequest;

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-# E.g.:
-#./scripts/gen_fpt.py <-p rave|v80> [-o output_folder]
+# E.g. Build PDI with FPT:
+#./scripts/fpt_pdi_gen.py -p <rave|v80> -i <OSPI.pdi> -o <OSPI_fpt.bin>
 #
-# Generate FPT binary file with profile input. Default rave profile
+# This will create a OSPI pdi/bin with Flash Partition Table (FPT)
 #
 
+import sys
 import os
+import hashlib
 import argparse
 from collections import namedtuple
 
@@ -42,25 +44,31 @@ fpt_config_data = {
         'fpt_header_size':  128,
         'fpt_entry_size':   128,
         'num_entries':      3,
-        'fpt_entry_offset': 128 * 1024,  # 0x0002_0000
+        'fpt_entry_offset': 128 * 1024,           # 0x0002_0000
     },
     'fpt_entry_rave': [
         {
             'type':            0x00000E00,        # "PDI"
             'base_addr':       0x00080000,
             'partition_size':  58 * 1024 * 1024,  # 0x03A0_0000
+            'pdi_md5':         0x00000000000000000000000000000000,
+            'pdi_size':        0x00000000,
             'partition_flags': 0x00,
         },
         {
             'type':            0x00000E00,        # "PDI"
             'base_addr':       0x03B80000,
             'partition_size':  58 * 1024 * 1024,  # 0x03A0_0000
+            'pdi_md5':         0x00000000000000000000000000000000,
+            'pdi_size':        0x00000000,
             'partition_flags': 0x00,
         },
         {
             'type':            0x00000F00,        # "USER"
             'base_addr':       0x07680000,
             'partition_size':  8 * 1024 * 1024,   # 0x0080_0000
+            'pdi_md5':         0x00000000000000000000000000000000,
+            'pdi_size':        0x00000000,
             'partition_flags': 0x00,
         },
     ],
@@ -69,24 +77,31 @@ fpt_config_data = {
             'type':            0x00000E00,        # "PDI"
             'base_addr':       0x00080000,
             'partition_size':  116 * 1024 * 1024, # 0x0740_0000
+            'pdi_md5':         0x00000000000000000000000000000000,
+            'pdi_size':        0x00000000,
             'partition_flags': 0x00,
         },
         {
             'type':            0x00000E00,        # "PDI"
             'base_addr':       0x07480000,
             'partition_size':  116 * 1024 * 1024, # 0x0740_0000
+            'pdi_md5':         0x00000000000000000000000000000000,
+            'pdi_size':        0x00000000,
             'partition_flags': 0x00,
         },
         {
             'type':            0x00000F00,        # "USER"
             'base_addr':       0x0E880000,
             'partition_size':  16 * 1024 * 1024,  # 0x0170_0000
+            'pdi_md5':         0x00000000000000000000000000000000,
+            'pdi_size':        0x00000000,
             'partition_flags': 0x00,
         },
     ],
 }
 
 # Constants
+MD5_SIZE_BYTES = 16
 U32_SIZE_BYTES = 4
 U8_SIZE_BYTES  = 1
 
@@ -120,29 +135,43 @@ class hexdump:
     def __repr__(self):
         return "\n".join(self)
 
+# Function to print an error message and exit
+def error_exit(msg):
+    print("ERROR: " + msg)
+    exit(1)
 
-# The main loop
-def main():
+# Function to dump data to a file
+def write_data_to_file(filename, data, permissions='w+'):
+    try:
+        f = open(filename, permissions)
+        f.write(data)
+        f.close()
+    except:
+        error_exit(str(sys.exc_info()[1]))
 
-    parser = argparse.ArgumentParser(description='Generate FPT binary file',
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--profile',     help='profile [rave|v80]', default = 'rave')
-    parser.add_argument('-o', '--output_path', help='FPT output path', default = './')
-    parser.add_argument('-v', '--verbose',     action='store_true', help="increase output verbosity")
-    args = parser.parse_args()
+# Function to read data from a file
+def read_data_from_file(filename, permissions='r'):
+    try:
+        f = open(filename, permissions)
+        data = f.read()
+        file_size = os.path.getsize(filename)
+        md5_hash = hashlib.md5(data).hexdigest()
+        f.close()
+    except:
+        error_exit(str(sys.exc_info()[1]))
 
-    args.profile = args.profile.lower()
-    if args.profile != 'rave' and args.profile != 'v80':
-        print('Error: Invalid profile, supported profiles: rave | v80')
-        parser.print_help()
-        raise SystemExit(1)
+    return data, md5_hash, file_size
+
+# Function to generate FPT binary file
+def do_generate_fpt(profile, md5_hash, file_size, verbose):
 
     # Step1: Print verbose args
-    if args.verbose:
-        print('profile:     ' + args.profile)
-        print('Output path: ' + args.output_path)
+    if verbose:
+        print('profile:     ' + profile)
+        print('MD5 hash:    ' + md5_hash)
+        print('File size:   ' + file_size)
 
-    # Step2: Use the FPT configuration data directly
+    # Step2: load the FPT configuration data
     data = fpt_config_data
 
     # Step3: Parse the FPT header
@@ -154,15 +183,20 @@ def main():
     fpt_entry_offset = data['fpt_header']['fpt_entry_offset']
 
     # Step4: Parse the FPT entries
-    fpt_entry = namedtuple('fpt_entry', 'type base_addr partition_size partition_flags')
+    data['fpt_entry_' + profile][0]['pdi_size'] = int(file_size)
+    data['fpt_entry_' + profile][0]['pdi_md5']  = int(md5_hash, 16)
+
+    fpt_entry = namedtuple('fpt_entry', 'type base_addr partition_size pdi_md5 pdi_size partition_flags')
     fpt_entry_list = []
-    for entry in data['fpt_entry_' + args.profile]:
+    for entry in data['fpt_entry_' + profile]:
         fpt_entry_list.append(fpt_entry(
                               entry.get('type'),
                               entry.get('base_addr'),
                               entry.get('partition_size'),
+                              entry.get('pdi_md5'),
+                              entry.get('pdi_size'),
                               entry.get('partition_flags')))
-    if args.verbose:
+    if verbose:
         print('\nFPT Header:')
         print('    magic_word:      ', hex(magic_word))
         print('    fpt_version:     ', fpt_version)
@@ -172,10 +206,12 @@ def main():
         print('    fpt_entry_offset:', hex(fpt_entry_offset))
         for i, fpt_tuple in enumerate(fpt_entry_list):
             print('FPT entry:',        i)
-            print('    type:           ', hex(fpt_tuple.type))
-            print('    base_addr:      ', hex(fpt_tuple.base_addr))
-            print(f'    partition_size:  {fpt_tuple.partition_size / (1024 * 1024):.2f} MB')
-            print('    partition_flags:', hex(fpt_tuple.partition_flags))
+            print('  type:            ', hex(fpt_tuple.type))
+            print('  base_addr:       ', hex(fpt_tuple.base_addr))
+            print('  partition_size:  ', hex(fpt_tuple.partition_size))
+            print('  pdi_md5:         ', hex(fpt_tuple.pdi_md5))
+            print('  pdi_size:        ', hex(fpt_tuple.pdi_size))
+            print('  partition_flags: ', hex(fpt_tuple.partition_flags))
         print('')
 
     # Step5: Create an empty byte array of fixed size & populate
@@ -212,30 +248,87 @@ def main():
             pos += U32_SIZE_BYTES
             fpt_data[pos:0] =  fpt_tuple.partition_size.to_bytes(U32_SIZE_BYTES, 'little')
 
-            # FPT entry partition flag
+            # FPT entry pdi md5
+            pos += U32_SIZE_BYTES
+            fpt_data[pos:0] = fpt_tuple.pdi_md5.to_bytes(MD5_SIZE_BYTES, 'big')
+
+            # FPT entry pdi size
+            pos += MD5_SIZE_BYTES
+            fpt_data[pos:0] = fpt_tuple.pdi_size.to_bytes(U32_SIZE_BYTES, 'little')
+
+            # FPT entry partition flags (user defined flags)
             pos += U32_SIZE_BYTES
             fpt_data[pos:0] = fpt_tuple.partition_flags.to_bytes(U32_SIZE_BYTES, 'little')
 
             index_tuple += 1
 
         fpt_data = fpt_data[:fpt_size]
-        if args.verbose:
+        if verbose:
             # dump out the generated FPT
             print(hexdump(fpt_data))
     except Exception as e:
         print('Error: Failed to populate FPT data array: ' + str(e))
         raise SystemExit(1)
 
-    # Step6: Write bytearray to binary file
-    try:
-        fpt_bin_file = os.path.join(args.output_path, "amr_fpt.bin")
-        print('FPT file: ' + fpt_bin_file)
+    return fpt_data
 
-        with open(fpt_bin_file, 'wb') as fp:
-            fp.write(fpt_data)
-            print('Successfully generated binary amr_fpt.bin...')
-    except Exception as e:
-        print(e)
+# Function to generate FPT Setup PDI
+def do_generate_fpt_pdi(profile, pdi_file, output_file_name, verbose):
 
+    # open the PDI and create FPT + PDI structure
+    if pdi_file.endswith(('.pdi', '.bin')):
+        pdi_data, pdi_md5_hash, pdi_file_size = read_data_from_file(pdi_file, 'rb')
+        pdi_bin_data = bytearray(pdi_data)
+    else:
+        error_exit("PDI file must be either be *.bin or *.pdi suffix - {}".format(
+            pdi_file))
+
+    # Generate FPT binary file
+    fpt_bin_data = do_generate_fpt(profile, str(pdi_md5_hash), str(pdi_file_size), verbose)
+
+    # pad the binary file to 32KB to align to PMC boot search
+    fpt_bin_data = fpt_bin_data.ljust(0x8000, b'\xff')
+
+    # combine FPT and PDI data
+    combined_bin_data = fpt_bin_data + pdi_bin_data
+
+    # write the combined data to the output file
+    write_data_to_file(output_file_name, combined_bin_data, 'wb')
+
+
+# Script main entry point
 if __name__ == '__main__':
-    main()
+
+    parser = argparse.ArgumentParser(description='Generate AMR FPT Setup PDI')
+    parser.add_argument('-p', '--profile',     help='profile [rave|v80]', default = 'rave')
+    parser.add_argument('-i', '--pdi', dest='pdi_file', metavar=('pdi_file'),
+                        help='PDI File, to be combined with FPT')
+    parser.add_argument('-o', '--output', dest='outfile', default='-', metavar=('output_file'),
+                        help='Destination file after an input file(s) processed')
+    parser.add_argument('-v', '--verbose',     action='store_true', help="increase output verbosity")
+
+    # If nothing is input to this script, print usage
+    if len(sys.argv[1:]) == 0:
+        parser.print_help()
+        parser.exit()
+
+    args = parser.parse_args()
+
+    # Generate FPT Setup PDI
+
+    # Both a PDI and FPT is required for this option
+    if not args.profile or not args.pdi_file :
+        error_exit("FPT Setup PDI Generation requires --profile and --pdi to be specified")
+
+    if args.outfile == '-':
+        out_file_local = "./build/amr_ospi_fpt.bin"
+    elif False == args.outfile.lower().endswith(('.bin','.pdi')):
+        error_exit("Please provide an output filename with suffix '.pdi' or '.bin'")
+    else:
+        out_file_local = args.outfile
+
+
+    print("Generating FPT Setup PDI :\t\t{}".format(out_file_local))
+    do_generate_fpt_pdi(args.profile, args.pdi_file, out_file_local, args.verbose)
+    print("FPT Setup PDI Generated ****************************************")
+    sys.exit()

@@ -396,8 +396,9 @@ typedef struct
     uint32_t ulPartitionRsvd:15;
     uint16_t usLastPacket:1;
     uint16_t usPacketNum:15;
-    uint32_t ulPacketSize; /* packet size in KB */
-    uint32_t ulPad;
+    uint32_t ulPacketSize;        /* packet size in KB */
+    uint8_t  pucPdiMd5[MD5_SIZE]; /* MD5 checksum of PDI file */
+    uint32_t ulPdiSize;           /* Size of PDI file in bytes */
 
 } AMIProxyCmdDataPayload;
 
@@ -447,14 +448,15 @@ typedef struct
  */
 typedef struct
 {
-    uint32_t ulReqType;       /* 0 = Read, 1 = Write */
-    uint32_t ulBootDevice;    /* 0 = Primary, 1 = Secondary */
-    uint32_t ulPartitionId;   /* Partition ID */
-    uint32_t ulType;          /* Partition type */
-    uint32_t ulBaseAddr;      /* Partition base address */
-    uint32_t ulSize;          /* Partition size */
-    uint32_t ulFlags;         /* Flags value (for write) */
-
+    uint32_t ulReqType;         /* 0 = Read, 1 = Write */
+    uint32_t ulBootDevice;      /* 0 = Primary, 1 = Secondary */
+    uint32_t ulPartitionId;     /* Partition ID */
+    uint32_t ulType;            /* Partition type */
+    uint32_t ulBaseAddr;        /* Partition base address */
+    uint32_t ulSize;            /* Partition size */
+    uint8_t  pdi_md5[MD5_SIZE]; /* MD5 checksum of the pdi file (16 bytes). Populated by the driver. */
+    uint32_t ulPdiSize;         /* Size of the pdi file (in bytes) */
+    uint32_t ulFlags;           /* Flags value (for write) */
 } AMIProxyCmdFptFlagsPayload;
 
 /**
@@ -1084,6 +1086,11 @@ int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.ulLength;
                 pxDownloadRequest->ulPartitionSel =
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPartitionSel;
+                pvOSAL_MemCpy( pxDownloadRequest->pucPdiMd5,
+                               pxThis->xRxData[ ucIndex ].xDownloadRequest.pucPdiMd5,
+                               sizeof( pxDownloadRequest->pucPdiMd5 ) );
+                pxDownloadRequest->ulPdiSize =
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPdiSize;
                 pxDownloadRequest->usPacketNum =
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.usPacketNum;
                 pxDownloadRequest->ulPacketSize =
@@ -1621,6 +1628,17 @@ int iAMI_GetFptFlagsRequest( EVLSignal *pxSignal,
                             pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulBootDevice;
                 pxFptFlagsRequest->ulPartitionId =
                             pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulPartitionId;
+                pxFptFlagsRequest->ulType =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulType;
+                pxFptFlagsRequest->ulBaseAddr =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulBaseAddr;
+                pxFptFlagsRequest->ulSize =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulSize;
+                pvOSAL_MemCpy( pxFptFlagsRequest->pdi_md5,
+                               pxThis->xRxData[ ucIndex ].xFptFlagsRequest.pdi_md5,
+                               sizeof( pxFptFlagsRequest->pdi_md5 ) );
+                pxFptFlagsRequest->ulPdiSize =
+                            pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulPdiSize;
                 pxFptFlagsRequest->ulFlags =
                             pxThis->xRxData[ ucIndex ].xFptFlagsRequest.ulFlags;
 
@@ -1810,6 +1828,11 @@ static void vProxyDriverTask( void *pvArgs )
                                 xCmdRequest.xPdiDownloadPayload.ulPdiProgram;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iLastPacket =
                                 xCmdRequest.xPdiDownloadPayload.usLastPacket;
+                            pvOSAL_MemCpy( pxThis->xRxData[ ucIndex ].xDownloadRequest.pucPdiMd5,
+                                           xCmdRequest.xPdiDownloadPayload.pucPdiMd5,
+                                           sizeof( pxThis->xRxData[ ucIndex ].xDownloadRequest.pucPdiMd5 ) );
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPdiSize =
+                                xCmdRequest.xPdiDownloadPayload.ulPdiSize;
                             pxThis->xRxData[ ucIndex ].ucInUse = TRUE;
                         }
                         else
@@ -1934,6 +1957,11 @@ static void vProxyDriverTask( void *pvArgs )
                                 xCmdRequest.xPdiDownloadPayload.ulPdiProgram;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iLastPacket =
                                 xCmdRequest.xPdiDownloadPayload.usLastPacket;
+                            pvOSAL_MemCpy( pxThis->xRxData[ ucIndex ].xDownloadRequest.pucPdiMd5,
+                                           xCmdRequest.xPdiDownloadPayload.pucPdiMd5,
+                                           sizeof( pxThis->xRxData[ ucIndex ].xDownloadRequest.pucPdiMd5 ) );
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.ulPdiSize =
+                                xCmdRequest.xPdiDownloadPayload.ulPdiSize;
                             pxThis->xRxData[ ucIndex ].ucInUse = TRUE;
                         }
                         else
@@ -2632,16 +2660,21 @@ static int iHandleFptFlagsRequest( AMI_CMD_REQUEST *pxCmdRequest )
                 pxRxData->xFptFlagsRequest.ulType = pxCmdRequest->xFptFlagsPayload.ulType;
                 pxRxData->xFptFlagsRequest.ulBaseAddr = pxCmdRequest->xFptFlagsPayload.ulBaseAddr;
                 pxRxData->xFptFlagsRequest.ulSize = pxCmdRequest->xFptFlagsPayload.ulSize;
+                pvOSAL_MemCpy( pxRxData->xFptFlagsRequest.pdi_md5,
+                               pxCmdRequest->xFptFlagsPayload.pdi_md5,
+                               sizeof( pxRxData->xFptFlagsRequest.pdi_md5 ) );
+                pxRxData->xFptFlagsRequest.ulPdiSize = pxCmdRequest->xFptFlagsPayload.ulPdiSize;
                 pxRxData->xFptFlagsRequest.ulFlags = pxCmdRequest->xFptFlagsPayload.ulFlags;
 
                 PLL_DBG( AMI_NAME, "FPT Flags: Request=0x%X, BootDevice=0x%X, PartitionId=0x%X\r\n"
-                        "Type=0x%X, BaseAddr=0x%X, Size=0x%X, Flags=0x%08X\r\n",
+                        "Type=0x%X, BaseAddr=0x%X, Size=0x%X, PdiSize=0x%X, Flags=0x%08X\r\n",
                     pxCmdRequest->xFptFlagsPayload.ulReqType,
                     pxCmdRequest->xFptFlagsPayload.ulBootDevice,
                     pxCmdRequest->xFptFlagsPayload.ulPartitionId,
                     pxCmdRequest->xFptFlagsPayload.ulType,
                     pxCmdRequest->xFptFlagsPayload.ulBaseAddr,
                     pxCmdRequest->xFptFlagsPayload.ulSize,
+                    pxCmdRequest->xFptFlagsPayload.ulPdiSize,
                     pxCmdRequest->xFptFlagsPayload.ulFlags );
             }
             else

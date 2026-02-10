@@ -24,8 +24,8 @@
 
 /* Base & protocol for DSP0236_1.3.1 Versions */
 
-#define MCTP_BASE_SPEC_VER_1_3_0 0xf1f3f000
-#define MCTP_BASE_SPEC_VER_1_3_1 0xf1f3f100
+#define MCTP_BASE_SPEC_VER_1_3_0    0xf1f3f000
+#define MCTP_BASE_SPEC_VER_1_3_1    0xf1f3f100
 
 #define MCTP_CTRL_PROTOCOL_VER_1_3_0 0xf1f3f000
 #define MCTP_CTRL_PROTOCOL_VER_1_3_1 0xf1f3f100
@@ -34,10 +34,10 @@
 #define PLDM_OVER_MCTP_DSP0241_VER_1_0_0 0xf1f0f000
 
 
-#define BYTE_SWAP32( val ) ( ( ( ( val ) & 0xff000000 ) >> 24 ) | \
-                             ( ( ( val ) & 0x00ff0000 ) >>  8 ) | \
-                             ( ( ( val ) & 0x0000ff00 ) <<  8 ) | \
-                             ( ( ( val ) & 0x000000ff ) << 24 ) )
+#define BYTE_SWAP32( val ) ( ( ( (val) & 0xff000000 ) >> 24 ) | \
+                             ( ( (val) & 0x00ff0000 ) >>  8 ) | \
+                             ( ( (val) & 0x0000ff00 ) <<  8 ) | \
+                             ( ( (val) & 0x000000ff ) << 24 ) )
 
 /* DSP0236: Table 18 - Get MCTP version support message */
 #define MCTP_GET_VERSION_BASE_SPEC             0xFF
@@ -54,7 +54,7 @@
 /* Externs                                                                    */
 /******************************************************************************/
 
-extern int iGetUuid( uint8_t *pucUuid );
+int iGetUuid( uint8_t *pucUuid );
 
 
 /******************************************************************************/

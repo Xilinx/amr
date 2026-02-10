@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 
 AR := ar -rc
 
@@ -16,7 +16,10 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 # Replace .o with .d for dependencies.
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS  := ./include /usr/include/libami/api
+INC_DIRS  := ./include
+ifneq ($(NO_SYSTEM_API),1)
+INC_DIRS  += /usr/include/libami/api
+endif
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us.

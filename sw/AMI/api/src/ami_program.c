@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <openssl/evp.h>
 
 /* Public API includes */
 #include "ami_program.h"
@@ -98,6 +99,35 @@ close:
 }
 
 /**
+ * calculate_md5() - Calculate MD5 checksum of a data buffer.
+ * @data: Pointer to data buffer.
+ * @len: Length of data in bytes.
+ * @md5_out: Output buffer for 16-byte MD5 hash.
+ *
+ * Uses OpenSSL EVP interface for MD5 calculation.
+ */
+static void calculate_md5(const uint8_t *data, uint32_t len, uint8_t *md5_out)
+{
+	EVP_MD_CTX *ctx = NULL;
+	unsigned int md_len = 0;
+
+	if (!data || !md5_out)
+		return;
+
+	ctx = EVP_MD_CTX_new();
+	if (!ctx)
+		return;
+
+	if (EVP_DigestInit_ex(ctx, EVP_md5(), NULL) == 1 &&
+		EVP_DigestUpdate(ctx, data, len) == 1 &&
+		EVP_DigestFinal_ex(ctx, md5_out, &md_len) == 1) {
+		/* Success - md5_out now contains the hash */
+	}
+
+	EVP_MD_CTX_free(ctx);
+}
+
+/**
  * do_image_download() - Perform an image download operation.
  * @dev: Device handle.
  * @path: Path to image file.
@@ -126,8 +156,10 @@ static int do_image_download(ami_device *dev, const char *path, uint8_t boot_dev
 		return AMI_STATUS_ERROR;  /* last error is set by ami_open_cdev */
 
 	if (read_file(path, &img_data, &img_size) == AMI_STATUS_OK) {
+		calculate_md5(img_data, img_size, payload.pdi_md5);
 		payload.size = img_size;
 		payload.addr = (unsigned long)(&img_data[0]);
+		payload.pdi_size = img_size;
 		payload.cap_override = dev->cap_override;
 		payload.boot_device = boot_device;
 		payload.partition = partition;
@@ -334,6 +366,10 @@ int ami_prog_set_fpt_partition(ami_device *dev, uint8_t boot_device,
 	data.type = partition->type;
 	data.base_addr = partition->base_addr;
 	data.size = partition->size;
+	/* Make a copy of the response before removing from the list */
+	memcpy(&data.pdi_md5, &partition->pdi_md5,
+		sizeof(data.pdi_md5));
+	data.pdi_size = partition->pdi_size;
 	data.flags = partition->flags;
 	errno = 0;
 	if (ioctl(dev->cdev, AMI_IOC_SET_FPT_PARTITION, &data) == AMI_LINUX_STATUS_ERROR) {
@@ -381,6 +417,10 @@ int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device,
 		partition->type = (enum ami_fpt_type)data.type;
 		partition->base_addr = data.base_addr;
 		partition->size = data.size;
+		/* Make a copy of the response before removing from the list */
+		memcpy(&partition->pdi_md5, &data.pdi_md5,
+			sizeof(data.pdi_md5));
+		partition->pdi_size = data.pdi_size;
 		partition->flags = data.flags;
 	}
 

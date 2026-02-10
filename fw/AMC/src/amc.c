@@ -1159,7 +1159,7 @@ static void vConfigureSharedMemTable( void )
 static int iLoadPdiOnPowerUp( void )
 {
     int iStatus = ERROR;
-    u32 PdiLoadStatus = 0U;
+    uint32_t ulPdiLoadStatus = 0U;
     APCProxyDriverFptHeader xFptHeader = { 0 };
     APCProxyDriverFptPartition xFptPartition = { 0 };
     uint64_t ullPdiAddr = 0;
@@ -1219,7 +1219,7 @@ static int iLoadPdiOnPowerUp( void )
     if (XST_SUCCESS != XLoader_LoadPartialPdi( &XLoaderInstance,
                                     XLOADER_PDI_OSPI,
                                     ullPdiAddr,
-                                    &PdiLoadStatus ))
+                                    &ulPdiLoadStatus ))
     {
         PLL_ERR( AMC_NAME, "Error: Failed to load PDI\r\n" );
     }
@@ -1234,7 +1234,7 @@ fail:
     if ( OK != iStatus )
     {
         PLL_ERR( AMC_NAME, "Error: PDI load failed, status 0x%X, PLM status 0x%X\r\n",
-                iStatus, PdiLoadStatus );
+                iStatus, ulPdiLoadStatus );
         ulUserPdiLoadStatus = USER_PDI_POWERUP_ERROR;
     }
 

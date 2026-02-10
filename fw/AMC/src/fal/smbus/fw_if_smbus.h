@@ -217,7 +217,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_SMBUS_Init( FWIfSMBusInitCfg *pxCfg );
+uint32_t ulFW_IF_SMBUS_Init( FWIfSMBusInitCfg *pxCfg );
 
 /**
  * @brief   creates an instance of the smbus interface
@@ -227,7 +227,7 @@ extern uint32_t ulFW_IF_SMBUS_Init( FWIfSMBusInitCfg *pxCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pxFwIf, FWIfSMBusCfg *pxSmbusCfg );
+uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pxFwIf, FWIfSMBusCfg *pxSmbusCfg );
 
 /**
  *
@@ -236,7 +236,7 @@ extern uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pxFwIf, FWIfSMBusCfg *pxSmbusCfg 
  * @return   OK                  Stats retrieved from interface successfully
  *           ERROR               Stats not retrieved successfully
  */
-extern int iFW_IF_SMBUS_PrintStatistics( void );
+int iFW_IF_SMBUS_PrintStatistics( void );
 
 /**
  *
@@ -245,6 +245,6 @@ extern int iFW_IF_SMBUS_PrintStatistics( void );
  * @return   OK                  Stats cleared successfully
  *           ERROR               Stats not cleared successfully
  */
-extern int iFW_IF_SMBUS_ClearStatistics( void );
+int iFW_IF_SMBUS_ClearStatistics( void );
 
 #endif /* _FW_IF_SMBUS_H_ */

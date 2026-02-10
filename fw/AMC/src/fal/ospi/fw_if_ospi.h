@@ -105,7 +105,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *pxInitCfg );
+uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *pxInitCfg );
 
 /**
  * @brief   creates an instance of the OSPI interface
@@ -115,7 +115,7 @@ extern uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFWIf, FWIfOspiCfg *pxOspiCfg );
+uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFWIf, FWIfOspiCfg *pxOspiCfg );
 
 /**
  *

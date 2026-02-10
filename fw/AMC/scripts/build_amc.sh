@@ -251,11 +251,6 @@ function build_amc() {
 # Build AMC elf
 build_amc
 
-# Takes in board profile and produces fpt.bin
-./scripts/gen_fpt.py \
-        -p rave \
-        -o build
-
 
 # Generate PDI w/ bootgen
 cat << EOF > ./build/amr_ospi_pdi.bif
@@ -273,7 +268,7 @@ bootgen \
     -w -o  ./build/amr_ospi.bin
 
 # final pdi generation
-./scripts/fpt_pdi_gen.py \
-    --fpt    ./build/amr_fpt.bin \
+./scripts/gen_fpt_pdi.py \
+    --profile ${PROFILE} \
     --pdi    ./build/amr_ospi.bin \
     --output ./build/amr_ospi_fpt.bin

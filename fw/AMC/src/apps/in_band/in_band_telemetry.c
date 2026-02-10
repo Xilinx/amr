@@ -602,7 +602,10 @@ static int iAmiCallback( EVLSignal *pxSignal )
                                                   ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR,
                                                   xDownloadRequest.ulLength,
                                                   xDownloadRequest.usPacketNum,
-                                                  xDownloadRequest.ulPacketSize );
+                                                  xDownloadRequest.ulPacketSize,
+                                                  xDownloadRequest.pucPdiMd5,
+                                                  xDownloadRequest.ulPdiSize,
+                                                  xDownloadRequest.iLastPacket );
                 }
 
                 if (OK != iStatus)
@@ -690,7 +693,10 @@ static int iAmiCallback( EVLSignal *pxSignal )
                                               ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR,
                                               xProgramRequest.ulLength,
                                               xProgramRequest.usPacketNum,
-                                              xProgramRequest.ulPacketSize );
+                                              xProgramRequest.ulPacketSize,
+                                              NULL,
+                                              0,
+                                              xProgramRequest.iLastPacket );
 
                 if (OK != iStatus)
                 {
@@ -803,21 +809,23 @@ static int iAmiCallback( EVLSignal *pxSignal )
                 }
                 else
                 {
-                    /* Write FPT partition flags */
-                    if (OK == iAPC_SetFptPartitionFlags(
+                    /* Write FPT partition data (including pdi_md5, pdi_size, and flags) */
+                    if (OK == iAPC_SetFptPartition(
                                 pxSignal,
                                 (APC_BOOT_DEVICES)xFptFlagsRequest.ulBootDevice,
                                 (int)xFptFlagsRequest.ulPartitionId,
+                                xFptFlagsRequest.pdi_md5,
+                                xFptFlagsRequest.ulPdiSize,
                                 xFptFlagsRequest.ulFlags ))
                     {
                         ulFlagsValue = xFptFlagsRequest.ulFlags;
-                        PLL_DBG( IN_BAND_NAME, "FPT Partition %d flags updated to 0x%08X\r\n",
-                                 xFptFlagsRequest.ulPartitionId, ulFlagsValue );
+                        PLL_DBG( IN_BAND_NAME, "FPT Partition %d updated: PdiSize=0x%08X, Flags=0x%08X\r\n",
+                                 xFptFlagsRequest.ulPartitionId, xFptFlagsRequest.ulPdiSize, ulFlagsValue );
                     }
                     else
                     {
                         xResult = AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED;
-                        PLL_ERR( IN_BAND_NAME, "Error updating FPT partition %d flags\r\n",
+                        PLL_ERR( IN_BAND_NAME, "Error updating FPT partition %d\r\n",
                                  xFptFlagsRequest.ulPartitionId );
                     }
                 }

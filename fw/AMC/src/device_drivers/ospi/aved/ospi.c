@@ -2006,12 +2006,9 @@ static int iFlashRead( XOspiPsv *pxOspiPsvPtr,
          ( NULL != pucReadBfrPtr ) )
     {
         XOspiPsv_Msg xFlashMsg = { 0 };
-        uint32_t ulRealAddr       = 0;
-        uint32_t ulBytesToRead    = 0;
-        uint8_t  ucNumLines       = 0;
-        int      iUnalignedRead   = FALSE;      /* Read buffer required to be on 8 byte boundary */
-        uint32_t ucReadIterations = 1;          /* At least one read required when aligned */
-        int      i                = 0;
+        uint32_t ulRealAddr    = 0;
+        uint32_t ulBytesToRead = 0;
+        uint8_t  ucNumLines    = 0;
 
         if ( ( ulAddress < pxFlashConfigTable[ pxThis->ucFctIndex ].ulFlashDeviceSize ) &&
              ( ( ulAddress + ulByteCount ) >= pxFlashConfigTable[ pxThis->ucFctIndex ].ulFlashDeviceSize ) &&
@@ -2024,86 +2021,48 @@ static int iFlashRead( XOspiPsv *pxOspiPsvPtr,
             ulBytesToRead = ulByteCount;
         }
 
-        if ( 0 != ( ulBytesToRead % OSPI_READ_BUFFER_ALIGNMENT ) )
+        /*
+         * Translate address based on type of connection
+         * If stacked assert the slave select based on address
+         */
+        iOspiStatus = iGetRealAddr( pxOspiPsvPtr, ulAddress, &ulRealAddr );
+        if ( XST_SUCCESS != iOspiStatus )
         {
-            /* Unaligned read found, use internal buffer to read over a number of iterations */
-            if ( OSPI_READ_BUFFER_SIZE < ulBytesToRead )
-            {
-                ucReadIterations = ( ( ulBytesToRead / OSPI_READ_BUFFER_SIZE ) + 1 );
-            }
-            iUnalignedRead = TRUE;
-            ulBytesToRead  = OSPI_READ_BUFFER_SIZE;
+            PLL_ERR( OSPI_NAME, "Error: iGetRealAddr failed: %d\r\n", iOspiStatus );
         }
-
-        for ( i = 0; i < ucReadIterations; i++ )
+        else
         {
-            /*
-             * Translate address based on type of connection
-             * If stacked assert the slave select based on address
-             */
-            iOspiStatus = iGetRealAddr( pxOspiPsvPtr, ulAddress, &ulRealAddr );
-            if ( XST_SUCCESS != iOspiStatus )
-            {
-                PLL_ERR( OSPI_NAME, "Error: iGetRealAddr failed: %d\r\n", iOspiStatus );
-                break;
-            }
-
             iOspiStatus = iGetProtoType( pxOspiPsvPtr, TRUE, &ucNumLines );
             if ( XST_SUCCESS != iOspiStatus )
             {
                 PLL_ERR( OSPI_NAME, "Error: iGetProtoType failed: %d\r\n", iOspiStatus );
-                break;
-            }
-
-            xFlashMsg.Opcode    = ( uint8_t )pxFlashConfigTable[ pxThis->ucFctIndex ].ulReadCmd;
-            xFlashMsg.Addrsize  = XFLASH_CMD_ADDRSIZE_4;
-            xFlashMsg.Addrvalid = TRUE;
-            xFlashMsg.TxBfrPtr  = NULL;
-            if ( FALSE == iUnalignedRead )
-            {
-                /* Normal aligned mode just read into buffer provided */
-                xFlashMsg.RxBfrPtr = pucReadBfrPtr;
             }
             else
             {
-                /* Read into internal 8 byte aligned buffer */
-                xFlashMsg.RxBfrPtr = pxThis->ucReadBfrPtr;
-            }
-            xFlashMsg.ByteCount = ulBytesToRead;
-            xFlashMsg.Flags     = XOSPIPSV_MSG_FLAG_RX;
-            xFlashMsg.Addr      = ulRealAddr;
-            xFlashMsg.Proto     = ucNumLines;
-            xFlashMsg.Dummy     = pxFlashConfigTable[ pxThis->ucFctIndex ].ucDummyCycles +
-                                  pxOspiPsvPtr->Extra_DummyCycle;
-            xFlashMsg.IsDDROpCode = 0;
+                xFlashMsg.Opcode    = ( uint8_t )pxFlashConfigTable[ pxThis->ucFctIndex ].ulReadCmd;
+                xFlashMsg.Addrsize  = XFLASH_CMD_ADDRSIZE_4;
+                xFlashMsg.Addrvalid = TRUE;
+                xFlashMsg.TxBfrPtr  = NULL;
+                xFlashMsg.RxBfrPtr  = pucReadBfrPtr;
+                xFlashMsg.ByteCount = ulBytesToRead;
+                xFlashMsg.Flags     = XOSPIPSV_MSG_FLAG_RX;
+                xFlashMsg.Addr      = ulRealAddr;
+                xFlashMsg.Proto     = ucNumLines;
+                xFlashMsg.Dummy     = pxFlashConfigTable[ pxThis->ucFctIndex ].ucDummyCycles +
+                                        pxOspiPsvPtr->Extra_DummyCycle;
+                xFlashMsg.IsDDROpCode = 0;
 
-            if ( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
-            {
-                xFlashMsg.Proto = XOSPIPSV_READ_8_8_8;
-                xFlashMsg.Dummy = ( XFLASH_OPCODE_DUMMY_CYCLES + XFLASH_OPCODE_DUMMY_CYCLES ) +
-                                  pxOspiPsvPtr->Extra_DummyCycle;
-            }
-
-            iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
-            if ( XST_SUCCESS != iOspiStatus )
-            {
-                PLL_ERR( OSPI_NAME, "Error: flash Read fail: %d\r\n", iOspiStatus );
-                break;
-            }
-            else
-            {
-                if ( TRUE == iUnalignedRead )
+                if ( XOSPIPSV_EDGE_MODE_DDR_PHY == pxOspiPsvPtr->SdrDdrMode )
                 {
-                    /* Copy the data into the return buffer */
-                    pvOSAL_MemCpy( &pucReadBfrPtr[ i * OSPI_READ_BUFFER_SIZE ], pxThis->ucReadBfrPtr, ulBytesToRead );
+                    xFlashMsg.Proto = XOSPIPSV_READ_8_8_8;
+                    xFlashMsg.Dummy = ( XFLASH_OPCODE_DUMMY_CYCLES + XFLASH_OPCODE_DUMMY_CYCLES ) +
+                                        pxOspiPsvPtr->Extra_DummyCycle;
+                }
 
-                    /* Move the next base address forward */
-                    ulAddress += OSPI_READ_BUFFER_SIZE;
-                    if ( ( ucReadIterations - 1 ) == i )
-                    {
-                        /* Final iteration will be less than OSPI_READ_BUFFER_SIZE */
-                        ulBytesToRead = ( ulByteCount % OSPI_READ_BUFFER_SIZE );
-                    }
+                iOspiStatus = iPollTransferWithRetry( pxOspiPsvPtr, &xFlashMsg );
+                if ( XST_SUCCESS != iOspiStatus )
+                {
+                    PLL_ERR( OSPI_NAME, "Error: flash Read fail: %d\r\n", iOspiStatus );
                 }
             }
         }

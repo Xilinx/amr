@@ -331,7 +331,9 @@ typedef struct
 {
     uint32_t ulType;
     uint32_t ulBaseAddr;
-    uint32_t ulPartitionSize;
+    uint32_t ulPartitionSize;     /* Partition size (in bytes) */
+    uint8_t  pucPdiMd5[MD5_SIZE]; /* MD5 checksum of the pdi file (16 bytes) */
+    uint32_t ulPdiSize;           /* Size of the pdi file (in bytes) */
     uint32_t ulPartitionFlags;
 
 } ASDMFptEntry;
@@ -1018,7 +1020,7 @@ static int iGetFptData( void )
 
              INC_STAT_COUNTER( ASDM_STATS_MALLOC )
              pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][USER_PDI_POWERUP_PARTITION].ulPartitionFlags |= ulUserPdiLoadStatus;
-             ulOspiBootAddr = ( HAL_IO_READ32( HAL_APC_PMC_BOOT_REG ) * ( 32 * 1024 ));
+             ulOspiBootAddr = HAL_IO_READ32( HAL_APC_PMC_BOOT_REG ) * ( 32 * 1024 );
 
              for ( i = 0; i < pxThis->pxFptHeader[APC_BOOT_DEVICE_PRIMARY].ucNumEntries; i++ )
              {
@@ -1040,6 +1042,11 @@ static int iGetFptData( void )
                      pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionBaseAddr;
                  pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulPartitionSize =
                      pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionSize;
+                 pvOSAL_MemCpy( pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].pucPdiMd5,
+                     pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].pdi_md5,
+                     MD5_SIZE );
+                 pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulPdiSize =
+                     pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPdiSize;
                  pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntryPrimary[i].ulPartitionFlags =
                      pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][i].ulPartitionFlags;
                  usByteCount += sizeof( ASDMFptEntry );
@@ -1076,6 +1083,11 @@ static int iGetFptData( void )
                          pxThis->ppxFptPartitions[APC_BOOT_DEVICE_SECONDARY][i].ulPartitionBaseAddr;
                      pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].ulPartitionSize =
                          pxThis->ppxFptPartitions[APC_BOOT_DEVICE_SECONDARY][i].ulPartitionSize;
+                     pvOSAL_MemCpy( pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].pucPdiMd5,
+                         pxThis->ppxFptPartitions[APC_BOOT_DEVICE_SECONDARY][i].pdi_md5,
+                         MD5_SIZE );
+                     pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].ulPdiSize =
+                         pxThis->ppxFptPartitions[APC_BOOT_DEVICE_SECONDARY][i].ulPdiSize;
                      pxThis->pxAsdmSdrInfo[iRepoIndex].xFptRecord.pxFptEntrySecondary[i].ulPartitionFlags =
                          pxThis->ppxFptPartitions[APC_BOOT_DEVICE_SECONDARY][i].ulPartitionFlags;
                      usByteCount += sizeof( ASDMFptEntry );
@@ -1253,6 +1265,36 @@ static int iApcCallback( EVLSignal *pxSignal )
                 {
                     INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
                     PLL_ERR( ASDM_NAME, "Failed to refresh FPT data after flags update\r\n" );
+                }
+                break;
+
+            case APC_PROXY_DRIVER_E_COPY_COMPLETE:
+                PLL_DBG( ASDM_NAME, "Received partition copy complete event - refreshing FPT data\r\n" );
+
+                if ( OK == iRefreshFptData() )
+                {
+                    iStatus = OK;
+                    PLL_DBG( ASDM_NAME, "FPT data refreshed successfully after partition copy\r\n" );
+                }
+                else
+                {
+                    INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
+                    PLL_ERR( ASDM_NAME, "Failed to refresh FPT data after partition copy\r\n" );
+                }
+                break;
+
+            case APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE:
+                PLL_DBG( ASDM_NAME, "Received download complete event - refreshing FPT data\r\n" );
+
+                if ( OK == iRefreshFptData() )
+                {
+                    iStatus = OK;
+                    PLL_DBG( ASDM_NAME, "FPT data refreshed successfully after download\r\n" );
+                }
+                else
+                {
+                    INC_ERROR_COUNTER( ASDM_ERRORS_APC_FPT_UPDATE_FAILED )
+                    PLL_ERR( ASDM_NAME, "Failed to refresh FPT data after download\r\n" );
                 }
                 break;
 

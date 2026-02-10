@@ -103,7 +103,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_EMMC_Init( FWIfEmmcInitCfg *pxInitCfg );
+uint32_t ulFW_IF_EMMC_Init( FWIfEmmcInitCfg *pxInitCfg );
 
 /**
  * @brief   creates an instance of the EMMC interface
@@ -113,7 +113,7 @@ extern uint32_t ulFW_IF_EMMC_Init( FWIfEmmcInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_EMMC_Create( FWIfCfg *pxFwIf, FWIfEmmcCfg *pxEmmcCfg );
+uint32_t ulFW_IF_EMMC_Create( FWIfCfg *pxFwIf, FWIfEmmcCfg *pxEmmcCfg );
 
 /**
  *
@@ -122,7 +122,7 @@ extern uint32_t ulFW_IF_EMMC_Create( FWIfCfg *pxFwIf, FWIfEmmcCfg *pxEmmcCfg );
  * @return   OK                  Stats retrieved from fw_if_emmc successfully
  *           ERROR               Stats not retrieved successfully
  */
-extern int iFW_IF_EMMC_PrintStatistics( void );
+int iFW_IF_EMMC_PrintStatistics( void );
 
 /**
  *
@@ -131,6 +131,6 @@ extern int iFW_IF_EMMC_PrintStatistics( void );
  * @return   OK                  Stats cleared successfully
  *           ERROR               Stats not cleared successfully
  */
-extern int iFW_IF_EMMC_ClearStatistics( void );
+int iFW_IF_EMMC_ClearStatistics( void );
 
 #endif /* _FW_IF_EMMC_H_ */

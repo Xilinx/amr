@@ -151,6 +151,8 @@ struct amc_proxy_pdi_download_request {
 	uint64_t address;
 	uint32_t boot_device;
 	uint32_t partition;
+	uint8_t  pdi_md5[MD5_SIZE];
+	uint32_t pdi_size;
 	uint16_t last_chunk;
 	uint16_t chunk;
 	uint32_t chunk_size;
@@ -197,6 +199,8 @@ struct amc_proxy_hearbeat_request {
  * @type: the partition type
  * @base_addr: the partition base address
  * @size: the partition size
+ * @pdi_md5: the MD5 checksum of the pdi file
+ * @pdi_size: the size of the pdi file
  * @flags: the flags value (for write)
  */
 struct amc_proxy_fpt_partition_request {
@@ -206,6 +210,8 @@ struct amc_proxy_fpt_partition_request {
 	uint32_t type;
 	uint32_t base_addr;
 	uint32_t size;
+	uint8_t  pdi_md5[MD5_SIZE];
+	uint32_t pdi_size;
 	uint32_t flags;
 };
 

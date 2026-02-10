@@ -29,6 +29,8 @@
  * @size: Size of bitstream buffer.
  * @boot_device: Target boot device.
  * @partition: Partition number to flash.
+ * @pdi_md5: MD5 checksum of the PDI file (16 bytes).
+ * @pdi_size: Size of the PDI file in bytes.
  * @efd_ctx: eventfd context for reporting progress (optional).
  *
  * If `partition` is equal to `FPT_UPDATE_MAGIC` will update the FPT.
@@ -36,7 +38,8 @@
  * Return: 0 or negative error code.
  */
 static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf, uint32_t size,
-	uint8_t boot_device, uint32_t partition, struct eventfd_ctx *efd_ctx)
+	uint8_t boot_device, uint32_t partition, uint8_t *pdi_md5, uint32_t pdi_size,
+	struct eventfd_ctx *efd_ctx)
 {
 	int ret = SUCCESS;
 	uint16_t chunk = 0;
@@ -68,6 +71,13 @@ static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *bu
 		"Attempting to download PDI bitstream with image size %d to partition %d num_chunks = %d",
 		size, part, num_chunks
 	);
+
+	/* Store PDI metadata in context for GCQ command population */
+	if (pdi_md5)
+		memcpy(amc_ctrl_ctxt->pdi_md5, pdi_md5, sizeof(amc_ctrl_ctxt->pdi_md5));
+	else
+		memset(amc_ctrl_ctxt->pdi_md5, 0, sizeof(amc_ctrl_ctxt->pdi_md5));
+	amc_ctrl_ctxt->pdi_size = pdi_size;
 
 	while (bytes_written < size) {
 		if ((PDI_CHUNK_SIZE * PDI_CHUNK_MULTIPLIER) > (size - bytes_written))
@@ -169,7 +179,8 @@ static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *bu
  * Download a PDI bitstream.
  */
 int download_pdi(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf, uint32_t size,
-	uint8_t boot_device, uint32_t partition, struct eventfd_ctx *efd_ctx)
+	uint8_t boot_device, uint32_t partition, uint8_t *pdi_md5, uint32_t pdi_size,
+	struct eventfd_ctx *efd_ctx)
 {
 	if (!amc_ctrl_ctxt || !size || !buf || (partition == FPT_UPDATE_MAGIC))
 		return -EINVAL;
@@ -180,6 +191,8 @@ int download_pdi(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf, uint32_t 
 		size,
 		boot_device,
 		partition,
+		pdi_md5,
+		pdi_size,
 		efd_ctx
 	);
 }
@@ -188,7 +201,8 @@ int download_pdi(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf, uint32_t 
  * Update device FPT.
  */
 int update_fpt(struct pf_dev_struct *pf_dev, uint8_t *buf, uint32_t size,
-	uint8_t boot_device, struct eventfd_ctx *efd_ctx)
+	uint8_t boot_device, uint8_t *pdi_md5, uint32_t pdi_size,
+	struct eventfd_ctx *efd_ctx)
 {
 	int ret = 0;
 
@@ -201,6 +215,8 @@ int update_fpt(struct pf_dev_struct *pf_dev, uint8_t *buf, uint32_t size,
 		size,
 		boot_device,
 		FPT_UPDATE_MAGIC,
+		pdi_md5,
+		pdi_size,
 		efd_ctx
 	);
 

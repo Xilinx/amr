@@ -2,7 +2,7 @@
 /*
  * table.c - This file contains utilities for printing tables
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <stdlib.h>
@@ -17,7 +17,7 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define COLUMN_PADDING (2)
+#define COLUMN_PADDING (0)
 
 /*****************************************************************************/
 /* Public function declarations                                              */

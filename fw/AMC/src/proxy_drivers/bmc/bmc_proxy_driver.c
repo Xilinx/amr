@@ -205,14 +205,8 @@ typedef struct
 /* Global Variables used in PLDM and MCTP code                                */
 /******************************************************************************/
 
-uint8_t ReqBuffer[ MAX_BUFFER_SIZE ] =
-{
-    0
-};
-uint8_t RespBuffer[ MAX_BUFFER_SIZE ] =
-{
-    0
-};
+uint8_t ReqBuffer[ MAX_BUFFER_SIZE ]  = { 0 };
+uint8_t RespBuffer[ MAX_BUFFER_SIZE ] = { 0 };
 
 TerminusPDRFormatUid xPdrTerminusLocator[ TOTAL_PDR_COUNT_TERMINUS ] =
 {
@@ -224,9 +218,9 @@ TerminusPDRFormatUid xPdrTerminusLocator[ TOTAL_PDR_COUNT_TERMINUS ] =
         .locator.terminusLocatorType      = ETerminusTypeUID,
         .locator.terminusLocatorValueSize = BMC_TERMINUS_LOCATOR_VALUE_SIZE,
         .locator.terminusInstance         = BMC_TERMINUS_INSTANCE_1,
-        .locator.deviceUID                = {
-            0
-        }                                                                      /* This data is filled with UUID from EEPROM, in vPdrRepoInit() function */
+        .locator.deviceUID                = { 0 } /* This data is filled with
+                                                     UUID from EEPROM, in
+                                                     vPdrRepoInit() function */
     },
 };
 

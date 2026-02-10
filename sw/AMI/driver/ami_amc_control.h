@@ -477,12 +477,16 @@ struct fpt_header {
  * @type: Partition type
  * @base_addr: Partition base address
  * @size: Partition size
+ * @pdi_md5: MD5 checksum of the pdi file
+ * @pdi_size: Size of the pdi file
  * @flags: Partition flags
  */
 struct fpt_partition {
 	uint32_t type;
 	uint32_t base_addr;
 	uint32_t size;
+	uint8_t  pdi_md5[MD5_SIZE];
+	uint32_t pdi_size;
 	uint32_t flags;
 };
 
@@ -711,6 +715,9 @@ struct amc_control_ctxt {
 	bool			logging_thread_created;
 	int			last_printed_msg_index;
 	bool			compat_mode;
+	/* PDI download metadata - set before download, used in GCQ command */
+	uint8_t			pdi_md5[MD5_SIZE];
+	uint32_t		pdi_size;
 };
 
 

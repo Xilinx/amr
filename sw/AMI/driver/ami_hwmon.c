@@ -2,7 +2,7 @@
 /*
  * ami_hwmon.c - This file contains logic related to hwmon.
  *
- * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/hwmon.h>
@@ -1420,11 +1420,12 @@ int register_hwmon(struct device *dev, struct pf_dev_struct *pf_dev)
 
 /*
  * Unregister hwmon device.
+ *
+ * Note: Since we use devm_hwmon_device_register_with_info(), the hwmon
+ * device is automatically unregistered when the parent device is removed.
+ * This function is kept for API compatibility but is intentionally a no-op.
  */
 void remove_hwmon(struct device *dev)
 {
-	if (!dev)
-		return;
-
-	devm_hwmon_device_unregister(dev);
+	(void)dev; /* Unused - devm handles cleanup automatically */
 }

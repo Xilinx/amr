@@ -123,7 +123,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_GCQ_Init( FWIfGCQInitCfg *pxInitCfg );
+uint32_t ulFW_IF_GCQ_Init( FWIfGCQInitCfg *pxInitCfg );
 
 /**
  * @brief   creates an instance of the sGCQ interface
@@ -133,7 +133,7 @@ extern uint32_t ulFW_IF_GCQ_Init( FWIfGCQInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_GCQ_Create( FWIfCfg *pxFwIf, FWIfGCQCfg *pxGCQCfg );
+uint32_t ulFW_IF_GCQ_Create( FWIfCfg *pxFwIf, FWIfGCQCfg *pxGCQCfg );
 
 /**
  * @brief    Print all the stats gathered by the interface

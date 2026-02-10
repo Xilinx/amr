@@ -39,15 +39,15 @@ static uint8_t _TID = 0x00;
 /* Externs                                                                    */
 /******************************************************************************/
 
-extern int iSetNumericSensorEnable( uint16_t usSensorId,
-                                    uint8_t ucRequestedSensorOperationalState,
-                                    uint8_t *pucResponseMessage,
-                                    int *piResponseSize );
+int iSetNumericSensorEnable( uint16_t usSensorId,
+                             uint8_t ucRequestedSensorOperationalState,
+                             uint8_t *pucResponseMessage,
+                             int *piResponseSize );
 
-extern int iGetNumericSensorReading( uint16_t usSensorId,
-                                     uint8_t *pucCompletionCode,
-                                     uint8_t *pucSensorOperationalState,
-                                     int16_t *pssReading );
+int iGetNumericSensorReading( uint16_t usSensorId,
+                              uint8_t *pucCompletionCode,
+                              uint8_t *pucSensorOperationalState,
+                              int16_t *pssReading );
 
 
 /******************************************************************************/

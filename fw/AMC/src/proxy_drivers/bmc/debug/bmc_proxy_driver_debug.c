@@ -59,7 +59,7 @@ static DAL_HDL pxPldmType5Dir = NULL;
 /* Externs                                                                    */
 /******************************************************************************/
 
-extern void vEmulateReceivedMessage( uint8_t *pucData, uint16_t usDatasize );
+void vEmulateReceivedMessage( uint8_t *pucData, uint16_t usDatasize );
 
 
 /******************************************************************************/

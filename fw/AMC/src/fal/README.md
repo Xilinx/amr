@@ -147,7 +147,7 @@ If any configuration values aren't required for a specific implementation, they 
 *
 * @return  See FW_IF_ERRORS
 */
-extern uint32_t FW_IF_smbus_init( FWIfSMBusInitCfg * cfg );
+uint32_t FW_IF_smbus_init( FWIfSMBusInitCfg * cfg );
 ```
 The initialisation function should only pass in a pointer to the initialisation structure, so that porting a user application from one driver to another takes minimal effort (only the structure contents and the name of the function need changed).
 
@@ -244,7 +244,7 @@ As before, if any values aren't required for a specific implementation, they can
 *
 * @return  See FW_IF_ERRORS
 */
-extern uint32_t FW_IF_smbus_create( FWIfCfg *fwIf, FWIfSMBusCfg *smbusCfg );
+uint32_t FW_IF_smbus_create( FWIfCfg *fwIf, FWIfSMBusCfg *smbusCfg );
 ```
 * The parameter ***fw_if** is the handle to the interface that will be used for all subsequent calls (e.g. **open**, **write**, etc). It must initialised in the user application as an empty structure.
 * The parameter ***smbusCfg** is a pointer to the instance configuration structure shown previously - within the implementation, the contents will be copied to the private structure of the **fw_if** handle.

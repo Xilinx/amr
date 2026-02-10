@@ -82,7 +82,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t FW_IF_test_init( FWIfTestInitCfg *pxCfg );
+uint32_t FW_IF_test_init( FWIfTestInitCfg *pxCfg );
 
 /**
  * @brief   creates an instance of the test interface
@@ -92,6 +92,6 @@ extern uint32_t FW_IF_test_init( FWIfTestInitCfg *pxCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t FW_IF_test_create( FWIfCfg *pxFwIf, FWIfTestCfg *pxTestCfg );
+uint32_t FW_IF_test_create( FWIfCfg *pxFwIf, FWIfTestCfg *pxTestCfg );
 
 #endif /* _FW_IF_TEST_H_ */

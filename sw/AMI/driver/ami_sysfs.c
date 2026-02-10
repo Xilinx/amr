@@ -2,7 +2,7 @@
 /*
  * ami_sysfs.c - This file contains sysfs-related logic for the AMI driver.
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/device.h>
@@ -301,7 +301,7 @@ static ssize_t dev_name_show(struct device		*dev,
 		return -ENODEV;
 
 	/* Must use dynamically allocated memory here due to a large struct. */
-	bd_info_record = vzalloc(sizeof(struct bd_info_record));
+	bd_info_record = kvzalloc(sizeof(struct bd_info_record), GFP_KERNEL);
 
 	if (!bd_info_record) {
 		put_pf_dev_entry(pf_dev);
@@ -326,7 +326,7 @@ static ssize_t dev_name_show(struct device		*dev,
 	}
 
 	put_pf_dev_entry(pf_dev);
-	vfree(bd_info_record);
+	kvfree(bd_info_record);
 	return ret;
 }
 static DEVICE_ATTR_RO(dev_name);

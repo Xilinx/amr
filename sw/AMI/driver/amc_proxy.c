@@ -247,6 +247,8 @@ struct amc_proxy_cmd_req_sensor_payload {
  * @last_chunk: 1 to indicate that this is the last data chunk
  * @chunk: current chunk (used only for download operation)
  * @chunk_size: chunk size in KB (used for download operation)
+ * @pdi_md5: MD5 checksum of the PDI file (16 bytes)
+ * @pdi_size: Size of the PDI file in bytes
  */
 struct amc_proxy_cmd_data_payload {
 	uint64_t address;
@@ -264,6 +266,8 @@ struct amc_proxy_cmd_data_payload {
 	uint16_t last_chunk:1;
 	uint16_t chunk:15;
 	uint32_t chunk_size;
+	uint8_t  pdi_md5[MD5_SIZE];
+	uint32_t pdi_size;
 };
 
 /**
@@ -322,16 +326,20 @@ struct amc_proxy_cmd_heartbeat_payload {
  * @type: the partition type
  * @base_addr: the partition base address
  * @size: the partition size
+ * @pdi_md5: the MD5 checksum of the pdi file
+ * @pdi_size: the size of the pdi file
  * @flags: the flags value (for write)
  */
  struct amc_proxy_cmd_fpt_partition_payload {
-	uint32_t req_type;      /* 0 = Read, 1 = Write */
-	uint32_t boot_device;   /* 0 = Primary, 1 = Secondary */
-	uint32_t partition;     /* Partition index */
-	uint32_t type;          /* Partition type */
-	uint32_t base_addr;     /* Partition base address */
-	uint32_t size;          /* Partition size */
-	uint32_t flags;         /* Flags value (for write) */
+	uint32_t req_type;           /* 0 = Read, 1 = Write */
+	uint32_t boot_device;        /* 0 = Primary, 1 = Secondary */
+	uint32_t partition;          /* Partition index */
+	uint32_t type;               /* Partition type */
+	uint32_t base_addr;          /* Partition base address */
+	uint32_t size;               /* Partition size */
+	uint8_t  pdi_md5[MD5_SIZE];  /* MD5 checksum of the pdi file */
+	uint32_t pdi_size;           /* Size of the pdi file */
+	uint32_t flags;              /* Flags value (for write) */
 };
 
 /**
@@ -1105,6 +1113,9 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
 		request_cmd_entry.pdi_payload.last_chunk = pdi_download->last_chunk;
 		request_cmd_entry.pdi_payload.chunk = pdi_download->chunk;
 		request_cmd_entry.pdi_payload.chunk_size = pdi_download->chunk_size;
+		memcpy(&request_cmd_entry.pdi_payload.pdi_md5,
+			&pdi_download->pdi_md5, sizeof(pdi_download->pdi_md5));
+		request_cmd_entry.pdi_payload.pdi_size = pdi_download->pdi_size;
 		request_cmd_entry.pdi_payload.update_fpt = 0;
 		request_cmd_entry.pdi_payload.program_pdi = 0;
 
@@ -1418,6 +1429,9 @@ int amc_proxy_request_set_fpt_partition(struct amc_proxy_cmd_struct *cmd,
 		request_cmd_entry.fpt_partition_payload.type = fpt_partition->type;
 		request_cmd_entry.fpt_partition_payload.base_addr = fpt_partition->base_addr;
 		request_cmd_entry.fpt_partition_payload.size = fpt_partition->size;
+		memcpy(&request_cmd_entry.fpt_partition_payload.pdi_md5,
+			&fpt_partition->pdi_md5, sizeof(fpt_partition->pdi_md5));
+		request_cmd_entry.fpt_partition_payload.pdi_size = fpt_partition->pdi_size;
 		request_cmd_entry.fpt_partition_payload.flags = fpt_partition->flags;
 		ret = gcq_write(amc_ctxt->inst.gcq_handle,
 				(uint8_t*)&request_cmd_entry,

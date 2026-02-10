@@ -2,7 +2,7 @@
 /*
  * ami_program.h - This file contains functions to program (flash) devices.
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_PROGRAM_H
@@ -69,13 +69,15 @@
  * @size: Size of bitstream buffer.
  * @boot_device: Target boot device.
  * @partition: Partition number to flash.
+ * @pdi_md5: MD5 checksum of the PDI file (16 bytes).
+ * @pdi_size: Size of the PDI file in bytes.
  * @efd_ctx: eventfd context for reporting progress (optional).
  *
  * Return: 0 or negative error code.
  */
 int download_pdi(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf,
 	uint32_t size, uint8_t boot_device, uint32_t partition,
-	struct eventfd_ctx *efd_ctx);
+	uint8_t *pdi_md5, uint32_t pdi_size, struct eventfd_ctx *efd_ctx);
 
 /**
  * update_fpt() - Download a PDI containing an FPT onto a device.
@@ -83,12 +85,15 @@ int download_pdi(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *buf,
  * @buf: Bitstream byte buffer - must contain valid FPT.
  * @size: Size of bitstream buffer.
  * @boot_device: Target boot device.
+ * @pdi_md5: MD5 checksum of the PDI file (16 bytes).
+ * @pdi_size: Size of the PDI file in bytes.
  * @efd_ctx: eventfd context for reporting progress (optional).
  *
  * Return: 0 or negative error code.
  */
 int update_fpt(struct pf_dev_struct *pf_dev, uint8_t *buf, uint32_t size,
-	uint8_t boot_device, struct eventfd_ctx *efd_ctx);
+	uint8_t boot_device, uint8_t *pdi_md5, uint32_t pdi_size,
+	struct eventfd_ctx *efd_ctx);
 
 /**
  * device_boot() - Set the device boot partition.

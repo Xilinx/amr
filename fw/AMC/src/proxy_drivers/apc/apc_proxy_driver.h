@@ -113,6 +113,8 @@ typedef struct
     uint32_t    ulPartitionType;
     uint32_t    ulPartitionBaseAddr;
     uint32_t    ulPartitionSize;
+    uint8_t     pdi_md5[MD5_SIZE];
+    uint32_t    ulPdiSize;
     union {
         uint32_t ulPartitionFlags;     /* User defined flags */
         struct {
@@ -121,7 +123,7 @@ typedef struct
             uint32_t reserved1:15;      /* Reserved for future use */
             uint32_t powerup_error:2;   /* Power on load user partition error flag
                                            0: Not Loaded, 1: Loaded, 2: Error */
-            uint32_t reserved2:15;      /* Reserved for future use */
+            uint32_t reserved2:14;      /* Reserved for future use */
         } user;
     };
 
@@ -176,6 +178,9 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
  * @ulImageSize:  Size of image (in bytes)
  * @usPacketNum:  Image packet number
  * @ulPacketSize: Size of image packet (in KB)
+ * @pucPdiMd5:    Pointer to 16-byte PDI MD5 checksum
+ * @ulPdiSize:    Size of full PDI file in bytes
+ * @iLastPacket:  Boolean indicating if this is the last data packet
  *
  * @return  OK    Image downloaded successfully
  *          ERROR Image not downloaded successfully
@@ -186,7 +191,10 @@ int iAPC_DownloadImage( EVLSignal *pxSignal,
                         uint32_t ulSrcAddr,
                         uint32_t ulImageSize,
                         uint16_t usPacketNum,
-                        uint32_t ulPacketSize );
+                        uint32_t ulPacketSize,
+                        uint8_t *pucPdiMd5,
+                        uint32_t ulPdiSize,
+                        int iLastPacket );
 
 /**
  * iAPC_UpdateFpt() - Download an image with an FPT to a location in NV memory
@@ -320,6 +328,45 @@ int iAPC_SetFptPartitionFlags( EVLSignal *pxSignal,
                                APC_BOOT_DEVICES xBootDevice,
                                int iPartition,
                                uint32_t ulFlags );
+
+/**
+ * iAPC_SetFptPartition() - Set/Update an FPT Partition entry
+ *
+ * @pxSignal:       Current event occurance (used for tracking)
+ * @xBootDevice:    Target boot device
+ * @iPartition:     Index of partition to update (0 is the 1st partition)
+ * @pucPdiMd5:      Pointer to 16-byte PDI MD5 checksum (NULL to skip update)
+ * @ulPdiSize:      Size of the PDI file in bytes
+ * @ulFlags:        New flags value to set
+ *
+ * @return  OK      FPT partition updated successfully
+ *          ERROR   FPT partition not updated successfully
+ *
+ * @note    This function updates the partition in both the cached copy
+ *          and the flash storage
+ */
+int iAPC_SetFptPartition( EVLSignal *pxSignal,
+                          APC_BOOT_DEVICES xBootDevice,
+                          int iPartition,
+                          uint8_t *pucPdiMd5,
+                          uint32_t ulPdiSize,
+                          uint32_t ulFlags );
+
+/**
+ * iAPC_ReadFlashRaw() - Read raw bytes from flash
+ *
+ * @xBootDevice:    Target boot device
+ * @ulOffset:       Offset in flash to read from
+ * @pucBuffer:      Buffer to store the read data
+ * @ulLength:       Number of bytes to read
+ *
+ * @return  OK      Data read successfully
+ *          ERROR   Data not read successfully
+ */
+int iAPC_ReadFlashRaw( APC_BOOT_DEVICES xBootDevice,
+                       uint32_t ulOffset,
+                       uint8_t *pucBuffer,
+                       uint32_t ulLength );
 
 /**
  * iAPC_PrintStatistics() - Print all the stats gathered by the proxy driver

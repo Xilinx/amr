@@ -40,6 +40,8 @@
 #define UNUSED( p ) ( void )( p )
 #endif
 
+#define MD5_SIZE    ( 16 )
+
 /**
  * @enum   MODULE_STATE
  *

@@ -77,12 +77,16 @@ enum ami_fpt_type {
  * @type: Partition type.
  * @base_addr: Partition base address.
  * @size: Partition size.
+ * @pdi_md5: MD5 checksum of the pdi file (16 bytes).
+ * @pdi_size: Size of the pdi file.
  * @flags: Partition flags.
  */
 struct ami_fpt_partition {
 	enum ami_fpt_type type;
 	uint32_t base_addr;
 	uint32_t size;		/* in bytes */
+	uint8_t  pdi_md5[16];	/* MD5 checksum of the pdi file */
+	uint32_t pdi_size;	/* Size of the pdi file */
 	union {
 		uint32_t flags;		/* User defined flags */
 		struct {

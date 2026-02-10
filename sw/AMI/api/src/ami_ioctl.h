@@ -24,6 +24,7 @@
 #define AMI_IOC_FPT_UPDATE_MAGIC	(0xAAAAAAAA)
 #define AMI_IOC_PDI_PROGRAM_MAGIC	(0xBBBBBBBB)
 #define AMI_IOC_SENSOR_STATUS_LEN	(40)
+#define MD5_SIZE			(16)  /* MD5 checksum size in bytes */
 
 /**
  * struct ami_ioc_data_payload - payload struct for dynamically sized ioctl data
@@ -31,6 +32,8 @@
  * @addr: Location of data buffer in userspace memory.
  * @boot_device: Target boot device (for fpt, download).
  * @partition: Partition number to flash (also used for boot select).
+ * @pdi_md5: MD5 checksum of the pdi file (16 bytes).
+ * @pdi_size: Size of the pdi file.
  * @src_device: Source device (for copy operation).
  * @src_part: Source partition (for copy operation).
  * @dest_device: Destination device (for copy operation).
@@ -52,6 +55,8 @@ struct ami_ioc_data_payload {
 	unsigned long  addr;
 	uint8_t        boot_device;
 	uint32_t       partition;
+	uint8_t        pdi_md5[MD5_SIZE];
+	uint32_t       pdi_size;
 	uint32_t       src_device;
 	uint32_t       src_part;
 	uint32_t       dest_device;
@@ -148,6 +153,8 @@ struct ami_ioc_fpt_hdr_value {
  * @type: The partition type. Populated by the driver.
  * @base_addr: The partition base address. Populated by the driver.
  * @size: The partition size. Populated by the driver.
+ * @pdi_md5: The MD5 checksum of the pdi file (16 bytes). Populated by the driver.
+ * @pdi_size: The size of the pdi file (in bytes). Populated by the driver.
  * @flags: The partition flags. Populated by the driver.
  */
 struct ami_ioc_fpt_partition_value {
@@ -156,6 +163,8 @@ struct ami_ioc_fpt_partition_value {
 	uint32_t type;
 	uint32_t base_addr;
 	uint32_t size;
+	uint8_t  pdi_md5[MD5_SIZE];
+	uint32_t pdi_size;
 	uint32_t flags;
 };
 

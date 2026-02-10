@@ -231,10 +231,10 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/*
-		 * Using vzalloc because the PDI buffer will be too large
+		 * Using kvzalloc because the PDI buffer will be too large
 		 * for kzalloc (around 4-6MB)
 		 */
-		buf = vzalloc(data.size);
+		buf = kvzalloc(data.size, GFP_KERNEL);
 
 		if (!buf) {
 			ret = -ENOMEM;
@@ -252,6 +252,8 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 					buf,
 					data.size,
 					data.boot_device,
+					data.pdi_md5,
+					data.pdi_size,
 					efd_ctx
 				);
 			else
@@ -261,13 +263,15 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 					data.size,
 					data.boot_device,
 					data.partition,
+					data.pdi_md5,
+					data.pdi_size,
 					efd_ctx
 				);
 		} else {
 			ret = -EFAULT;
 		}
 
-		vfree(buf);
+		kvfree(buf);
 		break;
 	}
 
@@ -367,7 +371,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Allocate memory for response buffer. */
-		buf = vzalloc(data.num * sizeof(uint32_t));
+		buf = kvzalloc(data.num * sizeof(uint32_t), GFP_KERNEL);
 
 		if (!buf) {
 			ret = -ENOMEM;
@@ -382,7 +386,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			ret = copy_to_user((uint32_t*)data.addr, buf,
 				data.num * sizeof(uint32_t));
 
-		vfree(buf);
+		kvfree(buf);
 		break;
 	}
 
@@ -413,7 +417,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Allocate memory for payload buffer. */
-		buf = vzalloc(data.num * sizeof(uint32_t));
+		buf = kvzalloc(data.num * sizeof(uint32_t), GFP_KERNEL);
 
 		if (!buf) {
 			ret = -ENOMEM;
@@ -427,7 +431,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		else
 			ret = -EFAULT;
 
-		vfree(buf);
+		kvfree(buf);
 		break;
 	}
 
@@ -550,6 +554,8 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			data.type = partition.type;
 			data.base_addr = partition.base_addr;
 			data.size = partition.size;
+			memcpy(&data.pdi_md5, &partition.pdi_md5, sizeof(data.pdi_md5));
+			data.pdi_size = partition.pdi_size;
 			data.flags = partition.flags;
 			ret = copy_to_user((
 				struct ami_ioc_fpt_partition_value*)arg,
@@ -595,7 +601,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Allocate memory for response buffer. */
-		buf = vzalloc(data.len * sizeof(uint8_t));
+		buf = kvzalloc(data.len, GFP_KERNEL);
 
 		if (!buf) {
 			ret = -ENOMEM;
@@ -617,7 +623,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			ret = copy_to_user((uint8_t*)data.addr, buf,
 				data.len * sizeof(uint8_t));
 		}
-		vfree(buf);
+		kvfree(buf);
 		break;
 	}
 
@@ -638,7 +644,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Allocate memory for payload buffer. */
-		buf = vzalloc(data.len * sizeof(uint8_t));
+		buf = kvzalloc(data.len, GFP_KERNEL);
 
 		if (!buf) {
 			ret = -ENOMEM;
@@ -658,7 +664,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		else {
 			ret = -EFAULT;
 		}
-		vfree(buf);
+		kvfree(buf);
 		break;
 	}
 
@@ -695,7 +701,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Allocate memory for response buffer. */
-		buf = vzalloc(data.len * sizeof(uint8_t));
+		buf = kvzalloc(data.len, GFP_KERNEL);
 
 		if (!buf) {
 			ret = -ENOMEM;
@@ -720,7 +726,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			ret = copy_to_user((uint8_t*)data.addr, buf,
 				data.len * sizeof(uint8_t));
 		}
-		vfree(buf);
+		kvfree(buf);
 		break;
 	}
 
@@ -741,7 +747,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 
 		/* Allocate memory for payload buffer. */
-		buf = vzalloc(data.len * sizeof(uint8_t));
+		buf = kvzalloc(data.len, GFP_KERNEL);
 
 		if (!buf) {
 			ret = -ENOMEM;
@@ -766,7 +772,7 @@ long dev_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		else
 			ret = -EFAULT;
 
-		vfree(buf);
+		kvfree(buf);
 		break;
 	}
 

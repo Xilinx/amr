@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 
 import re
 import os

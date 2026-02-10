@@ -11,12 +11,12 @@
 #include <linux/printk.h>
 
 /* Meta Information */
-#define MDL_VERSION		"2.0.0"
+#define MDL_VERSION	"2.0.0"
 #define MDL_DESCRIPTION	"Adapative Management Interface (AMI) is used " \
-						"to manage AMR-based devices through PCIe"
-#define MDL_AUTHOR		"AMD, Inc."
-#define MDL_RELDATE		"2026"
-#define MDL_LICENSE		"GPL"
+				"to manage AMR-based devices through PCIe"
+#define MDL_AUTHOR	"AMD, Inc."
+#define MDL_RELDATE	"2026"
+#define MDL_LICENSE	"GPL"
 
 /* Enables debug messages in dmesg */
 extern bool ami_debug_enabled;
@@ -37,7 +37,8 @@ extern bool ami_debug_enabled;
 
 #define BDF_STR_LEN 7
 
-#define XILINX_ENDPOINT_NAME_SIZE 30
+#define XILINX_ENDPOINT_NAME_SIZE	30
+#define MD5_SIZE			16
 
 typedef struct {
 	bool		found;

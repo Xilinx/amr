@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (C) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 
 import re
 import os
@@ -229,14 +229,14 @@ def main(args):
         step = 'build AMI library'
         start_time = start_step('BUILD_AMI_LIB', step)
 
-        build_api = 'cd api && make clean && make'
+        build_api = 'cd api && make clean && make NO_SYSTEM_API=1'
         exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
         check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
 
         end_step('BUILD_AMI_LIB', start_time)
 
         step = 'clean libami'
-        clean_lib_ami = 'cd api && make clean'
+        clean_lib_ami = 'cd api && make clean NO_SYSTEM_API=1'
         exec_step_cmd('CLEAN_LIB_AMI', step, clean_lib_ami, shell=True, cwd=PROJECT_DIR)
         end_step('CLEAN_LIB_AMI', start_time)
 

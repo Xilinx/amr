@@ -45,11 +45,7 @@
 /* Locals                                                                     */
 /******************************************************************************/
 
-uint8_t multiPartReqBuffer[ MAX_MULTIPART_BUFFER_SIZE ] =
-{
-    0
-};
-
+uint8_t multiPartReqBuffer[ MAX_MULTIPART_BUFFER_SIZE ] = { 0 };
 int request_pkt = TRUE;
 
 uint8_t BMC_endpoint_id_g     = 0;
@@ -63,7 +59,7 @@ uint8_t BMC_slave_address_g   = 0;
 /******************************************************************************/
 
 extern uint16_t _EID;                                                          /* Stores assigned EID value */
-extern int iResponseDataWrite( uint8_t *pucData, uint16_t usDataSize );
+int iResponseDataWrite( uint8_t *pucData, uint16_t usDataSize );
 
 
 /******************************************************************************/

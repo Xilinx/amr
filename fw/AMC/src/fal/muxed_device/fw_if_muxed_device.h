@@ -119,7 +119,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_MUXED_DEVICE_Init( FWIfMuxedDeviceInitCfg *pxInitCfg );
+uint32_t ulFW_IF_MUXED_DEVICE_Init( FWIfMuxedDeviceInitCfg *pxInitCfg );
 
 /**
  * @brief   creates an instance of the MUXED_DEVICE interface
@@ -129,7 +129,7 @@ extern uint32_t ulFW_IF_MUXED_DEVICE_Init( FWIfMuxedDeviceInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-extern uint32_t ulFW_IF_MUXED_DEVICE_Create( FWIfCfg *pxFwIf, FW_IF_MUXED_DEVICE_CFG *pxQsfpCfg );
+uint32_t ulFW_IF_MUXED_DEVICE_Create( FWIfCfg *pxFwIf, FW_IF_MUXED_DEVICE_CFG *pxQsfpCfg );
 
 /**
  * @brief   Print all the stats gathered by the application
@@ -137,7 +137,7 @@ extern uint32_t ulFW_IF_MUXED_DEVICE_Create( FWIfCfg *pxFwIf, FW_IF_MUXED_DEVICE
  * @return  See FW_IF_ERRORS
  *
  */
-extern uint32_t ulFW_IF_MUXED_DEVICE_PrintStatistics( void );
+uint32_t ulFW_IF_MUXED_DEVICE_PrintStatistics( void );
 
 /**
  * @brief   Clear all the stats in the application
@@ -145,6 +145,6 @@ extern uint32_t ulFW_IF_MUXED_DEVICE_PrintStatistics( void );
  * @return  See FW_IF_ERRORS
  *
  */
-extern uint32_t ulFW_IF_MUXED_DEVICE_ClearStatistics( void );
+uint32_t ulFW_IF_MUXED_DEVICE_ClearStatistics( void );
 
 #endif /* _FW_IF_MUXED_DEVICE_H_ */

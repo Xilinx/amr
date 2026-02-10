@@ -189,6 +189,16 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 						&sdr_buf[buf_index],
 						sizeof(repo->fpt.partition_primary[i].size));
 					buf_index += sizeof(repo->fpt.partition_primary[i].size);
+					/* pdi md5 */
+					memcpy(&repo->fpt.partition_primary[i].pdi_md5,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_primary[i].pdi_md5));
+					buf_index += sizeof(repo->fpt.partition_primary[i].pdi_md5);
+					/* pdi size */
+					memcpy(&repo->fpt.partition_primary[i].pdi_size,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_primary[i].pdi_size));
+					buf_index += sizeof(repo->fpt.partition_primary[i].pdi_size);
 					/* flags */
 					memcpy(&repo->fpt.partition_primary[i].flags,
 						&sdr_buf[buf_index],
@@ -225,6 +235,16 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 						&sdr_buf[buf_index],
 						sizeof(repo->fpt.partition_secondary[i].size));
 					buf_index += sizeof(repo->fpt.partition_secondary[i].size);
+					/* pdi md5 */
+					memcpy(&repo->fpt.partition_secondary[i].pdi_md5,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_secondary[i].pdi_md5));
+					buf_index += sizeof(repo->fpt.partition_secondary[i].pdi_md5);
+					/* pdi size */
+					memcpy(&repo->fpt.partition_secondary[i].pdi_size,
+						&sdr_buf[buf_index],
+						sizeof(repo->fpt.partition_secondary[i].pdi_size));
+					buf_index += sizeof(repo->fpt.partition_secondary[i].pdi_size);
 					/* flags */
 					memcpy(&repo->fpt.partition_secondary[i].flags,
 						&sdr_buf[buf_index],
@@ -516,7 +536,7 @@ static int get_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 	/* TODO: Get the SDR size. */
 
-	sdr_raw_buf = vzalloc(sizeof(char) * SDR_RESP_LEN);
+	sdr_raw_buf = kvzalloc(SDR_RESP_LEN, GFP_KERNEL);
 	if (!sdr_raw_buf) {
 		AMI_ERR(amc_ctrl_ctxt, "Failed to allocate memory buffer for sdr_raw_buf");
 		ret = -ENOMEM;
@@ -558,7 +578,7 @@ static int get_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 done:
 	if (sdr_raw_buf)
-		vfree(sdr_raw_buf);
+		kvfree(sdr_raw_buf);
 
 	if (ret == SUCCESS)
 		AMI_DBG(amc_ctrl_ctxt, "Successfully fetched SDR");
@@ -875,7 +895,7 @@ static int get_all_sensors(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	if (!amc_ctrl_ctxt || !sensor_repo)
 		return -EINVAL;
 
-	sdr_raw_buf = vzalloc(sizeof(char) * SENSOR_RSP_LEN);
+	sdr_raw_buf = kvzalloc(SENSOR_RSP_LEN, GFP_KERNEL);
 	if (!sdr_raw_buf) {
 		AMI_ERR(amc_ctrl_ctxt, "Failed to allocate memory buffer for sdr_raw_buf");
 		ret = -ENOMEM;
@@ -963,7 +983,7 @@ static int get_all_sensors(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 done:
 	if (sdr_raw_buf)
-		vfree(sdr_raw_buf);
+		kvfree(sdr_raw_buf);
 
 	if (ret == SUCCESS) {
 		AMI_DBG(amc_ctrl_ctxt, "Successfully fetched sensors");
@@ -1164,65 +1184,6 @@ int read_fpt_hdr(struct pf_dev_struct *pf_dev, uint8_t boot_device, struct fpt_h
 
 		case AMI_AMC_BOOT_DEVICE_SECONDARY:
 			*hdr = repo->fpt.hdr_secondary;
-			break;
-
-		default:
-			return -EINVAL;
-			break;
-	}
-
-	return 0;
-}
-
-/*
- * set_fpt_partition() - Set a FPT partition.
- * @pf_dev: Pointer to top level PCI data struct.
- * @boot_device: Target boot device
- * @partition_id: The partition to set.
- * @partition: Pointer to the partition information to set.
- *
- * Sets a stored FPT partition.
- *
- * Return: 0 on success or negative error code.
- */
-int set_fpt_partition(struct pf_dev_struct	*pf_dev,
-	uint8_t			boot_device,
-	uint32_t		partition_id,
-	struct fpt_partition	*partition)
-{
-	struct sdr_repo *repo = NULL;
-
-	if (!pf_dev || !partition || (boot_device >= AMI_AMC_BOOT_DEVICE_MAX))
-		return -EINVAL;
-
-	repo = find_sdr_repo(pf_dev->sensor_repos,
-				pf_dev->num_sensor_repos,
-				SDR_TYPE_FPT);
-	if (!repo)
-		return -EINVAL;
-
-	if (!repo->num_records)
-		return -ENODATA;
-
-	switch (boot_device) {
-		case AMI_AMC_BOOT_DEVICE_PRIMARY:
-			if (partition_id > (repo->fpt.hdr_primary.num_entries - 1))
-				return -EINVAL;
-
-			if (repo->fpt.partition_primary == NULL)
-				return -ENODATA;
-
-			*partition = repo->fpt.partition_primary[partition_id];
-			break;
-
-		case AMI_AMC_BOOT_DEVICE_SECONDARY:
-			if (partition_id > (repo->fpt.hdr_secondary.num_entries - 1))
-				return -EINVAL;
-
-			if (repo->fpt.partition_secondary == NULL)
-				return -ENODATA;
-
-			*partition = repo->fpt.partition_secondary[partition_id];
 			break;
 
 		default:
