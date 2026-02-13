@@ -301,8 +301,8 @@ def main(args):
                 outfile.write('\n'.join(config['pkg']['postinst']))
 
         config['pkg']['deps'] = {
-            'rpm': ['glibc', 'gcc', 'make', 'grep', 'libami', 'gawk'],
-            'deb': ['libc6', 'gcc', 'make', 'grep', 'libami', 'gawk', 'build-essential']
+            'rpm': ['glibc', 'gcc', 'make', 'grep', 'libami', 'gawk', 'libssl-dev'],
+            'deb': ['libc6', 'gcc', 'make', 'grep', 'libami', 'gawk', 'build-essential', 'libssl-dev']
         }
 
         # We want to conflict with XRT, however, we don't want the package manager to automatically

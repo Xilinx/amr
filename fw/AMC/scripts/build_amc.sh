@@ -5,8 +5,9 @@
 #
 # E.g. Build:
 # ./scripts/build_amc.sh -xsa <xsa>  -profile <product>
+#     Default build directory is ./build_amc
 #
-# This will build bsp (amc_bsp), amc.elf and AMR SPI images
+# This will build bsp (amc_bsp), amc.elf and AMR OSPI flash images
 #
 
 set -Eeuo pipefail
@@ -17,17 +18,21 @@ SDT=""
 XSA=""
 AMC_ONLY=
 
-# Local variables
-ROOT_DIR=$(pwd)
-BUILD_DIR=$ROOT_DIR/build
-BSP_DIR=$ROOT_DIR/amc_bsp
+# Local variables - determine script location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SCRIPTS_DIR=$ROOT_DIR/scripts
+
+# Build output directories created where script is invoked from
+CWD=$(pwd)
+BUILD_DIR=$CWD/build_amc
+BSP_DIR=$CWD/amc_bsp
 BUILD_LOG=$BUILD_DIR/build.log
 OUTPUT_BIN="amc.elf"
 
 OS="freertos10_xilinx"
 SDT_DIR=$BSP_DIR/"emb_plus_sdt"
-CMAKE_PARAMS=" -DDEBUG_BUILD"
+CMAKE_PARAMS="-DDEBUG_BUILD=ON"
 
 STATIC_ANALYSIS=0
 
@@ -37,8 +42,8 @@ function print_help() {
     echo "=================================== AMC Build script ===================================="
     echo
     echo "-profile <profile_name> : set the board profile to build (rave|v80)"
-    echo "-xsa <abs_path_to_xsa>  : Absolute path to the XSA file to generate BSP from"
-    echo "-sdt                    : Absolute path to SDT folder"
+    echo "-xsa <abs_path_to_xsa>  : Path to the XSA file to generate BSP from"
+    echo "-sdt                    : Path to SDT folder"
     echo "-amc                    : only builds the AMC application (BSP untouched)"
     echo "-analysis               : triggers a static analysis check on AMC files"
     echo
@@ -48,7 +53,7 @@ function print_help() {
     echo "     if both XSA and SDT are provided, then the SDT will be used to generate the BSP"
     echo
     echo "E.g.: To build from scratch:"
-    echo " ./scripts/build_amc.sh -xsa /direct/path/to/example.xsa -profile <v80|rave>"
+    echo " ./scripts/build_amc.sh -xsa /path/to/example.xsa -profile <v80|rave>"
     echo
     echo "========================================================================================="
 }
@@ -75,12 +80,18 @@ while [ $# -gt 0 ]; do
         ;;
     -xsa)
         shift  ### shift to next passed variable (-xsa *) ###
-        XSA=$1 ### store option into xsa variable ###
 
         ### handle empty string ###
         if [ "$1" = "" ]; then
             echo "Error: Invalid xsa"
             exit 1
+        fi
+
+        ### convert relative path to absolute path ###
+        if [[ "$1" = /* ]]; then
+            XSA="$1"
+        else
+            XSA="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
         fi
         echo "Using xsa=${XSA}"
         ;;
@@ -91,10 +102,16 @@ while [ $# -gt 0 ]; do
         ;;
     -sdt)
         shift
-        SDT=$1
-        if [ -z "$SDT" ]; then
+        if [ -z "$1" ]; then
             echo "Error: Invalid sdt"
             exit 1
+        fi
+
+        ### convert relative path to absolute path ###
+        if [[ "$1" = /* ]]; then
+            SDT="$1"
+        else
+            SDT="$(cd "$1" && pwd)"
         fi
         SDT_DIR=${SDT}
         echo "Using sdt=${SDT}"
@@ -227,7 +244,7 @@ function build_amc() {
     # Running CMake
     echo "=== Executing CMake build process ===" |& tee -a $BUILD_LOG
     SECTION_START=$SECONDS
-    cmake -DOS="$OS" -DPROFILE="$PROFILE" "$CMAKE_PARAMS" .. |& tee -a $BUILD_LOG
+    cmake -DOS="$OS" -DPROFILE="$PROFILE" -DBSP_DIR="$BSP_DIR" $CMAKE_PARAMS "$ROOT_DIR" |& tee -a $BUILD_LOG
     echo "*** CMake took $((SECONDS - $SECTION_START)) S ***" |& tee -a $BUILD_LOG
 
     #Running Make
@@ -253,22 +270,22 @@ build_amc
 
 
 # Generate PDI w/ bootgen
-cat << EOF > ./build/amr_ospi_pdi.bif
+cat << EOF > $BUILD_DIR/amr_ospi_pdi.bif
 all:
 {
     image { { type=bootimage, file=$(find ${SDT_DIR} -name "*.pdi" | sort | sed -n '1p') } }
     image { id = 0x1c000000, name=rpu_subsystem, delay_handoff
-            { core=r5-0, file=./build/amc.elf } }
+            { core=r5-0, file=$BUILD_DIR/amc.elf } }
 }
 EOF
 
 bootgen \
     -arch versal \
-    -image ./build/amr_ospi_pdi.bif \
-    -w -o  ./build/amr_ospi.bin
+    -image $BUILD_DIR/amr_ospi_pdi.bif \
+    -w -o  $BUILD_DIR/amr_ospi.bin
 
 # final pdi generation
-./scripts/gen_fpt_pdi.py \
+$SCRIPTS_DIR/gen_fpt_pdi.py \
     --profile ${PROFILE} \
-    --pdi    ./build/amr_ospi.bin \
-    --output ./build/amr_ospi_fpt.bin
+    --pdi    $BUILD_DIR/amr_ospi.bin \
+    --output $BUILD_DIR/amr_ospi_fpt.bin
