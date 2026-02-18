@@ -2,7 +2,7 @@
 /*
  * cmd_device_boot.c - This file contains the implementation for the command "device_boot"
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -99,6 +99,7 @@ static int do_cmd_device_boot(struct app_option *options, int num_args, char **a
 	/* Required data */
 	ami_device *dev = NULL;
 	uint32_t partition_number = 0;
+	struct ami_fpt_partition fpt_partition = { 0 };
 
 	/* Must have at least a device and partition number. */
 	if (!options) {
@@ -125,6 +126,20 @@ static int do_cmd_device_boot(struct app_option *options, int num_args, char **a
 	warn_compat_mode(dev);
 
 	partition_number = (uint32_t)strtoul(partition->arg, NULL, 0);
+
+	/* Check that the partition type is BOOT before proceeding */
+	if (ami_prog_get_fpt_partition(dev, AMI_BOOT_DEVICES_PRIMARY,
+			partition_number, &fpt_partition) != AMI_STATUS_OK) {
+		APP_API_ERROR("could not read partition information");
+		ami_dev_delete(&dev);
+		return EXIT_FAILURE;
+	}
+
+	if (fpt_partition.type != AMI_FPT_TYPE_PDI_BOOT) {
+		APP_USER_ERROR("partition is not a BOOT partition", help_msg);
+		ami_dev_delete(&dev);
+		return EXIT_FAILURE;
+	}
 
 	printf("Will do a hot reset to boot into partition %d. This may take a minute...\r\n",
 		partition_number);
