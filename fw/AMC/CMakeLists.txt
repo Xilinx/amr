@@ -55,6 +55,7 @@ else()
             set(FW_EMMC_PATH                  "src/device_drivers/emmc/aved/emmc.c")
             set(FW_IF_EMMC_PATH               "src/fal/emmc/fw_if_emmc_amc.c")
             set(FW_IF_SMBUS_BLOCK_IO_PATH     "src/fal/smbus/fw_if_smbus_block_io.c")
+            set(FW_IF_SMBUS_STUB_PATH         "src/fal/smbus/fw_if_smbus_stub.c")
             set(FW_IF_MUXED_DEVICE_PATH       "src/fal/muxed_device/fw_if_muxed_device_amc.c")
             set(FW_IF_MUXED_DEVICE_DEBUG_PATH "src/fal/muxed_device/debug/fw_if_muxed_device_debug.c")
         endif()
@@ -229,6 +230,7 @@ else()
         ${FW_IF_MUXED_DEVICE_PATH}
         ${FW_IF_EMMC_PATH}
         ${FW_IF_SMBUS_BLOCK_IO_PATH}
+        ${FW_IF_SMBUS_STUB_PATH}
         src/device_drivers/gcq_driver/src/gcq_driver.c
         src/device_drivers/sensors/ina3221/ina3221.c
         src/device_drivers/sensors/isl68221/isl68221.c

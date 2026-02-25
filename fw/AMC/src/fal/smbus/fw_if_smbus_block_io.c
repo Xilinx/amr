@@ -7,6 +7,11 @@
 * @file fw_if_smbus_block_io.c
 */
 
+#include "profile_hal.h"
+
+/* Entire file disabled if SMBUS feature is off */
+#if (HAL_SMBUS_FEATURE == 1)
+
 #include <stdio.h>
 #include <string.h>
 #include "pll.h"
@@ -957,3 +962,5 @@ int iFW_IF_SMBUS_ClearStatistics( void )
 
     return iStatus;
 }
+
+#endif /* HAL_SMBUS_FEATURE */

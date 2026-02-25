@@ -55,7 +55,8 @@
 
 /* For PCI reloading */
 #define PCI_RESET_GPIO_BAR		(0)
-#define PCI_RESET_GPIO_OFFSET		(0x20000)
+#define PCI_RESET_RAVE_GPIO_OFFSET	(0x20000)
+#define PCI_RESET_V80_GPIO_OFFSET       (0x820000)
 #define PCI_ENABLE			(1)
 
 /*
@@ -655,7 +656,7 @@ int ami_dev_hot_reset(ami_device **dev)
 	/* Set PMC GPIO */
 	ret = ami_mem_bar_write(
 			*dev, PCI_RESET_GPIO_BAR,
-			PCI_RESET_GPIO_OFFSET,
+			(device == AMI_PCIE_DEVICE_ID_RAVE) ? PCI_RESET_RAVE_GPIO_OFFSET : PCI_RESET_V80_GPIO_OFFSET,
 			PCI_ENABLE
 	);
 

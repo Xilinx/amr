@@ -7,8 +7,14 @@
 * @file fw_if_smbus_stub.c
 */
 
+#include "profile_hal.h"
+
+/* Only compile stub when SMBUS feature is disabled */
+#if !HAL_SMBUS_FEATURE
+
 #include "fw_if_smbus.h"
 #include "osal.h"
+#include "util.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -53,14 +59,6 @@ static uint32_t ulSmbusOpen( void *pvFwIf )
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
-
-    /*
-     * this is where the SMBus device would be created/enabled
-     */
-
-    printf( "SMBus FW_IF_open for addr 0x%02X\r\n", pxThisSmbusCfg->ulPort );
-
     return status;
 }
 
@@ -77,13 +75,6 @@ static uint32_t ulSmbusClose( void *pvFwIf )
     CHECK_FIREWALLS( pxThisIf );
     CHECK_DRIVER;
 
-    FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
-
-    /*
-     * this is where the SMBus device would be destroyed/disabled
-     */
-
-    printf( "SMBus FW_IF_close for addr 0x%02X\r\n", pxThisSmbusCfg->ulPort );
 
     return status;
 }
@@ -104,7 +95,6 @@ static uint32_t ulSmbusWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucDat
 
     if( ( NULL != pucData ) && ( FW_IF_SMBUS_MAX_DATA >=ulSize ) )
     {
-        FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
         /*
          * this is where the SMBus data would be tx'd
@@ -113,9 +103,6 @@ static uint32_t ulSmbusWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucDat
          *  - Target    : load the response data
          */
 
-        printf( "SMBus FW_IF_write (%s) from addr 0x%02X to addr 0x%02lX\r\n",
-                ( FW_IF_SMBUS_ROLE_CONTROLLER == pxThisSmbusCfg->xRole ) ? ( "controller" ):( "target" ),
-                pxThisSmbusCfg->ulPort, ullDstPort );
     }
     else
     {
@@ -140,7 +127,6 @@ static uint32_t ulSmbusRead( void *pvFwIf, uint64_t ullSrcPort, uint8_t *pucData
 
     if( ( NULL != pucData ) && ( NULL != pulSize ) && ( FW_IF_SMBUS_MAX_DATA >= *pulSize ) )
     {
-        FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
         /*
          * this is where the SMBus data would be rx'd
@@ -149,9 +135,6 @@ static uint32_t ulSmbusRead( void *pvFwIf, uint64_t ullSrcPort, uint8_t *pucData
          *  - Target    : retrieve any unread received data
          */
 
-        printf( "SMBus FW_IF_read (%s) at addr 0x%02X from addr 0x%02lX\r\n",
-                ( FW_IF_SMBUS_ROLE_CONTROLLER == pxThisSmbusCfg->xRole ) ? ( "controller" ):( "target" ),
-                pxThisSmbusCfg->ulPort, ullSrcPort );
     }
     else
     {
@@ -176,7 +159,6 @@ static uint32_t ulSmbusIoctrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
 
     FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
-    printf( "SMBus FW_IF_ioctrl for addr 0x%02X (option %u)\r\n", pxThisSmbusCfg->ulPort, ulOption );
 
     switch( ulOption )
     {
@@ -190,17 +172,14 @@ static uint32_t ulSmbusIoctrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
 
         case FW_IF_SMBUS_IOCTRL_SET_CONTROLLER:
             pxThisSmbusCfg->xRole = FW_IF_SMBUS_ROLE_CONTROLLER;
-            printf( "SMBus addr 0x%02X - Controller\r\n", pxThisSmbusCfg->ulPort );
             break;
 
         case FW_IF_SMBUS_IOCTRL_SET_TARGET:
             pxThisSmbusCfg->xRole = FW_IF_SMBUS_ROLE_TARGET;
-            printf( "SMBus addr 0x%02X - Target\r\n", pxThisSmbusCfg->ulPort );
             break;
 
         default:
             status = FW_IF_ERRORS_UNRECOGNISED_OPTION;
-            printf( "SMBus addr 0x%02X - Unrecognised option\r\n", pxThisSmbusCfg->ulPort );
             break;
     }
 
@@ -223,11 +202,9 @@ static uint32_t ulSmbusBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 
     if( NULL != pxNewFunc )
     {
-        FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
 
         pxThisIf->raiseEvent = pxNewFunc;
 
-        printf( "SMBus FW_IF_bindCallback called for port 0x%02X\r\n", pxThisSmbusCfg->ulPort );
     }
     else
     {
@@ -267,10 +244,6 @@ uint32_t ulFW_IF_SMBUS_Init( FWIfSMBusInitCfg *pxCfg )
         pvOSAL_MemCpy( &myLocalCfg, pxCfg, sizeof(FWIfSMBusInitCfg) );
         iInitialised = FW_IF_TRUE;
 
-        printf( "ulFW_IF_SMBUS_Init, addr: 0x%08X, baudrate: %uHz\r\n",
-                myLocalCfg.ulBaseAddr,
-                myLocalCfg.ulBaudRate );
-
     }
 
     return status;
@@ -287,7 +260,7 @@ uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pvFwIf, FWIfSMBusCfg *pxSmbusCfg )
 
     if( ( NULL != pvFwIf ) && ( NULL != pxSmbusCfg ) )
     {
-        if( ( MAX_FW_IF_SMBUS_ROLE > pxSmbusCfg->xRole ) && ( NULL != pxSmbusCfg->pucUdid ) )
+        if( MAX_FW_IF_SMBUS_ROLE > pxSmbusCfg->xRole )
         {
             FWIfCfg myLocalIf =
             {
@@ -303,12 +276,6 @@ uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pvFwIf, FWIfSMBusCfg *pxSmbusCfg )
             };
 
             pvOSAL_MemCpy( pvFwIf, &myLocalIf, sizeof( FWIfCfg ) );
-
-            FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pvFwIf->cfg;
-
-            printf( "ulFW_IF_SMBUS_Create for addr 0x%02X (%s)\r\n",
-                    pxThisSmbusCfg->ulPort,
-                    ( FW_IF_SMBUS_ROLE_CONTROLLER == pxThisSmbusCfg->xRole ) ? ( "Controller" ):( "Target" ) );
         }
         else
         {
@@ -350,3 +317,5 @@ int iFW_IF_SMBUS_ClearStatistics( void )
 
     return iStatus;
 }
+
+#endif /* !HAL_SMBUS_FEATURE */
