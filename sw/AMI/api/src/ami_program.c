@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <openssl/evp.h>
 
 /* Public API includes */
 #include "ami_program.h"
@@ -21,6 +20,7 @@
 #include "ami_ioctl.h"
 #include "ami_internal.h"
 #include "ami_device_internal.h"
+#include "md5.h"
 
 /*****************************************************************************/
 /* Private functions                                                         */
@@ -96,35 +96,6 @@ del_buf:
 close:
 	fclose(fp);
 	return ret;
-}
-
-/**
- * calculate_md5() - Calculate MD5 checksum of a data buffer.
- * @data: Pointer to data buffer.
- * @len: Length of data in bytes.
- * @md5_out: Output buffer for 16-byte MD5 hash.
- *
- * Uses OpenSSL EVP interface for MD5 calculation.
- */
-static void calculate_md5(const uint8_t *data, uint32_t len, uint8_t *md5_out)
-{
-	EVP_MD_CTX *ctx = NULL;
-	unsigned int md_len = 0;
-
-	if (!data || !md5_out)
-		return;
-
-	ctx = EVP_MD_CTX_new();
-	if (!ctx)
-		return;
-
-	if (EVP_DigestInit_ex(ctx, EVP_md5(), NULL) == 1 &&
-		EVP_DigestUpdate(ctx, data, len) == 1 &&
-		EVP_DigestFinal_ex(ctx, md5_out, &md_len) == 1) {
-		/* Success - md5_out now contains the hash */
-	}
-
-	EVP_MD_CTX_free(ctx);
 }
 
 /**

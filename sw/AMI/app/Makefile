@@ -25,7 +25,7 @@ LIB_FLAGS := $(addprefix -L,$(LIB_DIRS))
 AMI_LIB   := ami
 
 CFLAGS    := $(INC_FLAGS) -Wall -Werror
-LDFLAGS   := $(LIB_FLAGS) -l$(AMI_LIB) -lm -lpthread -lssl -lcrypto
+LDFLAGS   := $(LIB_FLAGS) -l$(AMI_LIB) -lm -lpthread
 
 #
 # Default make
