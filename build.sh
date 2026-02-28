@@ -1,32 +1,36 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # E.g. Build:
 # ./build.sh -xsa <xsa> -profile <v80|rave>
 #
-# This will build bsp (amc_bsp), amc.elf and OSPI images
+# This will build bsp (amc_bsp), amc.elf and OSPI images for the given profile
 #
 
 set -Eeuo pipefail
 
 # Init
-XSA="ve2302_pcie_qdma_base.xsa"
+XSA="ve2302_xdma_base.xsa"
 PROFILE="rave"
-FW_DIR=$(realpath ./fw/AMC)
-SW_DIR=$(realpath ./sw/AMI)
+HW_DIR=build_$PROFILE
+USE_XSA=false
+USE_SDT=false
+V80_SRC_REV="1303223abba7009d203a9df0cb5904ea955c1857"
 
 function print_help() {
-	echo "=================================== AMC Build script ===================================="
+	echo "=================================== AMR Build script ===================================="
 	echo
 	echo "-profile <profile_name> : set the profile to build for (rave/v80, etc)"
-	echo "-xsa <abs_path_to_xsa>  : XSA to generate BSP from"
+	echo "-xsa <path_to_xsa>      : XSA to generate BSP from"
 	echo "-sdt                    : SDT folder name"
 	echo
 	echo "Any additional arguments are passed directly into CMAKE"
 	echo
-	echo "E.g.: To build from scratch:"
+	echo "E.g.: To build:"
+	echo " ./scripts/build.sh -profile <v80|rave>"
+	echo " ./scripts/build.sh -sdt /direct/path/to/sdt -profile <v80|rave>"
 	echo " ./scripts/build.sh -xsa /direct/path/to/example.xsa -profile <v80|rave>"
 	echo
 	echo "========================================================================================="
@@ -45,24 +49,31 @@ while [ $# -gt 0 ]; do
 		print_help
 		exit 0;;
 	-xsa)
-		shift  ### shift to next passed variable (-xsa *) ###
-		XSA=$1 ### store option into xsa variable ###
+		shift
+		USE_XSA=true
 
-		### handle empty string ###
 		if [ "$1" = "" ]; then
 			echo "Error: Invalid xsa"
 			exit 1
+		fi
+
+		if [[ "$1" = /* ]]; then
+			XSA="$1"
+		else
+			XSA="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 		fi
 		echo "Using xsa=${XSA}"
 		;;
 	-profile)
 		shift
 		PROFILE=$1
+		HW_DIR=build_$PROFILE
 		echo "Using profile=${PROFILE}"
 		;;
 	-sdt)
 		shift
 		SDT=$1
+		USE_SDT=true
 		echo "Using sdt=${SDT}"
 		;;
 	*)
@@ -70,26 +81,42 @@ while [ $# -gt 0 ]; do
 	shift ### shift to next passed option ###
 done
 
-# Step HW
-if [ "$PROFILE" != "rave" ]; then
-	echo "${PROFILE}"
-	HW_DIR=$(realpath ./hw/amd_rave_gen3x4_25.1)
-	mkdir -p ${HW_DIR}/build
+# Check for mutually exclusive options
+if $USE_XSA && $USE_SDT; then
+	echo "Error: -xsa and -sdt are mutually exclusive"
+	exit 1
+fi
+
+# Build HW if no XSA or SDT is provided
+if ! $USE_XSA && ! $USE_SDT; then
+	rm -rf ${HW_DIR}
+	mkdir -p ${HW_DIR}
 	pushd ${HW_DIR}
+
+	if [ "$PROFILE" == "rave" ]; then
+		#TODO: Add support for Rave
 		vivado -source src/create_design.tcl -source src/build_design.tcl -mode batch -nojournal -log ./build/vivado.log
+	elif [ "$PROFILE" == "v80" ]; then
+		#TODO: Add support for github repo matching V80_SRC_REV
+		git clone https://gitenterprise.xilinx.com/PAEG/amr_vivado_designs.git
+		cd amr_vivado_designs/alveo_v80/v80_base
+		git checkout ${V80_SRC_REV}
+		make xsa
+		XSA="$(realpath project/v80_base.xsa)"
+		USE_XSA=true
+	else
+		echo "Invalid profile"
+		exit 1
+	fi
 	popd
 fi
 
-# Step FW
-pushd ${FW_DIR}
-	echo "${FW_DIR}"
-	# Builds AMC/OSPI images
-	./build_all.sh -xsa ${XSA} -profile ${PROFILE}
-popd
+# Build OSPI and AMC FW
+if $USE_XSA; then
+	./fw/AMC/scripts/build.sh -xsa ${XSA} -profile ${PROFILE}
+else
+	./fw/AMC/scripts/build.sh -sdt ${SDT} -profile ${PROFILE}
+fi
 
-# Generate AMI
-pushd ${SW_DIR}
-	echo "${SW_DIR}"
-	./scripts/build.sh -profile ${PROFILE}
-	./scripts/gen_package.py -g -n -f
-popd
+# Build AMI/debian packages
+./sw/AMI/scripts/build.sh
