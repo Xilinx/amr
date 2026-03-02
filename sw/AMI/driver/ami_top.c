@@ -359,6 +359,8 @@ static int create_pf_dev_data(struct pci_dev *dev)
 		driver_dev.drv_cls_str,
 		strlen(driver_dev.drv_cls_str));
 
+	snprintf(pf_dev->cdev.dev_name, sizeof(pf_dev->cdev.dev_name), "ami-bdf-%s", pf_dev->bdf_str);
+
 	ret = create_cdev(pf_dev_index, &pf_dev->cdev, &dev->dev, &dev_fops);
 	if (ret)
 		goto delete_sysfs;

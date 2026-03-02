@@ -855,11 +855,9 @@ int create_cdev(unsigned baseminor, struct drv_cdev_struct *drv_cdev,
 	}
 
 	/* Create device */
-	snprintf(drv_cdev->dev_name,
-		DEV_NAME_SIZE,
-		"%s%d",
-		DEFAULT_DEVICE_NAME,
-		baseminor);
+	if(parent == NULL) {
+		snprintf(drv_cdev->dev_name, DEV_NAME_SIZE, "%s%d", DEFAULT_DEVICE_NAME, baseminor);
+	}
 	drv_cdev->device = device_create(drv_cdev->dev_class, NULL,
 		drv_cdev->cdev_num, NULL, drv_cdev->dev_name);
 

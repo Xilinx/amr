@@ -55,6 +55,7 @@ struct ami_device {
 	int                 num_sensors;
 	int                 num_total_sensors;
 	struct ami_sensor  *sensors;
+	char                cdev_name[AMI_DEV_NAME_MAX];
 };
 
 /*****************************************************************************/

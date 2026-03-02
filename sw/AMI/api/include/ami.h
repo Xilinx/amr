@@ -27,8 +27,8 @@ extern "C" {
 #define AMI_INVALID_FD		(-1)
 
 /* AMI character device files. */
-#define AMI_DEV			"/dev/ami%d"
-#define AMI_DEV_NAME_MAX	(16)
+#define AMI_DEV			"/dev/%s"
+#define AMI_DEV_NAME_MAX	(64)
 
 /* Driver attributes */
 #define AMI_DRIVER_VERSION	"/sys/bus/pci/drivers/ami/version"

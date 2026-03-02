@@ -296,7 +296,13 @@ int ami_open_cdev(ami_device *dev)
 	if (dev->cdev != AMI_INVALID_FD)
 		return AMI_STATUS_OK;  /* Device already opened */
 
-	snprintf(path, AMI_DEV_NAME_MAX, AMI_DEV, dev->cdev_num);
+	uint8_t bus = (dev->bdf >> 8) & 0xFF;
+	uint8_t device = (dev->bdf >> 3) & 0x1F;
+	uint8_t func = dev->bdf & 0x7;
+
+	snprintf(dev->cdev_name, AMI_DEV_NAME_MAX, "ami-bdf-%02x:%02x.%x", bus, device, func);
+	snprintf(path, AMI_DEV_NAME_MAX, "/dev/%.32s", dev->cdev_name);
+
 	fd = open(path, O_RDWR | O_NONBLOCK);
 
 	if (fd != AMI_INVALID_FD) {
