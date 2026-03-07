@@ -2,7 +2,7 @@
 /*
  * cmd_cfgmem_program.c - This file contains the implementation for the command "cfgmem_program"
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -154,6 +154,7 @@ static int do_cmd_cfgmem_program(struct app_option *options, int num_args, char 
 	ami_device *dev = NULL;
 	int selected_boot_device = 0;
 	uint32_t partition_number = 0;
+	struct ami_fpt_partition fpt_partition = { 0 };
 
 	/* For UUID checks */
 	int found_current_uuid = AMI_STATUS_ERROR;
@@ -243,7 +244,10 @@ static int do_cmd_cfgmem_program(struct app_option *options, int num_args, char 
 			printf("\r\nImage programming complete.\r\n");
 
 			if ((NULL == find_app_option('q', options)) &&
-			    (AMI_BOOT_DEVICES_PRIMARY == selected_boot_device)) {
+			    (AMI_BOOT_DEVICES_PRIMARY == selected_boot_device) &&
+			    (ami_prog_get_fpt_partition(dev, selected_boot_device,
+				partition_number, &fpt_partition) == AMI_STATUS_OK) &&
+			    (fpt_partition.type != AMI_FPT_TYPE_PDI_USER)) {
 				/* If we're not quitting, set the device boot partition */
 				printf("Will do a hot reset to boot into partition %d. This may take a minute...\r\n",
 				       partition_number);
