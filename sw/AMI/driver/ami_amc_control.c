@@ -1548,6 +1548,10 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 			pdi_download_request.partition = FPT_UPDATE_MAGIC;
 		else if (PDI_PARTITION(flags) == PDI_PROGRAM_FLAG)
 			pdi_download_request.partition = PDI_PROGRAM_MAGIC;
+		else if (PDI_PARTITION(flags) == PDI_APU_PROGRAM_FLAG)
+			pdi_download_request.partition = PDI_APU_PROGRAM_MAGIC;
+		else if (PDI_PARTITION(flags) == PDI_RPU_PROGRAM_FLAG)
+			pdi_download_request.partition = PDI_RPU_PROGRAM_MAGIC;
 		else
 			pdi_download_request.partition = PDI_PARTITION(flags);
 

@@ -243,6 +243,8 @@ struct amc_proxy_cmd_req_sensor_payload {
  * @boot_device: target boot device (used for fpt and download operation)
  * @src_device: boot device to copy from (applicable only to copy operation)
  * @dest_device: boot device to copy to (applicable only to copy operation)
+ * @program_apu_pdi: 1 to indicate a live APU-targeted PDI load
+ * @program_rpu_pdi: 1 to indicate a live RPU-targeted PDI load
  * @partition_resvd: reserved for future use
  * @last_chunk: 1 to indicate that this is the last data chunk
  * @chunk: current chunk (used only for download operation)
@@ -262,7 +264,9 @@ struct amc_proxy_cmd_data_payload {
 	uint32_t boot_device:1;
 	uint32_t src_device:1;
 	uint32_t dest_device:1;
-	uint32_t partition_resvd:15;
+	uint32_t program_apu_pdi:1;
+	uint32_t program_rpu_pdi:1;
+	uint32_t partition_resvd:13;
 	uint16_t last_chunk:1;
 	uint16_t chunk:15;
 	uint32_t chunk_size;
@@ -1116,13 +1120,15 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
 		memcpy(&request_cmd_entry.pdi_payload.pdi_md5,
 			&pdi_download->pdi_md5, sizeof(pdi_download->pdi_md5));
 		request_cmd_entry.pdi_payload.pdi_size = pdi_download->pdi_size;
-		request_cmd_entry.pdi_payload.update_fpt = 0;
-		request_cmd_entry.pdi_payload.program_pdi = 0;
 
 		if (pdi_download->partition == FPT_UPDATE_MAGIC) {
 			request_cmd_entry.pdi_payload.update_fpt = 1;
 		} else if (pdi_download->partition == PDI_PROGRAM_MAGIC) {
 			request_cmd_entry.pdi_payload.program_pdi = 1;
+		} else if (pdi_download->partition == PDI_APU_PROGRAM_MAGIC) {
+			request_cmd_entry.pdi_payload.program_apu_pdi = 1;
+		} else if (pdi_download->partition == PDI_RPU_PROGRAM_MAGIC) {
+			request_cmd_entry.pdi_payload.program_rpu_pdi = 1;
 		} else {
 			request_cmd_entry.pdi_payload.partition_sel = pdi_download->partition;
 		}

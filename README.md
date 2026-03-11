@@ -125,9 +125,7 @@ MACHINE=emb-plus-ve2302-amr bitbake emb-plus-ospi-amr
 **Building x86 Packages:**
 
 ```bash
-./sw/AMI/scripts/gen_pkg_driver.py  -o <output_folder>
-./sw/AMI/scripts/gen_pkg_libami.py  -o <output_folder>
-./sw/AMI/scripts/gen_pkg_amitool.py -o <output_folder>
+./sw/AMI/scripts/buil.sh
 ```
 
 ### 4. Test
@@ -151,21 +149,21 @@ The following table lists available AMI commands. Use `--help` with any command 
 | 1  | AMI      | Help           | `ami_tool --help`                                                       | Display AMI help                               |
 | 2  | AMI      | Version        | `ami_tool --version`                                                    | Display AMI version                            |
 | 3  | AMI      | Overview       | `ami_tool overview`                                                     | Display AMI overview                           |
-| 4  | AMI      | PCIe Info      | `ami_tool pcieinfo -d <b:d:f>`                                          | Display PCIe information                       |
+| 4  | AMI      | PCIe Info      | `ami_tool pcieinfo -d <b:d.f>`                                          | Display PCIe information                       |
 | 5  | AMI      | Reload         | `sudo ami_tool reload -d 1 -t driver`                                   | Reload driver/pci/sbr                          |
-| 6  | EEPROM   | Read           | `ami_tool eeprom_rd -d <b:d:f> -a 0 -l 4`                               | Read bytes from EEPROM                         |
-| 7  | EEPROM   | Mfg Info       | `ami_tool mfg_info -d <b:d:f>`                                          | Read manufacturing information                 |
-| 8  | OSPI     | CfgMem Info    | `ami_tool cfgmem_info -d <b:d:f> -t primary`                            | Read config memory information                 |
-| 9  | OSPI     | CfgMem Flags   | `ami_tool cfgmem_flags_rd -d <b:d:f> -t primary -p 2`                   | Read config memory information                 |
-| 10 | OSPI     | CfgMem Flags   | `ami_tool cfgmem_flags_wr -d <b:d:f> -t primary -p 2 -i <on/off>`       | Read config memory information                 |
-| 11 | OSPI     | CfgMem Program | `sudo ami_tool cfgmem_program -d <b:d:f> -i <OSPI image> -p 1 -t primary` | Program PDI bitstream onto device            |
-| 12 | OSPI     | CfgMem FPT     | `sudo ami_tool cfgmem_fpt -d <b:d:f> -t primary -i <fpt_file>`          | Program FPT onto OSPI                          |
+| 6  | EEPROM   | Read           | `ami_tool eeprom_rd -d <b:d.f> -a 0 -l 4`                               | Read bytes from EEPROM                         |
+| 7  | EEPROM   | Mfg Info       | `ami_tool mfg_info -d <b:d.f>`                                          | Read manufacturing information                 |
+| 8  | OSPI     | CfgMem Info    | `ami_tool cfgmem_info -d <b:d.f> -t primary`                            | Read config memory information                 |
+| 9  | OSPI     | CfgMem Flags   | `ami_tool cfgmem_flags_rd -d <b:d.f> -t primary -p 2`                   | Read config memory information                 |
+| 10 | OSPI     | CfgMem Flags   | `ami_tool cfgmem_flags_wr -d <b:d.f> -t primary -p 2 -i <on/off>`       | Read config memory information                 |
+| 11 | OSPI     | CfgMem Program | `sudo ami_tool cfgmem_program -d <b:d.f> -i <OSPI image> -p 1 -t primary` | Program PDI bitstream onto device            |
+| 12 | OSPI     | CfgMem FPT     | `sudo ami_tool cfgmem_fpt -d <b:d.f> -t primary -i <fpt_file>`          | Program FPT onto OSPI                          |
 | 13 | OSPI     | CfgMem Copy    | `sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1`              | Copy partition to another                      |
-| 14 | OSPI     | Device Boot    | `sudo ami_tool device_boot -d <b:d:f> -p 0`                             | Set device boot partition                      |
-| 15 | PL       | PDI Program    | `sudo ami_tool pdi_program -d <b:d:f> -i <pdi>`                         | Program partial PDI                            |
-| 16 | APU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d:f> -i <apu.image> -a`                | Download APU image                             |
-| 17 | Sensor   | Read Sensors   | `ami_tool sensors -d <b:d:f>`                                           | Get sensor values                              |
-| 18 | Debug    | Verbosity      | `ami_tool debug_verbosity -d <b:d:f> -l debug`                          | Set log level                                  |
+| 14 | OSPI     | Device Boot    | `sudo ami_tool device_boot -d <b:d.f> -p 0`                             | Set device boot partition                      |
+| 15 | PL       | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <pdi>`                         | Program partial PDI                            |
+| 16 | APU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <apu.image> -a`                | Download APU image                             |
+| 17 | Sensor   | Read Sensors   | `ami_tool sensors -d <b:d.f>`                                           | Get sensor values                              |
+| 18 | Debug    | Verbosity      | `ami_tool debug_verbosity -d <b:d.f> -l debug`                          | Set log level                                  |
 
 ### 5. Glossary
 

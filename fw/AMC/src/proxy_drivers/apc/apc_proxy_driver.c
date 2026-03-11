@@ -11,8 +11,11 @@
 #include "util.h"
 #include "pll.h"
 #include "osal.h"
-#include "apc_proxy_driver.h"
+#include "pm_api_sys.h"
 #include "profile_hal.h"
+#include "apc_proxy_driver.h"
+#include "ami_proxy_driver.h"
+
 
 /******************************************************************************/
 /* Defines                                                                    */
@@ -225,6 +228,8 @@ typedef struct
     int      iPartition;
     int      iUpdateFpt;
     int      iPdiProgram;
+    int      iApuPdiProgram;
+    int      iRpuPdiProgram;
     int      iLastPacket;
     uint32_t ulImageSize;
     uint32_t ulSrcAddr;
@@ -450,6 +455,39 @@ static APCPrivateData xLocalData =
 
 static APCPrivateData *pxThis = &xLocalData;
 
+static XIpiPsu IpiInst;
+
+/**
+ * InitXilPm() - initialize interrupts and context
+ */
+ static u32 InitXilPm(void)
+ {
+    XStatus Status = XST_FAILURE;
+    XIpiPsu_Config *IpiCfgPtr;
+
+    /* Look Up the config data */
+    IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
+    if (NULL == IpiCfgPtr) {
+        PLL_ERR(APC_NAME, "ERROR: Failed to get CfgPtr\r\n");
+        return Status;
+    }
+
+    /* Init with the Cfg Data */
+    Status = XIpiPsu_CfgInitialize(&IpiInst, IpiCfgPtr, IpiCfgPtr->BaseAddress);
+    if (XST_SUCCESS != Status) {
+        PLL_ERR(APC_NAME, "ERROR: Failed to configure IPI %d\r\n", Status);
+        return Status;
+    }
+
+    Status = XPm_InitXilpm(&IpiInst);
+    if (XST_SUCCESS != Status) {
+        PLL_ERR(APC_NAME, "ERROR: Failed to initialize XilPm %d\r\n", Status);
+        return Status;
+    }
+
+    return Status;
+ }
+
 
 /******************************************************************************/
 /* Public Function implementations                                            */
@@ -476,6 +514,13 @@ int iAPC_Initialise( uint8_t ucProxyId,
          ( FALSE == pxThis->iInitialised ) &&
          ( NULL != pxPrimaryFwIf ) )
     {
+        iStatus = InitXilPm();
+        if (XST_SUCCESS != iStatus)
+        {
+            PLL_ERR( APC_NAME, "ERROR: Failed to initialize XilPm\r\n" );
+            return iStatus;
+        }
+
         /* store parameters locally */
         pxThis->ucMyId = ucProxyId;
         pxThis->ppxFwIf[ APC_BOOT_DEVICE_PRIMARY ]   = pxPrimaryFwIf;
@@ -825,37 +870,34 @@ int iAPC_CopyImage( EVLSignal *pxSignal,
 }
 
 /**
- * @brief Download an image to a location in NV memory
+ * @brief   Live-load a PDI image onto the device
  */
 int iAPC_PdiProgram( EVLSignal *pxSignal,
-                     APC_BOOT_DEVICES xBootDevice,
-                     int iPartition,
-                     uint32_t ulSrcAddr,
-                     uint32_t ulImageSize,
-                     uint32_t ulLastPacket,
-                     uint16_t usPacketNum,
-                     uint32_t ulPacketSize )
+                     const AMIProxyPdiDownloadRequest *pxDownloadRequest,
+                     uint32_t ulSrcAddr )
 {
     int iStatus = ERROR;
 
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( NULL != pxSignal ) &&
-        ( 0 != ulImageSize ) )
+         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
+         ( TRUE == pxThis->iInitialised ) &&
+         ( NULL != pxSignal ) &&
+         ( 0 != pxDownloadRequest->ulLength ) )
     {
         APCMboxMsg xMsg = { 0 };
-        xMsg.eMsgType                        = APC_MSG_TYPE_PROGRAM_PDI;
-        xMsg.ucRequestId                     = pxSignal->ucInstance;
-        xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
-        xMsg.xDownloadImageData.iPartition   = iPartition;
-        xMsg.xDownloadImageData.iUpdateFpt   = FALSE;
-        xMsg.xDownloadImageData.iPdiProgram  = TRUE;
-        xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
-        xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
-        xMsg.xDownloadImageData.iLastPacket  = ulLastPacket;
-        xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
-        xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
+        xMsg.eMsgType                          = APC_MSG_TYPE_PROGRAM_PDI;
+        xMsg.ucRequestId                       = pxSignal->ucInstance;
+        xMsg.xDownloadImageData.xBootDevice    = pxDownloadRequest->iBootDevice;
+        xMsg.xDownloadImageData.iPartition     = pxDownloadRequest->ulPartitionSel;
+        xMsg.xDownloadImageData.iUpdateFpt     = pxDownloadRequest->iUpdateFpt;
+        xMsg.xDownloadImageData.iPdiProgram    = pxDownloadRequest->iPdiProgram;
+        xMsg.xDownloadImageData.iApuPdiProgram = pxDownloadRequest->iApuPdiProgram;
+        xMsg.xDownloadImageData.iRpuPdiProgram = pxDownloadRequest->iRpuPdiProgram;
+        xMsg.xDownloadImageData.ulImageSize    = pxDownloadRequest->ulLength;
+        xMsg.xDownloadImageData.ulSrcAddr      = ulSrcAddr;
+        xMsg.xDownloadImageData.iLastPacket    = pxDownloadRequest->iLastPacket;
+        xMsg.xDownloadImageData.usPacketNum    = pxDownloadRequest->usPacketNum;
+        xMsg.xDownloadImageData.ulPacketSize   = pxDownloadRequest->ulPacketSize;
 
         if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
                                                 ( void* )&xMsg,
@@ -1434,7 +1476,9 @@ static void vProxyDriverTask( void *pArg )
                                 xMBoxData.xDownloadImageData.usPacketNum );
                             /* Check if we need to program pdi image */
                             if ( ( TRUE == xMBoxData.xDownloadImageData.iLastPacket ) &&
-                                ( TRUE == xMBoxData.xDownloadImageData.iPdiProgram ) )
+                                ( ( TRUE == xMBoxData.xDownloadImageData.iPdiProgram ) ||
+                                  ( TRUE == xMBoxData.xDownloadImageData.iApuPdiProgram ) ||
+                                  ( TRUE == xMBoxData.xDownloadImageData.iRpuPdiProgram ) ) )
                             {
                                 INC_STAT_COUNTER( APC_PROXY_STATS_FPT_UPDATE )
 
@@ -1931,7 +1975,9 @@ static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData )
             PLL_DBG( APC_NAME, "Src:  0x%08x\r\n", pxImageData->ulSrcAddr );
             PLL_DBG( APC_NAME, "Dest: 0x%08x\r\n", ulDestAddr );
 
-            if ( TRUE == pxImageData->iPdiProgram )
+            if ( ( TRUE == pxImageData->iPdiProgram ) ||
+                 ( TRUE == pxImageData->iApuPdiProgram ) ||
+                 ( TRUE == pxImageData->iRpuPdiProgram ) )
             {
                 pvOSAL_MemCpy((void *)( HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr ),
                     (const void*)(pxImageData->ulSrcAddr), ulImageSize);
@@ -1949,6 +1995,30 @@ static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData )
                     }
                     else
                     {
+                        /* Power down RPU1 (0x1c000007) */
+                        if ( TRUE == pxImageData->iRpuPdiProgram )
+                        {
+                            PLL_DBG( APC_NAME, "Force power down RPU1 subsystem\r\n" );
+                            iStatus = XPm_ForcePowerDown(0x1c000007U, 2U);
+                            if (XST_SUCCESS != iStatus)
+                            {
+                                PLL_ERR( APC_NAME, "ERROR: Failed to force power down RPU1 subsystem 0x%X\r\n",
+                                            ( unsigned )iStatus );
+                            }
+                        }
+
+                        if ( TRUE == pxImageData->iApuPdiProgram )
+                        {
+                            /* Power down APU (0x1c000008) */
+                            PLL_DBG( APC_NAME, "Force power down APU subsystem\r\n" );
+                            iStatus = XPm_ForcePowerDown(0x1c000008U, 2U);
+                            if (XST_SUCCESS != iStatus)
+                            {
+                                PLL_ERR( APC_NAME, "ERROR: Failed to force power down APU subsystem 0x%X\r\n",
+                                         ( unsigned )iStatus );
+                            }
+                        }
+
                         iStatus = XLoader_LoadPartialPdi(pxThis->pXLoaderInst,
                                                     XLOADER_PDI_DDR,
                                                     (u64)HAL_RPU_MEMORY_BUFFER_BASE,

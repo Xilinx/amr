@@ -416,3 +416,38 @@ int ami_prog_pdi(ami_device *dev, const char *path,
 	);
 }
 
+/*
+ * Live-load an APU PDI image onto a device.
+ */
+int ami_prog_pdi_apu(ami_device *dev, const char *path,
+	ami_event_handler progress_handler)
+{
+	if (!dev || !path)
+		return AMI_API_ERROR(AMI_ERROR_EINVAL);
+
+	return do_image_download(
+		dev,
+		path,
+		0/*boot_device*/,
+		AMI_IOC_PDI_APU_PROGRAM_MAGIC,
+		progress_handler
+	);
+}
+
+/*
+ * Live-load an RPU PDI image onto a device.
+ */
+int ami_prog_pdi_rpu(ami_device *dev, const char *path,
+	ami_event_handler progress_handler)
+{
+	if (!dev || !path)
+		return AMI_API_ERROR(AMI_ERROR_EINVAL);
+
+	return do_image_download(
+		dev,
+		path,
+		0/*boot_device*/,
+		AMI_IOC_PDI_RPU_PROGRAM_MAGIC,
+		progress_handler
+	);
+}

@@ -139,11 +139,13 @@ typedef struct
  * @struct  AMIProxyPdiDownloadRequest
  * @brief   PDI download request
  */
-typedef struct
+typedef struct AMIProxyPdiDownloadRequest
 {
     int      iBootDevice;
     int      iUpdateFpt;
     int      iPdiProgram;
+    int      iApuPdiProgram;
+    int      iRpuPdiProgram;
     int      iLastPacket;
     uint64_t ullAddress;
     uint32_t ulLength;

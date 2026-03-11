@@ -3,7 +3,7 @@
  * cmd_pdi_program.c - This file contains the implementation for the command
  * "pdi_program"
  *
- * Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -65,8 +65,10 @@ static void progress_handler(enum ami_event_status status, uint64_t ctr, void *d
  * i: Image file
  * y: Skip user confirmation
  * q: Quit after programming
+ * a: APU image (live-load targeting APU only)
+ * r: RPU image (live-load targeting RPU only)
  */
-static const char short_options[] = "hd:i:yqa";
+static const char short_options[] = "hd:i:yqar";
 
 static const struct option long_options[] = {
 	{ "help", no_argument, NULL, 'h' },  /* help screen */
@@ -74,15 +76,16 @@ static const struct option long_options[] = {
 };
 
 static const char help_msg[] = \
-	"mem_program - program a bitstream onto a device\r\n"
+	"pdi_program - live-load a PDI bitstream onto a device\r\n"
 	"\r\nThis command requires root/sudo permissions.\r\n"
 	"\r\nUsage:\r\n"
-	"\t" APP_NAME " mem_program -d <bdf> -i <path> <-a>\r\n"
+	"\t" APP_NAME " pdi_program -d <bdf> -i <path> [-a | -r]\r\n"
 	"\r\nOptions:\r\n"
 	"\t-h --help             Show this screen\r\n"
 	"\t-d <b>:[d].[f]        Specify the device BDF\r\n"
-	"\t-i <path>             Path to image file\r\n"
-	"\t-a                    APU image\r\n"
+	"\t-i <path>             Path to PDI image file\r\n"
+	"\t-a                    APU image (load targeting APU subsystem only)\r\n"
+	"\t-r                    RPU image (load targeting RPU subsystem only)\r\n"
 	"\t-y                    Skip confirmation\r\n"
 	"\t-q                    Quit after programming\r\n"
 ;
@@ -213,18 +216,30 @@ static int do_cmd_pdi_program(struct app_option *options, int num_args, char **a
 	);
 
 
-	if ((NULL == find_app_option('a', options)) &&
-		(strcasecmp(current_uuid, parent_uuid) != 0)) {
+	struct app_option *apu_opt = find_app_option('a', options);
+	struct app_option *rpu_opt = find_app_option('r', options);
+	int skip_uuid_check = (apu_opt != NULL) || (rpu_opt != NULL);
+
+	if (!skip_uuid_check && (strcasecmp(current_uuid, parent_uuid) != 0)) {
 		printf("\r\nError: %s's parent ID doesn't match...\r\n",
 			image->arg);
 	}
 	else if ((NULL != find_app_option('y', options)) ||
 		confirm_action(APP_CONFIRM_PROMPT, 'Y', 3)) {
-		printf("\r\nProgramming pdi image...\r\n");
+		int prog_ret = AMI_STATUS_ERROR;
 
-		if (ami_prog_pdi(dev,
-						image->arg,
-						progress_handler) == AMI_STATUS_OK) {
+		if (apu_opt != NULL) {
+			printf("\r\nProgramming APU PDI image...\r\n");
+			prog_ret = ami_prog_pdi_apu(dev, image->arg, progress_handler);
+		} else if (rpu_opt != NULL) {
+			printf("\r\nProgramming RPU PDI image...\r\n");
+			prog_ret = ami_prog_pdi_rpu(dev, image->arg, progress_handler);
+		} else {
+			printf("\r\nProgramming pdi image...\r\n");
+			prog_ret = ami_prog_pdi(dev, image->arg, progress_handler);
+		}
+
+		if (prog_ret == AMI_STATUS_OK) {
 			printf("\r\nPDI programming complete.\r\n");
 
 			printf(

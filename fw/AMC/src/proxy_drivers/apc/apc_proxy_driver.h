@@ -82,6 +82,8 @@ typedef enum
 	APC_FPT_TYPE_PDI_SYS_DTB     = 0x0E04,
 	APC_FPT_TYPE_PDI_META        = 0x0E05,
 	APC_FPT_TYPE_PDI_META_BACKUP = 0x0E06,
+	APC_FPT_TYPE_PDI_APU         = 0x0E07,
+	APC_FPT_TYPE_PDI_RPU         = 0x0E08,
 	APC_FPT_TYPE_PDI_USER        = 0x0F00,
 	APC_FPT_TYPE_SC_FW           = 0x0C00,
 } APC_FPT_TYPE;
@@ -128,6 +130,8 @@ typedef struct
     };
 
 } APCProxyDriverFptPartition;
+
+typedef struct AMIProxyPdiDownloadRequest AMIProxyPdiDownloadRequest;
 
 extern uint32_t ulUserPdiLoadStatus;    /* User PDI power on load status 0: Success */
 
@@ -244,25 +248,16 @@ int iAPC_CopyImage( EVLSignal *pxSignal,
  * iAPC_PdiProgram() - Program PDI image to a location in memory
  *
  * @pxSignal:     Current event occurance (used for tracking)
- * @xBootDevice:  Target boot device
- * @iPartition:   The partition in the FPT to store this image in
+ * @pxDownloadRequest:  Target boot device
  * @ulSrcAddr:    Address (in RAM) to read the image from
- * @ulImageSize:  Size of image (in bytes)
- * @ulLastPacket: Last packet
- * @usPacketNum:  Image packet number
- * @ulPacketSize: Size of image packet (in KB)
  *
- * @return  OK    Image copied successfully
- *          ERROR Image not copied successfully
+ * @return  OK    PDI programmed successfully
+ *          ERROR PDI programming failed
  */
 int iAPC_PdiProgram( EVLSignal *pxSignal,
-                     APC_BOOT_DEVICES xBootDevice,
-                     int iPartition,
-                     uint32_t ulSrcAddr,
-                     uint32_t ulImageSize,
-                     uint32_t ulLastPacket,
-                     uint16_t usPacketNum,
-                     uint32_t ulPacketSize );
+                     const AMIProxyPdiDownloadRequest *pxDownloadRequest,
+                     uint32_t ulSrcAddr );
+
 /**
  * iAPC_SetNextPartition() - Select which partition (from primary boot device) to boot from
  *

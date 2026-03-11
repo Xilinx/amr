@@ -32,17 +32,21 @@
 				((uint8_t)dest_part))
 
 
-#define DEVICE_SRC(flags)		((uint8_t)(flags >> 24))
+#define DEVICE_SRC(flags)	((uint8_t)(flags >> 24))
 #define PARTITION_SRC(flags)	((uint8_t)(flags >> 16))
-#define DEVICE_DEST(flags)		((uint8_t)(flags >> 8))
+#define DEVICE_DEST(flags)	((uint8_t)(flags >> 8))
 #define PARTITION_DEST(flags)	((uint8_t)(flags))
 
-#define FPT_UPDATE_FLAG			(0xAA)  /* uint8 - the other bytes are the boot device, and chunk num */
-#define FPT_UPDATE_MAGIC		(0xAAAAAAAA)
-#define PDI_PROGRAM_FLAG		(0xBB)  /* uint8 - the other bytes are the boot device, and chunk num */
-#define PDI_PROGRAM_MAGIC		(0xBBBBBBBB)
+#define FPT_UPDATE_FLAG		(0xAA)  /* uint8 - the other bytes are the boot device, and chunk num */
+#define FPT_UPDATE_MAGIC	(0xAAAAAAAA)
+#define PDI_PROGRAM_FLAG	(0xBB)  /* uint8 - the other bytes are the boot device, and chunk num */
+#define PDI_PROGRAM_MAGIC	(0xBBBBBBBB)
+#define PDI_APU_PROGRAM_FLAG	(0xCC)  /* uint8 - APU-targeted live PDI load */
+#define PDI_APU_PROGRAM_MAGIC	(0xCCCCCCCC)
+#define PDI_RPU_PROGRAM_FLAG	(0xDD)  /* uint8 - RPU-targeted live PDI load */
+#define PDI_RPU_PROGRAM_MAGIC	(0xDDDDDDDD)
 #define PDI_CHUNK_MULTIPLIER	(1024)
-#define PDI_CHUNK_SIZE			(6144)	/* Multiple of 1024 */
+#define PDI_CHUNK_SIZE		(6144)	/* Multiple of 1024 */
 
 /*
  * Format of flags:

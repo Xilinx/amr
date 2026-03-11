@@ -178,6 +178,7 @@ function build_bsp() {
     empyro create_bsp -t empty_application -w amc_bsp -s ${SDT_DIR}/system-top.dts -p psv_cortexr5_0 -o freertos
     empyro config_bsp -d amc_bsp -al xilfpga
     empyro config_bsp -d amc_bsp -al xilloader
+    empyro config_bsp -d amc_bsp -al xilpm
     empyro config_bsp -d amc_bsp -st freertos freertos_support_static_allocation:true
     empyro config_bsp -d amc_bsp -st freertos freertos_tick_rate:1000
     empyro config_bsp -d amc_bsp -st freertos freertos_total_heap_size:131072
@@ -268,13 +269,24 @@ function build_amc() {
 # Build AMC elf
 build_amc
 
+if [ $PROFILE = "rave" ]; then
+    pushd ${CWD}
+    cd ${SDT_DIR}/extracted/ve2302_xdma_base_wrapper_1/pdi_files
+    bootgen \
+        -arch versal \
+        -image ve2302_xdma_base.bif \
+        -overlay_cdo $SCRIPTS_DIR/${PROFILE}/isospec.cdo \
+        -w \
+        -o  $SDT_DIR/ve2302_xdma_base.pdi
+    popd
+fi
 
 # Generate PDI w/ bootgen
 cat << EOF > $BUILD_DIR/amr_ospi_pdi.bif
 all:
 {
     image { { type=bootimage, file=$(find ${SDT_DIR} -name "*.pdi" | sort | sed -n '1p') } }
-    image { id = 0x1c000000, name=rpu_subsystem, delay_handoff
+    image { id = 0x1c000006, name=subsystem_amr, delay_handoff
             { core=r5-0, file=$BUILD_DIR/amc.elf } }
 }
 EOF
@@ -282,7 +294,8 @@ EOF
 bootgen \
     -arch versal \
     -image $BUILD_DIR/amr_ospi_pdi.bif \
-    -w -o  $BUILD_DIR/amr_ospi.bin
+    -w \
+    -o  $BUILD_DIR/amr_ospi.bin
 
 # final pdi generation
 $SCRIPTS_DIR/gen_fpt_pdi.py \

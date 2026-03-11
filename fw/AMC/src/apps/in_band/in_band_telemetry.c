@@ -565,6 +565,8 @@ static int iAmiCallback( EVLSignal *pxSignal )
                 PLL_DBG( IN_BAND_NAME, "PDI partition        : 0x%x\r\n",   xDownloadRequest.ulPartitionSel );
                 PLL_DBG( IN_BAND_NAME, "PDI has FPT          : 0x%x\r\n",   xDownloadRequest.iUpdateFpt );
                 PLL_DBG( IN_BAND_NAME, "PDI Program          : 0x%x\r\n",   xDownloadRequest.iPdiProgram );
+                PLL_DBG( IN_BAND_NAME, "APU PDI Program      : 0x%x\r\n",   xDownloadRequest.iApuPdiProgram );
+                PLL_DBG( IN_BAND_NAME, "RPU PDI Program      : 0x%x\r\n",   xDownloadRequest.iRpuPdiProgram );
                 PLL_DBG( IN_BAND_NAME, "PDI last packet      : 0x%x\r\n",   xDownloadRequest.iLastPacket );
                 PLL_DBG( IN_BAND_NAME, "PDI packet number    : 0x%hx\r\n",  xDownloadRequest.usPacketNum );
                 PLL_DBG( IN_BAND_NAME, "PDI packet size (KB) : 0x%hx\r\n",  xDownloadRequest.ulPacketSize );
@@ -580,17 +582,14 @@ static int iAmiCallback( EVLSignal *pxSignal )
                                               xDownloadRequest.ulPacketSize,
                                               xDownloadRequest.iLastPacket );
                 }
-                else if (TRUE == xDownloadRequest.iPdiProgram)
+                else if ( (TRUE == xDownloadRequest.iPdiProgram) ||
+                          (TRUE == xDownloadRequest.iApuPdiProgram) ||
+                          (TRUE == xDownloadRequest.iRpuPdiProgram) )
                 {
                     iStatus = iAPC_PdiProgram( pxSignal,
-                                              xDownloadRequest.iBootDevice,
-                                              ( int )xDownloadRequest.ulPartitionSel,
+                                              &xDownloadRequest,
                                               ( uint32_t )xDownloadRequest.ullAddress +
-                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR,
-                                              xDownloadRequest.ulLength,
-                                              xDownloadRequest.iLastPacket,
-                                              xDownloadRequest.usPacketNum,
-                                              xDownloadRequest.ulPacketSize );
+                                              ( uint32_t )HAL_RPU_SHARED_MEMORY_BASEADDR);
                     PLL_DBG( IN_BAND_NAME, "iAPC_PdiProgram status: 0x%x\r\n", iStatus );
                 }
                 else

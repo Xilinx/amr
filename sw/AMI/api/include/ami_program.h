@@ -54,6 +54,8 @@ struct ami_fpt_header {
  * @AMI_FPT_TYPE_PDI_SYS_DTB: SYS DTB.
  * @AMI_FPT_TYPE_PDI_META: PDI metadata.
  * @AMI_FPT_TYPE_PDI_META_BACKUP: PDI metadata backup.
+ * @AMI_FPT_TYPE_PDI_APU: APU PDI.
+ * @AMI_FPT_TYPE_PDI_RPU: RPU PDI.
  * @AMI_FPT_TYPE_PDI_USER: PDI user.
  * @AMI_FPT_TYPE_SC_FW: SC FW.
  */
@@ -68,6 +70,8 @@ enum ami_fpt_type {
 	AMI_FPT_TYPE_PDI_SYS_DTB     = 0x0E04,
 	AMI_FPT_TYPE_PDI_META        = 0x0E05,
 	AMI_FPT_TYPE_PDI_META_BACKUP = 0x0E06,
+	AMI_FPT_TYPE_PDI_APU         = 0x0E07,
+	AMI_FPT_TYPE_PDI_RPU         = 0x0E08,
 	AMI_FPT_TYPE_PDI_USER        = 0x0F00,
 	AMI_FPT_TYPE_SC_FW           = 0x0C00,
 };
@@ -228,6 +232,43 @@ int ami_prog_get_fpt_partition(ami_device *dev, uint8_t boot_device,
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 int ami_prog_pdi(ami_device *dev, const char *path,
+	ami_event_handler progress_handler);
+
+/**
+ * ami_prog_pdi_apu() - Live-load an APU .pdi image onto a device.
+ * @dev: Device handle.
+ * @path: Full path to PDI file.
+ * @progress_handler: An event handler to accept progress notifications.
+ *
+ * Programs the PDI image targeting the APU subsystem only.  Only the APU
+ * is powered down before XLoader is invoked; the RPU subsystem is left
+ * running.
+ *
+ * If a progress handler is given, a thread will be started to monitor driver
+ * events - `ctr` will be equal to the number of bytes successfully written
+ * and `data` will be a pointer to `struct ami_pdi_progress`.
+ *
+ * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
+ */
+int ami_prog_pdi_apu(ami_device *dev, const char *path,
+	ami_event_handler progress_handler);
+
+/**
+ * ami_prog_pdi_rpu() - Live-load an RPU .pdi image onto a device.
+ * @dev: Device handle.
+ * @path: Full path to PDI file.
+ * @progress_handler: An event handler to accept progress notifications.
+ *
+ * Programs the PDI image targeting the RPU subsystem only.  Only RPU1 is
+ * powered down before XLoader is invoked; the APU subsystem is left running.
+ *
+ * If a progress handler is given, a thread will be started to monitor driver
+ * events - `ctr` will be equal to the number of bytes successfully written
+ * and `data` will be a pointer to `struct ami_pdi_progress`.
+ *
+ * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
+ */
+int ami_prog_pdi_rpu(ami_device *dev, const char *path,
 	ami_event_handler progress_handler);
 
 #ifdef __cplusplus

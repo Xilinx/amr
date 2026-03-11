@@ -58,6 +58,10 @@ static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *bu
 		part = FPT_UPDATE_FLAG;
 	} else if (partition == PDI_PROGRAM_MAGIC) {
 		part = PDI_PROGRAM_FLAG;
+	} else if (partition == PDI_APU_PROGRAM_MAGIC) {
+		part = PDI_APU_PROGRAM_FLAG;
+	} else if (partition == PDI_RPU_PROGRAM_MAGIC) {
+		part = PDI_RPU_PROGRAM_FLAG;
 	} else {
 		/* Basic sanity check */
 		if (partition > MAX_PARTITION)
@@ -90,6 +94,7 @@ static int do_image_download(struct amc_control_ctxt *amc_ctrl_ctxt, uint8_t *bu
 		 * or if there is only a single chunk.
 		 */
 		if ((part == FPT_UPDATE_FLAG) || (num_chunks == 1) || (part == PDI_PROGRAM_FLAG) ||
+			(part == PDI_APU_PROGRAM_FLAG) || (part == PDI_RPU_PROGRAM_FLAG) ||
 			((num_chunks > 1) && (chunk != BOOT_TAG_CHUNK))) {
 			/*
 			* This will copy the bitstream buffer into shared memory and submit

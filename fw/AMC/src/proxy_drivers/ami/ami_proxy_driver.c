@@ -393,7 +393,9 @@ typedef struct
     uint32_t ulBootDevice:1;
     uint32_t ulSrcDevice:1;
     uint32_t ulDestDevice:1;
-    uint32_t ulPartitionRsvd:15;
+    uint32_t ulApuPdiProgram:1;
+    uint32_t ulRpuPdiProgram:1;
+    uint32_t ulPartitionRsvd:13;
     uint16_t usLastPacket:1;
     uint16_t usPacketNum:15;
     uint32_t ulPacketSize;        /* packet size in KB */
@@ -1099,6 +1101,10 @@ int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
                              pxThis->xRxData[ ucIndex ].xDownloadRequest.iUpdateFpt;
                 pxDownloadRequest->iPdiProgram =
                              pxThis->xRxData[ ucIndex ].xDownloadRequest.iPdiProgram;
+                pxDownloadRequest->iApuPdiProgram =
+                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iApuPdiProgram;
+                pxDownloadRequest->iRpuPdiProgram =
+                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iRpuPdiProgram;
                 pxDownloadRequest->iLastPacket =
                              pxThis->xRxData[ ucIndex ].xDownloadRequest.iLastPacket;
                 iStatus = OK;
@@ -1826,6 +1832,10 @@ static void vProxyDriverTask( void *pvArgs )
                                 xCmdRequest.xPdiDownloadPayload.ulUpdateFpt;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iPdiProgram =
                                 xCmdRequest.xPdiDownloadPayload.ulPdiProgram;
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.iApuPdiProgram =
+                                xCmdRequest.xPdiDownloadPayload.ulApuPdiProgram;
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.iRpuPdiProgram =
+                                xCmdRequest.xPdiDownloadPayload.ulRpuPdiProgram;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iLastPacket =
                                 xCmdRequest.xPdiDownloadPayload.usLastPacket;
                             pvOSAL_MemCpy( pxThis->xRxData[ ucIndex ].xDownloadRequest.pucPdiMd5,
@@ -1955,6 +1965,10 @@ static void vProxyDriverTask( void *pvArgs )
                                 xCmdRequest.xPdiDownloadPayload.ulUpdateFpt;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iPdiProgram =
                                 xCmdRequest.xPdiDownloadPayload.ulPdiProgram;
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.iApuPdiProgram =
+                                xCmdRequest.xPdiDownloadPayload.ulApuPdiProgram;
+                            pxThis->xRxData[ ucIndex ].xDownloadRequest.iRpuPdiProgram =
+                                xCmdRequest.xPdiDownloadPayload.ulRpuPdiProgram;
                             pxThis->xRxData[ ucIndex ].xDownloadRequest.iLastPacket =
                                 xCmdRequest.xPdiDownloadPayload.usLastPacket;
                             pvOSAL_MemCpy( pxThis->xRxData[ ucIndex ].xDownloadRequest.pucPdiMd5,
