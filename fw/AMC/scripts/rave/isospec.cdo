@@ -98,267 +98,273 @@ pm_add_node 0x18900002 0xffe30000 0 0x10000 0
 pm_add_node 0x18900003 0xfffc0000 0 0x40000 0
 #
 #  -- Add All Subsystems --
-#     add subsystem subsystem_amr id 0x1c000006
+#     add subsystem amr_subsystem id 0x1c000006
 pm_add_subsystem 0x1c000006
-#     add subsystem subsystem_user_apu id 0x1c000008
+#     add subsystem apu_subsystem id 0x1c000008
 pm_add_subsystem 0x1c000008
-#     add subsystem subsystem_user_rpu id 0x1c000007
+#     add subsystem rpu1_subsystem id 0x1c000007
 pm_add_subsystem 0x1c000007
 #
 #  -- Add subsystem to subsystem permissions
-#     subsystem subsystem_amr to subsystem subsystem_user_apu permissions
+#     subsystem amr_subsystem to subsystem apu_subsystem permissions
 #     wake[0] = 0x1
 #     powerdown[1] = 0x1
 pm_add_requirement 0x1c000006 0x1c000008 0x3
-#     subsystem subsystem_amr to subsystem subsystem_user_rpu permissions
+#     subsystem amr_subsystem to subsystem rpu1_subsystem permissions
 #     wake[0] = 0x1
 #     powerdown[1] = 0x1
 pm_add_requirement 0x1c000006 0x1c000007 0x3
 #
-#  -- Start Subsystem subsystem_amr Requirements --
-#   Add CPU RPU0 to subsystem subsystem_amr
+#  -- Start Subsystem amr_subsystem Requirements --
+#   Add CPU RPU0 to subsystem amr_subsystem
 #     allow_secure[2] = 0x0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18110005 0x42 0 0x1 0x64
-#   Add device IPI3 to subsystem subsystem_amr, aperture 54 in LPD_XPPU
+#   Add device IPI3 to subsystem amr_subsystem, aperture 54 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18224040 0x46 0 0x1 0x64
-#   Add device IPI4 to subsystem subsystem_amr, aperture 55 in LPD_XPPU
+#   Add device IPI4 to subsystem amr_subsystem, aperture 55 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18224041 0x46 0 0x1 0x64
-#   Add device LPD_I2C0 to subsystem subsystem_amr, aperture 2 in LPD_XPPU
+#   Add device LPD_I2C0 to subsystem amr_subsystem, aperture 2 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x1822401d 0x45 0 0 0x64
-#   Add device LPD_I2C1 to subsystem subsystem_amr, aperture 3 in LPD_XPPU
+#   Add device LPD_I2C1 to subsystem amr_subsystem, aperture 3 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x1822401e 0x45 0 0 0x64
-#   Add device PMC_GPIO to subsystem subsystem_amr, aperture 2 in PMC_XPPU
+#   Add device OSPI to subsystem amr_subsystem, aperture 1 in PMC_XPPU
+#     allow_secure[2] = 0x1 due to secure = 0
+#     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
+#     requested[6] = 0x1
+#     qos = 0x64
+pm_add_requirement 0x1c000006 0x1822402a 0x45 0 0 0x64
+#   Add device PMC_GPIO to subsystem amr_subsystem, aperture 2 in PMC_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x1822402c 0x45 0 0 0x64
-#   Add device PMC_OSPI_mem to subsystem subsystem_amr, aperture 400 in PMC_XPPU
+#   Add device PMC_OSPI_mem to subsystem amr_subsystem, aperture 400 in PMC_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18900000 0x45 0 0 0x64
-#   Add device RPU0_TCMA_mem to subsystem subsystem_amr, aperture 224 in LPD_XPPU
+#   Add device RPU0_TCMA_mem to subsystem amr_subsystem, aperture 224 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x1831800b 0x45 0 0 0x64
-#   Add device RPU0_TCMA_mem_lockstep to subsystem subsystem_amr, aperture 225 in LPD_XPPU
+#   Add device RPU0_TCMA_mem_lockstep to subsystem amr_subsystem, aperture 225 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18900001 0x45 0 0 0x64
-#   Add device RPU0_TCMB_mem to subsystem subsystem_amr, aperture 226 in LPD_XPPU
+#   Add device RPU0_TCMB_mem to subsystem amr_subsystem, aperture 226 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x1831800c 0x45 0 0 0x64
-#   Add device RPU0_TCMB_mem_lockstep to subsystem subsystem_amr, aperture 227 in LPD_XPPU
+#   Add device RPU0_TCMB_mem_lockstep to subsystem amr_subsystem, aperture 227 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18900002 0x45 0 0 0x64
-#   Add device SPI0 to subsystem subsystem_amr, aperture 4 in LPD_XPPU
+#   Add device SPI0 to subsystem amr_subsystem, aperture 4 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x1822401b 0x45 0 0 0x64
-#   Add device TTC0 to subsystem subsystem_amr, aperture 14 in LPD_XPPU
+#   Add device TTC0 to subsystem amr_subsystem, aperture 14 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18224024 0x45 0 0 0x64
-#   Add device UART0 to subsystem subsystem_amr, aperture 0 in LPD_XPPU
+#   Add device UART0 to subsystem amr_subsystem, aperture 0 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18224021 0x45 0 0 0x64
-#  -- End Subsystem subsystem_amr Requirements --
+#  -- End Subsystem amr_subsystem Requirements --
 #
-#  -- Start Subsystem subsystem_user_apu Requirements --
-#   Add CPU APU0 to subsystem subsystem_user_apu
+#  -- Start Subsystem apu_subsystem Requirements --
+#   Add CPU APU0 to subsystem apu_subsystem
 #     allow_secure[2] = 0x0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1810c003 0x42 0 0x1 0x64
-#   Add CPU APU1 to subsystem subsystem_user_apu
+#   Add CPU APU1 to subsystem apu_subsystem
 #     allow_secure[2] = 0x0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1810c004 0x42 0 0x1 0x64
-#   Add device IPI0 to subsystem subsystem_user_apu, aperture 51 in LPD_XPPU
+#   Add device IPI0 to subsystem apu_subsystem, aperture 51 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1822403d 0x6 0 0 0x64
-#   Add device IPI1 to subsystem subsystem_user_apu, aperture 52 in LPD_XPPU
+#   Add device IPI1 to subsystem apu_subsystem, aperture 52 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1822403e 0x6 0 0 0x64
-#   Add device IPI2 to subsystem subsystem_user_apu, aperture 53 in LPD_XPPU
+#   Add device IPI2 to subsystem apu_subsystem, aperture 53 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1822403f 0x6 0 0 0x64
-#   Add device LPD_DMA_CH0 to subsystem subsystem_user_apu, aperture 168 in LPD_XPPU
+#   Add device LPD_DMA_CH0 to subsystem apu_subsystem, aperture 168 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224035 0x6 0 0 0x64
-#   Add device LPD_DMA_CH1 to subsystem subsystem_user_apu, aperture 169 in LPD_XPPU
+#   Add device LPD_DMA_CH1 to subsystem apu_subsystem, aperture 169 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224036 0x6 0 0 0x64
-#   Add device LPD_DMA_CH2 to subsystem subsystem_user_apu, aperture 170 in LPD_XPPU
+#   Add device LPD_DMA_CH2 to subsystem apu_subsystem, aperture 170 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224037 0x6 0 0 0x64
-#   Add device LPD_DMA_CH3 to subsystem subsystem_user_apu, aperture 171 in LPD_XPPU
+#   Add device LPD_DMA_CH3 to subsystem apu_subsystem, aperture 171 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224038 0x6 0 0 0x64
-#   Add device LPD_DMA_CH4 to subsystem subsystem_user_apu, aperture 172 in LPD_XPPU
+#   Add device LPD_DMA_CH4 to subsystem apu_subsystem, aperture 172 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224039 0x6 0 0 0x64
-#   Add device LPD_DMA_CH5 to subsystem subsystem_user_apu, aperture 173 in LPD_XPPU
+#   Add device LPD_DMA_CH5 to subsystem apu_subsystem, aperture 173 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1822403a 0x6 0 0 0x64
-#   Add device LPD_DMA_CH6 to subsystem subsystem_user_apu, aperture 174 in LPD_XPPU
+#   Add device LPD_DMA_CH6 to subsystem apu_subsystem, aperture 174 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1822403b 0x6 0 0 0x64
-#   Add device LPD_DMA_CH7 to subsystem subsystem_user_apu, aperture 175 in LPD_XPPU
+#   Add device LPD_DMA_CH7 to subsystem apu_subsystem, aperture 175 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1822403c 0x6 0 0 0x64
-#   Add device LPD_GPIO to subsystem subsystem_user_apu, aperture 11 in LPD_XPPU
+#   Add device LPD_GPIO to subsystem apu_subsystem, aperture 11 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224023 0x46 0 0 0x64
-#   Add OCM0_mem to subsystem subsystem_user_apu due to OCM_mem
+#   Add OCM0_mem to subsystem apu_subsystem due to OCM_mem
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18314007 0x6 0 0 0x64
-#   Add OCM1_mem to subsystem subsystem_user_apu due to OCM_mem
+#   Add OCM1_mem to subsystem apu_subsystem due to OCM_mem
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18314008 0x6 0 0 0x64
-#   Add OCM2_mem to subsystem subsystem_user_apu due to OCM_mem
+#   Add OCM2_mem to subsystem apu_subsystem due to OCM_mem
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18314009 0x6 0 0 0x64
-#   Add OCM3_mem to subsystem subsystem_user_apu due to OCM_mem
+#   Add OCM3_mem to subsystem apu_subsystem due to OCM_mem
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x1831400a 0x6 0 0 0x64
-#   Add OCM_mem to subsystem subsystem_user_apu, OCM0_mem, OCM1_mem, OCM2_mem, OCM3_mem
+#   Add OCM_mem to subsystem apu_subsystem, OCM0_mem, OCM1_mem, OCM2_mem, OCM3_mem
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18900003 0x6 0 0 0x64
-#   Add device PMC_RTC to subsystem subsystem_user_apu, aperture 42 in PMC_XPPU
+#   Add device PMC_RTC to subsystem apu_subsystem, aperture 42 in PMC_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224034 0x46 0 0 0x64
-#   Add device TTC2 to subsystem subsystem_user_apu, aperture 16 in LPD_XPPU
+#   Add device TTC2 to subsystem apu_subsystem, aperture 16 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224026 0x46 0 0 0x64
-#   Add device TTC3 to subsystem subsystem_user_apu, aperture 17 in LPD_XPPU
+#   Add device TTC3 to subsystem apu_subsystem, aperture 17 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224027 0x46 0 0 0x64
-#   Add device UART1 to subsystem subsystem_user_apu, aperture 1 in LPD_XPPU
+#   Add device UART1 to subsystem apu_subsystem, aperture 1 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000008 0x18224022 0x46 0 0 0x64
-#  -- End Subsystem subsystem_user_apu Requirements --
+#  -- End Subsystem apu_subsystem Requirements --
 #
-#  -- Start Subsystem subsystem_user_rpu Requirements --
-#   Add CPU RPU1 to subsystem subsystem_user_rpu
+#  -- Start Subsystem rpu1_subsystem Requirements --
+#   Add CPU RPU1 to subsystem rpu1_subsystem
 #     allow_secure[2] = 0x0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000007 0x18110006 0x42 0 0x1 0x64
-#   Add device IPI5 to subsystem subsystem_user_rpu, aperture 56 in LPD_XPPU
+#   Add device IPI5 to subsystem rpu1_subsystem, aperture 56 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000007 0x18224042 0x46 0 0x1 0x64
-#   Add device IPI6 to subsystem subsystem_user_rpu, aperture 58 in LPD_XPPU
+#   Add device IPI6 to subsystem rpu1_subsystem, aperture 58 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2
 #     requested[6] = 0x1
 #     requested_full_access[0] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000007 0x18224043 0x46 0 0x1 0x64
-#   Add device UART0 to subsystem subsystem_user_rpu, aperture 0 in LPD_XPPU
+#   Add device UART0 to subsystem rpu1_subsystem, aperture 0 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000007 0x18224021 0x45 0 0 0x64
-#  -- End Subsystem subsystem_user_rpu Requirements --
+#  -- End Subsystem rpu1_subsystem Requirements --
 marker 0x65 "SUBSYSTEM_DEFINITION/SUBSYSTEMS"

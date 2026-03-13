@@ -318,9 +318,9 @@
   "design": {
     "name": "design",
     "destinations": [
-      {"name": "subsystem_amr", "addr": "0x0", "size": "256M", "mem": true},
-      {"name": "subsystem_user_rpu", "addr": "0x10800000", "size": "128M", "mem": true},
-      {"name": "subsystem_user_apu", "addr": "0x1c800000", "size": "1592M", "mem": true}
+      {"name": "amr_subsystem", "addr": "0x0", "size": "256M", "mem": true},
+      {"name": "rpu1_subsystem", "addr": "0x10800000", "size": "128M", "mem": true},
+      {"name": "apu_subsystem", "addr": "0x1c800000", "size": "1592M", "mem": true}
     ],
     "cells": {
       "STATIC_DESIGN": {
@@ -578,7 +578,7 @@
       }
     },
     "subsystems": {
-      "subsystem_amr": {
+      "amr_subsystem": {
         "id": "0x1c000006",
         "access": [
           {
@@ -614,11 +614,17 @@
             "name": "perm_0",
             "type": "ss_permissions",
             "flags": {"powerdown": true, "wake": true},
-            "domains": ["subsystem_user_apu", "subsystem_user_rpu"]
+            "domains": ["apu_subsystem", "rpu1_subsystem"]
+          },
+          {
+            "name": "access_amr_ospi",
+            "destinations": ["OSPI"],
+            "flags": {"requested": true, "shared": true},
+            "SMIDs": ["RPU0"]
           }
         ]
       },
-      "subsystem_user_apu": {
+      "apu_subsystem": {
         "id": "0x1c000008",
         "access": [
           {
@@ -658,7 +664,7 @@
           }
         ]
       },
-      "subsystem_user_rpu": {
+      "rpu1_subsystem": {
         "id": "0x1c000007",
         "access": [
           {

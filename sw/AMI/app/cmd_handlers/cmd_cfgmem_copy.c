@@ -240,8 +240,7 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 		return ret;
 	}
 	est_dur_seconds = calc_est_time(part.size);
-	printf("Estimated time to copy partition: %d (seconds) "
-			"(NOTE: Changing logging levels may increase copy time)\r\n",
+	printf("Estimated time to copy partition: %d (seconds)\r\n",
 			est_dur_seconds);
 
 	ret = ami_prog_copy_partition(

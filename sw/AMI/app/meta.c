@@ -46,16 +46,17 @@
 /* Default fields */
 #define OVERVIEW_COL_BDF	(0)
 #define OVERVIEW_COL_NAME	(1)
-#define OVERVIEW_COL_UUID	(2)
-#define OVERVIEW_COL_AMC	(3)
-#define OVERVIEW_COL_STATE	(4)
-#define NUM_OVERVIEW_COLS	(5)
+#define OVERVIEW_COL_SERIAL	(2)
+#define OVERVIEW_COL_UUID	(3)
+#define OVERVIEW_COL_AMC	(4)
+#define OVERVIEW_COL_STATE	(5)
+#define NUM_OVERVIEW_COLS	(6)
 
 /* Verbose only fields */
-#define OVERVIEW_COL_HWMON	(5)
-#define OVERVIEW_COL_CDEV	(6)
+#define OVERVIEW_COL_HWMON	(6)
+#define OVERVIEW_COL_CDEV	(7)
 /* Device overview table information */
-#define NUM_OVERVIEW_COLS_V	(7)
+#define NUM_OVERVIEW_COLS_V	(8)
 
 /* PCI info */
 #define NUM_PCIEINFO_COLS	(2)
@@ -831,6 +832,14 @@ static int populate_overview_header(ami_device *dev, char **header,
 				sprintf(header[i], "%s", "BDF");
 				break;
 
+			case OVERVIEW_COL_NAME:
+				sprintf(header[i], "%s", "Device");
+				break;
+
+			case OVERVIEW_COL_SERIAL:
+				sprintf(header[i], "%s", "Serial Number");
+				break;
+
 			case OVERVIEW_COL_UUID:
 				sprintf(header[i], "%s", "UUID");
 				break;
@@ -845,10 +854,6 @@ static int populate_overview_header(ami_device *dev, char **header,
 
 			case OVERVIEW_COL_STATE:
 				sprintf(header[i], "%s", "State");
-				break;
-
-			case OVERVIEW_COL_NAME:
-				sprintf(header[i], "%s", "Device");
 				break;
 
 			case OVERVIEW_COL_AMC:
@@ -878,11 +883,12 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 	char bdf_string[AMI_BDF_STR_LEN] = { 0 };
 	JsonNode *row = NULL;
 	JsonNode *uuid_node = NULL;
-	JsonNode *hwmon_node = NULL;
+	JsonNode *name_node = NULL;
+	JsonNode *serial_node = NULL;
 	JsonNode *cdev_node = NULL;
 	JsonNode *state_node = NULL;
-	JsonNode *name_node = NULL;
 	JsonNode *amc_node = NULL;
+	JsonNode *hwmon_node = NULL;
 
 	if (!dev || !parent)
 		return EXIT_FAILURE;
@@ -901,6 +907,32 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 					uuid_node = json_mknull();
 
 				json_append_member(row, "uuid", uuid_node);
+				break;
+			}
+
+			case OVERVIEW_COL_NAME:
+			{
+				char name[AMI_DEV_NAME_SIZE] = { 0 };
+
+				if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
+					name_node = json_mkstring(name);
+				else
+					name_node = json_mknull();
+
+				json_append_member(row, "name", name_node);
+				break;
+			}
+
+			case OVERVIEW_COL_SERIAL:
+			{
+				char serial[AMI_MFG_INFO_MAX_STR] = { 0 };
+
+				if (ami_mfg_get_info(dev, AMI_MFG_BOARD_SERIAL, serial) == AMI_STATUS_OK)
+					serial_node = json_mkstring(serial);
+				else
+					serial_node = json_mknull();
+
+				json_append_member(row, "serial_number", serial_node);
 				break;
 			}
 
@@ -940,19 +972,6 @@ static int construct_overview_node(ami_device *dev, JsonNode *parent, int n_fiel
 					state_node = json_mknull();
 
 				json_append_member(row, "state", state_node);
-				break;
-			}
-
-			case OVERVIEW_COL_NAME:
-			{
-				char name[AMI_DEV_NAME_SIZE] = { 0 };
-
-				if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
-					name_node = json_mkstring(name);
-				else
-					name_node = json_mknull();
-
-				json_append_member(row, "name", name_node);
 				break;
 			}
 
@@ -1022,6 +1041,27 @@ static int construct_overview_row(ami_device *dev, char **row, int n_fields)
 				break;
 			}
 
+			case OVERVIEW_COL_NAME:
+			{
+				char name[AMI_DEV_NAME_SIZE] = { 0 };
+
+				if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
+					sprintf(row[col], "%s", name);
+				else
+					sprintf(row[col], "%s", "Unknown");
+				break;
+			}
+
+			case OVERVIEW_COL_SERIAL:
+			{
+				char serial[AMI_MFG_INFO_MAX_STR] = { 0 };
+
+				if (ami_mfg_get_info(dev, AMI_MFG_BOARD_SERIAL, serial) == AMI_STATUS_OK)
+					sprintf(row[col], "%s", serial);
+				else
+					sprintf(row[col], "%s", "N/A");
+				break;
+			}
 			case OVERVIEW_COL_UUID:
 			{
 				char uuid[AMI_LOGIC_UUID_SIZE] = { 0 };
@@ -1060,17 +1100,6 @@ static int construct_overview_row(ami_device *dev, char **row, int n_fields)
 
 				if (ami_dev_get_state(dev, state) == AMI_STATUS_OK)
 					sprintf(row[col], "%s", state);
-				else
-					sprintf(row[col], "%s", "Unknown");
-				break;
-			}
-
-			case OVERVIEW_COL_NAME:
-			{
-				char name[AMI_DEV_NAME_SIZE] = { 0 };
-
-				if (ami_dev_get_name(dev, name) == AMI_STATUS_OK)
-					sprintf(row[col], "%s", name);
 				else
 					sprintf(row[col], "%s", "Unknown");
 				break;
