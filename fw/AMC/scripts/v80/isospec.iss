@@ -2,7 +2,7 @@
   "spec_file_version": 4,
   "info": {
     "arch_data_version": 100,
-    "device_name": "ve2302",
+    "device_name": "v80",
     "settings_file": "default_settings",
     "settings_suffix": "ps-pmc",
     "format": "shallow"
@@ -96,6 +96,50 @@
           "name": "PLM_image_store",
           "comment": "Destination for PLM image store",
           "SMIDs": ["PMC_DMA0", "PMC_DMA1", "PSM", "RCU_and_PPU"]
+        },
+        {
+          "name": "firmware_SLR1",
+          "comment": "Firmware masters, used as a masters list for protection unit root-access",
+          "type": "smid_list",
+          "SMIDs": ["PMC_DMA0_SLR1", "PMC_DMA1_SLR1", "RCU_and_PPU_SLR1"]
+        },
+        {
+          "name": "firmware_SLR1.debug",
+          "comment": "Firmware masters, used for root-access if debugger_access is enabled",
+          "type": "smid_list",
+          "SMIDs": ["DAP", "DPC", "PMC_DMA_and_DPC_SLR1", "RCU_and_PPU_SLR1"]
+        },
+        {
+          "name": "firmware_SLR2",
+          "comment": "Firmware masters, used as a masters list for protection unit root-access",
+          "type": "smid_list",
+          "SMIDs": ["PMC_DMA0_SLR2", "PMC_DMA1_SLR2", "RCU_and_PPU_SLR2"]
+        },
+        {
+          "name": "firmware_SLR2.debug",
+          "comment": "Firmware masters, used for root-access if debugger_access is enabled",
+          "type": "smid_list",
+          "SMIDs": ["DAP", "DPC", "PMC_DMA_and_DPC_SLR2", "RCU_and_PPU_SLR2"]
+        },
+        {
+          "name": "slr_ro",
+          "comment": "Any master can access these as read-only",
+          "destinations": ["PMC_SYSMON_CSR_SLR1", "PMC_SYSMON_CSR_SLR2"],
+          "flags": {"read_only": true},
+          "SMIDs": ["ANY"]
+        },
+        {
+          "name": "slr_ro_2",
+          "comment": "Any master can access these as read-only",
+          "destinations": ["PLM_RTCA_SLR1", "PLM_RTCA_SLR2", "SSIT_COMM", "SSIT_COMM_SLR1", "SSIT_COMM_SLR2"],
+          "flags": {"read_only": true},
+          "SMIDs": ["ANY"]
+        },
+        {
+          "name": "slr_rw",
+          "comment": "Any master can access these as read-write",
+          "destinations": ["PMC_SBI_STREAM_mem", "PMC_SBI_STREAM_mem_SLR1", "PMC_SBI_STREAM_mem_SLR2"],
+          "SMIDs": ["ANY"]
         }
       ],
       "units": {
@@ -115,12 +159,36 @@
           "root_access": "firmware",
           "flags": {"enable": true, "interrupt_enable": true, "lock": true}
         },
+        "PMC_XMPU_SLR1": {
+          "root_access": "firmware_SLR1",
+          "flags": {"enable": true, "interrupt_enable": true, "lock": true}
+        },
+        "PMC_XMPU_SLR2": {
+          "root_access": "firmware_SLR2",
+          "flags": {"enable": true, "interrupt_enable": true, "lock": true}
+        },
         "PMC_XPPU": {
           "root_access": "firmware",
           "flags": {"enable": true, "interrupt_enable": true, "lock": true}
         },
         "PMC_XPPU_NPI": {
           "root_access": "firmware",
+          "flags": {"enable": true, "interrupt_enable": true, "lock": true}
+        },
+        "PMC_XPPU_NPI_SLR1": {
+          "root_access": "firmware_SLR1",
+          "flags": {"enable": true, "interrupt_enable": true, "lock": true}
+        },
+        "PMC_XPPU_NPI_SLR2": {
+          "root_access": "firmware_SLR2",
+          "flags": {"enable": true, "interrupt_enable": true, "lock": true}
+        },
+        "PMC_XPPU_SLR1": {
+          "root_access": "firmware_SLR1",
+          "flags": {"enable": true, "interrupt_enable": true, "lock": true}
+        },
+        "PMC_XPPU_SLR2": {
+          "root_access": "firmware_SLR2",
           "flags": {"enable": true, "interrupt_enable": true, "lock": true}
         }
       }
@@ -291,23 +359,7 @@
               "PMC_I2C",
               "PMC_RTC",
               "SPI0",
-              "SPI1",
-              "XRAM0_0_mem",
-              "XRAM0_1_mem",
-              "XRAM0_2_mem",
-              "XRAM0_3_mem",
-              "XRAM1_0_mem",
-              "XRAM1_1_mem",
-              "XRAM1_2_mem",
-              "XRAM1_3_mem",
-              "XRAM2_0_mem",
-              "XRAM2_1_mem",
-              "XRAM2_2_mem",
-              "XRAM2_3_mem",
-              "XRAM3_0_mem",
-              "XRAM3_1_mem",
-              "XRAM3_2_mem",
-              "XRAM3_3_mem"
+              "SPI1"
             ],
             "flags": {"shared": true}
           }
@@ -318,41 +370,339 @@
   "design": {
     "name": "design",
     "destinations": [
-      {"name": "amr_subsystem", "addr": "0x0", "size": "256M", "mem": true, "nodeid": "0x18900000"},
-      {"name": "rpu1_subsystem", "addr": "0x10800000", "size": "128M", "mem": true, "nodeid": "0x18900001"},
-      {"name": "apu_subsystem", "addr": "0x1c800000", "size": "1592M", "mem": true, "nodeid": "0x18900002"}
+      {"name": "amr_mem_dram", "addr": "0x0", "size": "256M", "mem": true, "nodeid": "0x18900000"},
+      {"name": "rpu1_mem_dram", "addr": "0x10800000", "size": "128M", "mem": true},
+      {"name": "apu_mem_dram", "addr": "0x1c800000", "size": "1592M", "mem": true, "nodeid": "0x18900001"}
     ],
     "cells": {
-      "STATIC_DESIGN": {
-        "type": "hier",
-        "cells": {
-          "axi_noc_ic": {
-            "type": "noc",
-            "SMIDs": [
-              {"ref": "S06_AXI", "value": "0x10", "count": 1, "site": "NOC_NMU512_X0Y0"},
-              {"ref": "S07_AXI", "value": "0x11", "count": 1, "site": "NOC_NMU512_X0Y1"},
-              {"ref": "S08_AXI", "value": "0x12", "count": 1, "site": "NOC_NMU512_X0Y2"}
-            ]
-          },
-          "axi_noc_mc_1x": {
-            "type": "noc",
-            "XMPUs": [
-              {
-                "name": "ddrmc",
-                "module": "ddr4_xmpu",
-                "addrs": [
-                  {"addr": "0x0", "size": "2G"},
-                  {"addr": "0x50000000000", "size": "512G"}
-                ],
-                "sites": ["DDRMC_X0Y0"]
-              }
+      "axi_noc_cips": {
+        "type": "noc",
+        "XMPUs": [
+          {
+            "name": "HBM0_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4000000000", "size": "1G"}
             ],
-            "destinations": [
-              {"name": "DDR_LOW0", "addr": "0x0", "size": "2G", "mem": true},
-              {"name": "DDR_CH1", "addr": "0x50000000000", "size": "6G", "mem": true}
-            ]
+            "sites": ["HBM_MC_X0Y0_PC0"]
+          },
+          {
+            "name": "HBM0_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4040000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X0Y0_PC1"]
+          },
+          {
+            "name": "HBM10_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4500000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X10Y0_PC0"]
+          },
+          {
+            "name": "HBM10_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4540000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X10Y0_PC1"]
+          },
+          {
+            "name": "HBM11_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4580000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X11Y0_PC0"]
+          },
+          {
+            "name": "HBM11_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x45c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X11Y0_PC1"]
+          },
+          {
+            "name": "HBM12_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4600000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X12Y0_PC0"]
+          },
+          {
+            "name": "HBM12_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4640000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X12Y0_PC1"]
+          },
+          {
+            "name": "HBM13_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4680000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X13Y0_PC0"]
+          },
+          {
+            "name": "HBM13_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x46c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X13Y0_PC1"]
+          },
+          {
+            "name": "HBM14_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4700000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X14Y0_PC0"]
+          },
+          {
+            "name": "HBM14_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4740000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X14Y0_PC1"]
+          },
+          {
+            "name": "HBM15_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4780000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X15Y0_PC0"]
+          },
+          {
+            "name": "HBM15_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x47c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X15Y0_PC1"]
+          },
+          {
+            "name": "HBM1_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4080000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X1Y0_PC0"]
+          },
+          {
+            "name": "HBM1_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x40c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X1Y0_PC1"]
+          },
+          {
+            "name": "HBM2_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4100000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X2Y0_PC0"]
+          },
+          {
+            "name": "HBM2_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4140000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X2Y0_PC1"]
+          },
+          {
+            "name": "HBM3_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4180000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X3Y0_PC0"]
+          },
+          {
+            "name": "HBM3_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x41c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X3Y0_PC1"]
+          },
+          {
+            "name": "HBM4_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4200000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X4Y0_PC0"]
+          },
+          {
+            "name": "HBM4_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4240000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X4Y0_PC1"]
+          },
+          {
+            "name": "HBM5_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4280000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X5Y0_PC0"]
+          },
+          {
+            "name": "HBM5_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x42c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X5Y0_PC1"]
+          },
+          {
+            "name": "HBM6_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4300000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X6Y0_PC0"]
+          },
+          {
+            "name": "HBM6_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4340000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X6Y0_PC1"]
+          },
+          {
+            "name": "HBM7_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4380000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X7Y0_PC0"]
+          },
+          {
+            "name": "HBM7_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x43c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X7Y0_PC1"]
+          },
+          {
+            "name": "HBM8_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4400000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X8Y0_PC0"]
+          },
+          {
+            "name": "HBM8_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4440000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X8Y0_PC1"]
+          },
+          {
+            "name": "HBM9_PC0",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x4480000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X9Y0_PC0"]
+          },
+          {
+            "name": "HBM9_PC1",
+            "module": "hbm_xmpu",
+            "addrs": [
+              {"addr": "0x44c0000000", "size": "1G"}
+            ],
+            "sites": ["HBM_MC_X9Y0_PC1"]
           }
-        }
+        ],
+        "destinations": [
+          {"name": "HBM0_PC0", "addr": "0x4000000000", "size": "1G", "mem": true},
+          {"name": "HBM0_PC1", "addr": "0x4040000000", "size": "1G", "mem": true},
+          {"name": "HBM1_PC0", "addr": "0x4080000000", "size": "1G", "mem": true},
+          {"name": "HBM1_PC1", "addr": "0x40c0000000", "size": "1G", "mem": true},
+          {"name": "HBM2_PC0", "addr": "0x4100000000", "size": "1G", "mem": true},
+          {"name": "HBM2_PC1", "addr": "0x4140000000", "size": "1G", "mem": true},
+          {"name": "HBM3_PC0", "addr": "0x4180000000", "size": "1G", "mem": true},
+          {"name": "HBM3_PC1", "addr": "0x41c0000000", "size": "1G", "mem": true},
+          {"name": "HBM4_PC0", "addr": "0x4200000000", "size": "1G", "mem": true},
+          {"name": "HBM4_PC1", "addr": "0x4240000000", "size": "1G", "mem": true},
+          {"name": "HBM5_PC0", "addr": "0x4280000000", "size": "1G", "mem": true},
+          {"name": "HBM5_PC1", "addr": "0x42c0000000", "size": "1G", "mem": true},
+          {"name": "HBM6_PC0", "addr": "0x4300000000", "size": "1G", "mem": true},
+          {"name": "HBM6_PC1", "addr": "0x4340000000", "size": "1G", "mem": true},
+          {"name": "HBM7_PC0", "addr": "0x4380000000", "size": "1G", "mem": true},
+          {"name": "HBM7_PC1", "addr": "0x43c0000000", "size": "1G", "mem": true},
+          {"name": "HBM8_PC0", "addr": "0x4400000000", "size": "1G", "mem": true},
+          {"name": "HBM8_PC1", "addr": "0x4440000000", "size": "1G", "mem": true},
+          {"name": "HBM9_PC0", "addr": "0x4480000000", "size": "1G", "mem": true},
+          {"name": "HBM9_PC1", "addr": "0x44c0000000", "size": "1G", "mem": true},
+          {"name": "HBM10_PC0", "addr": "0x4500000000", "size": "1G", "mem": true},
+          {"name": "HBM10_PC1", "addr": "0x4540000000", "size": "1G", "mem": true},
+          {"name": "HBM11_PC0", "addr": "0x4580000000", "size": "1G", "mem": true},
+          {"name": "HBM11_PC1", "addr": "0x45c0000000", "size": "1G", "mem": true},
+          {"name": "HBM12_PC0", "addr": "0x4600000000", "size": "1G", "mem": true},
+          {"name": "HBM12_PC1", "addr": "0x4640000000", "size": "1G", "mem": true},
+          {"name": "HBM13_PC0", "addr": "0x4680000000", "size": "1G", "mem": true},
+          {"name": "HBM13_PC1", "addr": "0x46c0000000", "size": "1G", "mem": true},
+          {"name": "HBM14_PC0", "addr": "0x4700000000", "size": "1G", "mem": true},
+          {"name": "HBM14_PC1", "addr": "0x4740000000", "size": "1G", "mem": true},
+          {"name": "HBM15_PC0", "addr": "0x4780000000", "size": "1G", "mem": true},
+          {"name": "HBM15_PC1", "addr": "0x47c0000000", "size": "1G", "mem": true}
+        ]
+      },
+      "axi_noc_mc_ddr4_0": {
+        "type": "noc",
+        "XMPUs": [
+          {
+            "name": "ddrmc",
+            "module": "ddr4_xmpu",
+            "addrs": [
+              {"addr": "0x0", "size": "2G"},
+              {"addr": "0x50000000000", "size": "512G"}
+            ],
+            "sites": ["DDRMC_X0Y0"]
+          }
+        ],
+        "destinations": [
+          {"name": "DDR_LOW0", "addr": "0x0", "size": "2G", "mem": true},
+          {"name": "DDR_CH1", "addr": "0x50080000000", "size": "2G", "mem": true}
+        ]
+      },
+      "axi_noc_mc_ddr4_1": {
+        "type": "noc",
+        "XMPUs": [
+          {
+            "name": "ddrmc",
+            "module": "ddr4_xmpu",
+            "addrs": [
+              {"addr": "0x60000000000", "size": "512G"}
+            ],
+            "sites": ["DDRMC_X1Y0"]
+          }
+        ],
+        "destinations": [
+          {"name": "DDR_CH2", "addr": "0x60000000000", "size": "32G", "mem": true}
+        ]
       },
       "ps": {
         "type": "ps",
@@ -362,7 +712,8 @@
           {"name": "PL_AIE", "value": "0x0", "count": 256, "altname": "PL"},
           {"name": "FPD_CCI", "comment": "Issued by CCI-500 cache management", "value": "0x0"},
           {"name": "AIE", "value": "0xf0", "count": 16},
-          {"name": "CIPS", "value": "0x200", "count": 128},
+          {"name": "CPM", "value": "0x100", "count": 256},
+          {"name": "CIPS", "value": "0x200", "count": 128, "perSLR": true},
           {"name": "LPD", "value": "0x200", "count": 64},
           {"name": "RPU", "value": "0x200", "count": 8, "cpu": true, "type": "rpu"},
           {"name": "RPU0", "value": "0x200", "count": 4, "cpu": true, "type": "rpu", "nodeid": "0x18110005"},
@@ -383,22 +734,22 @@
           {"name": "PSM_and_DPC_DMA", "comment": "includes: PSM; DPC_DMA", "value": "0x238", "count": 2},
           {"name": "PSM", "value": "0x238", "count": 1},
           {"name": "DPC_DMA", "value": "0x239", "count": 1},
-          {"name": "PMC", "value": "0x240", "count": 16},
+          {"name": "PMC", "value": "0x240", "count": 16, "perSLR": true},
           {"name": "DAP", "value": "0x240", "count": 1},
-          {"name": "PMC_SYSMON", "value": "0x241", "count": 1},
+          {"name": "PMC_SYSMON", "value": "0x241", "count": 1, "perSLR": true},
           {"name": "SD_eMMC", "value": "0x242", "count": 2},
           {"name": "SD_eMMC0", "value": "0x242", "count": 1},
           {"name": "SD_eMMC1", "value": "0x243", "count": 1},
           {"name": "QSPI", "value": "0x244", "count": 1},
           {"name": "OSPI", "value": "0x245", "count": 1},
-          {"name": "RCU_and_PPU", "value": "0x246", "count": 2},
+          {"name": "RCU_and_PPU", "value": "0x246", "count": 2, "perSLR": true},
           {"name": "RCU", "comment": "ROM Code Unit", "value": "0x246", "count": 1, "cpu": true},
           {"name": "PPU", "value": "0x247", "count": 1},
           {"name": "DAP_and_DPC", "comment": "used for IPI; includes PMC_SYSMON and PMC_DMA0 ", "value": "0x248", "mask_n": "0x9"},
-          {"name": "PMC_DMA_and_DPC", "comment": "includes: PMC_DMA0; DPC; unused SMID 0x24A; PMC_DMA1", "value": "0x248", "count": 4},
-          {"name": "PMC_DMA0", "value": "0x248", "count": 1},
-          {"name": "DPC", "value": "0x249", "count": 1},
-          {"name": "PMC_DMA1", "value": "0x24b", "count": 1},
+          {"name": "PMC_DMA_and_DPC", "comment": "includes: PMC_DMA0; DPC; unused SMID 0x24A; PMC_DMA1", "value": "0x248", "count": 4, "perSLR": true},
+          {"name": "PMC_DMA0", "value": "0x248", "count": 1, "perSLR": true},
+          {"name": "DPC", "value": "0x249", "count": 1, "perSLR": true},
+          {"name": "PMC_DMA1", "value": "0x24b", "count": 1, "perSLR": true},
           {"name": "PCIe", "value": "0x250", "count": 8},
           {"name": "APU", "comment": "APU bits 3:0 are determined by the AXI_ID", "value": "0x260", "count": 16, "cpu": true, "type": "apu"},
           {"name": "APU0", "comment": "APU0 & 1 have the same SMIDs but can specify which core is used in a subsystem", "value": "0x260", "count": 16, "cpu": true, "type": "apu", "nodeid": "0x1810c003"},
@@ -438,7 +789,7 @@
           {"name": "RST_SYS_RST_1", "addr": "0x0", "size": "0", "nodeid": "0xc41000e"},
           {"name": "RST_SYS_RST_2", "addr": "0x0", "size": "0", "nodeid": "0xc41000f"},
           {"name": "RST_SYS_RST_3", "addr": "0x0", "size": "0", "nodeid": "0xc410010"},
-          {"name": "PMC_OSPI_mem", "addr": "0xc0000000", "size": "512M", "mem": true, "nodeid": "0x18900003"},
+          {"name": "PMC_OSPI_mem", "addr": "0xc0000000", "size": "512M", "mem": true, "nodeid": "0x18900002"},
           {"name": "PMC_I2C", "addr": "0xf1000000", "size": "64K", "nodeid": "0x1822402d"},
           {"name": "OSPI", "addr": "0xf1010000", "size": "64K", "nodeid": "0x1822402a"},
           {"name": "PMC_GPIO", "addr": "0xf1020000", "size": "64K", "nodeid": "0x1822402c"},
@@ -449,22 +800,6 @@
           {"name": "PMC_SYSMON_CSR", "addr": "0xf1270000", "size": "64K", "nodeid": "0x18224055"},
           {"name": "PMC_RTC", "addr": "0xf12a0000", "size": "64K", "nodeid": "0x18224034"},
           {"name": "FPD_SWDT", "addr": "0xfd4d0000", "size": "64K", "nodeid": "0x18224029"},
-          {"name": "XRAM0_0_mem", "addr": "0xfe800000", "size": "256K", "mem": true, "nodeid": "0x18334056"},
-          {"name": "XRAM0_1_mem", "addr": "0xfe840000", "size": "256K", "mem": true, "nodeid": "0x18334057"},
-          {"name": "XRAM0_2_mem", "addr": "0xfe880000", "size": "256K", "mem": true, "nodeid": "0x18334058"},
-          {"name": "XRAM0_3_mem", "addr": "0xfe8c0000", "size": "256K", "mem": true, "nodeid": "0x18334059"},
-          {"name": "XRAM1_0_mem", "addr": "0xfe900000", "size": "256K", "mem": true, "nodeid": "0x1833405a"},
-          {"name": "XRAM1_1_mem", "addr": "0xfe940000", "size": "256K", "mem": true, "nodeid": "0x1833405b"},
-          {"name": "XRAM1_2_mem", "addr": "0xfe980000", "size": "256K", "mem": true, "nodeid": "0x1833405c"},
-          {"name": "XRAM1_3_mem", "addr": "0xfe9c0000", "size": "256K", "mem": true, "nodeid": "0x1833405d"},
-          {"name": "XRAM2_0_mem", "addr": "0xfea00000", "size": "256K", "mem": true, "nodeid": "0x1833405e"},
-          {"name": "XRAM2_1_mem", "addr": "0xfea40000", "size": "256K", "mem": true, "nodeid": "0x1833405f"},
-          {"name": "XRAM2_2_mem", "addr": "0xfea80000", "size": "256K", "mem": true, "nodeid": "0x18334060"},
-          {"name": "XRAM2_3_mem", "addr": "0xfeac0000", "size": "256K", "mem": true, "nodeid": "0x18334061"},
-          {"name": "XRAM3_0_mem", "addr": "0xfeb00000", "size": "256K", "mem": true, "nodeid": "0x18334062"},
-          {"name": "XRAM3_1_mem", "addr": "0xfeb40000", "size": "256K", "mem": true, "nodeid": "0x18334063"},
-          {"name": "XRAM3_2_mem", "addr": "0xfeb80000", "size": "256K", "mem": true, "nodeid": "0x18334064"},
-          {"name": "XRAM3_3_mem", "addr": "0xfebc0000", "size": "256K", "mem": true, "nodeid": "0x18334065"},
           {"name": "UART0", "addr": "0xff000000", "size": "64K", "nodeid": "0x18224021"},
           {"name": "UART1", "addr": "0xff010000", "size": "64K", "nodeid": "0x18224022"},
           {"name": "LPD_I2C0", "addr": "0xff020000", "size": "64K", "nodeid": "0x1822401d"},
@@ -498,14 +833,14 @@
           {"name": "LPD_DMA_CH6", "addr": "0xffae0000", "size": "64K", "nodeid": "0x1822403b"},
           {"name": "LPD_DMA_CH7", "addr": "0xffaf0000", "size": "64K", "nodeid": "0x1822403c"},
           {"name": "RPU0_TCMA_mem", "addr": "0xffe00000", "size": "64K", "mem": true, "nodeid": "0x1831800b"},
-          {"name": "RPU0_TCMA_mem_lockstep", "addr": "0xffe10000", "size": "64K", "mem": true, "nodeid": "0x18900004"},
+          {"name": "RPU0_TCMA_mem_lockstep", "addr": "0xffe10000", "size": "64K", "mem": true, "nodeid": "0x18900003"},
           {"name": "RPU0_TCMB_mem", "addr": "0xffe20000", "size": "64K", "mem": true, "nodeid": "0x1831800c"},
-          {"name": "RPU0_TCMB_mem_lockstep", "addr": "0xffe30000", "size": "64K", "mem": true, "nodeid": "0x18900005"},
-          {"name": "RPU0_iCACHE_mem", "addr": "0xffe40000", "size": "32K", "mem": true, "nodeid": "0x18900006"},
-          {"name": "RPU0_dCACHE_mem", "addr": "0xffe50000", "size": "32K", "mem": true, "nodeid": "0x18900007"},
+          {"name": "RPU0_TCMB_mem_lockstep", "addr": "0xffe30000", "size": "64K", "mem": true, "nodeid": "0x18900004"},
+          {"name": "RPU0_iCACHE_mem", "addr": "0xffe40000", "size": "32K", "mem": true, "nodeid": "0x18900005"},
+          {"name": "RPU0_dCACHE_mem", "addr": "0xffe50000", "size": "32K", "mem": true, "nodeid": "0x18900006"},
           {"name": "RPU1_TCMA_mem_dual", "addr": "0xffe90000", "size": "64K", "mem": true, "nodeid": "0x1831800d"},
           {"name": "RPU1_TCMB_mem_dual", "addr": "0xffeb0000", "size": "64K", "mem": true, "nodeid": "0x1831800e"},
-          {"name": "OCM_mem", "addr": "0xfffc0000", "size": "256K", "mem": true, "nodeid": "0x18900008"},
+          {"name": "OCM_mem", "addr": "0xfffc0000", "size": "256K", "mem": true, "nodeid": "0x18900007"},
           {"name": "OCM0_mem", "addr": "0xfffc0000", "size": "64K", "mem": true, "nodeid": "0x18314007"},
           {"name": "OCM1_mem", "addr": "0xfffd0000", "size": "64K", "mem": true, "nodeid": "0x18314008"},
           {"name": "OCM2_mem", "addr": "0xfffe0000", "size": "64K", "mem": true, "nodeid": "0x18314009"},
@@ -519,25 +854,205 @@
         {"same_as_default": "firmware_and_cci.debug"},
         {"same_as_default": "firmware"},
         {"same_as_default": "firmware.debug"},
-        {"same_as_default": "open_rw"},
+        {
+          "name": "open_rw",
+          "comment": "Any master can access these as read/write",
+          "destinations": [
+            "CRP",
+            "CoreSight",
+            "IPI_buffers",
+            "IPI_channels",
+            "OCM_CSR",
+            "RPU_DUAL_CSR",
+            "USB2_XHCI"
+          ],
+          "SMIDs": ["ANY"]
+        },
         {"same_as_default": "open_rw_fpd"},
-        {"same_as_default": "open_ro"},
+        {
+          "name": "open_ro",
+          "comment": "Any master can access these as read-only",
+          "destinations": ["SCNTR_SECURE"],
+          "flags": {"read_only": true},
+          "SMIDs": ["ANY"]
+        },
         {"same_as_default": "open_ro_2"},
         {"same_as_default": "apu_rw"},
-        {"same_as_default": "bootmedia"},
-        {"same_as_default": "bootmedia_pmc"},
-        {"same_as_default": "PLM_image_store"}
+        {
+          "name": "bootmedia",
+          "comment": "Allow booting from different boot media",
+          "destinations": [
+            "CFU_STREAM_mem",
+            "PMC_OSPI_mem",
+            "PPU",
+            "PSM_DCACHE_mem",
+            "PSM_ICACHE_mem",
+            "RPU_Memory"
+          ],
+          "SMIDs": ["OSPI", "SD_eMMC"]
+        },
+        {
+          "name": "bootmedia_pmc",
+          "destinations": ["PMC_RAM_mem"],
+          "SMIDs": ["OSPI", "SD_eMMC"]
+        },
+        {"same_as_default": "PLM_image_store"},
+        {"same_as_default": "firmware_SLR1"},
+        {"same_as_default": "firmware_SLR1.debug"},
+        {"same_as_default": "firmware_SLR2"},
+        {"same_as_default": "firmware_SLR2.debug"},
+        {"same_as_default": "slr_ro"},
+        {"same_as_default": "slr_ro_2"},
+        {"same_as_default": "slr_rw"}
       ],
       "units": {
-        "/STATIC_DESIGN/axi_noc_mc_1x/ddrmc": {
+        "/axi_noc_cips/HBM0_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM0_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM10_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM10_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM11_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM11_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM12_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM12_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM13_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM13_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM14_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM14_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM15_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM15_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM1_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM1_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM2_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM2_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM3_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM3_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM4_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM4_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM5_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM5_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM6_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM6_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM7_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM7_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM8_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM8_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM9_PC0": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_cips/HBM9_PC1": {
+          "root_access": "",
+          "flags": {}
+        },
+        "/axi_noc_mc_ddr4_0/ddrmc": {
+          "root_access": "firmware_and_cci",
+          "flags": {}
+        },
+        "/axi_noc_mc_ddr4_1/ddrmc": {
           "root_access": "firmware_and_cci",
           "flags": {}
         },
         "FPD_XMPU": {"same_as_default": true},
         "IPI": {
-          "flags": {}
+          "flags": {"enable": true}
         },
         "IPI_PERM": {
+          "flags": {}
+        },
+        "IPI_PERM_SLR1": {
+          "flags": {}
+        },
+        "IPI_PERM_SLR2": {
           "flags": {}
         },
         "LPD_XPPU": {"same_as_default": true},
@@ -549,8 +1064,14 @@
           "flags": {}
         },
         "PMC_XMPU": {"same_as_default": true},
+        "PMC_XMPU_SLR1": {"same_as_default": true},
+        "PMC_XMPU_SLR2": {"same_as_default": true},
         "PMC_XPPU": {"same_as_default": true},
         "PMC_XPPU_NPI": {"same_as_default": true},
+        "PMC_XPPU_NPI_SLR1": {"same_as_default": true},
+        "PMC_XPPU_NPI_SLR2": {"same_as_default": true},
+        "PMC_XPPU_SLR1": {"same_as_default": true},
+        "PMC_XPPU_SLR2": {"same_as_default": true},
         "PSM_EM": {
           "flags": {}
         },
@@ -560,34 +1081,13 @@
         },
         "SW_EM": {
           "flags": {}
-        },
-        "XRAM_XMPU0": {
-          "root_access": "",
-          "flags": {}
-        },
-        "XRAM_XMPU1": {
-          "root_access": "",
-          "flags": {}
-        },
-        "XRAM_XMPU2": {
-          "root_access": "",
-          "flags": {}
-        },
-        "XRAM_XMPU3": {
-          "root_access": "",
-          "flags": {}
         }
       }
     },
     "subsystems": {
-      "amr_subsystem": {
+      "subsystem_amr": {
         "id": "0x1c000006",
         "access": [
-          {
-            "name": "cpus_0",
-            "type": "cpu_list",
-            "SMIDs": ["RPU0"]
-          },
           {
             "name": "access_amr",
             "destinations": [
@@ -603,109 +1103,87 @@
               "RPU0_iCACHE_mem",
               "SPI0"
             ],
-            "flags": {"requested": true, "shared": true},
-            "SMIDs": ["RPU0"]
-          },
-          {
-            "name": "access_amr_ipi",
-            "destinations": ["IPI3", "IPI4"],
-            "flags": {"requested": true},
-            "SMIDs": ["RPU0"]
+            "flags": {"requested": true, "shared": true}
           },
           {
             "name": "perm_0",
             "type": "ss_permissions",
             "flags": {"powerdown": true, "wake": true},
-            "domains": ["apu_subsystem", "rpu1_subsystem"]
+            "domains": ["subsystem_apu", "subsystem_rpu1"]
+          },
+          {
+            "name": "cpus_0",
+            "type": "cpu_list",
+            "SMIDs": ["RPU0"]
+          },
+          {
+            "name": "access_amr_ttc",
+            "destinations": ["TTC0"],
+            "flags": {"requested": true}
+          },
+          {
+            "name": "access_amr_ipi",
+            "destinations": ["IPI3", "IPI4"],
+            "flags": {"requested": true}
           },
           {
             "name": "access_amr_dram",
-            "destinations": ["amr_subsystem"],
-            "SMIDs": ["RPU0"]
+            "destinations": ["amr_mem_dram"]
           },
           {
             "name": "access_amr_ospi",
             "destinations": ["OSPI"],
             "flags": {"shared": true}
-          },
-          {
-            "name": "access_0",
-            "destinations": ["TTC0"],
-            "flags": {"requested": true}
           }
         ]
       },
-      "apu_subsystem": {
+      "subsystem_apu": {
         "id": "0x1c000008",
         "access": [
           {
-            "name": "cpus_0",
-            "type": "cpu_list",
-            "SMIDs": ["APU"]
-          },
-          {
-            "name": "access_apu_subsys",
-            "destinations": ["PMC_RTC", "TTC2", "TTC3", "UART1"],
-            "flags": {"requested": true},
-            "SMIDs": ["APU"]
+            "name": "access_apu",
+            "destinations": ["PMC_I2C", "TTC2", "TTC3", "UART1"],
+            "flags": {"requested": true}
           },
           {
             "name": "access_apu_ipi",
             "destinations": ["IPI0", "IPI1"],
-            "flags": {"requested": true},
-            "SMIDs": ["APU"]
+            "flags": {"requested": true}
           },
           {
-            "name": "access_apu_mem",
-            "destinations": ["OCM_mem"],
-            "SMIDs": ["APU"]
-          },
-          {
-            "name": "access_apu_dma",
-            "destinations": [
-              "LPD_DMA_CH0",
-              "LPD_DMA_CH1",
-              "LPD_DMA_CH2",
-              "LPD_DMA_CH3",
-              "LPD_DMA_CH4",
-              "LPD_DMA_CH5",
-              "LPD_DMA_CH6",
-              "LPD_DMA_CH7"
-            ],
-            "SMIDs": ["APU"]
+            "name": "access_apu_ocm",
+            "destinations": ["OCM_mem"]
           },
           {
             "name": "access_apu_dram",
-            "destinations": ["apu_subsystem"],
-            "flags": {"requested": true},
+            "destinations": ["apu_mem_dram"]
+          },
+          {
+            "name": "cpus_0",
+            "type": "cpu_list",
             "SMIDs": ["APU"]
           }
         ]
       },
-      "rpu1_subsystem": {
+      "subsystem_rpu1": {
         "id": "0x1c000007",
         "access": [
           {
-            "name": "cpus_0",
-            "type": "cpu_list",
-            "SMIDs": ["RPU1"]
+            "name": "access_rpu1_uart",
+            "destinations": ["UART0"],
+            "flags": {"requested": true, "shared": true}
           },
           {
             "name": "access_rpu1_ipi",
             "destinations": ["IPI5", "IPI6"],
-            "flags": {"requested": true},
-            "SMIDs": ["RPU1"]
+            "flags": {"requested": true}
           },
           {
-            "name": "access_rpu1_uart",
-            "destinations": ["UART0"],
-            "flags": {"requested": true, "shared": true},
-            "SMIDs": ["RPU1"]
+            "name": "access_rpu1_dram"
           },
           {
-            "name": "access_rpu1_dram",
-            "destinations": ["rpu1_subsystem"],
-            "flags": {"requested": true},
+            "name": "cpus_0",
+            "type": "cpu_list",
             "SMIDs": ["RPU1"]
           }
         ]

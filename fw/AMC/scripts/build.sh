@@ -269,24 +269,35 @@ function build_amc() {
 # Build AMC elf
 build_amc
 
-if [ $PROFILE = "rave" ]; then
-    pushd ${CWD}
-    cd ${SDT_DIR}/extracted/ve2302_xdma_base_wrapper_1/pdi_files
-    bootgen \
-        -arch versal \
-        -image ve2302_xdma_base.bif \
-        -overlay_cdo $SCRIPTS_DIR/${PROFILE}/isospec.cdo \
-        -w \
-        -o  $SDT_DIR/ve2302_xdma_base.pdi
-    popd
-fi
+# Regenerate base PDI with subsystem overlay
+case "$PROFILE" in
+    v80)
+        PDI_DIR="${SDT_DIR}/extracted/v80_base_wrapper_1/pdi_files"
+        PROFILE_BIF="v80_base_boot.bif"
+        PROFILE_PDI="${SDT_DIR}/v80_base_boot.pdi"
+        ;;
+    rave)
+        PDI_DIR="${SDT_DIR}/extracted/ve2302_xdma_base_wrapper_1/pdi_files"
+        PROFILE_BIF="ve2302_xdma_base.bif"
+        PROFILE_PDI="${SDT_DIR}/ve2302_xdma_base.pdi"
+        ;;
+esac
+
+pushd "${PDI_DIR}"
+bootgen \
+    -arch versal \
+    -image "${PROFILE_BIF}" \
+    -overlay_cdo "${SCRIPTS_DIR}/${PROFILE}/isospec.cdo" \
+    -w \
+    -o  "${PROFILE_PDI}"
+popd
 
 # Generate PDI w/ bootgen
 cat << EOF > $BUILD_DIR/amr_ospi_pdi.bif
 all:
 {
     image { { type=bootimage, file=$(find ${SDT_DIR} -name "*.pdi" | sort | sed -n '1p') } }
-    image { id = 0x1c000006, name=subsystem_amr, delay_handoff
+    image { id = 0x1c000006, name=amr_subsystem, delay_handoff
             { core=r5-0, file=$BUILD_DIR/amc.elf } }
 }
 EOF

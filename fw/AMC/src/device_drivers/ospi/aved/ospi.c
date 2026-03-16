@@ -11,6 +11,10 @@
 #include <stdlib.h>
 
 #include "xospipsv.h"   /* OSPIPSV device driver */
+#include "xipipsu.h"
+#include "pm_api_sys.h"
+#include "xpm_nodeid.h"
+#include "xpm_defs.h"
 
 #include "ospi.h"
 #include "util.h"
@@ -461,10 +465,15 @@ int iOSPI_FlashInit( OSPICfg *pxOspiCfg )
 {
     int iStatus = ERROR;
 
+    if ( NULL == pxOspiCfg )
+    {
+        PLL_ERR( OSPI_NAME, "Error: pxOspiCfg is NULL\r\n" );
+        return ERROR;
+    }
+
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
          ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( FALSE == pxThis->iInitialised ) &&
-         ( NULL != pxOspiCfg ) )
+         ( FALSE == pxThis->iInitialised ) )
     {
         int iOspiStatus = XST_FAILURE;
         pxThis->ulPageSize = pxOspiCfg->usPageSize;
@@ -499,6 +508,41 @@ int iOSPI_FlashInit( OSPICfg *pxOspiCfg )
             else
             {
                 INC_STAT_COUNTER( OSPI_STATS_CREATE_MUTEX )
+            }
+        }
+
+        if ( OK == iStatus )
+        {
+            static XIpiPsu xIpiInst;
+            XIpiPsu_Config *pxIpiCfg = XIpiPsu_LookupConfig( XPAR_XIPIPSU_0_BASEADDR );
+            if ( NULL == pxIpiCfg )
+            {
+                PLL_ERR( OSPI_NAME, "Error: XIpiPsu_LookupConfig failed\r\n" );
+                INC_ERROR_COUNTER( OSPI_ERRORS_DEVICE_RESET )
+                iStatus = ERROR;
+            }
+            else if ( XST_SUCCESS != XIpiPsu_CfgInitialize( &xIpiInst,
+                                                             pxIpiCfg,
+                                                             pxIpiCfg->BaseAddress ) )
+            {
+                PLL_ERR( OSPI_NAME, "Error: XIpiPsu_CfgInitialize failed\r\n" );
+                INC_ERROR_COUNTER( OSPI_ERRORS_DEVICE_RESET )
+                iStatus = ERROR;
+            }
+            else if ( XST_SUCCESS != XPm_InitXilpm( &xIpiInst ) )
+            {
+                PLL_ERR( OSPI_NAME, "Error: XPm_InitXilpm failed\r\n" );
+                INC_ERROR_COUNTER( OSPI_ERRORS_DEVICE_RESET )
+                iStatus = ERROR;
+            }
+            else if ( XST_SUCCESS != XPm_RequestNode( PM_DEV_OSPI,
+                                                       PM_CAP_ACCESS,
+                                                       XPM_DEF_QOS,
+                                                       REQUEST_ACK_BLOCKING ) )
+            {
+                PLL_ERR( OSPI_NAME, "Error: XPm_RequestNode(PM_DEV_OSPI) failed\r\n" );
+                INC_ERROR_COUNTER( OSPI_ERRORS_DEVICE_RESET )
+                iStatus = ERROR;
             }
         }
 

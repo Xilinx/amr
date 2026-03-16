@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc.
+# Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -18,10 +18,43 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 ############################################################
+
+
+
+# Set Versal to OSPI bootmode using XSDB/XSCT
+# Switch to QSPI boot mode #
+proc boot_ospi { } {
+	puts "Switch to OSPI boot mode"
+
+	tar -set -filter {name =~ "Versal *"}
+
+	# Enable ISO
+	mwr -force 0xf1120000 0xffbff
+
+	# Switch to OSPI mode
+	mwr 0xf1260200 0x08100
+	mrd 0xf1260200
+
+	# Set PMC_MULTI_BOOT address to 0
+	mwr -force 0xf1110004 0x0
+
+	# SYSMON_REF_CTRL is switched to NPI by user PDI so ensure its
+	#  switched back
+	mwr -force 0xf1260138 0
+
+	mwr -force 0xf1260320 0x77
+
+	# Perform reset
+	tar -set -filter {name =~ "PMC"}
+	rst
+	tar -set -filter {name =~ "Versal *"}
+}
+
 tar -set -filter {name =~ "Versal *"}
 
-# Switch boot mode
+# Switch to jtag boot mode
 
+mwr -force 0xf1120000 0xffbff
 mwr 0xf1260200 0x0100
 
 mrd 0xf1260200
