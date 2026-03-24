@@ -17,7 +17,6 @@ PROFILE="rave"
 HW_DIR=build_$PROFILE
 USE_XSA=false
 USE_SDT=false
-V80_SRC_REV="1303223abba7009d203a9df0cb5904ea955c1857"
 
 function print_help() {
 	echo "=================================== AMR Build script ===================================="
@@ -99,8 +98,7 @@ if ! $USE_XSA && ! $USE_SDT; then
 	elif [ "$PROFILE" == "v80" ]; then
 		#TODO: Add support for github repo matching V80_SRC_REV
 		git clone https://gitenterprise.xilinx.com/PAEG/amr_vivado_designs.git
-		cd amr_vivado_designs/alveo_v80/v80_base
-		git checkout ${V80_SRC_REV}
+		cd amr_vivado_designs/alveo_v80/platforms/v80_base
 		make xsa
 		XSA="$(realpath project/v80_base.xsa)"
 		USE_XSA=true

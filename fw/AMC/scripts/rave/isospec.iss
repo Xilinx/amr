@@ -318,9 +318,9 @@
   "design": {
     "name": "design",
     "destinations": [
-      {"name": "amr_subsystem", "addr": "0x0", "size": "256M", "mem": true, "nodeid": "0x18900000"},
-      {"name": "rpu1_subsystem", "addr": "0x10800000", "size": "128M", "mem": true, "nodeid": "0x18900001"},
-      {"name": "apu_subsystem", "addr": "0x1c800000", "size": "1592M", "mem": true, "nodeid": "0x18900002"}
+      {"name": "amr_mem_dram", "addr": "0x0", "size": "256M", "mem": true, "nodeid": "0x18900000"},
+      {"name": "rpu1_mem_dram", "addr": "0x10800000", "size": "128M", "mem": true, "nodeid": "0x18900001"},
+      {"name": "apu_mem_dram", "addr": "0x1c800000", "size": "1592M", "mem": true, "nodeid": "0x18900002"}
     ],
     "cells": {
       "STATIC_DESIGN": {
@@ -559,7 +559,7 @@
           "flags": {}
         },
         "SW_EM": {
-          "flags": {}
+          "flags": {"HB_MON_0": "log"}
         },
         "XRAM_XMPU0": {
           "root_access": "",
@@ -593,7 +593,6 @@
             "destinations": [
               "LPD_I2C0",
               "LPD_I2C1",
-              "PMC_GPIO",
               "PMC_OSPI_mem",
               "RPU0_TCMA_mem",
               "RPU0_TCMA_mem_lockstep",
@@ -603,7 +602,7 @@
               "RPU0_iCACHE_mem",
               "SPI0"
             ],
-            "flags": {"requested": true, "shared": true},
+            "flags": {"requested": true},
             "SMIDs": ["RPU0"]
           },
           {
@@ -613,25 +612,40 @@
             "SMIDs": ["RPU0"]
           },
           {
-            "name": "perm_0",
+            "name": "perm_amr_subsys",
             "type": "ss_permissions",
             "flags": {"powerdown": true, "wake": true},
             "domains": ["apu_subsystem", "rpu1_subsystem"]
           },
           {
             "name": "access_amr_dram",
-            "destinations": ["amr_subsystem"],
+            "destinations": ["amr_mem_dram"],
+            "flags": {"requested": true},
             "SMIDs": ["RPU0"]
           },
           {
             "name": "access_amr_ospi",
             "destinations": ["OSPI"],
-            "flags": {"shared": true}
+            "flags": {"shared": true},
+            "SMIDs": ["RPU0"]
           },
           {
-            "name": "access_0",
+            "name": "access_amr_ttc",
             "destinations": ["TTC0"],
-            "flags": {"requested": true}
+            "flags": {"requested": true},
+            "SMIDs": ["RPU0"]
+          },
+          {
+            "name": "access_amr_gpio",
+            "destinations": ["PMC_GPIO"],
+            "flags": {"requested": true, "shared": true},
+            "SMIDs": ["RPU0"]
+          },
+          {
+            "name": "access_amr_fpdsw",
+            "destinations": ["FPD_SWDT"],
+            "flags": {"requested": true, "requested_full_access": true, "shared": true},
+            "SMIDs": ["RPU0"]
           }
         ]
       },
@@ -656,8 +670,9 @@
             "SMIDs": ["APU"]
           },
           {
-            "name": "access_apu_mem",
+            "name": "access_apu_ocm",
             "destinations": ["OCM_mem"],
+            "flags": {"requested": true},
             "SMIDs": ["APU"]
           },
           {
@@ -672,13 +687,20 @@
               "LPD_DMA_CH6",
               "LPD_DMA_CH7"
             ],
+            "flags": {"requested": true},
             "SMIDs": ["APU"]
           },
           {
             "name": "access_apu_dram",
-            "destinations": ["apu_subsystem"],
+            "destinations": ["apu_mem_dram"],
             "flags": {"requested": true},
             "SMIDs": ["APU"]
+          },
+          {
+            "name": "mgnt_apu_hbmon",
+            "destinations": ["HB_MON0"],
+            "type": "ss_management",
+            "flags": {"timeout": 2500}
           }
         ]
       },
@@ -704,7 +726,7 @@
           },
           {
             "name": "access_rpu1_dram",
-            "destinations": ["rpu1_subsystem"],
+            "destinations": ["rpu1_mem_dram"],
             "flags": {"requested": true},
             "SMIDs": ["RPU1"]
           }

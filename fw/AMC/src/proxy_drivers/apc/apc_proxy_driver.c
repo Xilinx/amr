@@ -1979,15 +1979,14 @@ static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData )
                  ( TRUE == pxImageData->iApuPdiProgram ) ||
                  ( TRUE == pxImageData->iRpuPdiProgram ) )
             {
+                iStatus = OK;
+
                 pvOSAL_MemCpy((void *)( HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr ),
                     (const void*)(pxImageData->ulSrcAddr), ulImageSize);
                     HAL_FLUSH_CACHE_DATA( ( HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr ), ulImageSize );
-                iStatus = OK;
 
                 if ( 1 == pxImageData->iLastPacket )
                 {
-                    uint32_t ulPdiLoadStatus = 0U;
-
                     if (NULL == pxThis->pXLoaderInst)
                     {
                         INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
@@ -1995,11 +1994,13 @@ static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData )
                     }
                     else
                     {
+                        uint32_t ulPdiLoadStatus = 0U;
+
                         /* Power down RPU1 (0x1c000007) */
                         if ( TRUE == pxImageData->iRpuPdiProgram )
                         {
                             PLL_DBG( APC_NAME, "Force power down RPU1 subsystem\r\n" );
-                            iStatus = XPm_ForcePowerDown(0x1c000007U, 2U);
+                            iStatus = XPm_ForcePowerDown(0x1c000007U, REQUEST_ACK_BLOCKING);
                             if (XST_SUCCESS != iStatus)
                             {
                                 PLL_ERR( APC_NAME, "ERROR: Failed to force power down RPU1 subsystem 0x%X\r\n",
@@ -2011,7 +2012,7 @@ static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData )
                         {
                             /* Power down APU (0x1c000008) */
                             PLL_DBG( APC_NAME, "Force power down APU subsystem\r\n" );
-                            iStatus = XPm_ForcePowerDown(0x1c000008U, 2U);
+                            iStatus = XPm_ForcePowerDown( 0x1c000008U, REQUEST_ACK_BLOCKING );
                             if (XST_SUCCESS != iStatus)
                             {
                                 PLL_ERR( APC_NAME, "ERROR: Failed to force power down APU subsystem 0x%X\r\n",

@@ -155,15 +155,16 @@ The following table lists available AMI commands. Use `--help` with any command 
 | 7  | EEPROM   | Mfg Info       | `ami_tool mfg_info -d <b:d.f>`                                          | Read manufacturing information                 |
 | 8  | OSPI     | CfgMem Info    | `ami_tool cfgmem_info -d <b:d.f> -t primary`                            | Read config memory information                 |
 | 9  | OSPI     | CfgMem Flags   | `ami_tool cfgmem_flags_rd -d <b:d.f> -t primary -p 2`                   | Read config memory information                 |
-| 10 | OSPI     | CfgMem Flags   | `ami_tool cfgmem_flags_wr -d <b:d.f> -t primary -p 2 -i <on/off>`       | Read config memory information                 |
+| 10 | OSPI     | CfgMem Flags   | `ami_tool cfgmem_flags_wr -d <b:d.f> -t primary -p 2 -i <on/off>`       | Write config memory information                |
 | 11 | OSPI     | CfgMem Program | `sudo ami_tool cfgmem_program -d <b:d.f> -i <OSPI image> -p 1 -t primary` | Program PDI bitstream onto device            |
 | 12 | OSPI     | CfgMem FPT     | `sudo ami_tool cfgmem_fpt -d <b:d.f> -t primary -i <fpt_file>`          | Program FPT onto OSPI                          |
 | 13 | OSPI     | CfgMem Copy    | `sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1`              | Copy partition to another                      |
 | 14 | OSPI     | Device Boot    | `sudo ami_tool device_boot -d <b:d.f> -p 0`                             | Set device boot partition                      |
 | 15 | PL       | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <pdi>`                         | Program partial PDI                            |
 | 16 | APU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <apu.image> -a`                | Download APU image                             |
-| 17 | Sensor   | Read Sensors   | `ami_tool sensors -d <b:d.f>`                                           | Get sensor values                              |
-| 18 | Debug    | Verbosity      | `ami_tool debug_verbosity -d <b:d.f> -l debug`                          | Set log level                                  |
+| 17 | RPU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <rpu.image> -r`                | Download RPU1 image                            |
+| 18 | Sensor   | Read Sensors   | `ami_tool sensors -d <b:d.f>`                                           | Get sensor values                              |
+| 19 | Debug    | Verbosity      | `ami_tool debug_verbosity -d <b:d.f> -l debug`                          | Set log level                                  |
 
 ### 5. Glossary
 

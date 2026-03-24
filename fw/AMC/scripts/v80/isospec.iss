@@ -371,8 +371,8 @@
     "name": "design",
     "destinations": [
       {"name": "amr_mem_dram", "addr": "0x0", "size": "256M", "mem": true, "nodeid": "0x18900000"},
-      {"name": "rpu1_mem_dram", "addr": "0x10800000", "size": "128M", "mem": true},
-      {"name": "apu_mem_dram", "addr": "0x1c800000", "size": "1592M", "mem": true, "nodeid": "0x18900001"}
+      {"name": "rpu1_mem_dram", "addr": "0x10800000", "size": "128M", "mem": true, "nodeid": "0x18900001"},
+      {"name": "apu_mem_dram", "addr": "0x1c800000", "size": "1592M", "mem": true, "nodeid": "0x18900002"}
     ],
     "cells": {
       "axi_noc_cips": {
@@ -789,7 +789,7 @@
           {"name": "RST_SYS_RST_1", "addr": "0x0", "size": "0", "nodeid": "0xc41000e"},
           {"name": "RST_SYS_RST_2", "addr": "0x0", "size": "0", "nodeid": "0xc41000f"},
           {"name": "RST_SYS_RST_3", "addr": "0x0", "size": "0", "nodeid": "0xc410010"},
-          {"name": "PMC_OSPI_mem", "addr": "0xc0000000", "size": "512M", "mem": true, "nodeid": "0x18900002"},
+          {"name": "PMC_OSPI_mem", "addr": "0xc0000000", "size": "512M", "mem": true, "nodeid": "0x18900003"},
           {"name": "PMC_I2C", "addr": "0xf1000000", "size": "64K", "nodeid": "0x1822402d"},
           {"name": "OSPI", "addr": "0xf1010000", "size": "64K", "nodeid": "0x1822402a"},
           {"name": "PMC_GPIO", "addr": "0xf1020000", "size": "64K", "nodeid": "0x1822402c"},
@@ -833,14 +833,14 @@
           {"name": "LPD_DMA_CH6", "addr": "0xffae0000", "size": "64K", "nodeid": "0x1822403b"},
           {"name": "LPD_DMA_CH7", "addr": "0xffaf0000", "size": "64K", "nodeid": "0x1822403c"},
           {"name": "RPU0_TCMA_mem", "addr": "0xffe00000", "size": "64K", "mem": true, "nodeid": "0x1831800b"},
-          {"name": "RPU0_TCMA_mem_lockstep", "addr": "0xffe10000", "size": "64K", "mem": true, "nodeid": "0x18900003"},
+          {"name": "RPU0_TCMA_mem_lockstep", "addr": "0xffe10000", "size": "64K", "mem": true, "nodeid": "0x18900004"},
           {"name": "RPU0_TCMB_mem", "addr": "0xffe20000", "size": "64K", "mem": true, "nodeid": "0x1831800c"},
-          {"name": "RPU0_TCMB_mem_lockstep", "addr": "0xffe30000", "size": "64K", "mem": true, "nodeid": "0x18900004"},
-          {"name": "RPU0_iCACHE_mem", "addr": "0xffe40000", "size": "32K", "mem": true, "nodeid": "0x18900005"},
-          {"name": "RPU0_dCACHE_mem", "addr": "0xffe50000", "size": "32K", "mem": true, "nodeid": "0x18900006"},
+          {"name": "RPU0_TCMB_mem_lockstep", "addr": "0xffe30000", "size": "64K", "mem": true, "nodeid": "0x18900005"},
+          {"name": "RPU0_iCACHE_mem", "addr": "0xffe40000", "size": "32K", "mem": true, "nodeid": "0x18900006"},
+          {"name": "RPU0_dCACHE_mem", "addr": "0xffe50000", "size": "32K", "mem": true, "nodeid": "0x18900007"},
           {"name": "RPU1_TCMA_mem_dual", "addr": "0xffe90000", "size": "64K", "mem": true, "nodeid": "0x1831800d"},
           {"name": "RPU1_TCMB_mem_dual", "addr": "0xffeb0000", "size": "64K", "mem": true, "nodeid": "0x1831800e"},
-          {"name": "OCM_mem", "addr": "0xfffc0000", "size": "256K", "mem": true, "nodeid": "0x18900007"},
+          {"name": "OCM_mem", "addr": "0xfffc0000", "size": "256K", "mem": true, "nodeid": "0x18900008"},
           {"name": "OCM0_mem", "addr": "0xfffc0000", "size": "64K", "mem": true, "nodeid": "0x18314007"},
           {"name": "OCM1_mem", "addr": "0xfffd0000", "size": "64K", "mem": true, "nodeid": "0x18314008"},
           {"name": "OCM2_mem", "addr": "0xfffe0000", "size": "64K", "mem": true, "nodeid": "0x18314009"},
@@ -1044,7 +1044,7 @@
         },
         "FPD_XMPU": {"same_as_default": true},
         "IPI": {
-          "flags": {"enable": true}
+          "flags": {}
         },
         "IPI_PERM": {
           "flags": {}
@@ -1080,12 +1080,12 @@
           "flags": {}
         },
         "SW_EM": {
-          "flags": {}
+          "flags": {"HB_MON_0": "log"}
         }
       }
     },
     "subsystems": {
-      "subsystem_amr": {
+      "amr_subsystem": {
         "id": "0x1c000006",
         "access": [
           {
@@ -1093,7 +1093,6 @@
             "destinations": [
               "LPD_I2C0",
               "LPD_I2C1",
-              "PMC_GPIO",
               "PMC_OSPI_mem",
               "RPU0_TCMA_mem",
               "RPU0_TCMA_mem_lockstep",
@@ -1103,13 +1102,14 @@
               "RPU0_iCACHE_mem",
               "SPI0"
             ],
-            "flags": {"requested": true, "shared": true}
+            "flags": {"requested": true},
+            "SMIDs": ["RPU0"]
           },
           {
-            "name": "perm_0",
+            "name": "perm_amr_subsys",
             "type": "ss_permissions",
             "flags": {"powerdown": true, "wake": true},
-            "domains": ["subsystem_apu", "subsystem_rpu1"]
+            "domains": ["apu_subsystem", "rpu1_subsystem"]
           },
           {
             "name": "cpus_0",
@@ -1119,67 +1119,116 @@
           {
             "name": "access_amr_ttc",
             "destinations": ["TTC0"],
-            "flags": {"requested": true}
+            "flags": {"requested": true},
+            "SMIDs": ["RPU0"]
           },
           {
             "name": "access_amr_ipi",
             "destinations": ["IPI3", "IPI4"],
-            "flags": {"requested": true}
+            "flags": {"requested": true},
+            "SMIDs": ["RPU0"]
           },
           {
             "name": "access_amr_dram",
-            "destinations": ["amr_mem_dram"]
+            "destinations": ["amr_mem_dram"],
+            "flags": {"requested": true},
+            "SMIDs": ["RPU0"]
           },
           {
             "name": "access_amr_ospi",
             "destinations": ["OSPI"],
-            "flags": {"shared": true}
+            "flags": {"shared": true},
+            "SMIDs": ["RPU0"]
+          },
+          {
+            "name": "access_amr_gpio",
+            "destinations": ["PMC_GPIO"],
+            "flags": {"requested": true, "shared": true},
+            "SMIDs": ["RPU0"]
+          },
+          {
+            "name": "access_amr_fpdsw",
+            "destinations": ["FPD_SWDT"],
+            "flags": {"requested": true, "requested_full_access": true, "shared": true},
+            "SMIDs": ["RPU0"]
           }
         ]
       },
-      "subsystem_apu": {
+      "apu_subsystem": {
         "id": "0x1c000008",
         "access": [
           {
             "name": "access_apu",
-            "destinations": ["PMC_I2C", "TTC2", "TTC3", "UART1"],
-            "flags": {"requested": true}
+            "destinations": ["PMC_RTC", "TTC2", "TTC3", "UART1"],
+            "flags": {"requested": true},
+            "SMIDs": ["APU"]
           },
           {
             "name": "access_apu_ipi",
             "destinations": ["IPI0", "IPI1"],
-            "flags": {"requested": true}
+            "flags": {"requested": true},
+            "SMIDs": ["APU"]
           },
           {
             "name": "access_apu_ocm",
-            "destinations": ["OCM_mem"]
+            "destinations": ["OCM_mem"],
+            "flags": {"requested": true},
+            "SMIDs": ["APU"]
           },
           {
             "name": "access_apu_dram",
-            "destinations": ["apu_mem_dram"]
+            "destinations": ["apu_mem_dram"],
+            "flags": {"requested": true},
+            "SMIDs": ["APU"]
           },
           {
             "name": "cpus_0",
             "type": "cpu_list",
             "SMIDs": ["APU"]
+          },
+          {
+            "name": "mgnt_0",
+            "destinations": ["HB_MON0"],
+            "type": "ss_management",
+            "flags": {"timeout": 2500}
+          },
+          {
+            "name": "access_apu_dma",
+            "destinations": [
+              "LPD_DMA_CH0",
+              "LPD_DMA_CH1",
+              "LPD_DMA_CH2",
+              "LPD_DMA_CH3",
+              "LPD_DMA_CH4",
+              "LPD_DMA_CH5",
+              "LPD_DMA_CH6",
+              "LPD_DMA_CH7"
+            ],
+            "flags": {"requested": true},
+            "SMIDs": ["APU"]
           }
         ]
       },
-      "subsystem_rpu1": {
+      "rpu1_subsystem": {
         "id": "0x1c000007",
         "access": [
           {
             "name": "access_rpu1_uart",
             "destinations": ["UART0"],
-            "flags": {"requested": true, "shared": true}
+            "flags": {"requested": true, "shared": true},
+            "SMIDs": ["RPU1"]
           },
           {
             "name": "access_rpu1_ipi",
             "destinations": ["IPI5", "IPI6"],
-            "flags": {"requested": true}
+            "flags": {"requested": true},
+            "SMIDs": ["RPU1"]
           },
           {
-            "name": "access_rpu1_dram"
+            "name": "access_rpu1_dram",
+            "destinations": ["rpu1_mem_dram"],
+            "flags": {"requested": true},
+            "SMIDs": ["RPU1"]
           },
           {
             "name": "cpus_0",

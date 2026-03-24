@@ -270,20 +270,11 @@ function build_amc() {
 build_amc
 
 # Regenerate base PDI with subsystem overlay
-case "$PROFILE" in
-    v80)
-        PDI_DIR="${SDT_DIR}/extracted/v80_base_wrapper_1/pdi_files"
-        PROFILE_BIF="v80_base_boot.bif"
-        PROFILE_PDI="${SDT_DIR}/v80_base_boot.pdi"
-        ;;
-    rave)
-        PDI_DIR="${SDT_DIR}/extracted/ve2302_xdma_base_wrapper_1/pdi_files"
-        PROFILE_BIF="ve2302_xdma_base.bif"
-        PROFILE_PDI="${SDT_DIR}/ve2302_xdma_base.pdi"
-        ;;
-esac
+PROFILE_BIF=$(find ${SDT_DIR} -name "*.bif" | sort | sed -n '1p')
+PROFILE_PDI=$(find ${SDT_DIR} -name "*.pdi" | sort | sed -n '1p')
+echo "Generating PDI with subsystem overlay"
 
-pushd "${PDI_DIR}"
+pushd $(dirname "${PROFILE_BIF}")
 bootgen \
     -arch versal \
     -image "${PROFILE_BIF}" \
