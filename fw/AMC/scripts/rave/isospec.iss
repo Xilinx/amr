@@ -646,6 +646,11 @@
             "destinations": ["FPD_SWDT"],
             "flags": {"requested": true, "requested_full_access": true, "shared": true},
             "SMIDs": ["RPU0"]
+          },
+          {
+            "name": "mgnt_amr_rstpmc",
+            "destinations": ["RST_PMC"],
+            "type": "ss_management"
           }
         ]
       },

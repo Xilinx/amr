@@ -2,7 +2,7 @@
 /*
  * test_ami_device.c - Unit test file for ami_device.c
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -741,7 +741,6 @@ void test_happy_ami_dev_hot_reset(void **state)
 	WRAPPER_ACTION_C(OK, write, 4);
 	will_return_count(__wrap_lseek, 0, 3);
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	/* Set values for ami_dev_find_next */
 	will_return(__wrap_getline, "1");
 	will_return(__wrap_getline, "c1:00.0 2 3");
@@ -792,22 +791,11 @@ void test_fail_ami_dev_hot_reset(void **state)
 		AMI_STATUS_ERROR
 	);
 
-	/* ami_mem_bar_write fails */
-	WRAPPER_ACTION(OK, open);
-	WRAPPER_ACTION(OK, close);
-	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_ERROR);
-	assert_int_equal(
-		ami_dev_hot_reset(&dev),
-		AMI_STATUS_ERROR
-	);
-
 	/* pci_remove fails */
 	WRAPPER_ACTION_C(OK, open, 2);
 	WRAPPER_ACTION_C(OK, close, 2);
 	WRAPPER_ACTION(FAIL, write);
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	expect_function_call(__wrap_ami_set_last_error);
 	expect_value(__wrap_ami_set_last_error, err, AMI_ERROR_EIO);
 	assert_int_equal(
@@ -824,7 +812,6 @@ void test_fail_ami_dev_hot_reset(void **state)
 	WRAPPER_ACTION_C(OK, close, 2);
 	WRAPPER_ACTION(OK, write);
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	will_return(__wrap_lseek, AMI_LINUX_STATUS_ERROR);
 	expect_function_call(__wrap_ami_set_last_error);
 	expect_value(__wrap_ami_set_last_error, err, AMI_ERROR_EIO);
@@ -843,7 +830,6 @@ void test_fail_ami_dev_hot_reset(void **state)
 	WRAPPER_ACTION(OK, write);
 	WRAPPER_ACTION(FAIL, read);
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	will_return(__wrap_lseek, AMI_LINUX_STATUS_OK);
 	expect_function_call(__wrap_ami_set_last_error);
 	expect_value(__wrap_ami_set_last_error, err, AMI_ERROR_EIO);
@@ -863,7 +849,6 @@ void test_fail_ami_dev_hot_reset(void **state)
 	WRAPPER_ACTION(OK, read);
 	will_return(__wrap_read, "");
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	will_return(__wrap_lseek, AMI_LINUX_STATUS_OK);
 	will_return(__wrap_lseek, AMI_LINUX_STATUS_ERROR);
 	expect_function_call(__wrap_ami_set_last_error);
@@ -886,7 +871,6 @@ void test_fail_ami_dev_hot_reset(void **state)
 	WRAPPER_ACTION(OK, read);
 	will_return(__wrap_read, "");
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	will_return_count(__wrap_lseek, AMI_LINUX_STATUS_OK, 2);
 	expect_function_call(__wrap_ami_set_last_error);
 	expect_value(__wrap_ami_set_last_error, err, AMI_ERROR_EIO);
@@ -906,7 +890,6 @@ void test_fail_ami_dev_hot_reset(void **state)
 	WRAPPER_ACTION(OK, read);
 	will_return(__wrap_read, "");
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	will_return_count(__wrap_lseek, AMI_LINUX_STATUS_OK, 2);
 	will_return(__wrap_lseek, AMI_LINUX_STATUS_ERROR);
 	expect_function_call(__wrap_ami_set_last_error);
@@ -929,7 +912,6 @@ void test_fail_ami_dev_hot_reset(void **state)
 	WRAPPER_ACTION(OK, read);
 	will_return(__wrap_read, "");
 	will_return(__wrap_readlink, 0);
-	will_return(__wrap_ami_mem_bar_write, AMI_STATUS_OK);
 	will_return_count(__wrap_lseek, AMI_LINUX_STATUS_OK, 3);
 	expect_function_call(__wrap_ami_set_last_error);
 	expect_value(__wrap_ami_set_last_error, err, AMI_ERROR_EIO);

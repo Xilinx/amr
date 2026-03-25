@@ -83,13 +83,6 @@ static void vSetCopyImage( void );
 static void vSetNextPartition( void );
 
 /**
- * @brief   Debug function to enable hot reset
- *
- * @return  N/A
- */
-static void vSetEnableHotReset( void );
-
-/**
  * @brief   Debug function to retrieve the FPT header
  *
  * @return  N/A
@@ -157,7 +150,6 @@ void vAPC_DebugInit( DAL_HDL pxParentHandle )
                 pxDAL_NewDebugFunction( "set_download_image", pxSetDir, vSetDownloadImage );
                 pxDAL_NewDebugFunction( "set_copy_image",     pxSetDir, vSetCopyImage );
                 pxDAL_NewDebugFunction( "set_next_partition", pxSetDir, vSetNextPartition );
-                pxDAL_NewDebugFunction( "enable_hot_reset",   pxSetDir, vSetEnableHotReset );
             }
             if( NULL != pxGetDir )
             {
@@ -351,33 +343,6 @@ static void vSetNextPartition( void )
         else
         {
             PLL_DAL( APC_DBG_NAME, "Selected partition %d\r\n", iPartition );
-        }
-    }
-}
-
-/**
- * @brief   Debug function to enable hot reset (from primary boot device)
- */
-static void vSetEnableHotReset( void )
-{
-    int iInstance = 0;
-
-    if( OK != iDAL_GetIntInRange( "Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving instance\r\n" );
-    }
-    else
-    {
-        EVLSignal xSignal  = { 0 };
-        xSignal.ucInstance = iInstance;
-
-        if( OK != iAPC_EnableHotReset( &xSignal ) )
-        {
-            PLL_DAL( APC_DBG_NAME, "Error enabling hot reset\r\n" );
-        }
-        else
-        {
-            PLL_DAL( APC_DBG_NAME, "Hot reset enabled\r\n" );
         }
     }
 }

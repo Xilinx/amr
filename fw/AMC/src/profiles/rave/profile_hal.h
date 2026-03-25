@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the hal profile for the Rave
@@ -72,7 +72,6 @@
 /* Proxies */
 /* APC */
 #define HAL_APC_PMC_BOOT_REG            ( XPAR_PSV_PMC_GLOBAL_0_BASEADDR + 0x00004 )
-#define HAL_APC_PMC_SRST_REG            ( XPAR_PSV_PMC_GLOBAL_0_BASEADDR + 0x20084 )
 #define HAL_APC_PDI_BIT_MASK            ( 0x14 )
 
 /* Core libs */

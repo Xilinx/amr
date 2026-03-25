@@ -533,10 +533,24 @@ static int iApcCallback( EVLSignal *pxSignal )
 
             case APC_PROXY_DRIVER_E_PARTITION_SELECTED:
                 iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
+                if( OK == iStatus )
+                {
+                    iStatus = iAPC_TriggerSystemPOR( pxSignal );
+                }
                 break;
 
             case APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED:
                 iStatus = iAMI_SetBootSelectCompleteResponse( pxSignal, AMI_PROXY_RESULT_FAILURE );
+                break;
+
+            case APC_PROXY_DRIVER_E_POR_TRIGGERED:
+                PLL_INF( AMC_NAME, "System POR triggered\r\n" );
+                iStatus = OK;
+                break;
+
+            case APC_PROXY_DRIVER_E_POR_FAILED:
+                PLL_ERR( AMC_NAME, "System POR failed\r\n" );
+                iStatus = OK;
                 break;
 
             case APC_PROXY_DRIVER_E_PROGRAM_COMPLETE:
@@ -595,12 +609,6 @@ static int iAmiCallback( EVLSignal *pxSignal )
                     .ucLinkVerMinor = xGcqVersion.ucVerMinor
                 };
                 iStatus = iAMI_SetIdentityResponse( pxSignal, xResult, &xIdentityResponse );
-
-                /* AMI is ready - enable hot reset */
-                if( OK == iAPC_EnableHotReset( pxSignal ) )
-                {
-                    PLL_DBG( AMC_NAME, "Hot reset enabled\r\n" );
-                }
 
                 if( OK == iPLL_SendBootRecords() )
                 {

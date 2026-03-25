@@ -386,6 +386,8 @@ static const char *pcBimStatusStr[] =
                  case APC_PROXY_DRIVER_E_COPY_BUSY:
                  case APC_PROXY_DRIVER_E_PARTITION_SELECTED:
                  case APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED:
+                 case APC_PROXY_DRIVER_E_POR_TRIGGERED:
+                 case APC_PROXY_DRIVER_E_POR_FAILED:
                      break;
 
                  default:

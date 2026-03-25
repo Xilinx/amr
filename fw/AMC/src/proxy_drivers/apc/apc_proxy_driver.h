@@ -49,6 +49,8 @@ typedef enum
     APC_PROXY_DRIVER_E_PROGRAM_COMPLETE   = 13,
     APC_PROXY_DRIVER_E_PROGRAM_BUSY       = 14,
     APC_PROXY_DRIVER_E_PROGRAM_FAILED     = 15,
+    APC_PROXY_DRIVER_E_POR_TRIGGERED      = 16,
+    APC_PROXY_DRIVER_E_POR_FAILED         = 17,
     MAX_APC_PROXY_DRIVER_EVENTS
 
 } APC_PROXY_DRIVER_EVENTS;
@@ -270,14 +272,14 @@ int iAPC_PdiProgram( EVLSignal *pxSignal,
 int iAPC_SetNextPartition( EVLSignal *pxSignal, int iPartition );
 
 /**
- * iAPC_EnableHotReset() - Enable the hot reset capability (from primary boot device)
+ * iAPC_TriggerSystemPOR() - Trigger a system Power-On Reset via XilPM
  *
  * @pxSignal: Current event occurance (used for tracking)
  *
- * @return  OK    Hot reset successfully enabled
- *          ERROR Hot reset not enabled
+ * @return  OK    POR request successfully posted
+ *          ERROR POR request not posted
  */
-int iAPC_EnableHotReset( EVLSignal *pxSignal );
+int iAPC_TriggerSystemPOR( EVLSignal *pxSignal );
 
 /**
  * iAPC_GetFptHeader() - Get the Flash Partition Table (FPT) Header

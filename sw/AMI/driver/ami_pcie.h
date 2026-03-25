@@ -2,7 +2,7 @@
 /*
  * ami_pcie.h - This file contains PCI reading/writing definitions.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_PCIE_H
@@ -66,10 +66,6 @@ enum AMI_PCIE_DEVICE_ID {
 #define MSI_64_BIT_ADDRESSING   0x01
 
 #define CAP_NOT_FOUND           0
-
-#define PCI_GPIO_RESET_BAR                 (0)
-#define PCI_RESET_RAVE_GPIO_OFFSET         (0x20000)
-#define PCI_RESET_V80_GPIO_OFFSET          (0x820000)
 
 /* Command Register Offsets */
 #define  PCI_COMMAND_IO_OFFSET              0x0

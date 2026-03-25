@@ -224,6 +224,10 @@ pm_add_requirement 0x1c000006 0x18900007 0x46 0 0 0x64
 #     requested[6] = 0x1
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x18900006 0x46 0 0 0x64
+#   Add virtual node RST_PMC type reset to subsystem amr_subsystem
+#     write[0] = 0x1 due to !secure = 1
+#     secure_write[16] = 0x1
+pm_add_requirement 0x1c000006 0xc410002 0x10001
 #   Add device SPI0 to subsystem amr_subsystem, aperture 4 in LPD_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     non_shared[0] = 0x2 due to !shared && !timeshare = 1

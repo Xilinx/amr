@@ -12,6 +12,7 @@
 #include "pll.h"
 #include "osal.h"
 #include "pm_api_sys.h"
+#include "xpm_defs.h"
 #include "profile_hal.h"
 #include "apc_proxy_driver.h"
 #include "ami_proxy_driver.h"
@@ -24,6 +25,7 @@
 #define APC_NAME            "APC"
 
 #define APC_TASK_SLEEP_MS   ( 100 )
+#define APC_POR_DELAY_MS    ( 500 )
 
 #define APC_MBOX_SIZE       ( 10 )
 
@@ -31,7 +33,6 @@
 #define APC_FPT_PTN_SIZE    ( 128 )
 #define APC_FPT_PTN_OFFSET  ( 128 * 1024 )
 
-#define APC_POR_ENABLE      ( 1 << 24 )
 #define APC_MULTIBOOT_OFFSET( r ) ( ( r ) / ( 1024 * 32 ) )
 #define APC_MULTIBOOT_REAL( r )   ( ( r ) * ( 1024 * 32 ) )
 
@@ -61,8 +62,8 @@
     DO( APC_PROXY_STATS_MBOX_COPY_PEND )             \
     DO( APC_PROXY_STATS_MBOX_PTN_SELECT_POST )       \
     DO( APC_PROXY_STATS_MBOX_PTN_SELECT_PEND )       \
-    DO( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_POST ) \
-    DO( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_PEND ) \
+    DO( APC_PROXY_STATS_MBOX_SYSTEM_POR_POST )       \
+    DO( APC_PROXY_STATS_MBOX_SYSTEM_POR_PEND )       \
     DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST ) \
     DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND ) \
     DO( APC_PROXY_STATS_MBOX_LOAD_PDI_POST )         \
@@ -78,7 +79,7 @@
     DO( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )    \
     DO( APC_PROXY_STATS_IMAGE_COPY_COMPLETE )        \
     DO( APC_PROXY_STATS_PARTITION_SELECTED )         \
-    DO( APC_PROXY_STATS_HOT_RESET_ENABLED )          \
+    DO( APC_PROXY_STATS_POR_TRIGGERED )              \
     DO( APC_PROXY_STATS_TASK_TIME_MS )               \
     DO( APC_PROXY_STATS_FPT_UPDATE )                 \
     DO( APC_PROXY_STATS_STATUS_RETRIEVAL )           \
@@ -97,7 +98,7 @@
     DO( APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED )         \
     DO( APC_PROXY_ERRORS_MBOX_COPY_POST_FAILED )             \
     DO( APC_PROXY_ERRORS_MBOX_PTN_SELECT_POST_FAILED )       \
-    DO( APC_PROXY_ERRORS_MBOX_HOT_RESET_ENABLE_POST_FAILED ) \
+    DO( APC_PROXY_ERRORS_MBOX_SYSTEM_POR_POST_FAILED )      \
     DO( APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED ) \
     DO( APC_PROXY_ERRORS_MBOX_LOAD_PDI_POST_FAILED )         \
     DO( APC_PROXY_ERRORS_PDI_LOAD_FAILED )                   \
@@ -117,8 +118,7 @@
     DO( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )             \
     DO( APC_PROXY_ERRORS_IMAGE_COPY_FAILED )                 \
     DO( APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED )        \
-    DO( APC_PROXY_ERRORS_HOT_RESET_ENABLE_FAILED )           \
-    DO( APC_PROXY_ERRORS_NO_PARTITION_SELECTED )             \
+    DO( APC_PROXY_ERRORS_POR_FAILED )                        \
     DO( APC_PROXY_ERRORS_COPY_BUFFER_CREATION_FAILED )       \
     DO( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )                \
     DO( APC_PROXY_ERRORS_VALIDATION_FAILED )                 \
@@ -169,7 +169,7 @@ typedef enum
     APC_MSG_TYPE_PROGRAM_PDI,
     APC_MSG_TYPE_COPY_PDI,
     APC_MSG_TYPE_PARTITION_SELECT,
-    APC_MSG_TYPE_ENABLE_HOT_RESET,
+    APC_MSG_TYPE_SYSTEM_POR,
     APC_MSG_TYPE_UPDATE_FPT_FLAGS,
     MAX_APC_MSG_TYPE
 
@@ -363,13 +363,6 @@ static int iCopyImage( APCMboxCopyImage *pxCopyData );
  *          ERROR if the partition was not successfully selected
  */
 static int iSelectPartition( int iPartition );
-
-/**
- * @brief   Enable hot reset capability
- *
- * @return  N/A
- */
-static void vEnableHotReset( void );
 
 /**
  * @brief   Set FPT flags in cache and flash
@@ -964,32 +957,31 @@ int iAPC_SetNextPartition( EVLSignal *pxSignal, int iPartition )
 }
 
 /**
- * @brief   Enable the hot reset capability
+ * @brief   Trigger a system Power-On Reset via XilPM
  */
-int iAPC_EnableHotReset( EVLSignal *pxSignal )
+int iAPC_TriggerSystemPOR( EVLSignal *pxSignal )
 {
     int iStatus = ERROR;
 
     if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
          ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
          ( TRUE == pxThis->iInitialised ) &&
-         ( TRUE == pxThis->piValidFpt[ APC_BOOT_DEVICE_PRIMARY ] ) &&
          ( NULL != pxSignal ) )
     {
         APCMboxMsg xMsg  = { 0 };
-        xMsg.eMsgType    = APC_MSG_TYPE_ENABLE_HOT_RESET;
+        xMsg.eMsgType    = APC_MSG_TYPE_SYSTEM_POR;
         xMsg.ucRequestId = pxSignal->ucInstance;
 
         if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
                                                   ( void* )&xMsg,
                                                   OSAL_TIMEOUT_NO_WAIT ) )
         {
-            INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_POST )
+            INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_SYSTEM_POR_POST )
             iStatus = OK;
         }
         else
         {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_HOT_RESET_ENABLE_POST_FAILED )
+            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_SYSTEM_POR_POST_FAILED )
         }
     }
     else
@@ -1597,28 +1589,27 @@ static void vProxyDriverTask( void *pArg )
                 }
                 break;
 
-            case APC_MSG_TYPE_ENABLE_HOT_RESET:
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_HOT_RESET_ENABLE_PEND )
+            case APC_MSG_TYPE_SYSTEM_POR:
+                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_SYSTEM_POR_PEND )
 
-                if ( 0 == pxThis->ulNextBootAddr )
+                iOSAL_Task_SleepMs( APC_POR_DELAY_MS );
+
+                PLL_INF( APC_NAME, "Triggering system POR via XilPM\r\n" );
+                if ( XST_SUCCESS != XPm_SystemShutdown( PM_SHUTDOWN_TYPE_RESET,
+                                                        PM_SHUTDOWN_SUBTYPE_RST_SYSTEM ) )
                 {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_NO_PARTITION_SELECTED );
-                    PLL_DBG( APC_NAME,
-                             "No boot address loaded - defaulting to partition %d\r\n",
-                             APC_DEFAULT_PARTITION );
-                    if ( OK == iSelectPartition( APC_DEFAULT_PARTITION ) )
+                    PLL_ERR( APC_NAME, "ERROR: XPm_SystemShutdown POR failed\r\n" );
+                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_POR_FAILED )
+                    xSignal.ucEventType = APC_PROXY_DRIVER_E_POR_FAILED;
+
+                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
                     {
-                        INC_STAT_COUNTER( APC_PROXY_STATS_HOT_RESET_ENABLED )
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_HOT_RESET_ENABLE_FAILED );
+                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
                     }
                 }
                 else
                 {
-                    vEnableHotReset();
-                    INC_STAT_COUNTER( APC_PROXY_STATS_HOT_RESET_ENABLED )
+                    INC_STAT_COUNTER( APC_PROXY_STATS_POR_TRIGGERED )
                 }
                 break;
 
@@ -2314,7 +2305,23 @@ static int iSelectPartition( int iPartition )
     {
         pxThis->ulNextBootAddr = pxThis->ppxFptPartitions[ APC_BOOT_DEVICE_PRIMARY ][ iPartition ].ulPartitionBaseAddr;
 
-        vEnableHotReset();
+        if ( NULL != pxThis->pXLoaderInst )
+        {
+            if ( XST_SUCCESS != XLoader_UpdateMultiboot( pxThis->pXLoaderInst,
+                                                         XLOADER_PDI_OSPI,
+                                                         XLOADER_FLASH_RAW,
+                                                         pxThis->ulNextBootAddr ) )
+            {
+                PLL_ERR( APC_NAME, "ERROR: XLoader_UpdateMultiboot failed\r\n" );
+                INC_ERROR_COUNTER( APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED )
+                return iStatus;
+            }
+        }
+        else
+        {
+            PLL_ERR( APC_NAME, "ERROR: XLoader instance not initialised\r\n" );
+            return iStatus;
+        }
 
         PLL_DBG( APC_NAME,
                  "Next boot address: 0x%08x [0x%08x] (partition %d) - actual 0x%08x\r\n",
@@ -2326,20 +2333,6 @@ static int iSelectPartition( int iPartition )
         iStatus = OK;
     }
     return iStatus;
-}
-
-/**
- * @brief   Enable hot reset capability
- */
-static void vEnableHotReset( void )
-{
-    PLL_DBG( APC_NAME,
-             "Next boot address: 0x%08x [0x%08x]\r\n",
-             pxThis->ulNextBootAddr,
-             APC_MULTIBOOT_OFFSET( pxThis->ulNextBootAddr ) );
-
-    HAL_IO_WRITE32( APC_POR_ENABLE, HAL_APC_PMC_SRST_REG );
-    HAL_IO_WRITE32( APC_MULTIBOOT_OFFSET( pxThis->ulNextBootAddr ), HAL_APC_PMC_BOOT_REG );
 }
 
 /**

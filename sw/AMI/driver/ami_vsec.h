@@ -2,7 +2,7 @@
 /*
  * ami_vsec.h - This file contains definitions to parse PCI XILINX VSEC.
  *
- * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_VSEC_H
@@ -15,23 +15,17 @@
 #include "ami_pcie.h"
 
 /* PCIe BAR OFFSETS and Lengths */
-#define XILINX_ENDPOINT_BAR_SGCQ_V80_OFFSET     0x000000  /* 0MB */
-#define XILINX_ENDPOINT_BAR_PL_V80_OFFSET       0x800000  /* 8MB */
-#define XILINX_ENDPOINT_BAR_SGCQ_RAVE_OFFSET	0x800000  /* 8MB */
-#define XILINX_ENDPOINT_BAR_PL_RAVE_OFFSET	0x000000  /* 0MB */
-#define XILINX_ENDPOINT_BAR_SGCQ_LEN	        0x800000  /* 8MB */
-#define XILINX_ENDPOINT_BAR_PL_LEN	        0x800000  /* 8MB */
+#define XILINX_ENDPOINT_BAR_SGCQ_OFFSET	0x000000  /* 0MB */
+#define XILINX_ENDPOINT_BAR_SGCQ_LEN		0x800000  /* 8MB */
 
 /* CG TODO: Get this from hw design metadata */
 #define XILINX_ENDPOINT_NAME_SGCQ	"ep_gcq_mgmt_00"
-#define XILINX_ENDPOINT_NAME_PL_PF0	"ep_pl_mgmt_00"
 
 #define XILINX_LOGIC_UUID_SIZE_BYTES	16
 #define XILINX_SGCQ_SIZE_BYTES		0x1000	/* sGCQ size */
 
 typedef struct {
 	endpoint_info_struct gcq;
-	endpoint_info_struct pl;
 
 	uint32_t logic_uuid[XILINX_LOGIC_UUID_SIZE_BYTES/sizeof(uint32_t)];
 	char     logic_uuid_str[XILINX_LOGIC_UUID_SIZE_BYTES*2+1];

@@ -2,7 +2,7 @@
 /*
  * ami_device.c - This file contains the implementation of device related logic
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -54,10 +54,6 @@
 #define SYSFS_PCI_LINK_WIDTH_M	"link_width_max"
 
 /* For PCI reloading */
-#define PCI_RESET_GPIO_BAR		(0)
-#define PCI_RESET_RAVE_GPIO_OFFSET	(0x20000)
-#define PCI_RESET_V80_GPIO_OFFSET       (0x820000)
-#define PCI_ENABLE			(1)
 
 /*
  * NOTE: The following delays may need tweaking.
@@ -66,7 +62,6 @@
  */
 #define HOT_RESET_SBR_SET_DELAY_MS	(2)
 #define HOT_RESET_RESCAN_DELAY_MS	(5000)
-#define HOT_RESET_GPIO_SET_DELAY_MS	(1)
 
 #define PCI_DEV_DIR					"/sys/bus/pci/devices/0000:%02x:%02x.%1x"
 #define PCI_BRIDGE_CONTROL			(0x3e)
@@ -621,7 +616,6 @@ int ami_dev_hot_reset(ami_device **dev)
 	int config = AMI_INVALID_FD;
 	char port[AMI_DEV_PCI_PORT_SIZE] = { 0 };
 	uint16_t bridge_ctl = 0;
-	uint16_t device = 0;
 
 	/* Store data so we can restore the handle later. */
 	uint16_t bdf = 0;
@@ -648,21 +642,6 @@ int ami_dev_hot_reset(ami_device **dev)
 	if (config == AMI_INVALID_FD)
 		return AMI_API_ERROR(AMI_ERROR_EBADF);
 
-	ret = ami_dev_get_pci_device(*dev, &device);
-
-	if(ret)
-		return ret;
-
-	/* Set PMC GPIO */
-	ret = ami_mem_bar_write(
-			*dev, PCI_RESET_GPIO_BAR,
-			(device == AMI_PCIE_DEVICE_ID_RAVE) ? PCI_RESET_RAVE_GPIO_OFFSET : PCI_RESET_V80_GPIO_OFFSET,
-			PCI_ENABLE
-	);
-
-	if (ret)
-		goto close_config;
-
 	/* Remove device */
 	has_sensors = ((*dev)->sensors != NULL);
 	bdf = (*dev)->bdf;
@@ -676,7 +655,7 @@ int ami_dev_hot_reset(ami_device **dev)
 	 * forcing a system reboot - adding a delay before setting the SBR seems
 	 * to mitigate this issue.
 	 */
-	ami_msleep(HOT_RESET_GPIO_SET_DELAY_MS);
+	ami_msleep(HOT_RESET_SBR_SET_DELAY_MS);
 
 	/* Toggle SBR */
 	/* Read current BRIDGE_CONTROL */

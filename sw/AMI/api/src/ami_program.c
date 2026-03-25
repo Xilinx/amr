@@ -205,7 +205,12 @@ int ami_prog_update_fpt(ami_device *dev, const char *path, uint8_t boot_device,
 
 /*
  * Set the device boot partition.
+ *
+ * FW triggers a full system POR via XilPM after selecting the partition.
+ * Wait for POR to complete, then reload the PCI device.
  */
+#define POR_RESCAN_DELAY_MS	(10000)
+
 int ami_prog_device_boot(struct ami_device **dev, uint32_t partition)
 {
 	int ret = AMI_STATUS_ERROR;
@@ -227,8 +232,8 @@ int ami_prog_device_boot(struct ami_device **dev, uint32_t partition)
 			strerror(errno)
 		);
 	} else {
-		/* Perform hot reset. This will update the device handle. */
-		ret = ami_dev_hot_reset(dev);
+		ami_msleep(POR_RESCAN_DELAY_MS);
+		ret = ami_dev_pci_reload(dev, NULL);
 	}
 
 	return ret;

@@ -2,7 +2,7 @@
 /*
  * ami_pcie.c - This file contains PCI reading/writing logic.
  *
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/device.h>
@@ -933,7 +933,6 @@ fail:
 int write_pcie_configuration(struct pci_dev *dev)
 {
 	int ret = 0;
-	uint32_t gpio_reset = 0;
 
 	if (!dev)
 		return -EINVAL;
@@ -959,25 +958,6 @@ int write_pcie_configuration(struct pci_dev *dev)
 		ret = pcie_set_readrq(dev, PCIE_MAX_READ_BYTES);
 		if (ret) {
 			DEV_ERR(dev, "Failed to set the maximum memory read request");
-			goto fail;
-		}
-	}
-
-	/*
-	 * Identity event over sGCQ will enable the hot reload so we must make
-	 * sure the PMC GPIO is cleared to prevent a reboot.
-	 */
-	if (PCI_FUNC(dev->devfn) == 0) {
-		DEV_VDBG(dev, "Clearing GPIO reset");
-		ret = write_pcie_bar(
-			dev,
-			PCI_GPIO_RESET_BAR,
-			(dev->device == AMI_PCIE_DEVICE_ID_RAVE)? PCI_RESET_RAVE_GPIO_OFFSET : PCI_RESET_V80_GPIO_OFFSET,
-			1,
-			&gpio_reset
-		);
-		if (ret) {
-			DEV_ERR(dev, "Failed to clear GPIO reset");
 			goto fail;
 		}
 	}
