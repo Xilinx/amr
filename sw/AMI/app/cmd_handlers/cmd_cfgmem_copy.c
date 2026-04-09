@@ -24,7 +24,7 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define COPY_CHUNK_DUR_MS       (3532) /* Est duration for partition chunk copy (ms) */
+#define COPY_CHUNK_DUR_MS       (10396) /* Est duration for partition chunk copy (ms) */
 #define SECOND_IN_MS            (1000)
 
 /*****************************************************************************/
@@ -232,14 +232,37 @@ static int do_cmd_cfgmem_copy(struct app_option *options, int num_args, char **a
 
 	printf("Copying partition %d to partition %d\r\n", source_partition, dest_partition);
 
-	ret = ami_prog_get_fpt_partition(dev, source_device, source_partition, &part); /* get src partition size */
+	ret = ami_prog_get_fpt_partition(dev, source_device, source_partition, &part);
 
 	if (ret == AMI_STATUS_ERROR) {
 		APP_API_ERROR("could not get source fpt partition");
 		ami_dev_delete(&dev);
 		return ret;
 	}
+
+	if (part.type != AMI_FPT_TYPE_PDI_BOOT) {
+		APP_USER_ERROR("source partition is not a BOOT partition; only BOOT partitions can be copied", help_msg);
+		ami_dev_delete(&dev);
+		return EXIT_FAILURE;
+	}
+
 	est_dur_seconds = calc_est_time(part.size);
+
+	/* Validate destination partition type */
+	ret = ami_prog_get_fpt_partition(dev, dest_device, dest_partition, &part);
+
+	if (ret == AMI_STATUS_ERROR) {
+		APP_API_ERROR("could not get destination fpt partition");
+		ami_dev_delete(&dev);
+		return ret;
+	}
+
+	if (part.type != AMI_FPT_TYPE_PDI_BOOT) {
+		APP_USER_ERROR("destination partition is not a BOOT partition; only BOOT partitions can be copied", help_msg);
+		ami_dev_delete(&dev);
+		return EXIT_FAILURE;
+	}
+
 	printf("Estimated time to copy partition: %d (seconds)\r\n",
 			est_dur_seconds);
 

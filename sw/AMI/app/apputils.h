@@ -2,7 +2,7 @@
 /*
  * apputils.h - Utility functions for the AMI command line
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #ifndef AMI_APP_UTILS_H
@@ -33,6 +33,19 @@
 #define APP_INVALID_INDEX	(-1)
 #define APP_CONFIRM_PROMPT	"Are you sure you wish to proceed? [Y/n]: "
 
+
+/**
+ * PDI_IMAGE_TYPE - PDI image type classification.
+ * @PDI_IMAGE_TYPE_UNKNOWN: Could not determine the PDI type.
+ * @PDI_IMAGE_TYPE_BOOT: Full boot PDI with boot header.
+ * @PDI_IMAGE_TYPE_USER: Partial/user PDI without boot header.
+ */
+typedef enum {
+	PDI_IMAGE_TYPE_UNKNOWN = -1,
+	PDI_IMAGE_TYPE_BOOT    = 0,
+	PDI_IMAGE_TYPE_USER    = 1,
+} PDI_IMAGE_TYPE;
+
 /*****************************************************************************/
 /* Function declarations                                                     */
 /*****************************************************************************/
@@ -62,6 +75,17 @@ int read_file(const char *fname, uint8_t **buf, uint32_t *size);
  * Return: true if the user accepted, false otherwise.
  */
 bool confirm_action(const char *prompt, const char yes, int attempts);
+
+/**
+ * find_pdi_image_type() - Determine whether a PDI file is a boot or user PDI.
+ * @path: Full path to PDI file.
+ *
+ * Inspects the PDI boot header: a boot PDI contains a valid width detection
+ * word (0xAA995566) at offset 0x10; a user/partial PDI does not.
+ *
+ * Return: PDI_IMAGE_TYPE_BOOT, PDI_IMAGE_TYPE_USER, or PDI_IMAGE_TYPE_UNKNOWN.
+ */
+PDI_IMAGE_TYPE find_pdi_image_type(const char *path);
 
 /**
  * find_logic_uuid() - Find the logic UUID of a PDI file.

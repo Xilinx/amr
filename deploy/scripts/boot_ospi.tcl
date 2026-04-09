@@ -19,10 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 #
+# Usage:
+#      xsdb boot_ospi.tcl
 
 connect
-
-
 
 # Set Versal to OSPI bootmode using XSDB/XSCT
 puts "Switching to OSPI boot mode"
@@ -30,7 +30,7 @@ puts "Switching to OSPI boot mode"
 tar -set -filter {name =~ "Versal *"}
 
 # Enable ISO
-mwr -force 0xf1120000 0xffbff
+#mwr -force 0xf1120000 0xffbff
 
 # Switch to OSPI mode
 mwr 0xf1260200 0x08100
@@ -47,5 +47,3 @@ mwr -force 0xf1260320 0x77
 # Perform reset
 tar -set -filter {name =~ "PMC"}
 rst
-tar -set -filter {name =~ "Versal *"}
-mrd -force 0xf1120000

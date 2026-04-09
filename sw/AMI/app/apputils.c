@@ -2,7 +2,7 @@
 /*
  * apputils.c - Utility functions for the AMI command line
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -575,6 +575,37 @@ int find_logic_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE])
 	}
 
 	return ret;
+}
+
+/*
+ * Identify whether a PDI file is a boot PDI or user/partial PDI.
+ *
+ * A boot PDI has a Versal boot header with widthDetectionWord == 0xAA995566
+ * at offset 0x10. A user/partial PDI does not contain a boot header.
+ */
+PDI_IMAGE_TYPE find_pdi_image_type(const char *path)
+{
+	FILE *fp = NULL;
+	uint32_t header[5];
+	size_t words_read;
+
+	if (!path)
+		return PDI_IMAGE_TYPE_UNKNOWN;
+
+	fp = fopen(path, "rb");
+	if (!fp)
+		return PDI_IMAGE_TYPE_UNKNOWN;
+
+	words_read = fread(header, sizeof(uint32_t), 5, fp);
+	fclose(fp);
+
+	if (words_read < 5)
+		return PDI_IMAGE_TYPE_UNKNOWN;
+
+	if (header[4] == 0xAA995566)
+		return PDI_IMAGE_TYPE_BOOT;
+
+	return PDI_IMAGE_TYPE_USER;
 }
 
 /*

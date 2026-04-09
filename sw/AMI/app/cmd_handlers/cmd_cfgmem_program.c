@@ -75,15 +75,15 @@ static const struct option long_options[] = {
 };
 
 static const char help_msg[] = \
-	"cfgmem_program - program a bitstream onto a device\r\n"
+	"cfgmem_program - program a PDI onto the target device\r\n"
 	"\r\nThis command requires root/sudo permissions.\r\n"
 	"\r\nUsage:\r\n"
-	"\t" APP_NAME " cfgmem_program -d <bdf> -t <type> -i <path> -p <n>\r\n"
+	"\t" APP_NAME " cfgmem_program -d <bdf> -t <type> -i <path> -p <n> [-y | -q]\r\n"
 	"\r\nOptions:\r\n"
 	"\t-h --help             Show this screen\r\n"
 	"\t-d <b>:[d].[f]        Specify the device BDF\r\n"
 	"\t-t <type>             Specify the boot device type (primary or secondary)\r\n"
-	"\t-i <path>             Path to image file\r\n"
+	"\t-i <path>             Path to PDI image file\r\n"
 	"\t-p <partition>        Partition to flash\r\n"
 	"\t-y                    Skip confirmation\r\n"
 	"\t-q                    Quit after programming\r\n"
@@ -209,6 +209,26 @@ static int do_cmd_cfgmem_program(struct app_option *options, int num_args, char 
 	found_current_uuid = ami_dev_read_uuid(dev, current_uuid);
 	found_new_uuid = find_logic_uuid(image->arg, new_uuid);
 	partition_number = (uint32_t)strtoul(partition->arg, NULL, 0);
+
+	/* Identify incoming PDI type and validate against target partition */
+	PDI_IMAGE_TYPE pdi_type = find_pdi_image_type(image->arg);
+
+	if (ami_prog_get_fpt_partition(dev, selected_boot_device,
+			partition_number, &fpt_partition) == AMI_STATUS_OK) {
+		if ((pdi_type == PDI_IMAGE_TYPE_USER) &&
+		    (fpt_partition.type == AMI_FPT_TYPE_PDI_BOOT ||
+		     fpt_partition.type == AMI_FPT_TYPE_PDI_BOOT_BACKUP)) {
+			APP_ERROR("cannot program a user PDI to a boot partition");
+			ami_dev_delete(&dev);
+			return EXIT_FAILURE;
+		}
+		if ((pdi_type == PDI_IMAGE_TYPE_BOOT) &&
+		    (fpt_partition.type == AMI_FPT_TYPE_PDI_USER)) {
+			APP_ERROR("cannot program a boot PDI to a user partition");
+			ami_dev_delete(&dev);
+			return EXIT_FAILURE;
+		}
+	}
 
 	printf(
 		"----------------------------------------------\r\n"
