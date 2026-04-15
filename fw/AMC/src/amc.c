@@ -30,6 +30,7 @@
 #include "eeprom.h"
 #include "sys_mon.h"
 #include "gcq.h"
+#include "ospi.h"
 
 /* fal */
 #include "fw_if_test.h"
@@ -1236,6 +1237,17 @@ static int iLoadPdiOnPowerUp( void )
         iStatus = OK;
         ulUserPdiLoadStatus = USER_PDI_POWERUP_LOADED;
     }
+
+    /*
+     * PLM switches the OSPI controller to DDR mode during
+     * XLoader_LoadPartialPdi.  Reinitialize the controller back to SDR
+     * mode so AMC can continue using OSPI for erase/write/read.
+     */
+    if ( OK != iOSPI_FlashReinit() )
+    {
+        PLL_ERR( AMC_NAME, "Error: Failed to reinitialize OSPI after PDI load\r\n" );
+    }
+
     iOSAL_Task_SleepMs( AMC_TASK_SLEEP_MS );
 
 fail:

@@ -232,14 +232,14 @@ static OSPIFlashInfo pxFlashConfigTable[] =
         ( DIE_ERASE_CMD << BITSHIFT_2B ) | ( BULK_ERASE_CMD << BITSHIFT_1B ) | SEC_ERASE_CMD_4B,
         READ_FLAG_STATUS_CMD, 16
     },
-    {
+    {   /* 128MB/1Gb */
         0x2c5b1b, FLASH_SECTOR_SIZE_128KB, 0x400, FLASH_PAGE_SIZE_DEFAULT, 0x80000,
         FLASH_DEVICE_SIZE_1G, 1,
         READ_CMD_OCTAL_IO_4B, ( WRITE_CMD_OCTAL_4B << BITSHIFT_1B ) | WRITE_CMD_4B,
         ( DIE_ERASE_CMD << BITSHIFT_2B ) | ( BULK_ERASE_CMD << BITSHIFT_1B ) | SEC_ERASE_CMD_4B,
         READ_FLAG_STATUS_CMD, 16
     },
-    {
+    {   /* 256MB/2Gb */
         0x2c5b1c, FLASH_SECTOR_SIZE_32KB, 0x800, FLASH_PAGE_SIZE_DEFAULT, 0x100000,
         FLASH_DEVICE_SIZE_2G, 1,
         READ_CMD_OCTAL_IO_4B, ( WRITE_CMD_OCTAL_4B << BITSHIFT_1B ) | WRITE_CMD_4B,
@@ -663,56 +663,8 @@ int iOSPI_FlashInit( OSPICfg *pxOspiCfg )
         {
             if ( XOSPIPSV_CONNECTION_MODE_STACKED == pxThis->xOspiPsvInstance.Config.ConnectionMode )
             {
-                /* TODO: need to understand why this is * 2*/
-                pxFlashConfigTable[ pxThis->ucFctIndex ].ulNumPage   *= 2;
-                pxFlashConfigTable[ pxThis->ucFctIndex ].ululNumSect *= 2;
-
-                /* Reset the controller mode to NON-PHY */
-                iOspiStatus = XOspiPsv_SetSdrDdrMode( &pxThis->xOspiPsvInstance, XOSPIPSV_EDGE_MODE_SDR_NON_PHY );
-                if ( XST_SUCCESS != iOspiStatus )
-                {
-                    PLL_ERR( OSPI_NAME, "Error: XOspiPsv_SetSdrDdrMode failed:%d\r\n", iOspiStatus );
-                    INC_ERROR_COUNTER( OSPI_ERRORS_SET_SDR_DDR_MODE )
-                    iStatus = ERROR;
-                }
-
-                if ( OK == iStatus )
-                {
-                    iOspiStatus = XOspiPsv_SelectFlash( &pxThis->xOspiPsvInstance, XOSPIPSV_SELECT_FLASH_CS1 );
-                    if ( XST_SUCCESS != iOspiStatus )
-                    {
-                        PLL_ERR( OSPI_NAME, "Error: XOspiPsv_SelectFlash failed:%d\r\n", iOspiStatus );
-                        INC_ERROR_COUNTER( OSPI_ERRORS_SELECT_FLASH )
-                        iStatus = ERROR;
-                    }
-                }
-
-                /* Set Flash device and Controller modes */
-                if ( OK == iStatus )
-                {
-                    iOspiStatus = iFlashSetSdrDdrModeEdgeMode( &pxThis->xOspiPsvInstance,
-                                                               XOSPIPSV_EDGE_MODE_SDR_NON_PHY );
-                    if ( XST_SUCCESS != iOspiStatus )
-                    {
-                        PLL_ERR( OSPI_NAME, "Error: iFlashSetSdrDdrModeEdgeMode failed:%d\r\n", iOspiStatus );
-                        INC_ERROR_COUNTER( OSPI_ERRORS_SET_DDR_MODE_INDEX )
-                        iStatus = ERROR;
-                    }
-                }
-
-                if ( OK == iStatus )
-                {
-                    if ( pxFlashConfigTable[ pxThis->ucFctIndex ].ulFlashDeviceSize > SIXTEENMB )
-                    {
-                        iOspiStatus = iFlashSet4bAddrMode( &pxThis->xOspiPsvInstance, TRUE );
-                        if ( XST_SUCCESS != iOspiStatus )
-                        {
-                            PLL_ERR( OSPI_NAME, "Error: iFlashSet4bAddrMode failed:%d\r\n", iOspiStatus );
-                            INC_ERROR_COUNTER( OSPI_ERRORS_4B_ADDRESS_MODE )
-                            iStatus = ERROR;
-                        }
-                    }
-                }
+                PLL_ERR( OSPI_NAME, "Error: XOSPIPSV_CONNECTION_MODE_STACKED not supported\r\n" );
+                iStatus = ERROR;
             }
         }
 
@@ -748,6 +700,118 @@ int iOSPI_FlashInit( OSPICfg *pxOspiCfg )
         INC_ERROR_COUNTER( OSPI_ERRORS_VALIDAION_FAILED )
     }
     return iStatus;
+}
+
+/**
+ * @brief   Reinitializes the OSPI controller hardware without recreating
+ *          OS resources (mutex, timer, IPI).
+ *
+ *          PLM's XLoader_LoadPartialPdi(XLOADER_PDI_OSPI) takes direct control
+ *          of the OSPI controller and switches it to DDR mode.  If the PDI load
+ *          fails, PLM does not restore the controller state, leaving it in DDR
+ *          mode while the AMC driver expects SDR.  Call this function after
+ *          XLoader_LoadPartialPdi returns to bring the controller back to a
+ *          known-good state.
+ */
+int iOSPI_FlashReinit( void )
+{
+    int iOspiStatus = XST_FAILURE;
+
+    if ( ( UPPER_FIREWALL != pxThis->ulUpperFirewall ) ||
+         ( LOWER_FIREWALL != pxThis->ulLowerFirewall ) ||
+         ( FALSE == pxThis->iInitialised ) )
+    {
+        PLL_ERR( OSPI_NAME, "Error: driver not initialised, cannot reinit\r\n" );
+        return ERROR;
+    }
+
+    PLL_INF( OSPI_NAME, "Reinitializing OSPI controller after PLM access\r\n" );
+
+    iOspiStatus = XOspiPsv_DeviceReset( XOSPIPSV_HWPIN_RESET );
+    if ( XST_SUCCESS != iOspiStatus )
+    {
+        PLL_ERR( OSPI_NAME, "Error: XOspiPsv_DeviceReset failed:%d\r\n", iOspiStatus );
+        INC_ERROR_COUNTER( OSPI_ERRORS_DEVICE_RESET )
+        return ERROR;
+    }
+
+    XOspiPsv_Config *pxOspiPsvConfig = XOspiPsv_LookupConfig(
+        pxThis->xOspiPsvInstance.Config.BaseAddress );
+    if ( NULL == pxOspiPsvConfig )
+    {
+        PLL_ERR( OSPI_NAME, "Error: XOspiPsv_LookupConfig failed\r\n" );
+        INC_ERROR_COUNTER( OSPI_ERRORS_LOOKUP_CONFIG )
+        return ERROR;
+    }
+
+    iOspiStatus = XOspiPsv_CfgInitialize( &pxThis->xOspiPsvInstance, pxOspiPsvConfig );
+    if ( XST_SUCCESS != iOspiStatus )
+    {
+        PLL_ERR( OSPI_NAME, "Error: XOspiPsv_CfgInitialize failed:%d\r\n", iOspiStatus );
+        INC_ERROR_COUNTER( OSPI_ERRORS_CONFIG_INIT )
+        return ERROR;
+    }
+
+    iOspiStatus = XOspiPsv_SetOptions( &pxThis->xOspiPsvInstance, XOSPIPSV_IDAC_EN_OPTION );
+    if ( XST_SUCCESS != iOspiStatus )
+    {
+        PLL_ERR( OSPI_NAME, "Error: XOspiPsv_SetOptions failed:%d\r\n", iOspiStatus );
+        INC_ERROR_COUNTER( OSPI_ERRORS_SET_OPTIONS )
+        return ERROR;
+    }
+
+    iOspiStatus = XOspiPsv_SetClkPrescaler( &pxThis->xOspiPsvInstance, XOSPIPSV_CLK_PRESCALE_6 );
+    if ( XST_SUCCESS != iOspiStatus )
+    {
+        PLL_ERR( OSPI_NAME, "Error: XOspiPsv_SetClkPrescaler failed:%d\r\n", iOspiStatus );
+        INC_ERROR_COUNTER( OSPI_ERRORS_SET_CLK_PRESCALER )
+        return ERROR;
+    }
+
+    iOspiStatus = XOspiPsv_SelectFlash( &pxThis->xOspiPsvInstance, XOSPIPSV_SELECT_FLASH_CS0 );
+    if ( XST_SUCCESS != iOspiStatus )
+    {
+        PLL_ERR( OSPI_NAME, "Error: XOspiPsv_SelectFlash failed:%d\r\n", iOspiStatus );
+        INC_ERROR_COUNTER( OSPI_ERRORS_SELECT_FLASH )
+        return ERROR;
+    }
+
+    iOspiStatus = iFlashReadId( &pxThis->xOspiPsvInstance );
+    if ( XST_SUCCESS != iOspiStatus )
+    {
+        PLL_ERR( OSPI_NAME, "Error: iFlashReadId failed:%d\r\n", iOspiStatus );
+        INC_ERROR_COUNTER( OSPI_ERRORS_FLASH_READ_ID )
+        return ERROR;
+    }
+
+    iOspiStatus = iFlashSetSdrDdrModeEdgeMode( &pxThis->xOspiPsvInstance,
+                                                XOSPIPSV_EDGE_MODE_SDR_NON_PHY );
+    if ( XST_SUCCESS != iOspiStatus )
+    {
+        PLL_ERR( OSPI_NAME, "Error: iFlashSetSdrDdrModeEdgeMode failed:%d\r\n", iOspiStatus );
+        INC_ERROR_COUNTER( OSPI_ERRORS_SET_DDR_MODE_INDEX )
+        return ERROR;
+    }
+
+    if ( pxFlashConfigTable[ pxThis->ucFctIndex ].ulFlashDeviceSize > SIXTEENMB )
+    {
+        iOspiStatus = iFlashSet4bAddrMode( &pxThis->xOspiPsvInstance, TRUE );
+        if ( XST_SUCCESS != iOspiStatus )
+        {
+            PLL_ERR( OSPI_NAME, "Error: iFlashSet4bAddrMode failed:%d\r\n", iOspiStatus );
+            INC_ERROR_COUNTER( OSPI_ERRORS_4B_ADDRESS_MODE )
+            return ERROR;
+        }
+    }
+
+    if ( XOSPIPSV_CONNECTION_MODE_STACKED == pxThis->xOspiPsvInstance.Config.ConnectionMode )
+    {
+        PLL_ERR( OSPI_NAME, "Error: XOSPIPSV_CONNECTION_MODE_STACKED not supported\r\n" );
+        return ERROR;
+    }
+
+    PLL_INF( OSPI_NAME, "OSPI controller reinitialized successfully\r\n" );
+    return OK;
 }
 
 /**

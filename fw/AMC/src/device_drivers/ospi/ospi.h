@@ -42,6 +42,19 @@ typedef struct
 int iOSPI_FlashInit( OSPICfg *pxOspiCfg );
 
 /**
+ * @brief   Reinitializes the OSPI controller hardware after PLM access.
+ *
+ *          XLoader_LoadPartialPdi(XLOADER_PDI_OSPI) switches the OSPI
+ *          controller to DDR mode.  On failure PLM does not restore
+ *          the original state.  This function resets the controller and
+ *          reconfigures it back to SDR mode so AMC can resume normal
+ *          OSPI operations.
+ *
+ * @return  OK if successful, else ERROR.
+ */
+int iOSPI_FlashReinit( void );
+
+/**
  * @brief   Function to erase the flash device.
  *
  * @param   ulAddr              The start address to erase
