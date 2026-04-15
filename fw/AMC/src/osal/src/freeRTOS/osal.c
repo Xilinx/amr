@@ -2124,7 +2124,7 @@ void vOSAL_Printf( const char* pcFormat, ... )
         ( PRINT_BUFFER_SIZE >= strlen( pcFormat ) ) )
     {
         char buffer[ PRINT_BUFFER_SIZE ] = { 0 };
-        va_list args = { 0 };
+        va_list args;
 
         va_start( args, pcFormat );
         vsnprintf( buffer, PRINT_BUFFER_SIZE, pcFormat, args );

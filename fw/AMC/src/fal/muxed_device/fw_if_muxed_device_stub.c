@@ -20,8 +20,7 @@
 
 #define FW_IF_QSFP_NAME   "FW_IF_QSFP"
 
-#define CHECK_DRIVER            if( FW_IF_FALSE == pxThis->iInitialised )
-                                    return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
+#define CHECK_DRIVER            if( FW_IF_FALSE == pxThis->iInitialised ) return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
 #define CHECK_FIREWALLS( f )    if( ( UPPER_FIREWALL != f->upperFirewall ) &&        \
                                     ( LOWER_FIREWALL != f->lowerFirewall ) &&        \
                                     ( UPPER_FIREWALL != pxThis->ulUpperFirewall ) && \

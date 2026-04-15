@@ -25,12 +25,11 @@
 
 #define FW_IF_OSPI_NAME       "FW_IF_OSPI"
 
-#define CHECK_DRIVER          ( FW_IF_FALSE == pxThis->iInitialised )
-#define CHECK_FIREWALLS( f )  ( ( f->upperFirewall != UPPER_FIREWALL ) && \
-                                ( f->lowerFirewall != LOWER_FIREWALL ) )
-
-#define CHECK_HDL( f )        ( NULL == f )
-#define CHECK_CFG( f )        ( NULL == ( f )->cfg )
+#define CHECK_DRIVER            if ( FW_IF_FALSE == pxThis->iInitialised ) return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
+#define CHECK_FIREWALLS( f )    if ( ( f->upperFirewall != UPPER_FIREWALL ) &&\
+                                     ( f->lowerFirewall != LOWER_FIREWALL ) ) return FW_IF_ERRORS_INVALID_HANDLE
+#define CHECK_HDL( f )          if ( NULL == f ) return FW_IF_ERRORS_INVALID_HANDLE
+#define CHECK_CFG( f )          if ( NULL == ( f )->cfg  ) return FW_IF_ERRORS_INVALID_CFG
 
 /* Stat & Error definitions */
 #define FW_IF_OSPI_STAT_COUNTS( DO )                    \
@@ -301,11 +300,7 @@ uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFwIf, FWIfOspiCfg *pxOspiCfg )
     {
         xRet = FW_IF_ERRORS_NONE;
 
-        if( CHECK_DRIVER )
-        {
-            xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-            INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
-        }
+        CHECK_DRIVER;
 
         if( ( NULL != pxFwIf ) &&
             ( NULL != pxOspiCfg ) )
@@ -358,29 +353,10 @@ static uint32_t ulOspiOpen( void *pvFwIf )
     FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
     FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_CFG( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_CFG;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_CFG_COUNT );
-    }
-
-    if( CHECK_FIREWALLS( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_DRIVER )
-    {
-        xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
-    }
+    CHECK_HDL( pxThisIf );
+    CHECK_CFG( pxThisIf );
+    CHECK_FIREWALLS( pxThisIf );
+    CHECK_DRIVER;
 
     FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
     if( FW_IF_OSPI_STATE_INIT == pxCfg->xState )
@@ -406,29 +382,10 @@ static uint32_t ulOspiClose( void *pvFwIf )
     FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
     FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_CFG( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_CFG;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_CFG_COUNT );
-    }
-
-    if( CHECK_FIREWALLS( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_DRIVER )
-    {
-        xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
-    }
+    CHECK_HDL( pxThisIf );
+    CHECK_CFG( pxThisIf );
+    CHECK_FIREWALLS( pxThisIf );
+    CHECK_DRIVER;
 
     FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
     if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
@@ -460,84 +417,63 @@ static uint32_t ulOspiWrite( void *pvFwIf,
     (void)ulTimeoutMs;
 
     FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
+    CHECK_HDL( pxThisIf );
+    CHECK_CFG( pxThisIf );
+    CHECK_FIREWALLS( pxThisIf );
+    CHECK_DRIVER;
 
-    if( CHECK_CFG( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_CFG;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_CFG_COUNT );
-    }
-
-    if( CHECK_FIREWALLS( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_DRIVER )
-    {
-        xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
-    }
-
-    if( FW_IF_ERRORS_NONE == xRet )
+    if( NULL != pucData )
     {
         FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
 
-        if( ( NULL != pucData ) )
+        if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
         {
-            if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
+            uint32_t ulAddr = pxCfg->ulBaseAddress + ulAddrOffset;
+            xRet = ulValidateAddressRange( pxCfg, ulAddrOffset, ulLength );
+            if( FW_IF_ERRORS_NONE == xRet )
             {
-                uint32_t ulAddr = pxCfg->ulBaseAddress + ulAddrOffset;
-                xRet = ulValidateAddressRange( pxCfg, ulAddrOffset, ulLength );
-                if( FW_IF_ERRORS_NONE == xRet )
+                int iStatus = ERROR;
+
+                /* Check flag to see if erase if required before write */
+                if( FW_IF_TRUE == pxCfg->ucEraseBeforeWriteFlag )
                 {
-                    int iStatus = ERROR;
-
-                    /* Check flag to see if erase if required before write */
-                    if( FW_IF_TRUE == pxCfg->ucEraseBeforeWriteFlag )
-                    {
-                        iStatus = iOSPI_FlashErase( ulAddr, ulLength );
-                    }
-                    else
-                    {
-                        iStatus = OK;
-                    }
-
-                    if( OK == iStatus )
-                    {
-                        iStatus = iOSPI_FlashWrite( ulAddr, pucData, ulLength );
-                    }
-
-                    if( OK != iStatus )
-                    {
-                        xRet = FW_IF_OSPI_ERRORS_DRIVER_FAILURE;
-                        INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_DRIVER_FAILURE_COUNT );
-                    }
-                    else
-                    {
-                        xRet = FW_IF_ERRORS_NONE;
-                        INC_STAT_COUNTER( FW_IF_OSPI_STATS_WRITE_COUNT );
-                    }
+                    iStatus = iOSPI_FlashErase( ulAddr, ulLength );
                 }
-            }
-            else
-            {
-                xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
-                PLL_ERR( FW_IF_OSPI_NAME, "Error: write() should only be called from opened state [%s]\r\n",
-                        pcOspiStateModeStr[ pxCfg->xState ] );
-                INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_INVALID_STATE_COUNT );
+                else
+                {
+                    iStatus = OK;
+                }
+
+                if( OK == iStatus )
+                {
+                    iStatus = iOSPI_FlashWrite( ulAddr, pucData, ulLength );
+                }
+
+                if( OK != iStatus )
+                {
+                    xRet = FW_IF_OSPI_ERRORS_DRIVER_FAILURE;
+                    INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_DRIVER_FAILURE_COUNT );
+                }
+                else
+                {
+                    xRet = FW_IF_ERRORS_NONE;
+                    INC_STAT_COUNTER( FW_IF_OSPI_STATS_WRITE_COUNT );
+                }
             }
         }
         else
         {
-            xRet = FW_IF_ERRORS_PARAMS;
+            xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
+            PLL_ERR( FW_IF_OSPI_NAME, "Error: write() should only be called from opened state [%s]\r\n",
+                    pcOspiStateModeStr[ pxCfg->xState ] );
+            INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_INVALID_STATE_COUNT );
         }
     }
+    else
+    {
+        xRet = FW_IF_ERRORS_PARAMS;
+    }
+
     return xRet;
 }
 
@@ -555,70 +491,49 @@ static uint32_t ulOspiRead( void *pvFwIf,
     FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
     (void)ulTimeoutMs;
 
-    if( CHECK_HDL( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
+    CHECK_HDL( pxThisIf );
+    CHECK_CFG( pxThisIf );
+    CHECK_FIREWALLS( pxThisIf );
+    CHECK_DRIVER;
 
-    if( CHECK_CFG( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_CFG;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_CFG_COUNT );
-    }
-
-    if( CHECK_FIREWALLS( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_DRIVER )
-    {
-        xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
-    }
-
-    if( FW_IF_ERRORS_NONE == xRet )
+    if( ( NULL != pucData ) &&
+        ( NULL != pulLength ) )
     {
         FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
 
-        if( ( NULL != pucData ) &&
-            ( NULL != pulLength ) )
+        if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
         {
-            if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
+            uint32_t ulAddr = pxCfg->ulBaseAddress + ulAddrOffset;
+            xRet = ulValidateAddressRange( pxCfg, ulAddrOffset, *pulLength);
+            if( FW_IF_ERRORS_NONE == xRet )
             {
-                uint32_t ulAddr = pxCfg->ulBaseAddress + ulAddrOffset;
-                xRet = ulValidateAddressRange( pxCfg, ulAddrOffset, *pulLength);
-                if( FW_IF_ERRORS_NONE == xRet )
+                int iStatus = ERROR;
+                iStatus = iOSPI_FlashRead( ulAddr, pucData, pulLength );
+                if( OK != iStatus )
                 {
-                    int iStatus = ERROR;
-                    iStatus = iOSPI_FlashRead( ulAddr, pucData, pulLength );
-                    if( OK != iStatus )
-                    {
-                        xRet = FW_IF_OSPI_ERRORS_DRIVER_FAILURE;
-                        INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_DRIVER_FAILURE_COUNT );
-                    }
-                    else
-                    {
-                        xRet = FW_IF_ERRORS_NONE;
-                        INC_STAT_COUNTER( FW_IF_OSPI_STATS_READ_COUNT );
-                    }
+                    xRet = FW_IF_OSPI_ERRORS_DRIVER_FAILURE;
+                    INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_DRIVER_FAILURE_COUNT );
                 }
-            }
-            else
-            {
-                xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
-                PLL_ERR( FW_IF_OSPI_NAME, "Error: write() should only be called from opened state [%s]\r\n",
-                        pcOspiStateModeStr[ pxCfg->xState ] );
-                INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_INVALID_STATE_COUNT );
+                else
+                {
+                    xRet = FW_IF_ERRORS_NONE;
+                    INC_STAT_COUNTER( FW_IF_OSPI_STATS_READ_COUNT );
+                }
             }
         }
         else
         {
-            xRet = FW_IF_ERRORS_PARAMS;
+            xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
+            PLL_ERR( FW_IF_OSPI_NAME, "Error: write() should only be called from opened state [%s]\r\n",
+                    pcOspiStateModeStr[ pxCfg->xState ] );
+            INC_ERROR_COUNTER( FW_IF_OSPI_ERRORS_INVALID_STATE_COUNT );
         }
     }
+    else
+    {
+        xRet = FW_IF_ERRORS_PARAMS;
+    }
+
     return xRet;
 }
 
@@ -630,29 +545,10 @@ static uint32_t ulOspiIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
     FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
     FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
 
-    if( CHECK_HDL( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_CFG( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_CFG;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_CFG_COUNT );
-    }
-
-    if( CHECK_FIREWALLS( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_DRIVER )
-    {
-        xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
-    }
+    CHECK_HDL( pxThisIf );
+    CHECK_CFG( pxThisIf );
+    CHECK_FIREWALLS( pxThisIf );
+    CHECK_DRIVER;
 
     /*
      * Specialization options supported outside definition of standard API.
@@ -708,29 +604,10 @@ static uint32_t ulOspiBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
     FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
     FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_CFG( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_CFG;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_CFG_COUNT );
-    }
-
-    if( CHECK_FIREWALLS( pxThisIf ) )
-    {
-        xRet = FW_IF_ERRORS_INVALID_HANDLE;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_INVALID_HANDLE_COUNT );
-    }
-
-    if( CHECK_DRIVER )
-    {
-        xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
-        INC_ERROR_COUNTER( FW_IF_ERRORS_DRIVER_NOT_INITIALISED_COUNT );
-    }
+    CHECK_HDL( pxThisIf );
+    CHECK_CFG( pxThisIf );
+    CHECK_FIREWALLS( pxThisIf );
+    CHECK_DRIVER;
 
     if( NULL != pxNewFunc )
     {

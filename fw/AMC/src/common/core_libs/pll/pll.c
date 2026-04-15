@@ -402,7 +402,7 @@ void vPLL_Output( PLL_OUTPUT_LEVEL xOutputLevel, const char *pcFormat, ... )
         ( PRINT_BUFFER_SIZE >= strlen( pcFormat ) ) )
     {
         char pcBuffer[ PRINT_BUFFER_SIZE ] = { 0 };
-        va_list xArgs = { 0 };
+        va_list xArgs;
 
         va_start( xArgs, pcFormat );
         vsnprintf( pcBuffer, PRINT_BUFFER_SIZE, pcFormat, xArgs );
@@ -467,7 +467,7 @@ void vPLL_Printf( const char *pcFormat, ... )
         ( PRINT_BUFFER_SIZE >= strlen( pcFormat ) ) )
     {
         char pcBuffer[ PRINT_BUFFER_SIZE ] = { 0 };
-        va_list xArgs = { 0 };
+        va_list xArgs;
 
         va_start( xArgs, pcFormat );
         vsnprintf( pcBuffer, PRINT_BUFFER_SIZE, pcFormat, xArgs );
