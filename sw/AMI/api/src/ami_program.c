@@ -86,6 +86,7 @@ static int read_file(const char *fname, uint8_t **buf, uint32_t *size)
 		ret = AMI_STATUS_OK;
 	} else {
 		ret = AMI_API_ERROR(AMI_ERROR_EIO);
+		free(buffer);
 	}
 	fclose(fp);
 	return ret;

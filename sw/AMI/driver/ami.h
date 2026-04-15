@@ -35,7 +35,7 @@ extern bool ami_debug_enabled;
 #define SUCCESS  0
 #define FAILURE -1
 
-#define BDF_STR_LEN 7
+#define BDF_STR_LEN (7 + 1)
 
 #define XILINX_ENDPOINT_NAME_SIZE	30
 #define MD5_SIZE			16

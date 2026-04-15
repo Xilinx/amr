@@ -340,13 +340,15 @@ int read_hex_data(const char *fname, void **values, uint32_t *num_values,
 	if (file) {
 		while (getline(&line, &len, file) != -1) {
 			if (n_lines_done == n_lines_allocated) {
-				buf = (uint32_t*)realloc(
+				uint32_t *tmp = (uint32_t*)realloc(
 					buf,
 					(n_lines_allocated + HEX_DATA_REALLOC_BUFFER) * sizeof(uint32_t)
 				);
 
-				if (!buf)
+				if (!tmp)
 					goto exit;
+
+				buf = tmp;
 
 				n_lines_allocated += HEX_DATA_REALLOC_BUFFER;
 			}
@@ -505,6 +507,8 @@ int read_file(const char *fname, uint8_t **buf, uint32_t *size)
 		*size = (uint32_t)len;
 		*buf = buffer;
 		ret = EXIT_SUCCESS;
+	} else {
+		free(buffer);
 	}
 	fclose(fp);
 	return ret;

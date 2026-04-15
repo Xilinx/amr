@@ -1104,6 +1104,7 @@ int ami_dev_get_pci_port(ami_device *dev, char buf[AMI_DEV_PCI_PORT_SIZE])
 			basename(dirname(link_path)),
 			AMI_DEV_PCI_PORT_SIZE
 		);
+		buf[AMI_DEV_PCI_PORT_SIZE - 1] = '\0';
 
 		ret = AMI_STATUS_OK;
 	}

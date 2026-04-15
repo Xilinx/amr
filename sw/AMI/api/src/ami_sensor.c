@@ -233,10 +233,12 @@ static int open_hwmon(const char *hwmon, int hwmon_num, const char *attr, int mo
 	if (!hwmon && !attr)
 		return file;
 
-	if (attr)
+	if (attr) {
 		construct_hwmon(path, hwmon_num, attr);
-	else
+	} else {
 		strncpy(path, hwmon, AMI_HWMON_PATH_MAX_SIZE);
+		path[AMI_HWMON_PATH_MAX_SIZE - 1] = '\0';
+	}
 
 	return open(path, mode);
 }
@@ -296,7 +298,7 @@ static int parse_hwmon(const char *path, int *parsed_sid,
 
 	if ((sscanf(path, AMI_HWMON_ATTR_FORMAT, hwmon_attr) == 1) &&
 			(sscanf(hwmon_attr, "%*[^0123456789]%d", &sid) == 1) &&
-			(sscanf(hwmon_attr, "%*[^_]_%s", attr) == 1))  {
+			(sscanf(hwmon_attr, "%*[^_]_%15s", attr) == 1))  {
 		/* Populate fields. */
 		*parsed_sid = sid;
 
