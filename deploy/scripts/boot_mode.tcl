@@ -22,32 +22,28 @@
 
 
 # Set Versal to OSPI bootmode using XSDB/XSCT
-# Switch to QSPI boot mode #
 proc boot_ospi { } {
 	puts "Switch to OSPI boot mode"
 
 	tar -set -filter {name =~ "Versal *"}
 
-	# Enable ISO
+	# Unlock CRP register write access via PMC_GLOBAL.DOMAIN_ISO_CNTRL
 	mwr -force 0xf1120000 0xffbff
 
-	# Switch to OSPI mode
+	# Switch to OSPI boot mode
 	mwr 0xf1260200 0x08100
 	mrd 0xf1260200
 
-	# Set PMC_MULTI_BOOT address to 0
-	mwr -force 0xf1110004 0x0
+	# Clear MULTIBOOT address so PLM boots from partition 0
+	mwr -force 0xF1110004 0x0
 
-	# SYSMON_REF_CTRL is switched to NPI by user PDI so ensure its
-	#  switched back
+	# Restore SYSMON_REF_CTRL (may be switched to NPI by user PDI)
 	mwr -force 0xf1260138 0
 
 	mwr -force 0xf1260320 0x77
 
-	# Perform reset
-	tar -set -filter {name =~ "PMC"}
-	rst
-	tar -set -filter {name =~ "Versal *"}
+	# Perform PMC reset
+	rst -type pmc-srst
 }
 
 tar -set -filter {name =~ "Versal *"}
@@ -65,6 +61,4 @@ mwr -force 0xF1110004 0x0
 
 # Perform reset
 
-tar -set -filter {name =~ "PMC"}
-
-rst
+rst -type pmc-srst

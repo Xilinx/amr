@@ -735,6 +735,7 @@
           {"name": "PSM", "value": "0x238", "count": 1},
           {"name": "DPC_DMA", "value": "0x239", "count": 1},
           {"name": "PMC", "value": "0x240", "count": 16, "perSLR": true},
+          {"name": "DAP_DPC_MISC", "comment": "IPI assignment for DAP; DPC & Miscellaneous (PMC_SYSMON & PMC_DMA0)", "value": "0x240", "mask_n": "0x9", "altname": "DAP_and_DPC"},
           {"name": "DAP", "value": "0x240", "count": 1},
           {"name": "PMC_SYSMON", "value": "0x241", "count": 1, "perSLR": true},
           {"name": "SD_eMMC", "value": "0x242", "count": 2},
@@ -745,7 +746,6 @@
           {"name": "RCU_and_PPU", "value": "0x246", "count": 2, "perSLR": true},
           {"name": "RCU", "comment": "ROM Code Unit", "value": "0x246", "count": 1, "cpu": true},
           {"name": "PPU", "value": "0x247", "count": 1},
-          {"name": "DAP_and_DPC", "comment": "used for IPI; includes PMC_SYSMON and PMC_DMA0 ", "value": "0x248", "mask_n": "0x9"},
           {"name": "PMC_DMA_and_DPC", "comment": "includes: PMC_DMA0; DPC; unused SMID 0x24A; PMC_DMA1", "value": "0x248", "count": 4, "perSLR": true},
           {"name": "PMC_DMA0", "value": "0x248", "count": 1, "perSLR": true},
           {"name": "DPC", "value": "0x249", "count": 1, "perSLR": true},
@@ -1137,7 +1137,7 @@
           {
             "name": "access_amr_ospi",
             "destinations": ["OSPI"],
-            "flags": {"shared": true},
+            "flags": {"requested": true, "requested_full_access": true, "requested_secure": true, "secure": true, "shared": true},
             "SMIDs": ["RPU0"]
           },
           {

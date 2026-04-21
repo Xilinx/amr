@@ -7,6 +7,9 @@
 
 /* Standard includes */
 #include <sys/ioctl.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -208,35 +211,101 @@ int ami_prog_update_fpt(ami_device *dev, const char *path, uint8_t boot_device,
  * Set the device boot partition.
  *
  * FW triggers a full system POR via XilPM after selecting the partition.
- * Wait for POR to complete, then reload the PCI device.
+ * The POR brings down the PCIe link, so every PF on the slot must be
+ * removed from the PCI tree before the link goes down.  Sequence:
+ *   1. Issue the ioctl (tells FW to select partition + trigger POR)
+ *   2. Release our device handle (closes cdev fd)
+ *   3. Remove all sibling PFs from the PCI tree via sysfs
+ *   4. Wait for POR to complete
+ *   5. Rescan the PCI bus
+ *   6. Re-acquire the device handle
  */
-#define POR_RESCAN_DELAY_MS	(10000)
+#define POR_RESCAN_DELAY_MS	(15000)
+#define POR_POST_RESCAN_MS	(5000)
+
+static void pci_remove_all_pf(uint8_t bus, uint8_t dev_num)
+{
+	DIR *pci_dir = NULL;
+	struct dirent *entry = NULL;
+	unsigned int domain, bus_scan, dev_scan, fn_scan;
+	char path[256];
+	int fd;
+
+	pci_dir = opendir("/sys/bus/pci/devices");
+	if (!pci_dir)
+		return;
+
+	while ((entry = readdir(pci_dir)) != NULL) {
+		if (sscanf(entry->d_name, "%x:%x:%x.%x",
+				&domain, &bus_scan, &dev_scan, &fn_scan) != 4)
+			continue;
+
+		if (domain != 0 || bus_scan != bus || dev_scan != dev_num)
+			continue;
+
+		snprintf(path, sizeof(path),
+			"/sys/bus/pci/devices/%04x:%02x:%02x.%x/remove",
+			domain, bus_scan, dev_scan, fn_scan);
+
+		fd = open(path, O_WRONLY);
+		if (fd >= 0) {
+			write(fd, "1", 1);
+			close(fd);
+		}
+	}
+
+	closedir(pci_dir);
+}
 
 int ami_prog_device_boot(struct ami_device **dev, uint32_t partition)
 {
 	int ret = AMI_STATUS_ERROR;
 	struct ami_ioc_data_payload payload = { 0 };
+	uint16_t saved_bdf = 0;
+	int cdev_fd = AMI_INVALID_FD;
+	int rescan_fd = AMI_INVALID_FD;
 
 	if (!dev || !(*dev))
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
 
 	if (ami_open_cdev(*dev) != AMI_STATUS_OK)
-		return AMI_STATUS_ERROR; /* last error is set by ami_open_cdev */
+		return AMI_STATUS_ERROR;
 
+	saved_bdf = (*dev)->bdf;
+	cdev_fd = (*dev)->cdev;
 	payload.partition = partition;
 
-	if (ioctl((*dev)->cdev, AMI_IOC_DEVICE_BOOT, &payload) == AMI_LINUX_STATUS_ERROR) {
-		ret = AMI_API_ERROR_M(
+	errno = 0;
+	if (ioctl(cdev_fd, AMI_IOC_DEVICE_BOOT, &payload) == AMI_LINUX_STATUS_ERROR) {
+		return AMI_API_ERROR_M(
 			AMI_ERROR_EIO,
 			"errno %d (%s)",
 			errno,
 			strerror(errno)
 		);
 	} else {
-		ami_msleep(POR_RESCAN_DELAY_MS);
-		ret = ami_dev_pci_reload(dev, NULL);
-	}
+		/*
+		 * Ioctl succeeded — POR is imminent.
+		 * Release our device handle, then remove every PF on the slot
+		 * so no driver is still bound when the PCIe link drops.
+		 */
+		ami_dev_delete(dev);
+		pci_remove_all_pf(AMI_PCI_BUS(saved_bdf), AMI_PCI_DEV(saved_bdf));
 
+		ami_msleep(POR_RESCAN_DELAY_MS);
+
+		/* Rescan the PCI bus so the host re-enumerates the device. */
+		rescan_fd = open("/sys/bus/pci/rescan", O_WRONLY);
+		if (rescan_fd >= 0) {
+			write(rescan_fd, "1", 1);
+			close(rescan_fd);
+			ami_msleep(POR_POST_RESCAN_MS);
+		}
+
+		/* Re-acquire the device handle by BDF. */
+		ret = ami_dev_find_next(dev, AMI_PCI_BUS(saved_bdf),
+			AMI_PCI_DEV(saved_bdf), AMI_PCI_FUNC(saved_bdf), NULL);
+	}
 	return ret;
 }
 

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <errno.h>
 #include <libgen.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 
@@ -71,6 +72,7 @@
 #define SYSFS_PCI_CONFIG		"/sys/bus/pci/devices/%s/config"
 #define SYSFS_PCI_REMOVE		PCI_DEV_DIR "/remove"
 #define SYSFS_PCI_RESCAN		"/sys/bus/pci/rescan"
+#define SYSFS_PCI_DEVICES_DIR		"/sys/bus/pci/devices"
 
 /*****************************************************************************/
 /* Local function declarations                                               */
@@ -117,6 +119,17 @@ static int get_new_device_handle(ami_device **new_dev, uint16_t bdf, bool with_s
  * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
  */
 static int pci_remove(uint16_t bdf);
+
+/**
+ * pci_remove_slot() - Remove all PCI functions for a given bus/device.
+ * @bdf: Numeric BDF; function bits are ignored.
+ *
+ * This helper removes all present functions (.0 - .7) on the same slot.
+ * Missing functions are ignored.
+ *
+ * Return: AMI_STATUS_OK or AMI_STATUS_ERROR.
+ */
+static int pci_remove_slot(uint16_t bdf);
 
 /**
  * pci_rescan() - Rescan the PCI tree.
@@ -222,6 +235,90 @@ static int pci_remove(uint16_t bdf)
 		ret = AMI_API_ERROR(AMI_ERROR_EBADF);
 	}
 
+	return ret;
+}
+
+/*
+ * Remove all PCI functions on a slot from the PCI tree.
+ */
+static int pci_remove_slot(uint16_t bdf)
+{
+	int ret = AMI_STATUS_ERROR;
+	int remove_ret = AMI_STATUS_ERROR;
+	bool removed_any = false;
+	DIR *pci_dir = NULL;
+	struct dirent *entry = NULL;
+	uint8_t functions[8] = { 0 };
+	bool function_seen[8] = { false };
+	int function_count = 0;
+	int i = 0;
+	int j = 0;
+	uint8_t bus = AMI_PCI_BUS(bdf);
+	uint8_t dev = AMI_PCI_DEV(bdf);
+	unsigned int domain = 0;
+	unsigned int bus_scan = 0;
+	unsigned int dev_scan = 0;
+	unsigned int fn_scan = 0;
+	char remove_path[AMI_SYSFS_PATH_MAX] = { 0 };
+
+	pci_dir = opendir(SYSFS_PCI_DEVICES_DIR);
+	if (!pci_dir)
+		return AMI_API_ERROR(AMI_ERROR_EBADF);
+
+	while ((entry = readdir(pci_dir)) != NULL) {
+		if (sscanf(entry->d_name, "%x:%x:%x.%x", &domain, &bus_scan, &dev_scan, &fn_scan) != 4)
+			continue;
+
+		if ((domain != 0) || (bus_scan != bus) || (dev_scan != dev) || (fn_scan > 7))
+			continue;
+
+		if (!function_seen[fn_scan]) {
+			functions[function_count++] = (uint8_t)fn_scan;
+			function_seen[fn_scan] = true;
+		}
+	}
+
+	closedir(pci_dir);
+
+	/* Sort discovered functions in descending order (highest -> lowest). */
+	for (i = 0; i < (function_count - 1); i++) {
+		for (j = (i + 1); j < function_count; j++) {
+			if (functions[i] < functions[j]) {
+				uint8_t tmp = functions[i];
+
+				functions[i] = functions[j];
+				functions[j] = tmp;
+			}
+		}
+	}
+
+	for (i = 0; i < function_count; i++) {
+		uint8_t fn = functions[i];
+		snprintf(
+			remove_path,
+			AMI_SYSFS_PATH_MAX,
+			SYSFS_PCI_REMOVE,
+			bus,
+			dev,
+			fn
+		);
+
+		/* The remove call for one function may drop sibling nodes too. */
+		if (access(remove_path, F_OK) == AMI_LINUX_STATUS_ERROR)
+			continue;
+
+		remove_ret = pci_remove(AMI_MK_BDF(bus, dev, fn));
+		if (remove_ret != AMI_STATUS_OK)
+			return remove_ret;
+
+		removed_any = true;
+	}
+
+	if (!removed_any) {
+		return AMI_API_ERROR(AMI_ERROR_ENODEV);
+	}
+
+	ret = AMI_STATUS_OK;
 	return ret;
 }
 
@@ -591,7 +688,7 @@ int ami_dev_pci_reload(ami_device **dev, const char *bdf)
 		bdf_num = ami_parse_bdf(bdf);
 	}
 
-	if (pci_remove(bdf_num) == AMI_STATUS_OK) {
+	if (pci_remove_slot(bdf_num) == AMI_STATUS_OK) {
 		if ((ret = pci_rescan()) == AMI_STATUS_OK) {
 			/* Check if we need to update the device handle. */
 			if (dev)

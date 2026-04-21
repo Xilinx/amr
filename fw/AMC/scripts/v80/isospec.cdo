@@ -6,6 +6,7 @@ version 2.0
 #   not writing configure_uart due to plm_uart = 0
 #   not writing configure_log_level due to log_level = 0
 #   not writing RTCA_SecureCtrl due to !pdi_copy_optimization | clear_red_keys | kat_on_config = 0
+#   not writing boot_device_release due to skip_qspi_release | skip_sd_release | skip_sd_raw_release | skip_ospi_release | skip_usb_release | skip_ufs_release = 0
 # PLM: --END--
 #
 marker 0x64 "LPD_DATA/INTLPD_CONFIG"
@@ -166,10 +167,13 @@ pm_add_requirement 0x1c000006 0x1822401d 0x46 0 0 0x64
 #     qos = 0x64
 pm_add_requirement 0x1c000006 0x1822401e 0x46 0 0 0x64
 #   Add device OSPI to subsystem amr_subsystem, aperture 1 in PMC_XPPU
-#     allow_secure[2] = 0x1 due to secure = 0
+#     allow_secure[2] = 0x0 due to secure = 1
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1
+#     requested[6] = 0x1
+#     requested_full_access[0] = 0x1
+#     requested_secure[4] = 0x1
 #     qos = 0x64
-pm_add_requirement 0x1c000006 0x1822402a 0x5 0 0 0x64
+pm_add_requirement 0x1c000006 0x1822402a 0x41 0 0x11 0x64
 #   Add device PMC_GPIO to subsystem amr_subsystem, aperture 2 in PMC_XPPU
 #     allow_secure[2] = 0x1 due to secure = 0
 #     concurrent_shared[0] = 0x1 due to shared && !timeshare = 1

@@ -30,7 +30,7 @@ puts "Switching to OSPI boot mode"
 tar -set -filter {name =~ "Versal *"}
 
 # Enable ISO
-#mwr -force 0xf1120000 0xffbff
+mwr -force 0xf1120000 0xffbff
 
 # Switch to OSPI mode
 mwr 0xf1260200 0x08100
@@ -44,6 +44,5 @@ mwr -force 0xf1260138 0
 
 mwr -force 0xf1260320 0x77
 
-# Perform reset
-tar -set -filter {name =~ "PMC"}
-rst
+# Perform PMC reset
+rst -type pmc-srst
