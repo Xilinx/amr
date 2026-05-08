@@ -1,9 +1,9 @@
-Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: MIT
 
 # AMR Management Control (AMC)
 
-Refer to https://pages.gitenterprise.xilinx.com/XBB/AMC/ for the Architecture and API descriptions.
+Refer to https://github.com/Xilinx/amr-docs for the Architecture and API descriptions.
 
 ## Overview
 
@@ -32,7 +32,7 @@ Event driven architecture is provided by the Event Library (EVL).
 
 Copy source (ssh recommended):
 ```
-git clone git@gitenterprise.xilinx.com:Platform-Management/amr.git
+git clone https://github.com/Xilinx/amr
 ```
 cd into top-level of the cloned repo
 
@@ -42,7 +42,7 @@ Enable Xilinx software command-line tools:
 
 To build from clean:
 ```
-$ ./scripts/build.sh -os <target os (freertos10_xilinx, standalone etc.)> -profile <target profile (v80, rave etc.)> -xsa <path to xsa>
+$ ./scripts/build.sh -profile <target profile (v80, rave etc.)> -xsa <path to xsa>
 ```
 -xsa parameter is not required for building with the "-amc" option.
 
@@ -54,37 +54,22 @@ To see the full list of options:
 $ ./scripts/build.sh -help
 ```
 
-A minimum CMake version of 3.5.0 is required therefore you must ensure that this is installed and used in the place where you are building AMC i.e. server, VM or your local machine.
+A minimum CMake version of 3.7.0 is required therefore you must ensure that this is installed and used in the place where you are building AMC i.e. server, VM or your local machine.
 
 Compiled binary and auto-generated version information will be available:
 ```
 build/
 ├── amc.elf
-├── amc_version.json
-```
-
-### Compile AMC separately
 
 ```
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-```
+
 
 ### Clean
 
 ```
-$ rm -rf build/
+$ rm -rf build_amc/ amc_bsp
 ```
 
 ---
 
-## Unit testing
 
-Compile Unit Tests:
-```
-$ cd build
-$ cmake .. -DTEST_ENABLE=true
-$ make
-```

@@ -23,8 +23,8 @@
 
 
 /* Driver version numbers */
-#define AMI_VER			"2.0.0"
-#define AMI_VER_MAJOR	(2)
+#define AMI_VER			"3.0.0"
+#define AMI_VER_MAJOR	(3)
 #define AMI_VER_MINOR	(0)
 #define AMI_VER_PATCH	(0)
 

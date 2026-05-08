@@ -1,9 +1,9 @@
 SPDX-License-Identifier: GPL-2.0-only
-Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 
 # AMR Management Interface (AMI)
 
-Refer to https://pages.gitenterprise.xilinx.com/XBB/AMI/ for the Architecture and API descriptions.
+Refer to https://github.com/Xilinx/amr-docs for the Architecture and API descriptions.
 
 # Overview
 
@@ -66,20 +66,18 @@ For usage you can run `./build/ami_tool --help`.
 
 ## Running
 
-1. Make sure XRT is disabled.
-   1. `sudo rmmod xclmgmt xocl`
-2. Follow the above build instructions to compile AMI.
-3. Load the AMI kernel module.
+1. Follow the above build instructions to compile AMI.
+2. Load the AMI kernel module.
    1. `sudo insmod ami.ko`
    2. Verify correct installation by looking at dmesg.
-4. Build your application using the AMI API or run the provided command line tool.
+3. Build your application using the AMI API or run the provided command line tool.
 
 ## Installation
 
-To build .deb/.rpm packages, use the provided `gen_package.py` script.
+To build .deb/.rpm packages, use the provided `gen_pkg_xxx.py` script.
 
 ```
-./scripts/gen_package.py
+./scripts/gen_pkg_xxx.py
 cd output/<timestamp>/
 sudo apt install ./ami_xxx.deb
 ```

@@ -10,18 +10,18 @@
 #ifndef _AMC_VERSION_H_
 #define _AMC_VERSION_H_
 
-#define GIT_TAG                   "2.0.0"
-#define GIT_TAG_VER_MAJOR         (2)
+#define GIT_TAG                   "3.0.0"
+#define GIT_TAG_VER_MAJOR         (3)
 #define GIT_TAG_VER_MINOR         (0)
 #define GIT_TAG_VER_PATCH         (0)
 #define GIT_TAG_VER_DEV_COMMITS   (0)
 
 #ifndef GIT_HASH
-#define GIT_HASH                  "805e4c78a9cadbc68726075d2c9031ef66ebeeda"
+#define GIT_HASH                  "902aa633ac6ca10c468ec1f34b65347d75c2f448"
 #endif
 
 #ifndef GIT_DATE
-#define GIT_DATE                  "20260129"
+#define GIT_DATE                  "20260422"
 #endif
 
 #define GIT_BRANCH                ""

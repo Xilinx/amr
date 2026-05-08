@@ -11,7 +11,7 @@
 #include <linux/printk.h>
 
 /* Meta Information */
-#define MDL_VERSION	"2.0.0"
+#define MDL_VERSION	"3.0.0"
 #define MDL_DESCRIPTION	"Adapative Management Interface (AMI) is used " \
 				"to manage AMR-based devices through PCIe"
 #define MDL_AUTHOR	"AMD, Inc."
