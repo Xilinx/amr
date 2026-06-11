@@ -12,23 +12,10 @@
 
 ### 1. Introduction
 
-AMR (Adaptive Management Runtime) provides basic management capabilities for Alveo and Embedded+ boards. These boards feature a Versal device connected to an x86 host via PCIe. The Versal device is programmed with a PDI stored in OSPI flash and boots normally. Any updates to the OSPI are performed through the PCIe interface.
-
-Two types of Versal devices are supported: one with CPM and another with PL PCIe IP. The Versal design contains the basic PCIe configuration information for shared memory communication. RPU0 serves as the device Adaptive Management Controller (AMC). The OSPI flash contains three partitions: the first two contain boot PDIs, and the third is used for storing user designs. On power-up, the boot ROM loads the PDI from the OSPI flash selected partition and runs AMC on the RPU0 core (which is part of the boot PDIs). The x86 host enumerates the Versal PCIe device and configures it. Once x86 configuration is complete, communication is established between the x86 Adaptive Management Interface (AMI) and AMC.
-
-To build sample designs from source code in this repository, you will need the following tools installed. Follow the [build and install instructions](#2-build-instructions) link for details.
+Adaptive Management Runtime (AMR) is the next-generation platform software stack for Alveo V80 and RAVE product lines designed to enable a more modular, software-defined approach to system bring-up and device management. In contrast to the legacy AVED model (for V80) - where platform initialization, management functions, and programmable logic (PL) were tightly coupled within a single, static configuration - AMR decouples control, configuration, and application layers through a lightweight runtime and mailbox-based communication model. This allows the platform to boot with minimal dependencies and dynamically load or reconfigure functionality (such as PL images) at runtime. The result is improved flexibility for partial and segmented configurations, more robust system control without reliance on PL-based mechanisms, and a clearer separation between infrastructure and application logic. For users, this translates into faster iteration, easier integration into automated workflows, and a more scalable foundation for deploying and managing Alveo V80 and RAVE systems in production environments.
 
 
-**VPR-4616 Board:**
-
-![VPR-4616 Board](https://www.amd.com/content/dam/amd/en/images/products/som/2474370-sapphire-edge-vpr-4616.png)
-
-**Alveo V80:**
-![V80 Board](https://www.amd.com/content/dam/amd/en/images/products/aecg/alveo/v80/2612751-amd-alveo-v80-de-lidded.png)
-
-[1]: https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html
-[2]: https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html
-
+For more detailed information on architecture, APIs, and usage guides, see **[AMR Docs](https://xilinx.github.io/amr-docs/)**.
 
 ### 2. Test
 
@@ -54,16 +41,30 @@ The following table lists available AMI commands. Use `--help` with any command 
 | 13 | OSPI     | CfgMem Copy    | `sudo ami_tool cfgmem_copy -d 1 -i primary:0 -p primary:1`                | Copy partition to another         |
 | 14 | OSPI     | Device Boot    | `sudo ami_tool device_boot -d <b:d.f> -p 0`                               | Set device boot partition         |
 | 15 | PL       | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <pdi>`                           | Program partial PDI               |
-| 16 | APU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <apu.image> -a`                  | Download APU image                |
-| 17 | RPU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <rpu.image> -r`                  | Download RPU1 image               |
+| 16 | APU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <apu_linux.pdi> -a`              | Download APU image                |
+| 17 | RPU      | PDI Program    | `sudo ami_tool pdi_program -d <b:d.f> -i <rpu1.pdi> -r`                   | Download RPU1 image               |
 | 18 | Sensor   | Read Sensors   | `ami_tool sensors -d <b:d.f>`                                             | Get sensor values                 |
 | 19 | Debug    | Verbosity      | `ami_tool debug_verbosity -d <b:d.f> -l debug`                            | Set log level                     |
 
 ### 3. Glossary
-[Versal ACAP Technical Reference Manual](https://docs.xilinx.com/r/en-US/am011-versal-acap-trm/Introduction)
+
+| Name | Description                             |
+| :----| :---------------------------------------|
+| AMC  | Adaptive Management Controller          |
+| AMI  | Adaptive Management Interface           |
+| AMR  | Adapative Management Runtime            |
+| BDF  | Bus Device Function                     |
+| FPT  | Flash Partition Table                   |
+| OSPI | Octal SPI (Serial Peripheral Interface) |
+| RPU  | Realtime Processing Unit                |
+| PF   | PCIe Physical Function                  |
+| PL   | Programmable Logic                      |
+| UUID | Universal Unique Identifier             |
+
 
 ### 4. References
 
 1. [Versal ACAP Technical Reference Manual](https://docs.xilinx.com/r/en-US/am011-versal-acap-trm/Introduction)
 2. [AMD Embedded+](https://www.amd.com/en/products/embedded/embedded-plus.html)
-3. [AMR Docs](https://xilinx.github.io/AMR/)
+3. [AMR Docs](https://xilinx.github.io/amr-docs/)
+4. [AVED: For legacy AVED solution for Alveo V80, please refer to this link](https://github.com/Xilinx/AVED)

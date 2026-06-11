@@ -19,6 +19,12 @@ USE_XSA=false
 USE_SDT=false
 SDT=""
 
+# Vivado designs repo. Defaults to the public GitHub mirror; pass -internal
+# to clone from the Xilinx gitenterprise mirror instead.
+HW_REPO_URL_PUBLIC="https://github.com/Xilinx/amr_vivado_designs.git"
+HW_REPO_URL_INTERNAL="https://gitenterprise.xilinx.com/PAEG/amr_vivado_designs.git"
+HW_REPO_URL="${HW_REPO_URL_PUBLIC}"
+
 # Profile name -> repo-relative path to the Vivado platform directory
 declare -A PROFILE_PLATFORM_PATHS=(
 	[rave]="emb_plus_ve2302/platforms/ve2302_amr_base"
@@ -32,6 +38,8 @@ print_help() {
 	  -profile <name>     Profile to build for (${!PROFILE_PLATFORM_PATHS[*]})
 	  -xsa <path>         XSA to generate BSP from
 	  -sdt <path>         SDT folder path
+	  -internal           Clone amr_vivado_designs from the internal
+	                      gitenterprise mirror instead of public GitHub
 	  -h, -help, --help   Show this help message
 
 	Examples:
@@ -86,6 +94,10 @@ while [[ $# -gt 0 ]]; do
 		USE_SDT=true
 		echo "Using sdt=${SDT}"
 		;;
+	-internal)
+		HW_REPO_URL="${HW_REPO_URL_INTERNAL}"
+		echo "Using internal repo=${HW_REPO_URL}"
+		;;
 	*)
 		echo "Warning: Unknown option '$1' (ignored)"
 		;;
@@ -110,9 +122,9 @@ if ! $USE_XSA && ! $USE_SDT; then
 	mkdir -p "${HW_DIR}"
 	pushd "${HW_DIR}"
 
-	#TODO: Add support for github repo matching V80_SRC_REV
 	platform_path="${PROFILE_PLATFORM_PATHS[$PROFILE]}"
-	git clone https://gitenterprise.xilinx.com/PAEG/amr_vivado_designs.git
+	echo "Cloning ${HW_REPO_URL}"
+	git clone "${HW_REPO_URL}" amr_vivado_designs
 	cd "amr_vivado_designs/${platform_path}"
 	make xsa
 	XSA="$(realpath "project/$(basename "${platform_path}").xsa")"
