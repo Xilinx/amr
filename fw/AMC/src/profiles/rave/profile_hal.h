@@ -19,7 +19,8 @@
 #define HAL_EMMC_BASE_ADDR              ( 0 )
 #define HAL_EMMC_BLOCK_SIZE             ( 512 )
 #define HAL_EMMC_MAX_BLOCKS             ( 0x7690000 )   /* 64 GBytes / 512 Bytes */
-#define HAL_SMBUS_FEATURE               ( 0 )
+#define HAL_SMBUS_FEATURE               ( 0 )           /* SMBus stack present (real FAL vs stub) */
+#define HAL_PL_SMBUS_FEATURE            ( 0 )           /* SMBus IP is in PL -> defer init until PDI load */
 
 #define HAL_EEPROM_VERSION              ( EEPROM_VERSION_1_0 )
 #define HAL_EEPROM_I2C_BUS              ( 0 )
@@ -64,7 +65,7 @@
 #define HAL_SYS_MON_RAVE                ( TRUE )
 
 /* Definitions OSPI */
-#define HAL_OSPI_0_DEVICE_ID            ( XPAR_OSPI_BASEADDR )
+#define HAL_OSPI_0_BASEADDR             ( XPAR_OSPI_BASEADDR )
 #define HAL_OSPI_PAGE_SIZE              ( 256 )
 #define HAL_OSPI_RPU_BASE_ADDR          ( 0x0 )
 #define HAL_OSPI_RPU_LENGTH             ( 0x08000000 )    /* 1Gb (128MB) */

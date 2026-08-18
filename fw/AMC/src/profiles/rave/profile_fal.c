@@ -91,7 +91,7 @@ static FWIfOspiCfg xOspiCfg =
 
 static FWIfOspiInitCfg myOspiIf =
 {
-    HAL_OSPI_0_DEVICE_ID,
+    HAL_OSPI_0_BASEADDR,
     HAL_OSPI_PAGE_SIZE
 };
 

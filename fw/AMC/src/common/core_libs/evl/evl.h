@@ -84,6 +84,16 @@ int iEVL_Initialise( void );
 int iEVL_CreateRecord( EVLRecord **ppxRecord );
 
 /**
+ * @brief   Destroy an Event Library Record
+ *
+ * @param   ppxRecord   Record to destroy (set to NULL on success)
+ *
+ * @return  OK if record destroyed successfully
+ *          ERROR if record not destroyed
+ */
+int iEVL_DestroyRecord( EVLRecord **ppxRecord );
+
+/**
  * @brief   Bind a callback into a module
  *
  * @param   pxRecord        Record to bind callback to

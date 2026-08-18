@@ -103,23 +103,6 @@ typedef enum
 } AMC_TASK_PRIOS;
 
 
-/******************************************************************************/
-/* EVL Callback Declarations                                                  */
-/******************************************************************************/
-
-/**
- * @brief   EVL Callbacks for binding to Proxy Drivers
- *
- * @param   pxSignal     Event raised
- *
- * @return  OK if no errors were raised in the callback
- *          ERROR if an error was raised in the callback
- */
-static int iApcCallback( EVLSignal *pxSignal );
-static int iAmiCallback( EVLSignal *pxSignal );
-static int iAxcCallback( EVLSignal *pxSignal );
-static int iBmcCallback( EVLSignal *pxSignal );
-
 
 /******************************************************************************/
 /* Local Function Declarations                                                */
@@ -179,6 +162,14 @@ static int iInitDebug( void );
  *          ERROR if PDI loading failed
  */
 static int iLoadPdiOnPowerUp( void );
+
+#if (HAL_SMBUS_FEATURE == 1)
+static int iInitSmbusOobStackIfNeeded( void );
+#if (HAL_PL_SMBUS_FEATURE == 1)
+static void vRequestSmbusOobInitAfterPdiLoad( void );
+static void vProcessPendingSmbusOobInit( void );
+#endif
+#endif
 
 /**
  * @brief   The main task that init the FAL & proxy drivers
@@ -266,6 +257,10 @@ static AXCProxyDriverExternalDeviceCfg xDimmDevice =
 
 static uint64_t ullAmcInitStatus = 0;          /* AMC initialisation status */
 static XLoader_ClientInstance XLoaderInstance; /* XLoader instance */
+
+#if (HAL_PL_SMBUS_FEATURE == 1)
+static int iSmbusOobInitPending = FALSE;       /* Deferred init after runtime PDI load */
+#endif
 
 
 /******************************************************************************/
@@ -361,10 +356,12 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucSysmonInitialised             %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SYSMON_INITIALISED         ? "TRUE" : "FALSE" ) );
-#if (HAL_SMBUS_FEATURE == 1)
+#if (HAL_PL_SMBUS_FEATURE == 1)
     PLL_INF( AMC_NAME,
              "ucSmbusPcieLinkInitialised      %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_PCIE_LINK_INITIALISED  ? "TRUE" : "FALSE" ) );
+#endif
+#if HAL_I2C_MUXED_DEVICE
     PLL_INF( AMC_NAME,
              "ucMuxedDeviceFalInitialised     %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ? "TRUE" : "FALSE" ) );
@@ -384,6 +381,8 @@ static void vTaskFuncMain( void )
     PLL_INF( AMC_NAME,
              "ucSmbusFalInitialised           %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED       ? "TRUE" : "FALSE" ) );
+#endif
+#if HAL_I2C_MUXED_DEVICE
     PLL_INF( AMC_NAME,
              "ucMuxedDeviceFalCreated         %s\n\r",
              ( ullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_CREATED     ? "TRUE" : "FALSE" ) );
@@ -435,6 +434,9 @@ static void vTaskFuncMain( void )
 
     for( ;; )
     {
+#if (HAL_PL_SMBUS_FEATURE == 1)
+        vProcessPendingSmbusOobInit();
+#endif
         iOSAL_Task_SleepMs( AMC_TASK_SLEEP_MS );
     }
 }
@@ -505,6 +507,12 @@ static int iApcCallback( EVLSignal *pxSignal )
                 break;
 
             case APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE:
+#if (HAL_PL_SMBUS_FEATURE == 1)
+                if( APC_PROXY_PDI_PL_LOADED == pxSignal->ucAdditionalData )
+                {
+                    vRequestSmbusOobInitAfterPdiLoad();
+                }
+#endif
                 iStatus = iAMI_SetPdiDownloadCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
                 break;
 
@@ -555,6 +563,9 @@ static int iApcCallback( EVLSignal *pxSignal )
                 break;
 
             case APC_PROXY_DRIVER_E_PROGRAM_COMPLETE:
+#if (HAL_PL_SMBUS_FEATURE == 1)
+                vRequestSmbusOobInitAfterPdiLoad();
+#endif
                 iStatus = iAMI_SetPdiProgramCompleteResponse( pxSignal, AMI_PROXY_RESULT_SUCCESS );
                 break;
 
@@ -634,6 +645,7 @@ static int iAmiCallback( EVLSignal *pxSignal )
     return iStatus;
 }
 
+#if (HAL_SMBUS_FEATURE == 1)
 /**
  * @brief   BMC Proxy Driver EVL callback
  */
@@ -652,6 +664,7 @@ static int iBmcCallback( EVLSignal *pxSignal )
 
     return iStatus;
 }
+#endif
 
 /**
  * @brief   Get project info
@@ -811,6 +824,15 @@ static int iInitProxies( void )
             if( OK == iLoadPdiOnPowerUp() )
             {
                 PLL_INF( AMC_NAME, "PDI loaded from OSPI flash on power-up\r\n" );
+
+#if (HAL_PL_SMBUS_FEATURE == 1)
+                /* Defer the SMBus/BMC/OOB bring-up to the main loop, same as a
+                 * runtime PDI load - a power-up load is the same terminal event. */
+                if( USER_PDI_POWERUP_LOADED == ( ulUserPdiLoadStatus & USER_PDI_POWERUP_LOADED ) )
+                {
+                    vRequestSmbusOobInitAfterPdiLoad();
+                }
+#endif
             }
             else
             {
@@ -912,72 +934,15 @@ static int iInitProxies( void )
         }
     }
 
-    if( NULL != pxSMBusIf )
+#if (HAL_SMBUS_FEATURE == 1)
+    /* Pre-allocate the BMC EVL record early to reduce heap fragmentation before
+     * the SMBus/BMC/OOB stack is brought up (deferred on PL, at boot otherwise).
+     * Idempotent - the later bring-up path's own call becomes a no-op. */
+    if ( OK != iBMC_AllocateEvlRecord() )
     {
-        /* Get the UUID */
-        uint8_t ucUuidSize               = 0;
-        uint8_t pucUuid[ HAL_UUID_SIZE ] = { 0 };
-
-        if( AMC_CFG_I2C_INITIALISED == ( ullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
-        {
-            if( AMC_CFG_EEPROM_INITIALISED == ( ullAmcInitStatus & AMC_CFG_EEPROM_INITIALISED ) )
-            {
-                iStatus = iEEPROM_GetUuid( pucUuid, &ucUuidSize );
-                if( OK == iStatus )
-                {
-                    if( HAL_UUID_SIZE != ucUuidSize )
-                    {
-                        PLL_ERR( AMC_NAME, "UUID Size incorrect\r\n" );
-                        iStatus = ERROR;
-                    }
-                }
-                else
-                {
-                    PLL_ERR( AMC_NAME, "Unable to read UUID\r\n" );
-                }
-            }
-            else
-            {
-                /* Use the default (all 0s) UUID */
-            }
-
-            if( AMC_CFG_BMC_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_BMC_PREREQUISITES ) )
-            {
-                if( OK == iBMC_Initialise( AMC_CFG_UNIQUE_ID_BMC,
-                                           pxSMBusIf,
-                                           0,
-                                           AMC_TASK_PRIO_DEFAULT,
-                                           AMC_TASK_DEFAULT_STACK,
-                                           pxPdrTemperatureSensors,
-                                           TOTAL_PDR_TEMPERATURE,
-                                           pxPdrVoltageSensors,
-                                           TOTAL_PDR_VOLTAGE,
-                                           pxPdrCurrentSensors,
-                                           TOTAL_PDR_CURRENT,
-                                           pxPdrPowerSensors,
-                                           TOTAL_PDR_POWER,
-                                           pxPdrSensorNames,
-                                           TOTAL_PDR_NUMERIC_ASCI_SENSORS,
-                                           pucUuid ) )
-                {
-                    if( OK == iBMC_BindCallback( &iBmcCallback ) )
-                    {
-                        PLL_INF( AMC_NAME, "BMC Proxy Driver initialised and bound\r\n" );
-                        ullAmcInitStatus |= AMC_CFG_BMC_INITIALISED;
-                    }
-                    else
-                    {
-                        PLL_ERR( AMC_NAME, "Error binding to BMC Proxy Driver\r\n" );
-                    }
-                }
-                else
-                {
-                    PLL_ERR( AMC_NAME, "Error initialising BMC Proxy Driver\r\n" );
-                    iStatus = ERROR;
-                }
-            }
-        }
+        PLL_WRN( AMC_NAME, "BMC EVL record pre-allocation failed\r\n" );
     }
+#endif
 
     return iStatus;
 }
@@ -1016,19 +981,15 @@ static int iInitApp( void )
         }
     }
 
-    if( AMC_CFG_OUT_OF_BAND_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_OUT_OF_BAND_PREREQUISITES ) )
+#if (HAL_SMBUS_FEATURE == 1) && (HAL_PL_SMBUS_FEATURE == 0)
+    /* Non-PL cards (e.g. V95, SMBus on PMC I2C): SMBus is reachable at boot, so
+     * bring up the whole SMBus/BMC/OOB stack now. PL cards defer this to the
+     * main loop after a PDI load instead. */
+    if ( OK != iInitSmbusOobStackIfNeeded() )
     {
-        if( OK != iOUT_OF_BAND_TELEMETRY_Initialise() )
-        {
-            PLL_ERR( AMC_NAME, "Out of Band Telemetry Initialisation ERROR\r\n" );
-            iStatus = ERROR;
-        }
-        else
-        {
-            ullAmcInitStatus |= AMC_CFG_OUT_OF_BAND_INITIALISED;
-            PLL_INF( AMC_NAME, "Out-of-band service: ready\r\n" );
-        }
+        iStatus = ERROR;
     }
+#endif
 
     if( OK != iBIM_Initialise( PROFILE_BIM_MODULE_DATA ) )
     {
@@ -1042,6 +1003,210 @@ static int iInitApp( void )
 
     return iStatus;
 }
+
+#if (HAL_PL_SMBUS_FEATURE == 1)
+/**
+ * @brief   Request deferred SMBus/OOB init after runtime PDI load (V80 only)
+ *
+ * Must not run heavy init (BMC task/mutex creation) from EVL callback context.
+ */
+static void vRequestSmbusOobInitAfterPdiLoad( void )
+{
+    iSmbusOobInitPending = TRUE;
+}
+
+/**
+ * @brief   Process pending SMBus/OOB init from the main task (V80 only)
+ */
+static void vProcessPendingSmbusOobInit( void )
+{
+    if ( TRUE == iSmbusOobInitPending )
+    {
+        iSmbusOobInitPending = FALSE;
+
+        if ( OK != iInitSmbusOobStackIfNeeded() )
+        {
+            PLL_WRN( AMC_NAME, "Deferred SMBus/OOB init after PDI load failed\r\n" );
+        }
+    }
+}
+#endif /* HAL_PL_SMBUS_FEATURE */
+
+#if (HAL_SMBUS_FEATURE == 1)
+/**
+ * @brief   Initialise SMBus FAL if not already done
+ */
+static int iInitSmbusIfNeeded( void )
+{
+    int iStatus = OK;
+
+    if ( AMC_CFG_SMBUS_FAL_CREATED == ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_CREATED ) )
+    {
+        return OK;
+    }
+
+    if ( OK != iFAL_SMBUS_Initialise( &ullAmcInitStatus ) )
+    {
+        PLL_ERR( AMC_NAME, "SMBus FAL initialisation ERROR\r\n" );
+        iStatus = ERROR;
+    }
+    else
+    {
+        PLL_INF( AMC_NAME, "SMBus FAL initialised\r\n" );
+    }
+
+    return iStatus;
+}
+
+/**
+ * @brief   Initialise BMC proxy if not already done
+ */
+static int iInitBmcIfNeeded( void )
+{
+    int iStatus = OK;
+
+    if ( AMC_CFG_BMC_INITIALISED == ( ullAmcInitStatus & AMC_CFG_BMC_INITIALISED ) )
+    {
+        return OK;
+    }
+
+    if ( AMC_CFG_SMBUS_FAL_CREATED != ( ullAmcInitStatus & AMC_CFG_SMBUS_FAL_CREATED ) )
+    {
+        return OK;
+    }
+
+    {
+        uint8_t ucUuidSize               = 0;
+        uint8_t pucUuid[ HAL_UUID_SIZE ] = { 0 };
+
+        if ( AMC_CFG_I2C_INITIALISED == ( ullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
+        {
+            if( AMC_CFG_EEPROM_INITIALISED == ( ullAmcInitStatus & AMC_CFG_EEPROM_INITIALISED ) )
+            {
+                iStatus = iEEPROM_GetUuid( pucUuid, &ucUuidSize );
+                if ( OK == iStatus )
+                {
+                    if( HAL_UUID_SIZE != ucUuidSize )
+                    {
+                        PLL_ERR( AMC_NAME, "UUID Size incorrect\r\n" );
+                        iStatus = ERROR;
+                    }
+                }
+                else
+                {
+                    PLL_ERR( AMC_NAME, "Unable to read UUID\r\n" );
+                }
+            }
+
+            if ( AMC_CFG_BMC_PREREQUISITES != ( ullAmcInitStatus & AMC_CFG_BMC_PREREQUISITES ) )
+            {
+                PLL_ERR( AMC_NAME, "BMC prerequisites not met (status 0x%08X%08X)\r\n",
+                         ( unsigned int )( ullAmcInitStatus >> 32 ),
+                         ( unsigned int )( ullAmcInitStatus & 0xFFFFFFFFU ) );
+                iStatus = ERROR;
+            }
+            else if ( OK == iStatus )
+            {
+                if ( OK == iBMC_Initialise( AMC_CFG_UNIQUE_ID_BMC,
+                                           pxSMBusIf,
+                                           0,
+                                           AMC_TASK_PRIO_DEFAULT,
+                                           AMC_TASK_DEFAULT_STACK,
+                                           pxPdrTemperatureSensors,
+                                           TOTAL_PDR_TEMPERATURE,
+                                           pxPdrVoltageSensors,
+                                           TOTAL_PDR_VOLTAGE,
+                                           pxPdrCurrentSensors,
+                                           TOTAL_PDR_CURRENT,
+                                           pxPdrPowerSensors,
+                                           TOTAL_PDR_POWER,
+                                           pxPdrSensorNames,
+                                           TOTAL_PDR_NUMERIC_ASCI_SENSORS,
+                                           pucUuid ) )
+                {
+                    if ( OK == iBMC_BindCallback( &iBmcCallback ) )
+                    {
+                        PLL_INF( AMC_NAME, "BMC Proxy Driver initialised and bound\r\n" );
+                        ullAmcInitStatus |= AMC_CFG_BMC_INITIALISED;
+                    }
+                    else
+                    {
+                        PLL_ERR( AMC_NAME, "Error binding to BMC Proxy Driver\r\n" );
+                        iStatus = ERROR;
+                    }
+                }
+                else
+                {
+                    PLL_ERR( AMC_NAME, "Error initialising BMC Proxy Driver\r\n" );
+                    iStatus = ERROR;
+                }
+            }
+        }
+    }
+
+    return iStatus;
+}
+
+/**
+ * @brief   Initialise OOB telemetry if not already done
+ */
+static int iInitOobIfNeeded( void )
+{
+    int iStatus = OK;
+
+    if ( AMC_CFG_OUT_OF_BAND_INITIALISED == ( ullAmcInitStatus & AMC_CFG_OUT_OF_BAND_INITIALISED ) )
+    {
+        return OK;
+    }
+
+    if ( AMC_CFG_OUT_OF_BAND_PREREQUISITES == ( ullAmcInitStatus & AMC_CFG_OUT_OF_BAND_PREREQUISITES ) )
+    {
+        if ( OK != iOUT_OF_BAND_TELEMETRY_Initialise() )
+        {
+            PLL_ERR( AMC_NAME, "Out of Band Telemetry Initialisation ERROR\r\n" );
+            iStatus = ERROR;
+        }
+        else
+        {
+            ullAmcInitStatus |= AMC_CFG_OUT_OF_BAND_INITIALISED;
+            PLL_INF( AMC_NAME, "Out-of-band service: ready\r\n" );
+        }
+    }
+
+    return iStatus;
+}
+
+/**
+ * @brief   Bring up the SMBus FAL, BMC proxy, and OOB telemetry stack
+ *
+ * The single, idempotent entry point for both triggers: PL cards call it from
+ * the main loop after a PDI load; non-PL cards call it once at boot.
+ */
+static int iInitSmbusOobStackIfNeeded( void )
+{
+    int iStatus = OK;
+
+    if ( OK != iBMC_AllocateEvlRecord() )
+    {
+        PLL_WRN( AMC_NAME, "BMC EVL record allocation before SMBus init failed\r\n" );
+        iStatus = ERROR;
+    }
+    else if ( OK != iInitSmbusIfNeeded() )
+    {
+        iStatus = ERROR;
+    }
+    else if ( OK != iInitBmcIfNeeded() )
+    {
+        iStatus = ERROR;
+    }
+    else if ( OK != iInitOobIfNeeded() )
+    {
+        iStatus = ERROR;
+    }
+
+    return iStatus;
+}
+#endif /* HAL_SMBUS_FEATURE */
 
 /**
  * @brief   Initialise Debug monitoring
