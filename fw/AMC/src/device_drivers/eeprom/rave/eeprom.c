@@ -467,7 +467,7 @@ int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROMCfg *pxEepromCfg )
         pvOSAL_MemCpy( &pxThis->xEepromCfg, pxEepromCfg, sizeof( pxThis->xEepromCfg ) );
         vEepromInitialiseVersionFields( pxThis->xEepromExpectedVersion );
 
-        PLL_DBG( EEPROM_NAME, "iEepromReadField size=%d%d\r\n", pxThis->ucSizeEepromVersion);
+        PLL_DBG( EEPROM_NAME, "iEepromReadField size=%d\r\n", pxThis->ucSizeEepromVersion);
 
         iStatus = iEeprom_VerifyDeviceId();
         if ( OK == iStatus )

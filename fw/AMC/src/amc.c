@@ -1257,7 +1257,7 @@ static int iPlmGetUid(uint32_t* uuid)
 
     if (XST_SUCCESS != iStatus)
     {
-        PLL_ERR( AMC_NAME, "PLM UUID Read Failed =%d uuid=%x", iStatus, ImageInfo.UID);
+        PLL_ERR( AMC_NAME, "PLM UUID Read Failed =%d", iStatus);
     }
 
     return iStatus;
