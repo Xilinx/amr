@@ -257,10 +257,14 @@ static int read_hwmon(const char *hwmon, int hwmon_num, const char *attr, char *
 	file = open_hwmon(hwmon, hwmon_num, attr, O_RDONLY);
 
 	if (file != AMI_INVALID_FD) {
-		if (AMI_LINUX_STATUS_ERROR != read(file, buf, AMI_HWMON_MAX_STR))
+		ssize_t bytes = read(file, buf, AMI_HWMON_MAX_STR - 1);
+
+		if (AMI_LINUX_STATUS_ERROR != bytes) {
+			buf[bytes] = '\0';
 			ret = AMI_STATUS_OK;
-		else
+		} else {
 			ret = AMI_API_ERROR(AMI_ERROR_EIO);
+		}
 
 		close(file);
 	} else {
@@ -574,6 +578,7 @@ static int populate_device_sensors(ami_device *dev, struct ami_sensor_data *data
 				(ami_sensor_internal*)calloc(1, sizeof(struct ami_sensor_internal));
 
 			if (!sensor->sensor_data) {
+				free(sensor);
 				ret = AMI_API_ERROR(AMI_ERROR_ENOMEM);
 				break;
 			}
@@ -986,6 +991,16 @@ int ami_sensor_discover(ami_device *dev)
 
 	if (ret == AMI_STATUS_OK)
 		return populate_device_sensors(dev, sensors);
+
+	/* On failure nothing takes ownership of the list, so release it here. */
+	while (sensors) {
+		struct ami_sensor_data *next_data = sensors->next;
+
+		free(sensors);
+		sensors = next_data;
+	}
+
+	dev->num_total_sensors = 0;
 
 	return ret;
 }

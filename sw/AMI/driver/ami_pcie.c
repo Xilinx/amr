@@ -998,7 +998,7 @@ static int do_bar_transaction(struct pci_dev	*dev,
 	struct bar_header_struct *bar = NULL;
 	void __iomem *virt_addr = NULL;
 
-	if (!dev || !val || (num == 0) || (bar_idx > NUM_PCIE_BAR))
+	if (!dev || !val || (num == 0) || (bar_idx >= NUM_PCIE_BAR))
 		return -EINVAL;
 
 	pf_dev = dev_get_drvdata(&dev->dev);

@@ -246,6 +246,13 @@ int find_parent_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE])
 			goto exit;
 		}
 	}
+	else
+	{
+		printf("Cannot read %s Image Header (encrypted meta header)\n", pdi);
+		ret = EXIT_FAILURE;
+		goto exit;
+	}
+
 	snprintf(uuid, AMI_LOGIC_UUID_SIZE, "%0*x",
 		(AMI_LOGIC_UUID_SIZE - 1), img_hdr->parentUniqueId);
 

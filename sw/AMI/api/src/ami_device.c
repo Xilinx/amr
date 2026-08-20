@@ -439,10 +439,14 @@ int ami_read_sysfs(ami_device *dev, const char *attr, char *buf)
 	file = open_sysfs(dev, attr, O_RDONLY);
 
 	if (file != AMI_INVALID_FD) {
-		if (read(file, buf, AMI_SYSFS_STR_MAX) != AMI_LINUX_STATUS_ERROR)
+		ssize_t bytes = read(file, buf, AMI_SYSFS_STR_MAX - 1);
+
+		if (bytes != AMI_LINUX_STATUS_ERROR) {
+			buf[bytes] = '\0';
 			ret = AMI_STATUS_OK;
-		else
+		} else {
 			ret = AMI_API_ERROR(AMI_ERROR_EIO);
+		}
 
 		close(file);
 	} else {
@@ -1097,7 +1101,7 @@ int ami_dev_get_pci_cpulist(ami_device *dev, char buf[AMI_PCI_CPULIST_SIZE])
 int ami_dev_get_state(ami_device *dev, char buf[AMI_DEV_STATE_SIZE])
 {
 	int ret = AMI_STATUS_ERROR;
-	char raw_buf[AMI_DEV_STATE_SIZE] = { 0 };
+	char raw_buf[AMI_SYSFS_STR_MAX] = { 0 };
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
@@ -1119,7 +1123,7 @@ int ami_dev_get_state(ami_device *dev, char buf[AMI_DEV_STATE_SIZE])
 int ami_dev_get_name(ami_device *dev, char buf[AMI_DEV_NAME_SIZE])
 {
 	int ret = AMI_STATUS_ERROR;
-	char raw_buf[AMI_DEV_NAME_SIZE] = { 0 };
+	char raw_buf[AMI_SYSFS_STR_MAX] = { 0 };
 
 	if (!dev || !buf)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
@@ -1141,7 +1145,7 @@ int ami_dev_get_name(ami_device *dev, char buf[AMI_DEV_NAME_SIZE])
 int ami_dev_get_amc_version(ami_device *dev, struct amc_version *amc_version)
 {
 	int ret = AMI_STATUS_ERROR;
-	char raw_buf[AMC_VERSION_ATTR_SIZE] = { 0 };
+	char raw_buf[AMI_SYSFS_STR_MAX] = { 0 };
 
 	if (!dev || !amc_version)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
