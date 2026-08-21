@@ -277,6 +277,7 @@ else()
                 PRIVATE src/device_drivers/sensors/ina3221/debug/ina3221_debug.c
                 PRIVATE src/device_drivers/sensors/isl68221/debug/isl68221_debug.c
                 PRIVATE src/device_drivers/sensors/cat34ts02/debug/cat34ts02_debug.c
+                PRIVATE src/proxy_drivers/bmc/debug/bmc_proxy_driver_debug.c
                 PRIVATE src/apps/out_of_band/debug/out_of_band_telemetry_debug.c)
         endif()
         target_sources(${NAME}
@@ -295,7 +296,6 @@ else()
             PRIVATE src/proxy_drivers/apc/debug/apc_proxy_driver_debug.c
             PRIVATE src/proxy_drivers/axc/debug/axc_proxy_driver_debug.c
             PRIVATE src/proxy_drivers/asc/debug/asc_proxy_driver_debug.c
-            PRIVATE src/proxy_drivers/bmc/debug/bmc_proxy_driver_debug.c
             PRIVATE src/apps/asdm/debug/asdm_debug.c
             PRIVATE src/apps/in_band/debug/in_band_telemetry_debug.c
             PRIVATE src/apps/bim/debug/bim_debug.c)
