@@ -94,23 +94,6 @@ extern FWIfCfg *pxSMBusIf;
  */
 int iFAL_Initialise( uint64_t *pullAmcInitStatus );
 
-#if (HAL_SMBUS_FEATURE == 1)
-/**
- * @brief   Initialise the SMBus FAL
- *
- * On PL-hosted SMBus (HAL_PL_SMBUS_FEATURE) the registers are not accessible
- * until a PDI is loaded into the PL, so this is called after a successful PDI
- * load and before BMC/OOB init. On non-PL cards it is called once at boot.
- *
- * @param   pullAmcInitStatus   Pointer to the uint64_t bitmask of the
- *                              initialisation status of each component
- *
- * @return  OK if SMBus FAL initialised and created successfully
- *          ERROR if SMBus FAL initialisation or creation failed
- */
-int iFAL_SMBUS_Initialise( uint64_t *pullAmcInitStatus );
-#endif
-
 /**
  * @brief   Initialise FAL Debug monitoring
  *

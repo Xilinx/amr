@@ -63,8 +63,7 @@
 #define AMC_CFG_AMI_PREREQUISITES            ( AMC_CFG_GCQ_FAL_INITIALISED )
 
 #define AMC_CFG_BMC_PREREQUISITES            ( AMC_CFG_SMBUS_PCIE_LINK_INITIALISED | \
-                                               AMC_CFG_SMBUS_FAL_INITIALISED | \
-                                               AMC_CFG_SMBUS_FAL_CREATED )
+                                               AMC_CFG_SMBUS_FAL_INITIALISED )
 
 #define AMC_CFG_ASDM_PREREQUISITES           ( AMC_CFG_APC_INITIALISED |     \
                                                AMC_CFG_ASC_INITIALISED |     \

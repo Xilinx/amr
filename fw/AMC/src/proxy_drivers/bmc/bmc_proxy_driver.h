@@ -121,15 +121,6 @@ typedef enum
  *
  * @note    Proxy drivers can have 0 or more firmware interfaces
  */
-
-/**
- * @brief   Pre-allocate the BMC EVL record before heap-heavy init (e.g. SMBus)
- *
- * @return  OK      EVL record allocated or already present
- *          ERROR   Allocation failed
- */
-int iBMC_AllocateEvlRecord( void );
-
 int iBMC_Initialise( uint8_t ucProxyId,
                      FWIfCfg *pxFwIf,
                      uint32_t ulFwIfPort,

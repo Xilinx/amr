@@ -15,7 +15,6 @@
 
 #include "bmc_proxy_driver_debug.h"
 #include "bmc_proxy_driver.h"
-#include "fw_if_smbus.h"
 
 /******************************************************************************/
 /* Defines                                                                    */
@@ -103,20 +102,6 @@ static int iTestCallback( EVLSignal *pxSignal );
  * @brief   Debug function to get state of BMC
  */
 static void vGetState( void );
-
-/**
- * @brief   Debug function to enable SMBus/BMC byte tracing
- *
- * @return  N/A
- */
-static void vEnableByteTrace( void );
-
-/**
- * @brief   Debug function to disable SMBus/BMC byte tracing
- *
- * @return  N/A
- */
-static void vDisableByteTrace( void );
 
 /**
  * @brief   Test the the GetEID Message
@@ -248,12 +233,10 @@ void vBMC_DebugInit( DAL_HDL pxParentHandle )
 
         if( NULL != pxBmcTop )
         {
-            pxDAL_NewDebugFunction( "print_stats",         pxBmcTop, vPrintStats );
-            pxDAL_NewDebugFunction( "clear_stats",         pxBmcTop, vClearStats );
-            pxDAL_NewDebugFunction( "bind_callbacks",      pxBmcTop, vBindCallbacks );
-            pxDAL_NewDebugFunction( "get_state",           pxBmcTop, vGetState );
-            pxDAL_NewDebugFunction( "enable_byte_trace",   pxBmcTop, vEnableByteTrace );
-            pxDAL_NewDebugFunction( "disable_byte_trace",  pxBmcTop, vDisableByteTrace );
+            pxDAL_NewDebugFunction( "print_stats",    pxBmcTop, vPrintStats );
+            pxDAL_NewDebugFunction( "clear_stats",    pxBmcTop, vClearStats );
+            pxDAL_NewDebugFunction( "bind_callbacks", pxBmcTop, vBindCallbacks );
+            pxDAL_NewDebugFunction( "get_state",      pxBmcTop, vGetState );
             pxMctpDir      = pxDAL_NewSubDirectory( "mctp", pxBmcTop );
             pxPldmType0Dir = pxDAL_NewSubDirectory( "pldm_type0", pxBmcTop );
             pxPldmType2Dir = pxDAL_NewSubDirectory( "pldm_type2", pxBmcTop );
@@ -355,24 +338,6 @@ static void vGetState( void )
         PLL_DAL( BMC_DBG_NAME, "0: MODULE_STATE_OK 1: MODULE_STATE_UNINITIALISED 2: MODULE_STATE_ERROR\r\n" );
         PLL_DAL( BMC_DBG_NAME, "Successfully retrieved state: %d\r\n", xState );
     }
-}
-
-/**
- * @brief   Debug function to enable SMBus/BMC byte tracing
- */
-static void vEnableByteTrace( void )
-{
-    vFW_IF_SMBUS_SetByteTrace( TRUE );
-    PLL_DAL( BMC_DBG_NAME, "SMBus byte tracing ENABLED\r\n" );
-}
-
-/**
- * @brief   Debug function to disable SMBus/BMC byte tracing
- */
-static void vDisableByteTrace( void )
-{
-    vFW_IF_SMBUS_SetByteTrace( FALSE );
-    PLL_DAL( BMC_DBG_NAME, "SMBus byte tracing DISABLED\r\n" );
 }
 
 /**

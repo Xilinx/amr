@@ -24,9 +24,6 @@
 #include "smbus.h"
 #include "eeprom.h"
 
-/* osal */
-#include "osal.h"
-
 /* proxy drivers*/
 #include "apc_proxy_driver.h"
 #include "ami_proxy_driver.h"
@@ -52,10 +49,6 @@
 #define FAL_PROFILE_NAME      "PROFILE_FAL"
 #define EMMC_RPU_BASE_ADDRESS ( 0x0 )
 #define EMMC_RPU_LENGTH       ( ( uint64_t )HAL_EMMC_MAX_BLOCKS * ( uint64_t )HAL_EMMC_BLOCK_SIZE ) /* 64Gb */
-
-/* SMBus IP identification register (see smbus_hw.h) */
-#define FAL_SMBUS_REG_IP_MAGIC_NUM      ( 0x0008U )
-#define FAL_SMBUS_IP_MAGIC_NUMBER       ( 0x534D4273U )
 
 /* Enable SMBus PCIe link */
 #define TCA6416AR_BIT_3                 ( 1 << 3 )
@@ -223,7 +216,7 @@ static FWIfSMBusCfg xSMBusCfg =
 
 static FWIfOspiInitCfg myOspiIf =
 {
-    HAL_OSPI_0_BASEADDR,
+    HAL_OSPI_0_DEVICE_ID,
     HAL_OSPI_PAGE_SIZE
 };
 
@@ -319,17 +312,6 @@ static uint8_t ucTca6416aRegisterWrite( uint8_t ucI2cNum,
  */
 static uint8_t ucEnableSMBusPcieLink( void );
 
-/**
- * @brief   Probe for SMBus IP at the expected base address.
- *
- * Polls the IP magic-number register until it matches or the probe timeout
- * expires. Used to detect PDI images that do not contain SMBus.
- *
- * @return  OK if SMBus IP is present
- *          ERROR if SMBus IP not detected within the timeout
- */
-static int iSmbusIpProbeWithTimeout( void );
-
 
 /******************************************************************************/
 /* Private Function implementations                                           */
@@ -415,46 +397,6 @@ uint8_t ucEnableSMBusPcieLink( void )
     return ucStatus;
 }
 
-/**
- * @brief   Probe for SMBus IP at the expected base address.
- */
-static int iSmbusIpProbeWithTimeout( void )
-{
-    int iStatus = ERROR;
-    uint32_t ulStartMs = ulOSAL_GetUptimeMs();
-    volatile uint32_t *pulMagicReg = ( volatile uint32_t* )( uintptr_t )
-        ( HAL_SMBUS_BASE_ADDR + FAL_SMBUS_REG_IP_MAGIC_NUM );
-
-    if ( 0U == HAL_SMBUS_BASE_ADDR )
-    {
-        PLL_ERR( FAL_PROFILE_NAME, "SMBus base address not configured\r\n" );
-    }
-    else
-    {
-        do
-        {
-            if ( FAL_SMBUS_IP_MAGIC_NUMBER == *pulMagicReg )
-            {
-                iStatus = OK;
-                break;
-            }
-
-            iOSAL_Task_SleepMs( HAL_SMBUS_INIT_PROBE_INTERVAL_MS );
-        } while ( ( ulOSAL_GetUptimeMs() - ulStartMs ) < HAL_SMBUS_INIT_PROBE_TIMEOUT_MS );
-
-        if ( ERROR == iStatus )
-        {
-            PLL_WRN( FAL_PROFILE_NAME,
-                     "SMBus IP not detected at 0x%08X (magic 0x%08X) within %u ms\r\n",
-                     ( unsigned int )HAL_SMBUS_BASE_ADDR,
-                     ( unsigned int )*pulMagicReg,
-                     ( unsigned int )HAL_SMBUS_INIT_PROBE_TIMEOUT_MS );
-        }
-    }
-
-    return iStatus;
-}
-
 
 /******************************************************************************/
 /* Public Function implementations                                            */
@@ -465,11 +407,31 @@ static int iSmbusIpProbeWithTimeout( void )
  */
 int iFAL_Initialise( uint64_t *pullAmcInitStatus )
 {
-    int     iStatus            = OK;
-    int     iMuxedDeviceStatus = OK;
-
-    if ( NULL != pullAmcInitStatus )
+    int     iStatus                         = OK;
+    int     iMuxedDeviceStatus              = OK;
+    uint8_t ucUuidSize                      = 0;
+    uint8_t pucUuid[ FW_IF_SMBUS_UDID_LEN ] =
     {
+        0
+    };
+
+    if( NULL != pullAmcInitStatus )
+    {
+        if( AMC_CFG_I2C_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
+        {
+            /* Enable SMBus PCIe link */
+            if( OK == ucEnableSMBusPcieLink() )
+            {
+                PLL_LOG( FAL_PROFILE_NAME, "PCIe SMBus link enabled\n\r" );
+                *pullAmcInitStatus |= AMC_CFG_SMBUS_PCIE_LINK_INITIALISED;
+            }
+            else
+            {
+                PLL_ERR( FAL_PROFILE_NAME, "Error enabling PCIe SMBus link \n\r" );
+                iStatus = ERROR;
+            }
+        }
+
         /* Init the Muxed Device FAL */
         if( AMC_CFG_I2C_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
         {
@@ -531,6 +493,18 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
         else
         {
             PLL_ERR( FAL_PROFILE_NAME, "Error initialising eMMC FAL\r\n" );
+            iStatus = ERROR;
+        }
+
+        /* Init the SMBus FAL */
+        if( FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Init( &mySMBusIf ) )
+        {
+            PLL_DBG( FAL_PROFILE_NAME, "SMBus FAL initialised OK\r\n" );
+            *pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_INITIALISED;
+        }
+        else
+        {
+            PLL_ERR( FAL_PROFILE_NAME, "Error initialising SMBus FAL\r\n" );
             iStatus = ERROR;
         }
 
@@ -649,6 +623,42 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
             }
         }
 
+        /* Get UUID */
+        if( AMC_CFG_EEPROM_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_EEPROM_INITIALISED ) )
+        {
+            /* If EEPROM is ok use the UUID from it */
+            if( OK == iEEPROM_GetUuid( pucUuid, &ucUuidSize ) )
+            {
+                if( FW_IF_SMBUS_UDID_LEN != ucUuidSize )
+                {
+                    PLL_ERR( FAL_PROFILE_NAME, "Error UUID size incorrect\n\r" );
+                    iStatus = ERROR;
+                }
+            }
+            else
+            {
+                PLL_ERR( FAL_PROFILE_NAME, "Error getting UUID\r\n" );
+                iStatus = ERROR;
+            }
+        }
+
+        /* Lets use the UUID in place of the UDID for a unique identifier */
+        pvOSAL_MemCpy( &( xSMBusCfg.pucUdid[ 0 ] ), pucUuid, FW_IF_SMBUS_UDID_LEN );
+
+        if( AMC_CFG_SMBUS_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED ) )
+        {
+            /* Create instance of the SMBus based on the global configuration */
+            if( FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Create( &xSMBusIf, &xSMBusCfg ) )
+            {
+                PLL_DBG( FAL_PROFILE_NAME, "SMBus created OK\r\n" );
+                *pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_CREATED;
+            }
+            else
+            {
+                PLL_ERR( FAL_PROFILE_NAME, "Error creating SMBus\r\n" );
+                iStatus = ERROR;
+            }
+        }
     }
     else
     {
@@ -657,116 +667,10 @@ int iFAL_Initialise( uint64_t *pullAmcInitStatus )
 
     return iStatus;
 
-}
-
-/**
- * @brief   Initialise SMBus FAL after PDI is loaded
- */
-int iFAL_SMBUS_Initialise( uint64_t *pullAmcInitStatus )
-{
-    int     iStatus                         = OK;
-    uint8_t ucUuidSize                      = 0;
-    uint8_t pucUuid[ FW_IF_SMBUS_UDID_LEN ] = { 0 };
-
-    if ( NULL != pullAmcInitStatus )
-    {
-        /* PL-hosted SMBus: enable the PCIe sideband link and confirm the IP is
-         * present in the loaded PDI before touching any SMBus registers. */
-        if ( AMC_CFG_I2C_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
-        {
-            /* Enable SMBus PCIe link */
-            if ( OK == ucEnableSMBusPcieLink() )
-            {
-                PLL_LOG( FAL_PROFILE_NAME, "PCIe SMBus link enabled\n\r" );
-                *pullAmcInitStatus |= AMC_CFG_SMBUS_PCIE_LINK_INITIALISED;
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error enabling PCIe SMBus link \n\r" );
-                iStatus = ERROR;
-            }
-        }
-
-        /* Probe for SMBus IP before accessing registers */
-        if ( OK != iSmbusIpProbeWithTimeout() )
-        {
-            PLL_ERR( FAL_PROFILE_NAME, "Skipping SMBus init - IP not present in loaded PDI\r\n" );
-            iStatus = ERROR;
-        }
-
-        if ( OK == iStatus )
-        {
-            if ( FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Init( &mySMBusIf ) )
-            {
-                PLL_DBG( FAL_PROFILE_NAME, "SMBus FAL initialised OK\r\n" );
-                *pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_INITIALISED;
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error initialising SMBus FAL\r\n" );
-                iStatus = ERROR;
-            }
-        }
-
-        if ( OK == iStatus )
-        {
-            /* Get UUID */
-            if( AMC_CFG_EEPROM_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_EEPROM_INITIALISED ) )
-            {
-                /* If EEPROM is ok use the UUID from it */
-                if( OK == iEEPROM_GetUuid( pucUuid, &ucUuidSize ) )
-                {
-                    if( FW_IF_SMBUS_UDID_LEN != ucUuidSize )
-                    {
-                        PLL_ERR( FAL_PROFILE_NAME, "Error UUID size incorrect\n\r" );
-                        iStatus = ERROR;
-                    }
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error getting UUID\r\n" );
-                    iStatus = ERROR;
-                }
-            }
-
-            /* Lets use the UUID in place of the UDID for a unique identifier */
-            pvOSAL_MemCpy( &( xSMBusCfg.pucUdid[ 0 ] ), pucUuid, FW_IF_SMBUS_UDID_LEN );
-
-            if( AMC_CFG_SMBUS_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED ) )
-            {
-                /* Create instance of the SMBus based on the global configuration */
-                if( FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Create( &xSMBusIf, &xSMBusCfg ) )
-                {
-                    PLL_DBG( FAL_PROFILE_NAME, "SMBus created OK\r\n" );
-                    *pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_CREATED;
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error creating SMBus\r\n" );
-                    iStatus = ERROR;
-                }
-            }
-        }
-    }
-    else
-    {
-        iStatus = ERROR;
-    }
-
-    if ( ( NULL != pullAmcInitStatus ) && ( OK != iStatus ) )
-    {
-        *pullAmcInitStatus &= ~( AMC_CFG_SMBUS_PCIE_LINK_INITIALISED |
-                                 AMC_CFG_SMBUS_FAL_INITIALISED |
-                                 AMC_CFG_SMBUS_FAL_CREATED );
-    }
-
-    return iStatus;
 }
 
 /**
  * @brief   Initialise FAL Debug monitoring
- *
- * @return  none.
  */
 void vFAL_DebugInitialise( void )
 {

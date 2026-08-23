@@ -24,14 +24,10 @@
 #define XPAR_SMBUS_0_BASEADDR           ( 0 )
 #endif
 
-#define HAL_SMBUS_FEATURE               ( 1 )           /* SMBus stack present (real FAL vs stub) */
-#define HAL_PL_SMBUS_FEATURE            ( 1 )           /* SMBus IP is in PL -> defer init until PDI load */
+#define HAL_SMBUS_FEATURE               ( 0 )
 #define HAL_SMBUS_BASE_ADDR             ( XPAR_SMBUS_0_BASEADDR )
 #define HAL_SMBUS_ADDR                  ( 0x18 )
-#define HAL_SMBUS_INTERRUPT             ( 85U )         /* SPI number from pl.dtsi base_logic_axi_smbus_rpu:
-                                                           smbus@80044000 { interrupts = < 0 85 4 > } */
-#define HAL_SMBUS_INIT_PROBE_TIMEOUT_MS ( 100U )
-#define HAL_SMBUS_INIT_PROBE_INTERVAL_MS ( 10U )
+#define HAL_SMBUS_INTERRUPT             ( 85U + 32U)    /* pl.dtsi base_logic_axi_smbus_rpu: smbus@80044000 { interrupts = < 0 85 4 > */
 
 #define HAL_EEPROM_VERSION              ( EEPROM_VERSION_4_0 )
 #define HAL_EEPROM_I2C_BUS              ( 0 )
@@ -76,7 +72,7 @@
 #define HAL_SYS_MON_V80                 ( TRUE )
 
 /* Definitions OSPI */
-#define HAL_OSPI_0_BASEADDR             ( XPAR_OSPI_BASEADDR )
+#define HAL_OSPI_0_DEVICE_ID            ( XPAR_OSPI_BASEADDR )
 #define HAL_OSPI_PAGE_SIZE              ( 256 )
 #define HAL_OSPI_RPU_BASE_ADDR          ( 0x0 )
 #define HAL_OSPI_RPU_LENGTH             ( 0x10000000 )       /* 2Gb (256MB) */
