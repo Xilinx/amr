@@ -17,7 +17,7 @@
 /******************************************************************************/
 
 #ifndef DAL_MAX_NAME_LEN
-#define DAL_MAX_NAME_LEN    ( 50 )
+#define DAL_MAX_NAME_LEN (50)
 #endif
 
 
@@ -29,7 +29,7 @@
  * @typedef DAL_DEBUG_FUNCTION
  * @brief   Typedef of a debug function handled by the DAL
  */
-typedef void ( *DAL_DEBUG_FUNCTION )( void );
+typedef void (*DAL_DEBUG_FUNCTION)(void);
 
 
 /******************************************************************************/
@@ -40,7 +40,7 @@ typedef void ( *DAL_DEBUG_FUNCTION )( void );
  * @struct  DAL_HDL
  * @brief   Handle to an option in the debug menu
  */
-typedef struct DALMenuOption * DAL_HDL;
+typedef struct DALMenuOption* DAL_HDL;
 
 
 /******************************************************************************/
@@ -58,10 +58,10 @@ typedef struct DALMenuOption * DAL_HDL;
  * @return  OK if DAL is initialised and running successfully
  *          ERROR if the DAL is not initialised
  */
-int iDAL_Initialise( const char *pcMenuName,
-                     uint32_t ulTaskPrio,
-                     uint32_t ulStackSize,
-                     DAL_DEBUG_FUNCTION pxPrintInitBanner );
+int iDAL_Initialise(const char* pcMenuName,
+	uint32_t ulTaskPrio,
+	uint32_t ulStackSize,
+	DAL_DEBUG_FUNCTION pxPrintInitBanner);
 
 /**
  * @brief   Add a new directory to the top level of the DAL menu structure
@@ -70,7 +70,7 @@ int iDAL_Initialise( const char *pcMenuName,
  *
  * @return  Handle to the new directory (NULL if not added)
  */
-DAL_HDL pxDAL_NewDirectory( const char *pcDirName );
+DAL_HDL pxDAL_NewDirectory(const char* pcDirName);
 
 /**
  * @brief   Add a new subdirectory within an existing directory
@@ -80,7 +80,7 @@ DAL_HDL pxDAL_NewDirectory( const char *pcDirName );
  *
  * @return  Handle to the new directory (NULL if not added)
  */
-DAL_HDL pxDAL_NewSubDirectory( const char *pcSubDirName, DAL_HDL pxParent );
+DAL_HDL pxDAL_NewSubDirectory(const char* pcSubDirName, DAL_HDL pxParent);
 
 /**
  * @brief   Add a new debug function within an existing directory
@@ -90,7 +90,9 @@ DAL_HDL pxDAL_NewSubDirectory( const char *pcSubDirName, DAL_HDL pxParent );
  *
  * @return  Handle to the new function (NULL if not added)
  */
-DAL_HDL pxDAL_NewDebugFunction( const char *pcFunctionName, DAL_HDL pxParent, DAL_DEBUG_FUNCTION pxFunction );
+DAL_HDL pxDAL_NewDebugFunction(const char* pcFunctionName,
+	DAL_HDL pxParent,
+	DAL_DEBUG_FUNCTION pxFunction);
 
 
 /**
@@ -104,7 +106,7 @@ DAL_HDL pxDAL_NewDebugFunction( const char *pcFunctionName, DAL_HDL pxParent, DA
  *
  * @note    This is a block call - this function won't return until an integer value is inputted
  */
-int iDAL_GetInt( const char *pcPrompt, int *piInput );
+int iDAL_GetInt(const char* pcPrompt, int* piInput);
 
 /**
  * @brief   Retrieve a user-inputted decimal integer within a range
@@ -119,7 +121,7 @@ int iDAL_GetInt( const char *pcPrompt, int *piInput );
  *
  * @note    This is a block call - this function won't return until an integer value is inputted
  */
-int iDAL_GetIntInRange( const char *pcPrompt, int *piInput, int iMin, int iMax );
+int iDAL_GetIntInRange(const char* pcPrompt, int* piInput, int iMin, int iMax);
 
 /**
  * @brief Retrieve user-inputted float
@@ -131,8 +133,8 @@ int iDAL_GetIntInRange( const char *pcPrompt, int *piInput, int iMin, int iMax )
  *          ERROR       User has not inputted a valid value
  *
  * @note    This is a block call - this function won't return until a float value is inputted
-*/
-int iDAL_GetFloat( const char *pcPrompt, float *pfInput );
+ */
+int iDAL_GetFloat(const char* pcPrompt, float* pfInput);
 
 /**
  * @brief Retrieve user-inputted float within range
@@ -146,8 +148,8 @@ int iDAL_GetFloat( const char *pcPrompt, float *pfInput );
  *          ERROR       User has not inputted a valid value
  *
  * @note    This is a block call - this function won't return until a float value is inputted
-*/
-int iDAL_GetFloatInRange( const char *pcPrompt, float *pfInput, float fMin, float fMax );
+ */
+int iDAL_GetFloatInRange(const char* pcPrompt, float* pfInput, float fMin, float fMax);
 
 /**
  * @brief   Retrieve a user-inputted hexadecimal number
@@ -160,7 +162,7 @@ int iDAL_GetFloatInRange( const char *pcPrompt, float *pfInput, float fMin, floa
  *
  * @note    This is a block call - this function won't return until a hex value is inputted
  */
-int iDAL_GetHex( const char *pcPrompt, uint32_t *pulInput );
+int iDAL_GetHex(const char* pcPrompt, uint32_t* pulInput);
 
 /**
  * @brief   Retrieve a user-inputted hexadecimal number within a range
@@ -175,7 +177,7 @@ int iDAL_GetHex( const char *pcPrompt, uint32_t *pulInput );
  *
  * @note    This is a block call - this function won't return until a hex value is inputted
  */
-int iDAL_GetHexInRange( const char *pcPrompt, uint32_t *pulInput, uint32_t ulMin, uint32_t ulMax );
+int iDAL_GetHexInRange(const char* pcPrompt, uint32_t* pulInput, uint32_t ulMin, uint32_t ulMax);
 
 /**
  * @brief   Retrieve a user-inputted ASCII string
@@ -189,7 +191,7 @@ int iDAL_GetHexInRange( const char *pcPrompt, uint32_t *pulInput, uint32_t ulMin
  *
  * @note    This is a block call - this function won't return until a string is inputted
  */
-int iDAL_GetString( const char *pcPrompt, char *pcInput, int iMaxLen );
+int iDAL_GetString(const char* pcPrompt, char* pcInput, int iMaxLen);
 
 /**
  * @brief   Print all the stats gathered by the library
@@ -198,7 +200,7 @@ int iDAL_GetString( const char *pcPrompt, char *pcInput, int iMaxLen );
  *          ERROR       Stats not retrieved successfully
  *
  */
-int iDAL_PrintStatistics( void );
+int iDAL_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the library
@@ -207,6 +209,6 @@ int iDAL_PrintStatistics( void );
  *          ERROR       Stats not cleared successfully
  *
  */
-int iDAL_ClearStatistics( void );
+int iDAL_ClearStatistics(void);
 
 #endif /* _DAL_H_ */

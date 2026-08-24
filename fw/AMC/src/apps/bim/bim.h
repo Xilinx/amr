@@ -22,13 +22,12 @@
  * @enum    BIM_STATUS
  * @brief   Status levels for the overall health of AMC.
  */
-typedef enum
-{
-    BIM_STATUS_HEALTHY = 0,
-    BIM_STATUS_DEGRADED,
-    BIM_STATUS_CRITICAL,
-    BIM_STATUS_FATAL,
-    MAX_BIM_STATUS
+typedef enum {
+	BIM_STATUS_HEALTHY = 0,
+	BIM_STATUS_DEGRADED,
+	BIM_STATUS_CRITICAL,
+	BIM_STATUS_FATAL,
+	MAX_BIM_STATUS
 
 } BIM_STATUS;
 
@@ -41,11 +40,10 @@ typedef enum
  * @struct  BIMEvent
  * @brief   Structure to hold individual event info.
  */
-typedef struct
-{
-    uint32_t   ulEventId;
-    uint32_t   ulCallCount;
-    BIM_STATUS xContextStatus;
+typedef struct {
+	uint32_t ulEventId;
+	uint32_t ulCallCount;
+	BIM_STATUS xContextStatus;
 
 } BIMEvent;
 
@@ -53,13 +51,12 @@ typedef struct
  * @struct  BIMModule
  * @brief   Structure to hold individual module health info.
  */
-typedef struct
-{
-    AMC_CFG_UNIQUE_IDS xModuleId;
-    BIM_STATUS         xCurrentStatus;
-    BIM_STATUS         xContextStatus;
-    BIMEvent          *pxEvents;
-    uint32_t           ulEventsLen;
+typedef struct {
+	AMC_CFG_UNIQUE_IDS xModuleId;
+	BIM_STATUS xCurrentStatus;
+	BIM_STATUS xContextStatus;
+	BIMEvent* pxEvents;
+	uint32_t ulEventsLen;
 
 } BIMModule;
 
@@ -76,7 +73,7 @@ typedef struct
  * @return  OK     if the application is initialised and running successfully
  *          ERROR  if the application is not initialised
  */
-int iBIM_Initialise( BIMModule *pxModuleData );
+int iBIM_Initialise(BIMModule* pxModuleData);
 
 /**
  * @brief   Returns the current health status of the AMC.
@@ -86,7 +83,7 @@ int iBIM_Initialise( BIMModule *pxModuleData );
  * @return  OK     if successful
  *          ERROR  if not successful
  */
-int iBIM_GetOverallHealthStatus( BIM_STATUS *pxStatus );
+int iBIM_GetOverallHealthStatus(BIM_STATUS* pxStatus);
 
 /**
  * @brief   Updates the overall health status of the AMC
@@ -96,7 +93,7 @@ int iBIM_GetOverallHealthStatus( BIM_STATUS *pxStatus );
  * @return  OK     if successful
  *          ERROR  if not successful
  */
-int iBIM_SetOverallHealthStatus( BIM_STATUS xStatus );
+int iBIM_SetOverallHealthStatus(BIM_STATUS xStatus);
 
 /**
  * @brief   Print all the stats gathered by the library
@@ -105,7 +102,7 @@ int iBIM_SetOverallHealthStatus( BIM_STATUS xStatus );
  *          ERROR       Stats not retrieved successfully
  *
  */
-int iBIM_PrintStatistics( void );
+int iBIM_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the library
@@ -114,6 +111,6 @@ int iBIM_PrintStatistics( void );
  *          ERROR       Stats not cleared successfully
  *
  */
-int iBIM_ClearStatistics( void );
+int iBIM_ClearStatistics(void);
 
 #endif /* _BIM_H_ */

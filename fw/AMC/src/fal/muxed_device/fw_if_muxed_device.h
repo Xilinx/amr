@@ -21,12 +21,11 @@
  * @brief Enumeration of hw level for read/write functionality
  *        QSFP IO expander control lines, or QSFP or DIMM mem map registers
  */
-typedef enum
-{
-    FW_IF_MUXED_DEVICE_HW_LEVEL_IO_EXPANDER = 0,
-    FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
+typedef enum {
+	FW_IF_MUXED_DEVICE_HW_LEVEL_IO_EXPANDER = 0,
+	FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
 
-    MAX_FW_IF_MUXED_DEVICE_HW_LEVEL
+	MAX_FW_IF_MUXED_DEVICE_HW_LEVEL
 
 } FW_IF_MUXED_DEVICE_HW_LEVEL_TYPE;
 
@@ -34,12 +33,11 @@ typedef enum
  * @enum _FW_IF_MUXED_DEVICE_IOCTL_TYPE
  * @brief ioctrl options for Muxed Device interfaces (generic across all Muxed Device interfaces)
  */
-typedef enum
-{
-    FW_IF_MUXED_DEVICE_IOCTL_SET_IO_EXPANDER = MAX_FW_IF_COMMON_IOCTRL_OPTION,
-    FW_IF_MUXED_DEVICE_IOCTL_SET_MEMORY_MAP,
+typedef enum {
+	FW_IF_MUXED_DEVICE_IOCTL_SET_IO_EXPANDER = MAX_FW_IF_COMMON_IOCTRL_OPTION,
+	FW_IF_MUXED_DEVICE_IOCTL_SET_MEMORY_MAP,
 
-    MAX_FW_IF_MUXED_DEVICE_IOCTL_TYPE
+	MAX_FW_IF_MUXED_DEVICE_IOCTL_TYPE
 
 } FW_IF_MUXED_DEVICE_IOCTL_TYPE;
 
@@ -48,12 +46,11 @@ typedef enum
  * @enum FW_IF_DEVICE_TYPE
  * @brief Device type for FW_IF Mux interface
  */
-typedef enum
-{
-    FW_IF_DEVICE_QSFP = 0,
-    FW_IF_DEVICE_DIMM,
+typedef enum {
+	FW_IF_DEVICE_QSFP = 0,
+	FW_IF_DEVICE_DIMM,
 
-    MAX_FW_IF_DEVICE_TYPE
+	MAX_FW_IF_DEVICE_TYPE
 
 } FW_IF_DEVICE_TYPE;
 
@@ -61,12 +58,11 @@ typedef enum
  * @enum FW_IF_MUX_ADDRESS_TYPE
  * @brief Enumeration for non selected mux addresses
  */
-typedef enum
-{
-    FW_IF_MUX_ADDRESS_0 = 0,
-    FW_IF_MUX_ADDRESS_1,
+typedef enum {
+	FW_IF_MUX_ADDRESS_0 = 0,
+	FW_IF_MUX_ADDRESS_1,
 
-    MAX_FW_IF_MUX_ADDRESS
+	MAX_FW_IF_MUX_ADDRESS
 
 } FW_IF_MUX_ADDRESS_TYPE;
 
@@ -80,10 +76,9 @@ typedef enum
  * @brief   config options for Muxed Device initialisation
  *          (generic across all Muxed Device interfaces)
  */
-typedef struct
-{
-    char            *pcDriverName;
-    uint8_t         ulI2CBusNum;
+typedef struct {
+	char* pcDriverName;
+	uint8_t ulI2CBusNum;
 
 } FWIfMuxedDeviceInitCfg;
 
@@ -92,18 +87,17 @@ typedef struct
  * @brief   config options for Muxed Device interfaces
  *          (generic across all Muxed Device interfaces)
  */
-typedef struct
-{
-    FW_IF_DEVICE_TYPE                xDevice;
-    uint8_t                          ucPowerIoExpanderAddr;
-    uint8_t                          ucPowerIoExpanderRegBit;
-    uint8_t                          ucSelectedMuxAddr;
-    uint8_t                          pucUnselectedMuxAddr[ MAX_FW_IF_MUX_ADDRESS ];
-    uint32_t                         ulMuxRegBitIoExpander;
-    uint32_t                         ulMuxRegBit;
-    uint8_t                          ucIoExpanderAddr;
-    uint8_t                          ucDeviceI2cAddr;
-    FW_IF_MUXED_DEVICE_HW_LEVEL_TYPE xHwLevel;
+typedef struct {
+	FW_IF_DEVICE_TYPE xDevice;
+	uint8_t ucPowerIoExpanderAddr;
+	uint8_t ucPowerIoExpanderRegBit;
+	uint8_t ucSelectedMuxAddr;
+	uint8_t pucUnselectedMuxAddr[MAX_FW_IF_MUX_ADDRESS];
+	uint32_t ulMuxRegBitIoExpander;
+	uint32_t ulMuxRegBit;
+	uint8_t ucIoExpanderAddr;
+	uint8_t ucDeviceI2cAddr;
+	FW_IF_MUXED_DEVICE_HW_LEVEL_TYPE xHwLevel;
 
 } FW_IF_MUXED_DEVICE_CFG;
 
@@ -119,7 +113,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_MUXED_DEVICE_Init( FWIfMuxedDeviceInitCfg *pxInitCfg );
+uint32_t ulFW_IF_MUXED_DEVICE_Init(FWIfMuxedDeviceInitCfg* pxInitCfg);
 
 /**
  * @brief   creates an instance of the MUXED_DEVICE interface
@@ -129,7 +123,7 @@ uint32_t ulFW_IF_MUXED_DEVICE_Init( FWIfMuxedDeviceInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_MUXED_DEVICE_Create( FWIfCfg *pxFwIf, FW_IF_MUXED_DEVICE_CFG *pxQsfpCfg );
+uint32_t ulFW_IF_MUXED_DEVICE_Create(FWIfCfg* pxFwIf, FW_IF_MUXED_DEVICE_CFG* pxQsfpCfg);
 
 /**
  * @brief   Print all the stats gathered by the application
@@ -137,7 +131,7 @@ uint32_t ulFW_IF_MUXED_DEVICE_Create( FWIfCfg *pxFwIf, FW_IF_MUXED_DEVICE_CFG *p
  * @return  See FW_IF_ERRORS
  *
  */
-uint32_t ulFW_IF_MUXED_DEVICE_PrintStatistics( void );
+uint32_t ulFW_IF_MUXED_DEVICE_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the application
@@ -145,6 +139,6 @@ uint32_t ulFW_IF_MUXED_DEVICE_PrintStatistics( void );
  * @return  See FW_IF_ERRORS
  *
  */
-uint32_t ulFW_IF_MUXED_DEVICE_ClearStatistics( void );
+uint32_t ulFW_IF_MUXED_DEVICE_ClearStatistics(void);
 
 #endif /* _FW_IF_MUXED_DEVICE_H_ */

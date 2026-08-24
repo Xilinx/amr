@@ -24,7 +24,6 @@
  *
  * @return  N/A
  */
-void vAMI_DebugInit( DAL_HDL pxParentHandle );
+void vAMI_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _AMI_PROXY_DRIVER_DEBUG_H_ */
-

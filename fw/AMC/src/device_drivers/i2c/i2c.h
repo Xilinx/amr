@@ -18,8 +18,8 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define I2C_NUM_INSTANCES            ( 2 )
-#define I2C_DEFAULT_BUS_IDLE_WAIT_MS ( 2 * 1000 )
+#define I2C_NUM_INSTANCES            (2)
+#define I2C_DEFAULT_BUS_IDLE_WAIT_MS (2 * 1000)
 
 
 /******************************************************************************/
@@ -30,17 +30,16 @@
  * @struct  I2CConfig
  * @brief   The I2C device configuration
  */
-typedef struct
-{
-    uint8_t  ucDeviceId;           /* Unique ID of device */
-    uint64_t ullBaseAddress;       /* Base address of the device */
-    uint32_t ulInputClockHz;       /* Input clock frequency */
-    uint8_t  ucReTryCount;         /* Retry count in case of any communication failure */
-    uint32_t ulSwResetOffset;      /* Offset from the Base Address of the SW Reset Register */
-    uint8_t  ucResetDuringInit;    /* Do software reset during initialisation */
-    uint32_t ulHwResetAddress;     /* Address of the HW Reset Register */
-    uint32_t ulHwResetMask;        /* Bit mask of the bit to toggle in HW Reset Register */
-    uint8_t  ucHwResetDuringInit;  /* Do hardware reset during initialisation */
+typedef struct {
+	uint8_t ucDeviceId;          /* Unique ID of device */
+	uint64_t ullBaseAddress;     /* Base address of the device */
+	uint32_t ulInputClockHz;     /* Input clock frequency */
+	uint8_t ucReTryCount;        /* Retry count in case of any communication failure */
+	uint32_t ulSwResetOffset;    /* Offset from the Base Address of the SW Reset Register */
+	uint8_t ucResetDuringInit;   /* Do software reset during initialisation */
+	uint32_t ulHwResetAddress;   /* Address of the HW Reset Register */
+	uint32_t ulHwResetMask;      /* Bit mask of the bit to toggle in HW Reset Register */
+	uint8_t ucHwResetDuringInit; /* Do hardware reset during initialisation */
 
 } I2CConfig;
 
@@ -57,7 +56,7 @@ typedef struct
  * @return  OK                  If everything went well.
  *          ERROR               If the send data failed.
  */
-int iI2C_ReInit( uint8_t ucDeviceId );
+int iI2C_ReInit(uint8_t ucDeviceId);
 
 /**
  * @brief   Initialises the I2C driver.
@@ -68,7 +67,7 @@ int iI2C_ReInit( uint8_t ucDeviceId );
  * @return  OK                  Driver successfully init
  *          ERROR               Driver init failed
  */
-int iI2C_Init( I2CConfig *pxI2cCfg, uint16_t usBusIdleWaitMs );
+int iI2C_Init(I2CConfig* pxI2cCfg, uint16_t usBusIdleWaitMs);
 
 /**
  * @brief   This function reads data from the I2C device into a specified buffer.
@@ -81,10 +80,7 @@ int iI2C_Init( I2CConfig *pxI2cCfg, uint16_t usBusIdleWaitMs );
  * @return  OK                  If everything went well.
  *          ERROR               If the send data failed.
  */
-int iI2C_Send( uint8_t ucDeviceId,
-               uint8_t ucAddr,
-               uint8_t *pucDataBuff,
-               uint32_t ulLength );
+int iI2C_Send(uint8_t ucDeviceId, uint8_t ucAddr, uint8_t* pucDataBuff, uint32_t ulLength);
 
 /**
  * @brief   This function write data from the I2C device into a specified buffer.
@@ -97,10 +93,7 @@ int iI2C_Send( uint8_t ucDeviceId,
  * @return  OK                  If everything went well.
  *          ERROR               If the receive data failed.
  */
-int iI2C_Recv( uint8_t ucDeviceId,
-               uint8_t ucAddr,
-               uint8_t *pucDataBuff,
-               uint32_t ulLength );
+int iI2C_Recv(uint8_t ucDeviceId, uint8_t ucAddr, uint8_t* pucDataBuff, uint32_t ulLength);
 
 /**
  * @brief   This function sends data from the I2C device and waits for a response coming back.
@@ -115,12 +108,12 @@ int iI2C_Recv( uint8_t ucDeviceId,
  * @return  OK                  If everything went well.
  *          ERROR               If the send or receive failed.
  */
-int iI2C_SendRecv( uint8_t ucDeviceId,
-                   uint8_t ucWriteAddr,
-                   uint8_t *pucWriteDataBuff,
-                   uint32_t ulWriteLength,
-                   uint8_t *pucReadDataBuff,
-                   uint32_t ulReadLength );
+int iI2C_SendRecv(uint8_t ucDeviceId,
+	uint8_t ucWriteAddr,
+	uint8_t* pucWriteDataBuff,
+	uint32_t ulWriteLength,
+	uint8_t* pucReadDataBuff,
+	uint32_t ulReadLength);
 
 /**
  * @brief   Print all the stats gathered by the driver
@@ -129,7 +122,7 @@ int iI2C_SendRecv( uint8_t ucDeviceId,
  *          ERROR               Stats not retrieved successfully
  *
  */
-int iI2C_PrintStatistics( void );
+int iI2C_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the driver
@@ -138,7 +131,7 @@ int iI2C_PrintStatistics( void );
  *          ERROR               Stats not cleared successfully
  *
  */
-int iI2C_ClearStatistics( void );
+int iI2C_ClearStatistics(void);
 
 /**
  * @brief   Print the circular log
@@ -149,6 +142,6 @@ int iI2C_ClearStatistics( void );
  *          ERROR               Stats not cleared successfully
  *
  */
-int iI2C_PrintLog( int iDevice );
+int iI2C_PrintLog(int iDevice);
 
 #endif /* _I2C_H_ */

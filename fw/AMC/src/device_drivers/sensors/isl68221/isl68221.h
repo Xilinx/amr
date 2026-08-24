@@ -22,13 +22,12 @@
  * @enum    ISL68221_SENSOR_PAGE
  * @brief   Sensor page to read
  */
-typedef enum
-{
-    ISL68221_SENSOR_PAGE_0 = 0,
-    ISL68221_SENSOR_PAGE_1 = 1,
-    ISL68221_SENSOR_PAGE_2 = 2,
+typedef enum {
+	ISL68221_SENSOR_PAGE_0 = 0,
+	ISL68221_SENSOR_PAGE_1 = 1,
+	ISL68221_SENSOR_PAGE_2 = 2,
 
-    MAX_ISL68221_SENSOR_PAGE
+	MAX_ISL68221_SENSOR_PAGE
 
 } ISL68221_SENSOR_PAGE;
 
@@ -49,7 +48,10 @@ typedef enum
  *          ERROR          Voltage not read successfully
  *
  */
-int iISL68221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPageNum, float *pfVoltageInMV );
+int iISL68221_ReadVoltage(uint8_t ucBusNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucPageNum,
+	float* pfVoltageInMV);
 
 /**
  * @brief   Read current using ISL68221 sensor
@@ -63,7 +65,10 @@ int iISL68221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPage
  *          ERROR         Current not read successfully
  *
  */
-int iISL68221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPageNum, float *pfCurrentInA );
+int iISL68221_ReadCurrent(uint8_t ucBusNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucPageNum,
+	float* pfCurrentInA);
 
 /**
  * @brief   Read temperature using ISL68221 sensor
@@ -77,7 +82,10 @@ int iISL68221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPage
  *          ERROR          Temperature not read successfully
  *
  */
-int iISL68221_ReadTemperature( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucPageNum, float *pfTemperature );
+int iISL68221_ReadTemperature(uint8_t ucBusNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucPageNum,
+	float* pfTemperature);
 
 /**
  * @brief   Print all the stats gathered by the driver
@@ -86,7 +94,7 @@ int iISL68221_ReadTemperature( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t uc
  *          ERROR  Stats not retrieved successfully
  *
  */
-int iISL68221_PrintStatistics( void );
+int iISL68221_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the driver
@@ -95,6 +103,6 @@ int iISL68221_PrintStatistics( void );
  *          ERROR  Stats not cleared successfully
  *
  */
-int iISL68221_ClearStatistics( void );
+int iISL68221_ClearStatistics(void);
 
 #endif /* _ISL68221_H_ */

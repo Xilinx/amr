@@ -20,10 +20,9 @@
  * @struct  OSPICfg
  * @brief   The OSPI device configuration
  */
-typedef struct
-{
-    uint32_t ulBaseAddress;
-    uint16_t usPageSize;
+typedef struct {
+	uint32_t ulBaseAddress;
+	uint16_t usPageSize;
 
 } OSPICfg;
 
@@ -39,7 +38,7 @@ typedef struct
  *
  * @return  OK if successful, else ERROR.
  */
-int iOSPI_FlashInit( OSPICfg *pxOspiCfg );
+int iOSPI_FlashInit(OSPICfg* pxOspiCfg);
 
 /**
  * @brief   Reinitializes the OSPI controller hardware after PLM access.
@@ -52,7 +51,7 @@ int iOSPI_FlashInit( OSPICfg *pxOspiCfg );
  *
  * @return  OK if successful, else ERROR.
  */
-int iOSPI_FlashReinit( void );
+int iOSPI_FlashReinit(void);
 
 /**
  * @brief   Function to erase the flash device.
@@ -62,18 +61,19 @@ int iOSPI_FlashReinit( void );
  *
  * @return  OK if successful, else ERROR.
  */
-int iOSPI_FlashErase( uint32_t ulAddr, uint32_t ulLength );
+int iOSPI_FlashErase(uint32_t ulAddr, uint32_t ulLength);
 
 /**
  * @brief   Function to read a number of bytes from the flash device.
  *
  * @param   ulAddr              The start address to read the data
  * @param   pucReadBuffer       Pointer to buffer to populate with the bytes read
- * @param   pulLength           Length of read buffer passed in, updated to the length of response in bytes
+ * @param   pulLength           Length of read buffer passed in, updated to the length of response
+ * in bytes
  *
  * @return  OK if successful, else ERROR.
  */
-int iOSPI_FlashRead( uint32_t ulAddr, uint8_t *pucReadBuffer, uint32_t *pulLength );
+int iOSPI_FlashRead(uint32_t ulAddr, uint8_t* pucReadBuffer, uint32_t* pulLength);
 
 /**
  * @brief   Function to write a number of bytes to the flash device.
@@ -84,7 +84,7 @@ int iOSPI_FlashRead( uint32_t ulAddr, uint8_t *pucReadBuffer, uint32_t *pulLengt
  *
  * @return  OK if successful, else ERROR.
  */
-int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLength );
+int iOSPI_FlashWrite(uint32_t ulAddr, uint8_t* pucWriteBuffer, uint32_t ulLength);
 
 /**
  * @brief   Return the progress of the current operation
@@ -93,7 +93,7 @@ int iOSPI_FlashWrite( uint32_t ulAddr, uint8_t *pucWriteBuffer, uint32_t ulLengt
  *
  * @return  OK if successful, else ERROR.
  */
-int iOSPI_GetOperationProgress( uint8_t *pucPercentage );
+int iOSPI_GetOperationProgress(uint8_t* pucPercentage);
 
 /**
  * @brief   Print all the stats gathered by the driver
@@ -101,7 +101,7 @@ int iOSPI_GetOperationProgress( uint8_t *pucPercentage );
  * @return  OK                  Stats retrieved from proxy driver successfully
  *          ERROR               Stats not retrieved successfully
  */
-int iOSPI_PrintStatistics( void );
+int iOSPI_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the driver
@@ -109,6 +109,6 @@ int iOSPI_PrintStatistics( void );
  * @return  OK                  Stats cleared successfully
  *          ERROR               Stats not cleared successfully
  */
-int iOSPI_ClearStatistics( void );
+int iOSPI_ClearStatistics(void);
 
 #endif /* _OSPI_H_ */

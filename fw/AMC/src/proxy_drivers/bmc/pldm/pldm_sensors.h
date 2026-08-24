@@ -21,19 +21,18 @@
  * @enum    sensor_state
  * @brief   Enumeration of sensor state values
  */
-typedef enum
-{
-    Unknown,
-    Normal,
-    Warning,
-    Critical,
-    Fatal,
-    LowerWarning,
-    LowerCritical,
-    LowerFatal,
-    UpperWarning,
-    UpperCritical,
-    UpperFatal
+typedef enum {
+	Unknown,
+	Normal,
+	Warning,
+	Critical,
+	Fatal,
+	LowerWarning,
+	LowerCritical,
+	LowerFatal,
+	UpperWarning,
+	UpperCritical,
+	UpperFatal
 
 } sensor_state;
 
@@ -41,16 +40,15 @@ typedef enum
  * @enum    sensor_operational_state
  * @brief   Enumeration of sensor operational state values
  */
-typedef enum
-{
-    eSensorOpStateEnabled,
-    eSensorOpStateDisabled,
-    eSensorOpStateUnavailable,
-    eSensorOpStateStatusUnknown,
-    eSensorOpStateFailed,
-    eSensorOpStateInitializing,
-    eSensorOpStateShuttingDown,
-    eSensorOpStateInTest
+typedef enum {
+	eSensorOpStateEnabled,
+	eSensorOpStateDisabled,
+	eSensorOpStateUnavailable,
+	eSensorOpStateStatusUnknown,
+	eSensorOpStateFailed,
+	eSensorOpStateInitializing,
+	eSensorOpStateShuttingDown,
+	eSensorOpStateInTest
 
 } sensor_operational_state;
 
@@ -58,13 +56,12 @@ typedef enum
  * @enum    sensor_event
  * @brief   Enumeration of sensor event values
  */
-typedef enum
-{
-    eSensorNoEventGeneration,
-    eSensorEventsDisabled,
-    eSensorEventsEnabled,
-    eSensorOpEventsOnlyEnabled,
-    eSensorStateEventsOnlyEnabled
+typedef enum {
+	eSensorNoEventGeneration,
+	eSensorEventsDisabled,
+	eSensorEventsEnabled,
+	eSensorOpEventsOnlyEnabled,
+	eSensorStateEventsOnlyEnabled
 
 } sensor_event;
 

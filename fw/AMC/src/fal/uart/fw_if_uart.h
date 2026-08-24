@@ -21,12 +21,11 @@
  * @enum   FW_IF_UART_ERRORS
  * @brief  Enumeration of UART return values
  */
-typedef enum
-{
-    FW_IF_UART_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
-    FW_IF_UART_ERRORS_DRIVER_FAILURE,
+typedef enum {
+	FW_IF_UART_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
+	FW_IF_UART_ERRORS_DRIVER_FAILURE,
 
-    MAX_FW_IF_UART_ERRORS
+	MAX_FW_IF_UART_ERRORS
 
 } FW_IF_UART_ERRORS;
 
@@ -34,15 +33,14 @@ typedef enum
  * @enum   FW_IF_UART_STATE
  * @brief  ioctrl options for UART interfaces (generic across all UART interfaces)
  */
-typedef enum
-{
-    FW_IF_UART_STATE_INIT,
-    FW_IF_UART_STATE_CREATE,
-    FW_IF_UART_STATE_OPENED,
-    FW_IF_UART_STATE_CLOSED,
-    FW_IF_UART_STATE_ERROR,
+typedef enum {
+	FW_IF_UART_STATE_INIT,
+	FW_IF_UART_STATE_CREATE,
+	FW_IF_UART_STATE_OPENED,
+	FW_IF_UART_STATE_CLOSED,
+	FW_IF_UART_STATE_ERROR,
 
-    MAX_FW_IF_UART_STATE
+	MAX_FW_IF_UART_STATE
 
 } FW_IF_UART_STATE;
 
@@ -50,14 +48,13 @@ typedef enum
 /**
  * @enum    FW_IF_UART_DATA_BITS
  * @brief   number of data bits for the UART configuration
-*/
-typedef enum
-{
-    FW_IF_UART_6_BITS,
-    FW_IF_UART_7_BITS,
-    FW_IF_UART_8_BITS,
+ */
+typedef enum {
+	FW_IF_UART_6_BITS,
+	FW_IF_UART_7_BITS,
+	FW_IF_UART_8_BITS,
 
-    MAX_FW_IF_UART_DATA_BITS
+	MAX_FW_IF_UART_DATA_BITS
 
 } FW_IF_UART_DATA_BITS;
 
@@ -65,13 +62,12 @@ typedef enum
 /**
  * @enum    FW_IF_UART_STOP_BITS
  * @brief   number of stop bits for the UART configuration
-*/
-typedef enum
-{
-    FW_IF_UART_1_STOP_BIT,
-    FW_IF_UART_2_STOP_BITS,
+ */
+typedef enum {
+	FW_IF_UART_1_STOP_BIT,
+	FW_IF_UART_2_STOP_BITS,
 
-    MAX_FW_IF_UART_STOP_BITS
+	MAX_FW_IF_UART_STOP_BITS
 
 } FW_IF_UART_STOP_BITS;
 
@@ -79,16 +75,15 @@ typedef enum
 /**
  * @enum    FW_IF_UART_PARITY
  * @brief   parity options for the UART configuration
-*/
-typedef enum
-{
-    FW_IF_UART_PARITY_NONE,
-    FW_IF_UART_PARITY_ODD,
-    FW_IF_UART_PARITY_EVEN,
-    FW_IF_UART_PARITY_MARK,
-    FW_IF_UART_PARITY_SPACE,
+ */
+typedef enum {
+	FW_IF_UART_PARITY_NONE,
+	FW_IF_UART_PARITY_ODD,
+	FW_IF_UART_PARITY_EVEN,
+	FW_IF_UART_PARITY_MARK,
+	FW_IF_UART_PARITY_SPACE,
 
-    MAX_FW_IF_UART_PARITY
+	MAX_FW_IF_UART_PARITY
 
 } FW_IF_UART_PARITY;
 
@@ -96,15 +91,14 @@ typedef enum
 /**
  * @enum    FW_IF_UART_FLOW_CTRL
  * @brief   flow control options for the UART configuration
-*/
-typedef enum
-{
-    FW_IF_UART_FLOW_CTRL_NONE,
-    FW_IF_UART_FLOW_CTRL_XONOFF,
-    FW_IF_UART_FLOW_CTRL_RTS_CTS,
-    FW_IF_UART_FLOW_CTRL_DSR_DTR,
+ */
+typedef enum {
+	FW_IF_UART_FLOW_CTRL_NONE,
+	FW_IF_UART_FLOW_CTRL_XONOFF,
+	FW_IF_UART_FLOW_CTRL_RTS_CTS,
+	FW_IF_UART_FLOW_CTRL_DSR_DTR,
 
-    MAX_FW_IF_UART_FLOW_CTRL
+	MAX_FW_IF_UART_FLOW_CTRL
 
 } FW_IF_UART_FLOW_CTRL;
 
@@ -117,10 +111,9 @@ typedef enum
  * @struct  FWIfUartInitCfg
  * @brief   Config options for UART initialisation (generic across all UART interfaces)
  */
-typedef struct
-{
-    uint8_t     ucUartDeviceId;
-    uint32_t    ulBaseAddr;
+typedef struct {
+	uint8_t ucUartDeviceId;
+	uint32_t ulBaseAddr;
 
 } FWIfUartInitCfg;
 
@@ -128,15 +121,14 @@ typedef struct
  * @struct  FWIfUartCfg
  * @brief   Config options for UART interfaces (generic across all UART interfaces)
  */
-typedef struct
-{
-    uint32_t                ulPort;
-    uint32_t                ulBaudRate;
-    FW_IF_UART_DATA_BITS    xDataBits;
-    FW_IF_UART_STOP_BITS    xStopBits;
-    FW_IF_UART_PARITY       xParity;
-    FW_IF_UART_FLOW_CTRL    xFlowCtrl;
-    FW_IF_UART_STATE        xState;
+typedef struct {
+	uint32_t ulPort;
+	uint32_t ulBaudRate;
+	FW_IF_UART_DATA_BITS xDataBits;
+	FW_IF_UART_STOP_BITS xStopBits;
+	FW_IF_UART_PARITY xParity;
+	FW_IF_UART_FLOW_CTRL xFlowCtrl;
+	FW_IF_UART_STATE xState;
 
 } FWIfUartCfg;
 
@@ -152,7 +144,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_UART_Init( FWIfUartInitCfg *pxInitCfg );
+uint32_t ulFW_IF_UART_Init(FWIfUartInitCfg* pxInitCfg);
 
 /**
  * @brief   Creates an instance of the UART interface
@@ -161,8 +153,8 @@ uint32_t ulFW_IF_UART_Init( FWIfUartInitCfg *pxInitCfg );
  * @param   uartCfg     unique data of this instance (port, address, etc)
  *
  * @return  See FW_IF_ERRORS
-*/
-uint32_t ulFW_IF_UART_Create( FWIfCfg *pxFwIf, FWIfUartCfg *pxUartCfg );
+ */
+uint32_t ulFW_IF_UART_Create(FWIfCfg* pxFwIf, FWIfUartCfg* pxUartCfg);
 
 /**
  *
@@ -171,7 +163,7 @@ uint32_t ulFW_IF_UART_Create( FWIfCfg *pxFwIf, FWIfUartCfg *pxUartCfg );
  * @return   OK                  Stats retrieved from interface successfully
  *           ERROR               Stats not retrieved successfully
  */
-int iFW_IF_UART_PrintStatistics( void );
+int iFW_IF_UART_PrintStatistics(void);
 
 /**
  *
@@ -180,6 +172,6 @@ int iFW_IF_UART_PrintStatistics( void );
  * @return   OK                  Stats cleared successfully
  *           ERROR               Stats not cleared successfully
  */
-int iFW_IF_UART_ClearStatistics( void );
+int iFW_IF_UART_ClearStatistics(void);
 
 #endif /* _FW_IF_UART_H_ */

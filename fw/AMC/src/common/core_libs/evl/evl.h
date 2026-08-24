@@ -18,10 +18,10 @@
 
 
 #ifndef EVL_LOG_LEN
-#define EVL_LOG_LEN ( 100 )
+#define EVL_LOG_LEN (100)
 #endif
 
-#define EVL_MAX_BINDINGS ( 10 )
+#define EVL_MAX_BINDINGS (10)
 
 
 /******************************************************************************/
@@ -32,13 +32,12 @@
  * @struct  EVLSignal
  * @brief   Single instance of an event
  */
-typedef struct EVLSignal
-{
-    uint8_t ucModule;           /* Unique ID of the module raising the event   */
-    uint8_t ucEventType;        /* Unique ID of the event raised by the module */
-    uint8_t ucInstance;         /* Specific instance of the event raised       */
-    /* - for optional tracking                     */
-    uint8_t ucAdditionalData;   /* Additional data if required.                */
+typedef struct EVLSignal {
+	uint8_t ucModule;    /* Unique ID of the module raising the event   */
+	uint8_t ucEventType; /* Unique ID of the event raised by the module */
+	uint8_t ucInstance;  /* Specific instance of the event raised       */
+	/* - for optional tracking                     */
+	uint8_t ucAdditionalData; /* Additional data if required.                */
 
 } EVLSignal;
 
@@ -51,7 +50,7 @@ typedef struct EVLSignal
  *          ERROR if an error was raised in the callback
  *
  */
-typedef int ( EVL_CALLBACK )( EVLSignal *pxSignal );
+typedef int(EVL_CALLBACK)(EVLSignal* pxSignal);
 
 /**
  * @struct  EVLRecord
@@ -71,7 +70,7 @@ typedef struct EVLRecord EVLRecord;
  *          ERROR if library not initialised
  *
  */
-int iEVL_Initialise( void );
+int iEVL_Initialise(void);
 
 /**
  * @brief Initialise Event Library Record
@@ -81,7 +80,7 @@ int iEVL_Initialise( void );
  * @return OK if record initialised successfully
  *         ERROR if record not initialised
  */
-int iEVL_CreateRecord( EVLRecord **ppxRecord );
+int iEVL_CreateRecord(EVLRecord** ppxRecord);
 
 /**
  * @brief   Bind a callback into a module
@@ -94,7 +93,7 @@ int iEVL_CreateRecord( EVLRecord **ppxRecord );
  *
  * @note    Only EVL_MAX_BINDINGS may be bound to a single record
  */
-int iEVL_BindCallback( EVLRecord *pxRecord, EVL_CALLBACK *pxNewCallback );
+int iEVL_BindCallback(EVLRecord* pxRecord, EVL_CALLBACK* pxNewCallback);
 
 /**
  * @brief   Raise an event to each bound-in callback
@@ -106,7 +105,7 @@ int iEVL_BindCallback( EVLRecord *pxRecord, EVL_CALLBACK *pxNewCallback );
  *          ERROR if an error was returned by the callback
  *
  */
-int iEVL_RaiseEvent( EVLRecord *pxRecord, EVLSignal *pxSignal );
+int iEVL_RaiseEvent(EVLRecord* pxRecord, EVLSignal* pxSignal);
 
 /**
  * @brief   Get event stats
@@ -117,7 +116,7 @@ int iEVL_RaiseEvent( EVLRecord *pxRecord, EVLSignal *pxSignal );
  *          ERROR if the stats could not be retrieved
  *
  */
-int iEVL_GetStats( EVLRecord *pxRecord );
+int iEVL_GetStats(EVLRecord* pxRecord);
 
 /**
  * @brief   Print all the stats gathered by the library
@@ -126,7 +125,7 @@ int iEVL_GetStats( EVLRecord *pxRecord );
  *          ERROR       Stats not retrieved successfully
  *
  */
-int iEVL_PrintStatistics( void );
+int iEVL_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the library
@@ -135,7 +134,7 @@ int iEVL_PrintStatistics( void );
  *          ERROR       Stats not cleared successfully
  *
  */
-int iEVL_ClearStatistics( void );
+int iEVL_ClearStatistics(void);
 
 /**
  * @brief   Retrieve the event log
@@ -143,11 +142,11 @@ int iEVL_ClearStatistics( void );
  * @return  OK          Log retrieved successfully
  *          ERROR       Log not retrieved
  */
-int iEVL_PrintLog( void );
+int iEVL_PrintLog(void);
 
 /**
  * @brief   Toggle verbosity of EVL, TRUE or FALSE
  */
-void vEVL_SetVerbosity( int iVerbosity );
+void vEVL_SetVerbosity(int iVerbosity);
 
 #endif /* _EVL_H_ */

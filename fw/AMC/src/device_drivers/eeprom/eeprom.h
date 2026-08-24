@@ -18,8 +18,8 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define EEPROM_MAX_FIELD_SIZE   ( 40 )
-#define EEPROM_MAX_DATA_SIZE    ( 255 )
+#define EEPROM_MAX_FIELD_SIZE (40)
+#define EEPROM_MAX_DATA_SIZE  (255)
 
 
 /******************************************************************************/
@@ -30,16 +30,15 @@
  * @struct  EEPROMCfg
  * @brief   The EEPROM device configuration
  */
-typedef struct
-{
-    uint8_t  ucEepromI2cBus;            /* I2C Bus number of the device*/
-    uint8_t  ucEepromSlaveAddress;      /* I2C Slave address of the device */
-    uint8_t  ucEepromAddressSize;       /* The number of bytes in the EEPROM register address */
-    uint8_t  ucEepromPageSize;          /* Eeprom page size */
-    uint16_t usEepromNumPages;          /* The number of page in Eeprom */
-    uint8_t  ucEepromDeviceIdAddress;   /* I2C Slave address for reaching the device id register */
-    uint8_t  ucEepromDeviceIdRegister;  /* Device ID register */
-    uint16_t usEepromDeviceId;          /* The device id of eeprom */
+typedef struct {
+	uint8_t ucEepromI2cBus;           /* I2C Bus number of the device*/
+	uint8_t ucEepromSlaveAddress;     /* I2C Slave address of the device */
+	uint8_t ucEepromAddressSize;      /* The number of bytes in the EEPROM register address */
+	uint8_t ucEepromPageSize;         /* Eeprom page size */
+	uint16_t usEepromNumPages;        /* The number of page in Eeprom */
+	uint8_t ucEepromDeviceIdAddress;  /* I2C Slave address for reaching the device id register */
+	uint8_t ucEepromDeviceIdRegister; /* Device ID register */
+	uint16_t usEepromDeviceId;        /* The device id of eeprom */
 
 } EEPROMCfg;
 
@@ -51,14 +50,13 @@ typedef struct
  * @enum    EEPROM_VERSION
  * @brief   enumeration for all the supported EEPROM versions
  */
-typedef enum
-{
-    EEPROM_VERSION_1_0 = 1,
-    EEPROM_VERSION_3_0 = 30,
-    EEPROM_VERSION_3_1,
-    EEPROM_VERSION_4_0 = 40,
+typedef enum {
+	EEPROM_VERSION_1_0 = 1,
+	EEPROM_VERSION_3_0 = 30,
+	EEPROM_VERSION_3_1,
+	EEPROM_VERSION_4_0 = 40,
 
-    EEPROM_VERSION_MAX
+	EEPROM_VERSION_MAX
 
 } EEPROM_VERSION;
 
@@ -75,7 +73,7 @@ typedef enum
  *
  * @return  OK if successful, else ERROR.
  */
-int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROMCfg *pxEepromCfg );
+int iEEPROM_Initialise(EEPROM_VERSION xEepromVersion, EEPROMCfg* pxEepromCfg);
 
 /**
  * @brief   Read the EEPROM Version
@@ -87,7 +85,7 @@ int iEEPROM_Initialise( EEPROM_VERSION xEepromVersion, EEPROMCfg *pxEepromCfg );
  *          ERROR          EEPROM Version not read successfully
  *
  */
-int iEEPROM_GetEepromVersion( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetEepromVersion(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Product Name
@@ -99,7 +97,7 @@ int iEEPROM_GetEepromVersion( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Product Name not read successfully
  *
  */
-int iEEPROM_GetProductName( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetProductName(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Product Revision
@@ -111,7 +109,7 @@ int iEEPROM_GetProductName( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Product Revision not read successfully
  *
  */
-int iEEPROM_GetProductRevision( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetProductRevision(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the board serial number
@@ -123,7 +121,7 @@ int iEEPROM_GetProductRevision( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Serial number not read successfully
  *
  */
-int iEEPROM_GetSerialNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetSerialNumber(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the number of MAC addresses
@@ -135,7 +133,7 @@ int iEEPROM_GetSerialNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          MAC address count not read successfully
  *
  */
-int iEEPROM_GetMacAddressCount( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetMacAddressCount(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the First MAC Address
@@ -147,7 +145,7 @@ int iEEPROM_GetMacAddressCount( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          First MAC Address not read successfully
  *
  */
-int iEEPROM_GetFirstMacAddress( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetFirstMacAddress(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Active/Passive state
@@ -159,7 +157,7 @@ int iEEPROM_GetFirstMacAddress( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Active/Passive State not read successfully
  *
  */
-int iEEPROM_GetActiveState( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetActiveState(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Config Mode
@@ -171,7 +169,7 @@ int iEEPROM_GetActiveState( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Config Mode not read successfully
  *
  */
-int iEEPROM_GetConfigMode( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetConfigMode(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Manufacturing Date
@@ -183,7 +181,7 @@ int iEEPROM_GetConfigMode( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Manufacturing Date not read successfully
  *
  */
-int iEEPROM_GetManufacturingDate( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetManufacturingDate(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Part Number
@@ -195,7 +193,7 @@ int iEEPROM_GetManufacturingDate( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Part Number not read successfully
  *
  */
-int iEEPROM_GetPartNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetPartNumber(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Manufacturer Part Number
@@ -207,7 +205,7 @@ int iEEPROM_GetPartNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Part Number not read successfully
  *
  */
-int iEEPROM_GetMfgPartNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetMfgPartNumber(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the UUID
@@ -219,7 +217,7 @@ int iEEPROM_GetMfgPartNumber( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          UUID not read successfully
  *
  */
-int iEEPROM_GetUuid( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetUuid(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the PCIe ID
@@ -231,7 +229,7 @@ int iEEPROM_GetUuid( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          PCIe ID not read successfully
  *
  */
-int iEEPROM_GetPcieId( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetPcieId(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Max Power Mode
@@ -243,7 +241,7 @@ int iEEPROM_GetPcieId( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Max Power Mode not read successfully
  *
  */
-int iEEPROM_GetMaxPowerMode( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetMaxPowerMode(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Memory Size
@@ -255,7 +253,7 @@ int iEEPROM_GetMaxPowerMode( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Memory Size not read successfully
  *
  */
-int iEEPROM_GetMemorySize( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetMemorySize(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the OEM ID
@@ -267,7 +265,7 @@ int iEEPROM_GetMemorySize( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          OEM ID not read successfully
  *
  */
-int iEEPROM_GetOemId( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetOemId(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Capability
@@ -279,7 +277,7 @@ int iEEPROM_GetOemId( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Capability not read successfully
  *
  */
-int iEEPROM_GetCapability( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetCapability(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read the Config Mode
@@ -291,7 +289,7 @@ int iEEPROM_GetCapability( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Config Mode not read successfully
  *
  */
-int iEEPROM_GetConfigMode( uint8_t *pucField, uint8_t *pucSizeBytes );
+int iEEPROM_GetConfigMode(uint8_t* pucField, uint8_t* pucSizeBytes);
 
 /**
  * @brief   Read raw data
@@ -304,7 +302,7 @@ int iEEPROM_GetConfigMode( uint8_t *pucField, uint8_t *pucSizeBytes );
  *          ERROR          Data not read successfully
  *
  */
-int iEEPROM_ReadRawValue( uint8_t *pucData, uint8_t ucSizeBytes, uint8_t ucEepromAddr );
+int iEEPROM_ReadRawValue(uint8_t* pucData, uint8_t ucSizeBytes, uint8_t ucEepromAddr);
 
 /**
  * @brief   Write raw data
@@ -317,7 +315,7 @@ int iEEPROM_ReadRawValue( uint8_t *pucData, uint8_t ucSizeBytes, uint8_t ucEepro
  *          ERROR          Data not written successfully
  *
  */
-int iEEPROM_WriteRawValue( uint8_t *pucData, uint8_t ucSizeBytes, uint8_t ucEepromAddr );
+int iEEPROM_WriteRawValue(uint8_t* pucData, uint8_t ucSizeBytes, uint8_t ucEepromAddr);
 
 /**
  * @brief   Print all the stats gathered by the eeprom driver
@@ -326,7 +324,7 @@ int iEEPROM_WriteRawValue( uint8_t *pucData, uint8_t ucSizeBytes, uint8_t ucEepr
  *          ERROR               Stats not retrieved successfully
  *
  */
-int iEEPROM_PrintStatistics( void );
+int iEEPROM_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the eeprom driver
@@ -335,7 +333,7 @@ int iEEPROM_PrintStatistics( void );
  *          ERROR               Stats not cleared successfully
  *
  */
-int iEEPROM_ClearStatistics( void );
+int iEEPROM_ClearStatistics(void);
 
 /**
  * @brief   Display all the EEPROM fields
@@ -344,6 +342,6 @@ int iEEPROM_ClearStatistics( void );
  *          ERROR               Stats not cleared successfully
  *
  */
-int iEEPROM_DisplayEepromValues( void );
+int iEEPROM_DisplayEepromValues(void);
 
 #endif /* _EEPROM_H_ */

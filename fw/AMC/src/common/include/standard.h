@@ -21,39 +21,38 @@
 /******************************************************************************/
 
 #ifndef OK
-#define OK          ( 0 )
+#define OK (0)
 #endif
 
 #ifndef ERROR
-#define ERROR       ( -1 )
+#define ERROR (-1)
 #endif
 
 #ifndef TRUE
-#define TRUE        ( 1 )
+#define TRUE (1)
 #endif
 
 #ifndef FALSE
-#define FALSE       ( 0 )
+#define FALSE (0)
 #endif
 
 #ifndef UNUSED
-#define UNUSED( p ) ( void )( p )
+#define UNUSED(p) (void)(p)
 #endif
 
-#define MD5_SIZE    ( 16 )
+#define MD5_SIZE (16)
 
 /**
  * @enum   MODULE_STATE
  *
  * @brief  Module states
  */
-typedef enum
-{
-    MODULE_STATE_OK = 0,
-    MODULE_STATE_UNINITIALISED,
-    MODULE_STATE_ERROR,
+typedef enum {
+	MODULE_STATE_OK = 0,
+	MODULE_STATE_UNINITIALISED,
+	MODULE_STATE_ERROR,
 
-    MAX_MODULE_STATE
+	MAX_MODULE_STATE
 
 } MODULE_STATE;
 

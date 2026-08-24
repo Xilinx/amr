@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the profile debug menu
@@ -16,6 +16,6 @@
  * @return  none.
  *
  */
-void vDebugMenu_Initialise( void );
+void vDebugMenu_Initialise(void);
 
 #endif /* _PROFILE_DEBUG_MENU_H_ */

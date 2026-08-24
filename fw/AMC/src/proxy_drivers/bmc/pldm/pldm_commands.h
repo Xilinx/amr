@@ -26,7 +26,7 @@
  *
  * @return  Response size
  */
-typedef int ( *PldmFunction )( const void *PayLoadIn, void *PayloadOut );
+typedef int (*PldmFunction)(const void* PayLoadIn, void* PayloadOut);
 
 /**
  * @brief   Get the PLDM function for the type
@@ -37,6 +37,6 @@ typedef int ( *PldmFunction )( const void *PayLoadIn, void *PayloadOut );
  *
  * @return  RESP_PLDM_SUCCESS if successful, other error if type or command not supported
  */
-int get_pldm_func( uint8_t pldm_type, uint8_t pldm_cmd, PldmFunction *func );
+int get_pldm_func(uint8_t pldm_type, uint8_t pldm_cmd, PldmFunction* func);
 
 #endif /* PLDM_COMMANDS_H_ */

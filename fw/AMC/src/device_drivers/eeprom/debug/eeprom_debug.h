@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the EEPROM debug access
@@ -24,6 +24,6 @@
  *
  * @return  N/A
  */
-void vEeprom_DebugInit( DAL_HDL pxParentHandle );
+void vEeprom_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _EEPROM_DEBUG_H_ */

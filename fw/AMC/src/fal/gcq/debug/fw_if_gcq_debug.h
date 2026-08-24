@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF sGCQ debug access
@@ -24,6 +24,6 @@
  *
  * @return  N/A
  */
-void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle );
+void vFW_IF_GCQ_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _FW_IF_GCQ_DEBUG_H_ */

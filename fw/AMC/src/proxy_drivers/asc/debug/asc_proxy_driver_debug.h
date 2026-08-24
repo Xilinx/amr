@@ -24,7 +24,6 @@
  *
  * @return  N/A
  */
-void vASC_DebugInit( DAL_HDL pxParentHandle );
+void vASC_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _ASC_PROXY_DRIVER_DEBUG_H_ */
-

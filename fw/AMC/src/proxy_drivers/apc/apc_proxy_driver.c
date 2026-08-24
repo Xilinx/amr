@@ -22,125 +22,137 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define APC_NAME            "APC"
+#define APC_NAME "APC"
 
-#define APC_TASK_SLEEP_MS   ( 100 )
-#define APC_POR_DELAY_MS    ( 500 )
+#define APC_TASK_SLEEP_MS (100)
+#define APC_POR_DELAY_MS  (500)
 
-#define APC_MBOX_SIZE       ( 10 )
+#define APC_MBOX_SIZE (10)
 
-#define APC_FPT_HDR_SIZE    ( 128 )
-#define APC_FPT_PTN_SIZE    ( 128 )
-#define APC_FPT_PTN_OFFSET  ( 128 * 1024 )
+#define APC_FPT_HDR_SIZE   (128)
+#define APC_FPT_PTN_SIZE   (128)
+#define APC_FPT_PTN_OFFSET (128 * 1024)
 
-#define APC_MULTIBOOT_OFFSET( r ) ( ( r ) / ( 1024 * 32 ) )
-#define APC_MULTIBOOT_REAL( r )   ( ( r ) * ( 1024 * 32 ) )
+#define APC_MULTIBOOT_OFFSET(r) ((r) / (1024 * 32))
+#define APC_MULTIBOOT_REAL(r)   ((r) * (1024 * 32))
 
-#define APC_PMC_BOOT_TAG( d )   ( *( uint32_t* )( ( d ) + HAL_APC_PDI_BIT_MASK ) )
-#define APC_INVALID_PDI_TAG     ( 0xFFFFFFFF )
+#define APC_PMC_BOOT_TAG(d) (*(uint32_t*)((d) + HAL_APC_PDI_BIT_MASK))
+#define APC_INVALID_PDI_TAG (0xFFFFFFFF)
 
-#define APC_DEFAULT_PARTITION   ( 0 )
-#define APC_BASE_PACKET_SIZE    ( 1024 )
-#define APC_COPY_PACKET_SIZE_KB ( 128 )
+#define APC_DEFAULT_PARTITION   (0)
+#define APC_BASE_PACKET_SIZE    (1024)
+#define APC_COPY_PACKET_SIZE_KB (128)
 
-#define APC_COPY_CHUNK_LEN      ( 0x1000 )           /* 4KB */
+#define APC_COPY_CHUNK_LEN (0x1000) /* 4KB */
 
 #ifndef APC_FPT_HDR_MAGIC_NUM
-#define APC_FPT_HDR_MAGIC_NUM   ( 0x92F7A516 )
+#define APC_FPT_HDR_MAGIC_NUM (0x92F7A516)
 #endif
 
 /* Stat & Error definitions */
-#define APC_PROXY_STATS( DO )                        \
-    DO( APC_PROXY_STATS_INIT_OVERALL_COMPLETE )      \
-    DO( APC_PROXY_STATS_MUTEX_CREATE )               \
-    DO( APC_PROXY_STATS_MUTEX_TAKE )                 \
-    DO( APC_PROXY_STATS_MUTEX_RELEASE )              \
-    DO( APC_PROXY_STATS_MBOX_CREATE )                \
-    DO( APC_PROXY_STATS_MBOX_DOWNLOAD_POST )         \
-    DO( APC_PROXY_STATS_MBOX_DOWNLOAD_PEND )         \
-    DO( APC_PROXY_STATS_MBOX_COPY_POST )             \
-    DO( APC_PROXY_STATS_MBOX_COPY_PEND )             \
-    DO( APC_PROXY_STATS_MBOX_PTN_SELECT_POST )       \
-    DO( APC_PROXY_STATS_MBOX_PTN_SELECT_PEND )       \
-    DO( APC_PROXY_STATS_MBOX_SYSTEM_POR_POST )       \
-    DO( APC_PROXY_STATS_MBOX_SYSTEM_POR_PEND )       \
-    DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST ) \
-    DO( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND ) \
-    DO( APC_PROXY_STATS_MBOX_LOAD_PDI_POST )         \
-    DO( APC_PROXY_STATS_MBOX_LOAD_PDI_PEND )         \
-    DO( APC_PROXY_STATS_PDI_LOAD_COMPLETE )          \
-    DO( APC_PROXY_STATS_TASK_CREATE )                \
-    DO( APC_PROXY_STATS_FPT_CREATED )                \
-    DO( APC_PROXY_STATS_FPT_HEADER_LOADED )          \
-    DO( APC_PROXY_STATS_FPT_PARTITION_LOADED )       \
-    DO( APC_PROXY_STATS_FPT_HEADER_READ )            \
-    DO( APC_PROXY_STATS_FPT_PARTITION_READ )         \
-    DO( APC_PROXY_STATS_FPT_FLAGS_UPDATED )          \
-    DO( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )    \
-    DO( APC_PROXY_STATS_IMAGE_COPY_COMPLETE )        \
-    DO( APC_PROXY_STATS_PARTITION_SELECTED )         \
-    DO( APC_PROXY_STATS_POR_TRIGGERED )              \
-    DO( APC_PROXY_STATS_TASK_TIME_MS )               \
-    DO( APC_PROXY_STATS_FPT_UPDATE )                 \
-    DO( APC_PROXY_STATS_STATUS_RETRIEVAL )           \
-    DO( APC_PROXY_STATS_NUM_BOOT_DEVICES )           \
-    DO( APC_PROXY_STATS_MAX )
+#define APC_PROXY_STATS(DO)                        \
+	DO(APC_PROXY_STATS_INIT_OVERALL_COMPLETE)      \
+	DO(APC_PROXY_STATS_MUTEX_CREATE)               \
+	DO(APC_PROXY_STATS_MUTEX_TAKE)                 \
+	DO(APC_PROXY_STATS_MUTEX_RELEASE)              \
+	DO(APC_PROXY_STATS_MBOX_CREATE)                \
+	DO(APC_PROXY_STATS_MBOX_DOWNLOAD_POST)         \
+	DO(APC_PROXY_STATS_MBOX_DOWNLOAD_PEND)         \
+	DO(APC_PROXY_STATS_MBOX_COPY_POST)             \
+	DO(APC_PROXY_STATS_MBOX_COPY_PEND)             \
+	DO(APC_PROXY_STATS_MBOX_PTN_SELECT_POST)       \
+	DO(APC_PROXY_STATS_MBOX_PTN_SELECT_PEND)       \
+	DO(APC_PROXY_STATS_MBOX_SYSTEM_POR_POST)       \
+	DO(APC_PROXY_STATS_MBOX_SYSTEM_POR_PEND)       \
+	DO(APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST) \
+	DO(APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND) \
+	DO(APC_PROXY_STATS_MBOX_LOAD_PDI_POST)         \
+	DO(APC_PROXY_STATS_MBOX_LOAD_PDI_PEND)         \
+	DO(APC_PROXY_STATS_PDI_LOAD_COMPLETE)          \
+	DO(APC_PROXY_STATS_TASK_CREATE)                \
+	DO(APC_PROXY_STATS_FPT_CREATED)                \
+	DO(APC_PROXY_STATS_FPT_HEADER_LOADED)          \
+	DO(APC_PROXY_STATS_FPT_PARTITION_LOADED)       \
+	DO(APC_PROXY_STATS_FPT_HEADER_READ)            \
+	DO(APC_PROXY_STATS_FPT_PARTITION_READ)         \
+	DO(APC_PROXY_STATS_FPT_FLAGS_UPDATED)          \
+	DO(APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE)    \
+	DO(APC_PROXY_STATS_IMAGE_COPY_COMPLETE)        \
+	DO(APC_PROXY_STATS_PARTITION_SELECTED)         \
+	DO(APC_PROXY_STATS_POR_TRIGGERED)              \
+	DO(APC_PROXY_STATS_TASK_TIME_MS)               \
+	DO(APC_PROXY_STATS_FPT_UPDATE)                 \
+	DO(APC_PROXY_STATS_STATUS_RETRIEVAL)           \
+	DO(APC_PROXY_STATS_NUM_BOOT_DEVICES)           \
+	DO(APC_PROXY_STATS_MAX)
 
-#define APC_PROXY_ERRORS( DO )                               \
-    DO( APC_PROXY_ERRORS_INIT_NOT_COMPLETE )                 \
-    DO( APC_PROXY_ERRORS_FW_IF_OPEN_FAILED )                 \
-    DO( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )                \
-    DO( APC_PROXY_ERRORS_FW_IF_READ_FAILED )                 \
-    DO( APC_PROXY_ERRORS_MUTEX_CREATE_FAILED )               \
-    DO( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )                 \
-    DO( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )              \
-    DO( APC_PROXY_ERRORS_MBOX_CREATE_FAILED )                \
-    DO( APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED )         \
-    DO( APC_PROXY_ERRORS_MBOX_COPY_POST_FAILED )             \
-    DO( APC_PROXY_ERRORS_MBOX_PTN_SELECT_POST_FAILED )       \
-    DO( APC_PROXY_ERRORS_MBOX_SYSTEM_POR_POST_FAILED )      \
-    DO( APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED ) \
-    DO( APC_PROXY_ERRORS_MBOX_LOAD_PDI_POST_FAILED )         \
-    DO( APC_PROXY_ERRORS_PDI_LOAD_FAILED )                   \
-    DO( APC_PROXY_ERRORS_XLOADER_INSTANCE_NULL )             \
-    DO( APC_PROXY_ERRORS_MBOX_PEND_FAILED )                  \
-    DO( APC_PROXY_ERRORS_TASK_CREATE_FAILED )                \
-    DO( APC_PROXY_ERRORS_LOAD_FPT_FAILED )                   \
-    DO( APC_PROXY_ERRORS_FPT_NOT_CREATED )                   \
-    DO( APC_PROXY_ERRORS_FPT_INVALID_HEADER )                \
-    DO( APC_PROXY_ERRORS_FPT_INVALID_PARTITION )             \
-    DO( APC_PROXY_ERRORS_FPT_HEADER_NOT_READ )               \
-    DO( APC_PROXY_ERRORS_FPT_PARTITION_NOT_READ )            \
-    DO( APC_PROXY_ERRORS_FPT_NO_ENTRIES )                    \
-    DO( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )   \
-    DO( APC_PROXY_ERRORS_IMAGE_SIZE_ERROR )                  \
-    DO( APC_PROXY_ERRORS_PACKET_SIZE_ERROR )                 \
-    DO( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )             \
-    DO( APC_PROXY_ERRORS_IMAGE_COPY_FAILED )                 \
-    DO( APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED )        \
-    DO( APC_PROXY_ERRORS_POR_FAILED )                        \
-    DO( APC_PROXY_ERRORS_COPY_BUFFER_CREATION_FAILED )       \
-    DO( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )                \
-    DO( APC_PROXY_ERRORS_VALIDATION_FAILED )                 \
-    DO( APC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED )            \
-    DO( APC_PROXY_ERRORS_FPT_UPDATE_FAILED )                 \
-    DO( APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED )           \
-    DO( APC_PROXY_ERRORS_INVALID_BOOT_DEVICE )               \
-    DO( APC_PROXY_ERRORS_MAX )
+#define APC_PROXY_ERRORS(DO)                               \
+	DO(APC_PROXY_ERRORS_INIT_NOT_COMPLETE)                 \
+	DO(APC_PROXY_ERRORS_FW_IF_OPEN_FAILED)                 \
+	DO(APC_PROXY_ERRORS_FW_IF_WRITE_FAILED)                \
+	DO(APC_PROXY_ERRORS_FW_IF_READ_FAILED)                 \
+	DO(APC_PROXY_ERRORS_MUTEX_CREATE_FAILED)               \
+	DO(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)                 \
+	DO(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)              \
+	DO(APC_PROXY_ERRORS_MBOX_CREATE_FAILED)                \
+	DO(APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED)         \
+	DO(APC_PROXY_ERRORS_MBOX_COPY_POST_FAILED)             \
+	DO(APC_PROXY_ERRORS_MBOX_PTN_SELECT_POST_FAILED)       \
+	DO(APC_PROXY_ERRORS_MBOX_SYSTEM_POR_POST_FAILED)       \
+	DO(APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED) \
+	DO(APC_PROXY_ERRORS_MBOX_LOAD_PDI_POST_FAILED)         \
+	DO(APC_PROXY_ERRORS_PDI_LOAD_FAILED)                   \
+	DO(APC_PROXY_ERRORS_XLOADER_INSTANCE_NULL)             \
+	DO(APC_PROXY_ERRORS_MBOX_PEND_FAILED)                  \
+	DO(APC_PROXY_ERRORS_TASK_CREATE_FAILED)                \
+	DO(APC_PROXY_ERRORS_LOAD_FPT_FAILED)                   \
+	DO(APC_PROXY_ERRORS_FPT_NOT_CREATED)                   \
+	DO(APC_PROXY_ERRORS_FPT_INVALID_HEADER)                \
+	DO(APC_PROXY_ERRORS_FPT_INVALID_PARTITION)             \
+	DO(APC_PROXY_ERRORS_FPT_HEADER_NOT_READ)               \
+	DO(APC_PROXY_ERRORS_FPT_PARTITION_NOT_READ)            \
+	DO(APC_PROXY_ERRORS_FPT_NO_ENTRIES)                    \
+	DO(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)   \
+	DO(APC_PROXY_ERRORS_IMAGE_SIZE_ERROR)                  \
+	DO(APC_PROXY_ERRORS_PACKET_SIZE_ERROR)                 \
+	DO(APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED)             \
+	DO(APC_PROXY_ERRORS_IMAGE_COPY_FAILED)                 \
+	DO(APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED)        \
+	DO(APC_PROXY_ERRORS_POR_FAILED)                        \
+	DO(APC_PROXY_ERRORS_COPY_BUFFER_CREATION_FAILED)       \
+	DO(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)                \
+	DO(APC_PROXY_ERRORS_VALIDATION_FAILED)                 \
+	DO(APC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED)            \
+	DO(APC_PROXY_ERRORS_FPT_UPDATE_FAILED)                 \
+	DO(APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED)           \
+	DO(APC_PROXY_ERRORS_INVALID_BOOT_DEVICE)               \
+	DO(APC_PROXY_ERRORS_MAX)
 
-#define PRINT_STAT_COUNTER( x )  PLL_INF( APC_NAME,         \
-                      "%50s . . . . %d\r\n",                \
-                      APC_PROXY_STATS_STR[ x ],             \
-                      pxThis->pulStats[ x ] )
-#define PRINT_ERROR_COUNTER( x ) PLL_INF( APC_NAME,         \
-                      "%50s . . . . %d\r\n",                \
-                      APC_PROXY_ERRORS_STR[ x ],            \
-                      pxThis->pulErrors[ x ] )
+#define PRINT_STAT_COUNTER(x) \
+	PLL_INF(APC_NAME, "%50s . . . . %d\r\n", APC_PROXY_STATS_STR[x], pxThis->pulStats[x])
+#define PRINT_ERROR_COUNTER(x) \
+	PLL_INF(APC_NAME, "%50s . . . . %d\r\n", APC_PROXY_ERRORS_STR[x], pxThis->pulErrors[x])
 
-#define INC_STAT_COUNTER( x )             { if ( x < APC_PROXY_STATS_MAX ) pxThis->pulStats[ x ]++; }
-#define INC_ERROR_COUNTER( x )            { if ( x < APC_PROXY_ERRORS_MAX ) pxThis->pulErrors[ x ]++; }
-#define INC_ERROR_COUNTER_WITH_STATE( x ) { pxThis->xState = MODULE_STATE_ERROR; INC_ERROR_COUNTER( x ) }
-#define SET_STAT_COUNTER( x, y )          { if ( x < APC_PROXY_ERRORS_MAX ) pxThis->pulStats[ x ] = y; }
+#define INC_STAT_COUNTER(x)          \
+	{                                \
+		if (x < APC_PROXY_STATS_MAX) \
+			pxThis->pulStats[x]++;   \
+	}
+#define INC_ERROR_COUNTER(x)          \
+	{                                 \
+		if (x < APC_PROXY_ERRORS_MAX) \
+			pxThis->pulErrors[x]++;   \
+	}
+#define INC_ERROR_COUNTER_WITH_STATE(x)      \
+	{                                        \
+		pxThis->xState = MODULE_STATE_ERROR; \
+		INC_ERROR_COUNTER(x)                 \
+	}
+#define SET_STAT_COUNTER(x, y)        \
+	{                                 \
+		if (x < APC_PROXY_ERRORS_MAX) \
+			pxThis->pulStats[x] = y;  \
+	}
 
 
 /******************************************************************************/
@@ -151,27 +163,26 @@
  * @enum    APC_PROXY_STATS
  * @brief   Enumeration of stats counters for this application
  */
-UTIL_MAKE_ENUM_AND_STRINGS( APC_PROXY_STATS, APC_PROXY_STATS, APC_PROXY_STATS_STR )
+UTIL_MAKE_ENUM_AND_STRINGS(APC_PROXY_STATS, APC_PROXY_STATS, APC_PROXY_STATS_STR)
 
 /**
  * @enum    APC_PROXY_ERRORS
  * @brief   Enumeration of stats errors for this application
  */
-UTIL_MAKE_ENUM_AND_STRINGS( APC_PROXY_ERRORS, APC_PROXY_ERRORS, APC_PROXY_ERRORS_STR )
+UTIL_MAKE_ENUM_AND_STRINGS(APC_PROXY_ERRORS, APC_PROXY_ERRORS, APC_PROXY_ERRORS_STR)
 
 /**
  * @enum    APC_MSG_TYPES
  * @brief   Enumeration of mbox message types for this proxy
  */
-typedef enum
-{
-    APC_MSG_TYPE_DOWNLOAD_PDI = 0,
-    APC_MSG_TYPE_PROGRAM_PDI,
-    APC_MSG_TYPE_COPY_PDI,
-    APC_MSG_TYPE_PARTITION_SELECT,
-    APC_MSG_TYPE_SYSTEM_POR,
-    APC_MSG_TYPE_UPDATE_FPT_FLAGS,
-    MAX_APC_MSG_TYPE
+typedef enum {
+	APC_MSG_TYPE_DOWNLOAD_PDI = 0,
+	APC_MSG_TYPE_PROGRAM_PDI,
+	APC_MSG_TYPE_COPY_PDI,
+	APC_MSG_TYPE_PARTITION_SELECT,
+	APC_MSG_TYPE_SYSTEM_POR,
+	APC_MSG_TYPE_UPDATE_FPT_FLAGS,
+	MAX_APC_MSG_TYPE
 
 } APC_MSG_TYPES;
 
@@ -184,37 +195,36 @@ typedef enum
  * @struct  APCPrivateData
  * @brief   Structure to hold ths proxy driver's private data
  */
-typedef struct
-{
-    uint32_t    ulUpperFirewall;
+typedef struct {
+	uint32_t ulUpperFirewall;
 
-    int         iInitialised;
-    uint8_t     ucMyId;
+	int iInitialised;
+	uint8_t ucMyId;
 
-    FWIfCfg   *ppxFwIf[ MAX_APC_BOOT_DEVICES ];
-    XLoader_ClientInstance *pXLoaderInst;
+	FWIfCfg* ppxFwIf[MAX_APC_BOOT_DEVICES];
+	XLoader_ClientInstance* pXLoaderInst;
 
-    EVLRecord   *pxEvlRecord;
+	EVLRecord* pxEvlRecord;
 
-    void        *pvOsalMutexHdl;
-    void        *pvOsalFlashLockHdl;
-    void        *pvOsalMBoxHdl;
-    void        *pvOsalTaskHdl;
+	void* pvOsalMutexHdl;
+	void* pvOsalFlashLockHdl;
+	void* pvOsalMBoxHdl;
+	void* pvOsalTaskHdl;
 
-    int         piValidFpt[ MAX_APC_BOOT_DEVICES ];
-    APCProxyDriverFptHeader    pxFptHeader[ MAX_APC_BOOT_DEVICES ];
-    APCProxyDriverFptPartition *ppxFptPartitions[ MAX_APC_BOOT_DEVICES ];
+	int piValidFpt[MAX_APC_BOOT_DEVICES];
+	APCProxyDriverFptHeader pxFptHeader[MAX_APC_BOOT_DEVICES];
+	APCProxyDriverFptPartition* ppxFptPartitions[MAX_APC_BOOT_DEVICES];
 
-    uint8_t     pucChunkBuffer[ APC_COPY_CHUNK_LEN ];
+	uint8_t pucChunkBuffer[APC_COPY_CHUNK_LEN];
 
-    uint32_t    ulNextBootAddr;
+	uint32_t ulNextBootAddr;
 
-    MODULE_STATE xState;
+	MODULE_STATE xState;
 
-    uint32_t    pulStats[ APC_PROXY_STATS_MAX ];
-    uint32_t    pulErrors[ APC_PROXY_ERRORS_MAX ];
+	uint32_t pulStats[APC_PROXY_STATS_MAX];
+	uint32_t pulErrors[APC_PROXY_ERRORS_MAX];
 
-    uint32_t    ulLowerFirewall;
+	uint32_t ulLowerFirewall;
 
 } APCPrivateData;
 
@@ -222,21 +232,20 @@ typedef struct
  * @struct  APCMboxDownloadImage
  * @brief   Structure to post the image download data in the mailbox
  */
-typedef struct
-{
-    APC_BOOT_DEVICES xBootDevice;   /* target boot device */
-    int      iPartition;
-    int      iUpdateFpt;
-    int      iPdiProgram;
-    int      iApuPdiProgram;
-    int      iRpuPdiProgram;
-    int      iLastPacket;
-    uint32_t ulImageSize;
-    uint32_t ulSrcAddr;
-    uint16_t usPacketNum;
-    uint32_t ulPacketSize;
-    uint8_t  pucPdiMd5[MD5_SIZE];  /* MD5 checksum of PDI file */
-    uint32_t ulPdiSize;            /* Size of PDI file in bytes */
+typedef struct {
+	APC_BOOT_DEVICES xBootDevice; /* target boot device */
+	int iPartition;
+	int iUpdateFpt;
+	int iPdiProgram;
+	int iApuPdiProgram;
+	int iRpuPdiProgram;
+	int iLastPacket;
+	uint32_t ulImageSize;
+	uint32_t ulSrcAddr;
+	uint16_t usPacketNum;
+	uint32_t ulPacketSize;
+	uint8_t pucPdiMd5[MD5_SIZE]; /* MD5 checksum of PDI file */
+	uint32_t ulPdiSize;          /* Size of PDI file in bytes */
 
 } APCMboxDownloadImage;
 
@@ -244,14 +253,13 @@ typedef struct
  * @struct  APCMboxCopyImage
  * @brief   Structure to post the image copy data in the mailbox
  */
-typedef struct
-{
-    uint32_t ulAllocatedSize;
-    uint32_t ulCpyAddr;
-    APC_BOOT_DEVICES xSrcBootDevice;    /* boot device to copy from */
-    int iSrcPartition;                  /* partition to copy from */
-    APC_BOOT_DEVICES xDestBootDevice;   /* boot device to copy to */
-    int iDestPartition;                 /* partition to copy to */
+typedef struct {
+	uint32_t ulAllocatedSize;
+	uint32_t ulCpyAddr;
+	APC_BOOT_DEVICES xSrcBootDevice;  /* boot device to copy from */
+	int iSrcPartition;                /* partition to copy from */
+	APC_BOOT_DEVICES xDestBootDevice; /* boot device to copy to */
+	int iDestPartition;               /* partition to copy to */
 
 } APCMboxCopyImage;
 
@@ -259,11 +267,10 @@ typedef struct
  * @struct  APCMboxUpdateFptFlags
  * @brief   Structure to update the FPT flags in the mailbox
  */
-typedef struct
-{
-    APC_BOOT_DEVICES xBootDevice;
-    int iPartition;
-    uint32_t ulFlags;
+typedef struct {
+	APC_BOOT_DEVICES xBootDevice;
+	int iPartition;
+	uint32_t ulFlags;
 
 } APCMboxUpdateFptFlags;
 
@@ -271,23 +278,20 @@ typedef struct
  * @struct  APCMboxMsg
  * @brief   Data posted via the APC Proxy driver mailbox
  */
-typedef struct
-{
-    APC_MSG_TYPES eMsgType;
-    uint8_t ucRequestId;
+typedef struct {
+	APC_MSG_TYPES eMsgType;
+	uint8_t ucRequestId;
 
-    union
-    {
-        APCMboxDownloadImage  xDownloadImageData;
-        APCMboxCopyImage      xCopyImageData;
-        APCMboxUpdateFptFlags xUpdateFptFlagsData;
-        int iSelectedPartition;
-
-    };
+	union {
+		APCMboxDownloadImage xDownloadImageData;
+		APCMboxCopyImage xCopyImageData;
+		APCMboxUpdateFptFlags xUpdateFptFlagsData;
+		int iSelectedPartition;
+	};
 
 } APCMboxMsg;
 
-uint32_t ulUserPdiLoadStatus = 0;       /* User PDI power on load status 0: Success */
+uint32_t ulUserPdiLoadStatus = 0; /* User PDI power on load status 0: Success */
 
 /******************************************************************************/
 /* Local Function declarations                                                */
@@ -300,7 +304,7 @@ uint32_t ulUserPdiLoadStatus = 0;       /* User PDI power on load status 0: Succ
  *
  * @return  N/A (does not return)
  */
-static void vProxyDriverTask( void *pArg );
+static void vProxyDriverTask(void* pArg);
 
 /**
  * @brief   Load entire FPT from Flash device
@@ -310,7 +314,7 @@ static void vProxyDriverTask( void *pArg );
  * @return  OK if the FPT was successfully loaded
  *          ERROR if the FPT was not successfully loaded
  */
-static int iLoadFpt( APC_BOOT_DEVICES xBootDevice );
+static int iLoadFpt(APC_BOOT_DEVICES xBootDevice);
 
 /**
  * @brief   Load an FPT partition entry from flash device
@@ -322,7 +326,9 @@ static int iLoadFpt( APC_BOOT_DEVICES xBootDevice );
  * @return  OK if the FPT partition was loaded successfully
  *          ERROR if the FPT partition was not loaded
  */
-static int iLoadFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulPartitionAddr );
+static int iLoadFptPartition(APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	uint32_t ulPartitionAddr);
 
 /**
  * @brief   Download new image to flash
@@ -332,7 +338,7 @@ static int iLoadFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, uint
  * @return  OK if the image was successfully downloaded
  *          ERROR if the image was not successfully downloaded
  */
-static int iDownloadImage( APCMboxDownloadImage *pxImageData );
+static int iDownloadImage(APCMboxDownloadImage* pxImageData);
 
 /**
  * @brief   Download pdi image
@@ -342,7 +348,7 @@ static int iDownloadImage( APCMboxDownloadImage *pxImageData );
  * @return  OK if the image was successfully downloaded
  *          ERROR if the image was not successfully downloaded
  */
-static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData );
+static int iDownloadPdiImage(APCMboxDownloadImage* pxImageData);
 
 /**
  * @brief   Copy image from one partition to another
@@ -352,7 +358,7 @@ static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData );
  * @return  OK if the image was successfully copied
  *          ERROR if the image was not successfully copied
  */
-static int iCopyImage( APCMboxCopyImage *pxCopyData );
+static int iCopyImage(APCMboxCopyImage* pxCopyData);
 
 /**
  * @brief   Select partition (from primary boot device) to boot from next
@@ -362,7 +368,7 @@ static int iCopyImage( APCMboxCopyImage *pxCopyData );
  * @return  OK if the partition was successfully selected
  *          ERROR if the partition was not successfully selected
  */
-static int iSelectPartition( int iPartition );
+static int iSelectPartition(int iPartition);
 
 /**
  * @brief   Set FPT flags in cache and flash
@@ -373,7 +379,7 @@ static int iSelectPartition( int iPartition );
  *
  * @return  OK if the FPT flags were successfully set
  */
-static int iSetFptFlags( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulFlags );
+static int iSetFptFlags(APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulFlags);
 
 /**
  * @brief   Write FPT partition entry to flash
@@ -384,7 +390,7 @@ static int iSetFptFlags( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t 
  * @return  OK if the FPT partition was successfully written
  *          ERROR if the FPT partition was not written
  */
-static int iWriteFptPartitionToFlash( APC_BOOT_DEVICES xBootDevice, int iPartition );
+static int iWriteFptPartitionToFlash(APC_BOOT_DEVICES xBootDevice, int iPartition);
 
 /**
  * @brief   Verify that the values downloaded to flash match the source
@@ -394,7 +400,7 @@ static int iWriteFptPartitionToFlash( APC_BOOT_DEVICES xBootDevice, int iPartiti
  * @return  OK if the verification passed
  *          ERROR if the verification failed
  */
-static int iVerifyDownload( APCMboxDownloadImage *pxImageData );
+static int iVerifyDownload(APCMboxDownloadImage* pxImageData);
 
 /**
  * @brief   Attempt to reload all FPT data, from target boot device
@@ -403,83 +409,68 @@ static int iVerifyDownload( APCMboxDownloadImage *pxImageData );
  *
  * @return  OK or ERROR
  */
-static int iRefreshFptData( APC_BOOT_DEVICES xBootDevice );
+static int iRefreshFptData(APC_BOOT_DEVICES xBootDevice);
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static APCPrivateData xLocalData =
-{
-    UPPER_FIREWALL,                 /* ulUpperFirewall */
-    FALSE,                          /* iInitialised */
-    0,                              /* ucMyId */
-    {
-        NULL
-    },                              /* ppxFwIf */
-    NULL,                           /* pXLoaderInst */
-    NULL,                           /* pxEvlRecord */
-    NULL,                           /* pvOsalMutexHdl */
-    NULL,                           /* pvOsalFlashLockHdl */
-    NULL,                           /* pvOsalMBoxHdl */
-    NULL,                           /* pvOsalTaskHdl */
-    {
-        FALSE
-    },                              /* piValidFpt */
-    { {
-          0
-      } },                          /* pxFptHeader */
-    {
-        NULL
-    },                              /* ppxFptPartitions */
-    {
-        0
-    },                              /* pucChunkBuffer */
-    0,                              /* ulNextBootAddr */
-    MODULE_STATE_UNINITIALISED,     /* xState */
-    {
-        0
-    },                              /* pulStats */
-    {
-        0
-    },                              /* puErrors */
-    LOWER_FIREWALL                  /* ulLowerFirewall */
+static APCPrivateData xLocalData = {
+	UPPER_FIREWALL,             /* ulUpperFirewall */
+	FALSE,                      /* iInitialised */
+	0,                          /* ucMyId */
+	{ NULL },                   /* ppxFwIf */
+	NULL,                       /* pXLoaderInst */
+	NULL,                       /* pxEvlRecord */
+	NULL,                       /* pvOsalMutexHdl */
+	NULL,                       /* pvOsalFlashLockHdl */
+	NULL,                       /* pvOsalMBoxHdl */
+	NULL,                       /* pvOsalTaskHdl */
+	{ FALSE },                  /* piValidFpt */
+	{ { 0 } },                  /* pxFptHeader */
+	{ NULL },                   /* ppxFptPartitions */
+	{ 0 },                      /* pucChunkBuffer */
+	0,                          /* ulNextBootAddr */
+	MODULE_STATE_UNINITIALISED, /* xState */
+	{ 0 },                      /* pulStats */
+	{ 0 },                      /* puErrors */
+	LOWER_FIREWALL,             /* ulLowerFirewall */
 };
 
-static APCPrivateData *pxThis = &xLocalData;
+static APCPrivateData* pxThis = &xLocalData;
 
 static XIpiPsu IpiInst;
 
 /**
  * InitXilPm() - initialize interrupts and context
  */
- static u32 InitXilPm(void)
- {
-    XStatus Status = XST_FAILURE;
-    XIpiPsu_Config *IpiCfgPtr;
+static u32 InitXilPm(void)
+{
+	XStatus Status = XST_FAILURE;
+	XIpiPsu_Config* IpiCfgPtr;
 
-    /* Look Up the config data */
-    IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
-    if (NULL == IpiCfgPtr) {
-        PLL_ERR(APC_NAME, "ERROR: Failed to get CfgPtr\r\n");
-        return Status;
-    }
+	/* Look Up the config data */
+	IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
+	if (NULL == IpiCfgPtr) {
+		PLL_ERR(APC_NAME, "ERROR: Failed to get CfgPtr\r\n");
+		return Status;
+	}
 
-    /* Init with the Cfg Data */
-    Status = XIpiPsu_CfgInitialize(&IpiInst, IpiCfgPtr, IpiCfgPtr->BaseAddress);
-    if (XST_SUCCESS != Status) {
-        PLL_ERR(APC_NAME, "ERROR: Failed to configure IPI %d\r\n", Status);
-        return Status;
-    }
+	/* Init with the Cfg Data */
+	Status = XIpiPsu_CfgInitialize(&IpiInst, IpiCfgPtr, IpiCfgPtr->BaseAddress);
+	if (XST_SUCCESS != Status) {
+		PLL_ERR(APC_NAME, "ERROR: Failed to configure IPI %d\r\n", Status);
+		return Status;
+	}
 
-    Status = XPm_InitXilpm(&IpiInst);
-    if (XST_SUCCESS != Status) {
-        PLL_ERR(APC_NAME, "ERROR: Failed to initialize XilPm %d\r\n", Status);
-        return Status;
-    }
+	Status = XPm_InitXilpm(&IpiInst);
+	if (XST_SUCCESS != Status) {
+		PLL_ERR(APC_NAME, "ERROR: Failed to initialize XilPm %d\r\n", Status);
+		return Status;
+	}
 
-    return Status;
- }
+	return Status;
+}
 
 
 /******************************************************************************/
@@ -493,612 +484,491 @@ static XIpiPsu IpiInst;
  *          the secondary Firmware Interface handle however is optional
  *          and can be set to NULL.
  */
-int iAPC_Initialise( uint8_t ucProxyId,
-                     FWIfCfg *pxPrimaryFwIf,
-                     FWIfCfg *pxSecondaryFwIf,
-                     XLoader_ClientInstance *pXLoaderInst,
-                     uint32_t ulTaskPrio,
-                     uint32_t ulTaskStack )
+int iAPC_Initialise(uint8_t ucProxyId,
+	FWIfCfg* pxPrimaryFwIf,
+	FWIfCfg* pxSecondaryFwIf,
+	XLoader_ClientInstance* pXLoaderInst,
+	uint32_t ulTaskPrio,
+	uint32_t ulTaskStack)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( FALSE == pxThis->iInitialised ) &&
-         ( NULL != pxPrimaryFwIf ) )
-    {
-        iStatus = InitXilPm();
-        if (XST_SUCCESS != iStatus)
-        {
-            PLL_ERR( APC_NAME, "ERROR: Failed to initialize XilPm\r\n" );
-            return iStatus;
-        }
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (FALSE == pxThis->iInitialised) &&
+		(NULL != pxPrimaryFwIf)) {
+		iStatus = InitXilPm();
+		if (XST_SUCCESS != iStatus) {
+			PLL_ERR(APC_NAME, "ERROR: Failed to initialize XilPm\r\n");
+			return iStatus;
+		}
 
-        /* store parameters locally */
-        pxThis->ucMyId = ucProxyId;
-        pxThis->ppxFwIf[ APC_BOOT_DEVICE_PRIMARY ]   = pxPrimaryFwIf;
-        pxThis->ppxFwIf[ APC_BOOT_DEVICE_SECONDARY ] = pxSecondaryFwIf;
-        pxThis->pXLoaderInst = pXLoaderInst;
+		/* store parameters locally */
+		pxThis->ucMyId                             = ucProxyId;
+		pxThis->ppxFwIf[APC_BOOT_DEVICE_PRIMARY]   = pxPrimaryFwIf;
+		pxThis->ppxFwIf[APC_BOOT_DEVICE_SECONDARY] = pxSecondaryFwIf;
+		pxThis->pXLoaderInst                       = pXLoaderInst;
 
 
-        /* used for primary boot device only */
-        pxThis->ulNextBootAddr = APC_MULTIBOOT_REAL( HAL_IO_READ32( HAL_APC_PMC_BOOT_REG ) );
+		/* used for primary boot device only */
+		pxThis->ulNextBootAddr = APC_MULTIBOOT_REAL(HAL_IO_READ32(HAL_APC_PMC_BOOT_REG));
 
-        /* initalise evl record*/
-        if ( OK != iEVL_CreateRecord( &pxThis->pxEvlRecord ) )
-        {
-            PLL_ERR( APC_NAME, "Error initialising EVLRecord\r\n" );
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED );
-        }
-        else
-        {
-            /* open and load FPT data for each boot device */
-            int i = 0;
-            for ( i = APC_BOOT_DEVICE_PRIMARY; i < MAX_APC_BOOT_DEVICES; i++ )
-            {
-                if ( NULL != pxThis->ppxFwIf[ i ] )
-                {
-                    INC_STAT_COUNTER( APC_PROXY_STATS_NUM_BOOT_DEVICES )
-                    if ( FW_IF_ERRORS_NONE != pxThis->ppxFwIf[ i ]->open( pxThis->ppxFwIf[ i ] ) )
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_OPEN_FAILED )
-                    }
-                    else
-                    {
-                        if ( ERROR == iLoadFpt( i ) )
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_LOAD_FPT_FAILED )
-                        }
-                    }
-                }
-            }
+		/* initalise evl record*/
+		if (OK != iEVL_CreateRecord(&pxThis->pxEvlRecord)) {
+			PLL_ERR(APC_NAME, "Error initialising EVLRecord\r\n");
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED);
+		} else {
+			/* open and load FPT data for each boot device */
+			int i = 0;
+			for (i = APC_BOOT_DEVICE_PRIMARY; i < MAX_APC_BOOT_DEVICES; i++) {
+				if (NULL != pxThis->ppxFwIf[i]) {
+					INC_STAT_COUNTER(APC_PROXY_STATS_NUM_BOOT_DEVICES)
+					if (FW_IF_ERRORS_NONE != pxThis->ppxFwIf[i]->open(pxThis->ppxFwIf[i])) {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_OPEN_FAILED)
+					} else {
+						if (ERROR == iLoadFpt(i)) {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_LOAD_FPT_FAILED)
+						}
+					}
+				}
+			}
 
-            /* init APC proxy */
-            if ( OSAL_ERRORS_NONE != iOSAL_Mutex_Create( &pxThis->pvOsalMutexHdl, "apc_proxy mutex" ) )
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_CREATE_FAILED )
-            }
-            if ( OSAL_ERRORS_NONE != iOSAL_Mutex_Create( &pxThis->pvOsalFlashLockHdl, "apc_proxy fl_lock" ) )
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_CREATE_FAILED )
-            }
-            else if ( OSAL_ERRORS_NONE != iOSAL_MBox_Create( &pxThis->pvOsalMBoxHdl,
-                                                            APC_MBOX_SIZE,
-                                                            sizeof( APCMboxMsg ),
-                                                            "apc_proxy mbox" ) )
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_CREATE_FAILED )
-            }
-            else if ( OSAL_ERRORS_NONE != iOSAL_Task_Create( &pxThis->pvOsalTaskHdl,
-                                                            vProxyDriverTask,
-                                                            ulTaskStack,
-                                                            NULL,
-                                                            ulTaskPrio,
-                                                            "apc_proxy task" ) )
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_TASK_CREATE_FAILED )
-            }
-            else
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_CREATE )
-                INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_CREATE )
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_CREATE )
-                INC_STAT_COUNTER( APC_PROXY_STATS_TASK_CREATE )
+			/* init APC proxy */
+			if (OSAL_ERRORS_NONE !=
+				iOSAL_Mutex_Create(&pxThis->pvOsalMutexHdl, "apc_proxy mutex")) {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_CREATE_FAILED)
+			}
+			if (OSAL_ERRORS_NONE !=
+				iOSAL_Mutex_Create(&pxThis->pvOsalFlashLockHdl, "apc_proxy fl_lock")) {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_CREATE_FAILED)
+			} else if (OSAL_ERRORS_NONE !=
+				iOSAL_MBox_Create(&pxThis->pvOsalMBoxHdl,
+					APC_MBOX_SIZE,
+					sizeof(APCMboxMsg),
+					"apc_proxy mbox")) {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_CREATE_FAILED)
+			} else if (OSAL_ERRORS_NONE !=
+				iOSAL_Task_Create(&pxThis->pvOsalTaskHdl,
+					vProxyDriverTask,
+					ulTaskStack,
+					NULL,
+					ulTaskPrio,
+					"apc_proxy task")) {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_TASK_CREATE_FAILED)
+			} else {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_CREATE)
+				INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_CREATE)
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_CREATE)
+				INC_STAT_COUNTER(APC_PROXY_STATS_TASK_CREATE)
 
-                INC_STAT_COUNTER( APC_PROXY_STATS_INIT_OVERALL_COMPLETE )
-                pxThis->iInitialised = TRUE;
-                pxThis->xState       = MODULE_STATE_OK;
-                iStatus              = OK;
-            }
-        }
-    }
+				INC_STAT_COUNTER(APC_PROXY_STATS_INIT_OVERALL_COMPLETE)
+				pxThis->iInitialised = TRUE;
+				pxThis->xState       = MODULE_STATE_OK;
+				iStatus              = OK;
+			}
+		}
+	}
 
-    if ( OK != iStatus )
-    {
-        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INIT_NOT_COMPLETE )
-    }
-    return iStatus;
+	if (OK != iStatus) {
+		INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INIT_NOT_COMPLETE)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Bind into this proxy driver
  */
 
-int iAPC_BindCallback( EVL_CALLBACK *pxCallback )
+int iAPC_BindCallback(EVL_CALLBACK* pxCallback)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( TRUE == pxThis->iInitialised ) &&
-         ( NULL != pxCallback ) &&
-         ( NULL != pxThis->pxEvlRecord ) )
-    {
-        iStatus = iEVL_BindCallback( pxThis->pxEvlRecord, pxCallback );
-    }
-    return iStatus;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(NULL != pxCallback) && (NULL != pxThis->pxEvlRecord)) {
+		iStatus = iEVL_BindCallback(pxThis->pxEvlRecord, pxCallback);
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Print all the stats gathered by the proxy driver
  */
-int iAPC_PrintStatistics( void )
+int iAPC_PrintStatistics(void)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) )
-    {
-        int i = 0;
-        PLL_INF( APC_NAME, "============================================================\n\r" );
-        PLL_INF( APC_NAME, "APC Proxy Statistics:\n\r" );
-        for ( i = 0; i < APC_PROXY_STATS_MAX; i++ )
-        {
-            PRINT_STAT_COUNTER( i );
-        }
-        PLL_INF( APC_NAME, "------------------------------------------------------------\n\r" );
-        PLL_INF( APC_NAME, "APC Proxy Errors:\n\r" );
-        for ( i = 0; i < APC_PROXY_ERRORS_MAX; i++ )
-        {
-            PRINT_ERROR_COUNTER( i );
-        }
-        PLL_INF( APC_NAME, "============================================================\n\r" );
-        PLL_INF( APC_NAME,
-                 "FPT for primary device is %s\r\n",
-                 ( TRUE == pxThis->piValidFpt[ APC_BOOT_DEVICE_PRIMARY ] )?( "valid" ):( "invalid" ) );
-        PLL_INF( APC_NAME,
-                 "FPT for secondary device is %s\r\n",
-                 ( TRUE == pxThis->piValidFpt[ APC_BOOT_DEVICE_SECONDARY ] )?( "valid" ):( "invalid" ) );
-        PLL_INF( APC_NAME, "============================================================\n\r" );
-        iStatus = OK;
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall)) {
+		int i = 0;
+		PLL_INF(APC_NAME, "============================================================\n\r");
+		PLL_INF(APC_NAME, "APC Proxy Statistics:\n\r");
+		for (i = 0; i < APC_PROXY_STATS_MAX; i++) {
+			PRINT_STAT_COUNTER(i);
+		}
+		PLL_INF(APC_NAME, "------------------------------------------------------------\n\r");
+		PLL_INF(APC_NAME, "APC Proxy Errors:\n\r");
+		for (i = 0; i < APC_PROXY_ERRORS_MAX; i++) {
+			PRINT_ERROR_COUNTER(i);
+		}
+		PLL_INF(APC_NAME, "============================================================\n\r");
+		PLL_INF(APC_NAME,
+			"FPT for primary device is %s\r\n",
+			(TRUE == pxThis->piValidFpt[APC_BOOT_DEVICE_PRIMARY]) ? ("valid") : ("invalid"));
+		PLL_INF(APC_NAME,
+			"FPT for secondary device is %s\r\n",
+			(TRUE == pxThis->piValidFpt[APC_BOOT_DEVICE_SECONDARY]) ? ("valid") : ("invalid"));
+		PLL_INF(APC_NAME, "============================================================\n\r");
+		iStatus = OK;
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Clear all the stats in the proxy driver
  */
-int iAPC_ClearStatistics( void )
+int iAPC_ClearStatistics(void)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( TRUE == pxThis->iInitialised ) )
-    {
-        pvOSAL_MemSet( pxThis->pulStats, 0, sizeof( pxThis->pulStats ) );
-        pvOSAL_MemSet( pxThis->pulErrors, 0, sizeof( pxThis->pulErrors ) );
-        iStatus = OK;
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised)) {
+		pvOSAL_MemSet(pxThis->pulStats, 0, sizeof(pxThis->pulStats));
+		pvOSAL_MemSet(pxThis->pulErrors, 0, sizeof(pxThis->pulErrors));
+		iStatus = OK;
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Download an image to a location in NV memory
  */
-int iAPC_DownloadImage( EVLSignal *pxSignal,
-                        APC_BOOT_DEVICES xBootDevice,
-                        int iPartition,
-                        uint32_t ulSrcAddr,
-                        uint32_t ulImageSize,
-                        uint16_t usPacketNum,
-                        uint32_t ulPacketSize,
-                        uint8_t *pucPdiMd5,
-                        uint32_t ulPdiSize,
-                        int iLastPacket )
+int iAPC_DownloadImage(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	uint32_t ulSrcAddr,
+	uint32_t ulImageSize,
+	uint16_t usPacketNum,
+	uint32_t ulPacketSize,
+	uint8_t* pucPdiMd5,
+	uint32_t ulPdiSize,
+	int iLastPacket)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-        ( TRUE == pxThis->piValidFpt[ xBootDevice ] ) &&
-        ( NULL != pxSignal ) &&
-        ( 0 != ulImageSize ) )
-    {
-        if ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries )
-        {
-            APCMboxMsg xMsg = { 0 };
-            xMsg.eMsgType                        = APC_MSG_TYPE_DOWNLOAD_PDI;
-            xMsg.ucRequestId                     = pxSignal->ucInstance;
-            xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
-            xMsg.xDownloadImageData.iPartition   = iPartition;
-            xMsg.xDownloadImageData.iUpdateFpt   = FALSE;
-            xMsg.xDownloadImageData.iPdiProgram  = FALSE;
-            xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
-            xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
-            xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
-            xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
-            xMsg.xDownloadImageData.iLastPacket  = iLastPacket;
-            xMsg.xDownloadImageData.ulPdiSize    = ulPdiSize;
-            if ( NULL != pucPdiMd5 )
-            {
-                pvOSAL_MemCpy( xMsg.xDownloadImageData.pucPdiMd5, pucPdiMd5, 16 );
-            }
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(MAX_APC_BOOT_DEVICES > xBootDevice) && (TRUE == pxThis->piValidFpt[xBootDevice]) &&
+		(NULL != pxSignal) && (0 != ulImageSize)) {
+		if (iPartition < pxThis->pxFptHeader[xBootDevice].ucNumEntries) {
+			APCMboxMsg xMsg                      = { 0 };
+			xMsg.eMsgType                        = APC_MSG_TYPE_DOWNLOAD_PDI;
+			xMsg.ucRequestId                     = pxSignal->ucInstance;
+			xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
+			xMsg.xDownloadImageData.iPartition   = iPartition;
+			xMsg.xDownloadImageData.iUpdateFpt   = FALSE;
+			xMsg.xDownloadImageData.iPdiProgram  = FALSE;
+			xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
+			xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
+			xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
+			xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
+			xMsg.xDownloadImageData.iLastPacket  = iLastPacket;
+			xMsg.xDownloadImageData.ulPdiSize    = ulPdiSize;
+			if (NULL != pucPdiMd5) {
+				pvOSAL_MemCpy(xMsg.xDownloadImageData.pucPdiMd5, pucPdiMd5, 16);
+			}
 
-            if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                     ( void* )&xMsg,
-                                                     OSAL_TIMEOUT_NO_WAIT ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_POST )
-                iStatus = OK;
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+			if (OSAL_ERRORS_NONE ==
+				iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_DOWNLOAD_POST)
+				iStatus = OK;
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Download an image with an FPT
  */
-int iAPC_UpdateFpt( EVLSignal *pxSignal,
-                    APC_BOOT_DEVICES xBootDevice,
-                    uint32_t ulSrcAddr,
-                    uint32_t ulImageSize,
-                    uint16_t usPacketNum,
-                    uint32_t ulPacketSize,
-                    int iLastPacket )
+int iAPC_UpdateFpt(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	uint32_t ulSrcAddr,
+	uint32_t ulImageSize,
+	uint16_t usPacketNum,
+	uint32_t ulPacketSize,
+	int iLastPacket)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( NULL != pxSignal ) &&
-        ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-        ( NULL != pxThis->ppxFwIf[ xBootDevice ] ) &&
-        ( 0 != ulImageSize ) )
-    {
-        /* Partition is unused */
-        APCMboxMsg xMsg = { 0 };
-        xMsg.eMsgType                        = APC_MSG_TYPE_DOWNLOAD_PDI;
-        xMsg.ucRequestId                     = pxSignal->ucInstance;
-        xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
-        xMsg.xDownloadImageData.iUpdateFpt   = TRUE;
-        xMsg.xDownloadImageData.iPdiProgram  = FALSE;
-        xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
-        xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
-        xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
-        xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
-        xMsg.xDownloadImageData.iLastPacket  = iLastPacket;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(NULL != pxSignal) && (MAX_APC_BOOT_DEVICES > xBootDevice) &&
+		(NULL != pxThis->ppxFwIf[xBootDevice]) && (0 != ulImageSize)) {
+		/* Partition is unused */
+		APCMboxMsg xMsg                      = { 0 };
+		xMsg.eMsgType                        = APC_MSG_TYPE_DOWNLOAD_PDI;
+		xMsg.ucRequestId                     = pxSignal->ucInstance;
+		xMsg.xDownloadImageData.xBootDevice  = xBootDevice;
+		xMsg.xDownloadImageData.iUpdateFpt   = TRUE;
+		xMsg.xDownloadImageData.iPdiProgram  = FALSE;
+		xMsg.xDownloadImageData.ulImageSize  = ulImageSize;
+		xMsg.xDownloadImageData.ulSrcAddr    = ulSrcAddr;
+		xMsg.xDownloadImageData.usPacketNum  = usPacketNum;
+		xMsg.xDownloadImageData.ulPacketSize = ulPacketSize;
+		xMsg.xDownloadImageData.iLastPacket  = iLastPacket;
 
-        if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                 ( void* )&xMsg,
-                                                 OSAL_TIMEOUT_NO_WAIT ) )
-        {
-            INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_POST )
-            iStatus = OK;
-        }
-        else
-        {
-            INC_ERROR_COUNTER( APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+		if (OSAL_ERRORS_NONE ==
+			iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+			INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_DOWNLOAD_POST)
+			iStatus = OK;
+		} else {
+			INC_ERROR_COUNTER(APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Copy an image from one partition to another
  */
-int iAPC_CopyImage( EVLSignal *pxSignal,
-                    APC_BOOT_DEVICES xSrcBootDevice,
-                    int iSrcPartition,
-                    APC_BOOT_DEVICES xDestBootDevice,
-                    int iDestPartition,
-                    uint32_t ulCpyAddr,
-                    uint32_t ulAllocatedSize )
+int iAPC_CopyImage(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xSrcBootDevice,
+	int iSrcPartition,
+	APC_BOOT_DEVICES xDestBootDevice,
+	int iDestPartition,
+	uint32_t ulCpyAddr,
+	uint32_t ulAllocatedSize)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( MAX_APC_BOOT_DEVICES > xSrcBootDevice ) &&
-        ( MAX_APC_BOOT_DEVICES > xDestBootDevice ) &&
-        ( TRUE == pxThis->piValidFpt[ xSrcBootDevice ] ) &&
-        ( TRUE == pxThis->piValidFpt[ xDestBootDevice ] ) &&
-        ( NULL != pxSignal ) )
-    {
-        if ( ( iSrcPartition < pxThis->pxFptHeader[ xSrcBootDevice ].ucNumEntries ) &&
-            ( iDestPartition < pxThis->pxFptHeader[ xDestBootDevice ].ucNumEntries ) &&
-            ( ( xSrcBootDevice != xDestBootDevice ) || ( iSrcPartition != iDestPartition ) ) )
-        {
-            APCMboxMsg xMsg = { 0 };
-            xMsg.eMsgType                       = APC_MSG_TYPE_COPY_PDI;
-            xMsg.ucRequestId                    = pxSignal->ucInstance;
-            xMsg.xCopyImageData.ulAllocatedSize = ulAllocatedSize;
-            xMsg.xCopyImageData.ulCpyAddr       = ulCpyAddr;
-            xMsg.xCopyImageData.xSrcBootDevice  = xSrcBootDevice;
-            xMsg.xCopyImageData.iSrcPartition   = iSrcPartition;
-            xMsg.xCopyImageData.xDestBootDevice = xDestBootDevice;
-            xMsg.xCopyImageData.iDestPartition  = iDestPartition;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(MAX_APC_BOOT_DEVICES > xSrcBootDevice) && (MAX_APC_BOOT_DEVICES > xDestBootDevice) &&
+		(TRUE == pxThis->piValidFpt[xSrcBootDevice]) &&
+		(TRUE == pxThis->piValidFpt[xDestBootDevice]) && (NULL != pxSignal)) {
+		if ((iSrcPartition < pxThis->pxFptHeader[xSrcBootDevice].ucNumEntries) &&
+			(iDestPartition < pxThis->pxFptHeader[xDestBootDevice].ucNumEntries) &&
+			((xSrcBootDevice != xDestBootDevice) || (iSrcPartition != iDestPartition))) {
+			APCMboxMsg xMsg                     = { 0 };
+			xMsg.eMsgType                       = APC_MSG_TYPE_COPY_PDI;
+			xMsg.ucRequestId                    = pxSignal->ucInstance;
+			xMsg.xCopyImageData.ulAllocatedSize = ulAllocatedSize;
+			xMsg.xCopyImageData.ulCpyAddr       = ulCpyAddr;
+			xMsg.xCopyImageData.xSrcBootDevice  = xSrcBootDevice;
+			xMsg.xCopyImageData.iSrcPartition   = iSrcPartition;
+			xMsg.xCopyImageData.xDestBootDevice = xDestBootDevice;
+			xMsg.xCopyImageData.iDestPartition  = iDestPartition;
 
-            if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                     ( void* )&xMsg,
-                                                     OSAL_TIMEOUT_NO_WAIT ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_COPY_POST )
-                iStatus = OK;
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_COPY_POST_FAILED )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+			if (OSAL_ERRORS_NONE ==
+				iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_COPY_POST)
+				iStatus = OK;
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_COPY_POST_FAILED)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Live-load a PDI image onto the device
  */
-int iAPC_PdiProgram( EVLSignal *pxSignal,
-                     const AMIProxyPdiDownloadRequest *pxDownloadRequest,
-                     uint32_t ulSrcAddr )
+int iAPC_PdiProgram(EVLSignal* pxSignal,
+	const AMIProxyPdiDownloadRequest* pxDownloadRequest,
+	uint32_t ulSrcAddr)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( TRUE == pxThis->iInitialised ) &&
-         ( NULL != pxSignal ) &&
-         ( 0 != pxDownloadRequest->ulLength ) )
-    {
-        APCMboxMsg xMsg = { 0 };
-        xMsg.eMsgType                          = APC_MSG_TYPE_PROGRAM_PDI;
-        xMsg.ucRequestId                       = pxSignal->ucInstance;
-        xMsg.xDownloadImageData.xBootDevice    = pxDownloadRequest->iBootDevice;
-        xMsg.xDownloadImageData.iPartition     = pxDownloadRequest->ulPartitionSel;
-        xMsg.xDownloadImageData.iUpdateFpt     = pxDownloadRequest->iUpdateFpt;
-        xMsg.xDownloadImageData.iPdiProgram    = pxDownloadRequest->iPdiProgram;
-        xMsg.xDownloadImageData.iApuPdiProgram = pxDownloadRequest->iApuPdiProgram;
-        xMsg.xDownloadImageData.iRpuPdiProgram = pxDownloadRequest->iRpuPdiProgram;
-        xMsg.xDownloadImageData.ulImageSize    = pxDownloadRequest->ulLength;
-        xMsg.xDownloadImageData.ulSrcAddr      = ulSrcAddr;
-        xMsg.xDownloadImageData.iLastPacket    = pxDownloadRequest->iLastPacket;
-        xMsg.xDownloadImageData.usPacketNum    = pxDownloadRequest->usPacketNum;
-        xMsg.xDownloadImageData.ulPacketSize   = pxDownloadRequest->ulPacketSize;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(NULL != pxSignal) && (0 != pxDownloadRequest->ulLength)) {
+		APCMboxMsg xMsg                        = { 0 };
+		xMsg.eMsgType                          = APC_MSG_TYPE_PROGRAM_PDI;
+		xMsg.ucRequestId                       = pxSignal->ucInstance;
+		xMsg.xDownloadImageData.xBootDevice    = pxDownloadRequest->iBootDevice;
+		xMsg.xDownloadImageData.iPartition     = pxDownloadRequest->ulPartitionSel;
+		xMsg.xDownloadImageData.iUpdateFpt     = pxDownloadRequest->iUpdateFpt;
+		xMsg.xDownloadImageData.iPdiProgram    = pxDownloadRequest->iPdiProgram;
+		xMsg.xDownloadImageData.iApuPdiProgram = pxDownloadRequest->iApuPdiProgram;
+		xMsg.xDownloadImageData.iRpuPdiProgram = pxDownloadRequest->iRpuPdiProgram;
+		xMsg.xDownloadImageData.ulImageSize    = pxDownloadRequest->ulLength;
+		xMsg.xDownloadImageData.ulSrcAddr      = ulSrcAddr;
+		xMsg.xDownloadImageData.iLastPacket    = pxDownloadRequest->iLastPacket;
+		xMsg.xDownloadImageData.usPacketNum    = pxDownloadRequest->usPacketNum;
+		xMsg.xDownloadImageData.ulPacketSize   = pxDownloadRequest->ulPacketSize;
 
-        if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                ( void* )&xMsg,
-                                                OSAL_TIMEOUT_NO_WAIT ) )
-        {
-            INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_POST )
-            iStatus = OK;
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
+		if (OSAL_ERRORS_NONE ==
+			iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+			INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_DOWNLOAD_POST)
+			iStatus = OK;
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_DOWNLOAD_POST_FAILED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
 
-    return iStatus;
+	return iStatus;
 }
 
 /**
  * @brief   Select which partition to boot from
  */
-int iAPC_SetNextPartition( EVLSignal *pxSignal, int iPartition )
+int iAPC_SetNextPartition(EVLSignal* pxSignal, int iPartition)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( TRUE == pxThis->piValidFpt[ APC_BOOT_DEVICE_PRIMARY ] ) &&
-        ( NULL != pxSignal ) )
-    {
-        if ( iPartition < pxThis->pxFptHeader[ APC_BOOT_DEVICE_PRIMARY ].ucNumEntries )
-        {
-            APCMboxMsg xMsg = { 0 };
-            xMsg.eMsgType           = APC_MSG_TYPE_PARTITION_SELECT;
-            xMsg.ucRequestId        = pxSignal->ucInstance;
-            xMsg.iSelectedPartition = iPartition;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(TRUE == pxThis->piValidFpt[APC_BOOT_DEVICE_PRIMARY]) && (NULL != pxSignal)) {
+		if (iPartition < pxThis->pxFptHeader[APC_BOOT_DEVICE_PRIMARY].ucNumEntries) {
+			APCMboxMsg xMsg         = { 0 };
+			xMsg.eMsgType           = APC_MSG_TYPE_PARTITION_SELECT;
+			xMsg.ucRequestId        = pxSignal->ucInstance;
+			xMsg.iSelectedPartition = iPartition;
 
-            if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                     ( void* )&xMsg,
-                                                     OSAL_TIMEOUT_NO_WAIT ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_PTN_SELECT_POST )
-                iStatus = OK;
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_PTN_SELECT_POST_FAILED )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+			if (OSAL_ERRORS_NONE ==
+				iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_PTN_SELECT_POST)
+				iStatus = OK;
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_PTN_SELECT_POST_FAILED)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Trigger a system Power-On Reset via XilPM
  */
-int iAPC_TriggerSystemPOR( EVLSignal *pxSignal )
+int iAPC_TriggerSystemPOR(EVLSignal* pxSignal)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( TRUE == pxThis->iInitialised ) &&
-         ( NULL != pxSignal ) )
-    {
-        APCMboxMsg xMsg  = { 0 };
-        xMsg.eMsgType    = APC_MSG_TYPE_SYSTEM_POR;
-        xMsg.ucRequestId = pxSignal->ucInstance;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(NULL != pxSignal)) {
+		APCMboxMsg xMsg  = { 0 };
+		xMsg.eMsgType    = APC_MSG_TYPE_SYSTEM_POR;
+		xMsg.ucRequestId = pxSignal->ucInstance;
 
-        if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                  ( void* )&xMsg,
-                                                  OSAL_TIMEOUT_NO_WAIT ) )
-        {
-            INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_SYSTEM_POR_POST )
-            iStatus = OK;
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_SYSTEM_POR_POST_FAILED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+		if (OSAL_ERRORS_NONE ==
+			iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+			INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_SYSTEM_POR_POST)
+			iStatus = OK;
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_SYSTEM_POR_POST_FAILED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Get the Flash Partition Table (FPT)
  */
-int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice, APCProxyDriverFptHeader *pxFptHeader )
+int iAPC_GetFptHeader(APC_BOOT_DEVICES xBootDevice, APCProxyDriverFptHeader* pxFptHeader)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-        ( NULL != pxThis->ppxFwIf[ xBootDevice ] ) &&
-        ( NULL != pxFptHeader ) )
-    {
-        if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_WAIT_FOREVER ) )
-        {
-            INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_TAKE )
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(MAX_APC_BOOT_DEVICES > xBootDevice) && (NULL != pxThis->ppxFwIf[xBootDevice]) &&
+		(NULL != pxFptHeader)) {
+		if (OSAL_ERRORS_NONE ==
+			iOSAL_Mutex_Take(pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_WAIT_FOREVER)) {
+			INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_TAKE)
 
-            if ( NULL != pvOSAL_MemCpy( pxFptHeader,
-                                       &pxThis->pxFptHeader[ xBootDevice ],
-                                       sizeof( APCProxyDriverFptHeader ) ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_FPT_HEADER_READ )
+			if (NULL !=
+				pvOSAL_MemCpy(pxFptHeader,
+					&pxThis->pxFptHeader[xBootDevice],
+					sizeof(APCProxyDriverFptHeader))) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_FPT_HEADER_READ)
 
-                if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( pxThis->pvOsalMutexHdl ) )
-                {
-                    INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
-                    iStatus = OK;
-                }
-                else
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
-                }
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FPT_HEADER_NOT_READ )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+				if (OSAL_ERRORS_NONE == iOSAL_Mutex_Release(pxThis->pvOsalMutexHdl)) {
+					INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_RELEASE)
+					iStatus = OK;
+				} else {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)
+				}
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FPT_HEADER_NOT_READ)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Get a Flash Partition Table (FPT) Partition
  */
-int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
-    APCProxyDriverFptPartition *pxFptPartition )
+int iAPC_GetFptPartition(APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	APCProxyDriverFptPartition* pxFptPartition)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( TRUE == pxThis->iInitialised ) &&
-        ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-        ( TRUE == pxThis->piValidFpt[ xBootDevice ] ) &&
-        ( NULL != pxFptPartition ) )
-    {
-        if ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries )
-        {
-            if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_WAIT_FOREVER ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_TAKE )
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(MAX_APC_BOOT_DEVICES > xBootDevice) && (TRUE == pxThis->piValidFpt[xBootDevice]) &&
+		(NULL != pxFptPartition)) {
+		if (iPartition < pxThis->pxFptHeader[xBootDevice].ucNumEntries) {
+			if (OSAL_ERRORS_NONE ==
+				iOSAL_Mutex_Take(pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_WAIT_FOREVER)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_TAKE)
 
-                if ( NULL != pvOSAL_MemCpy( pxFptPartition,
-                                           &pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ],
-                                           sizeof( APCProxyDriverFptPartition ) ) )
-                {
-                    INC_STAT_COUNTER( APC_PROXY_STATS_FPT_PARTITION_READ )
+				if (NULL !=
+					pvOSAL_MemCpy(pxFptPartition,
+						&pxThis->ppxFptPartitions[xBootDevice][iPartition],
+						sizeof(APCProxyDriverFptPartition))) {
+					INC_STAT_COUNTER(APC_PROXY_STATS_FPT_PARTITION_READ)
 
-                    if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( pxThis->pvOsalMutexHdl ) )
-                    {
-                        INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
-                        iStatus = OK;
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
-                    }
-                }
-                else
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FPT_PARTITION_NOT_READ )
-                }
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+					if (OSAL_ERRORS_NONE == iOSAL_Mutex_Release(pxThis->pvOsalMutexHdl)) {
+						INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_RELEASE)
+						iStatus = OK;
+					} else {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)
+					}
+				} else {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FPT_PARTITION_NOT_READ)
+				}
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
@@ -1107,209 +977,166 @@ int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
  * This function updates the partition flags in both the cached copy
  * and writes the updated partition entry back to flash storage.
  */
-int iAPC_SetFptPartitionFlags( EVLSignal *pxSignal,
-                               APC_BOOT_DEVICES xBootDevice,
-                               int iPartition,
-                               uint32_t ulFlags )
+int iAPC_SetFptPartitionFlags(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	uint32_t ulFlags)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( TRUE == pxThis->iInitialised ) &&
-         ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-         ( TRUE == pxThis->piValidFpt[ xBootDevice ] ) &&
-         ( NULL != pxSignal ) )
-    {
-        if ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries )
-        {
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(MAX_APC_BOOT_DEVICES > xBootDevice) && (TRUE == pxThis->piValidFpt[xBootDevice]) &&
+		(NULL != pxSignal)) {
+		if (iPartition < pxThis->pxFptHeader[xBootDevice].ucNumEntries) {
+			APCMboxMsg xMsg                      = { 0 };
+			xMsg.eMsgType                        = APC_MSG_TYPE_UPDATE_FPT_FLAGS;
+			xMsg.ucRequestId                     = pxSignal->ucInstance;
+			xMsg.xUpdateFptFlagsData.xBootDevice = xBootDevice;
+			xMsg.xUpdateFptFlagsData.iPartition  = iPartition;
+			xMsg.xUpdateFptFlagsData.ulFlags     = ulFlags;
 
-            APCMboxMsg xMsg = { 0 };
-            xMsg.eMsgType                        = APC_MSG_TYPE_UPDATE_FPT_FLAGS;
-            xMsg.ucRequestId                     = pxSignal->ucInstance;
-            xMsg.xUpdateFptFlagsData.xBootDevice = xBootDevice;
-            xMsg.xUpdateFptFlagsData.iPartition  = iPartition;
-            xMsg.xUpdateFptFlagsData.ulFlags     = ulFlags;
+			if (OSAL_ERRORS_NONE ==
+				iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST)
+				iStatus = OK;
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
 
-            if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                     ( void* )&xMsg,
-                                                     OSAL_TIMEOUT_NO_WAIT ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST )
-                iStatus = OK;
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-
-    return iStatus;
+	return iStatus;
 }
 
 /**
  * @brief   Set/Update an FPT Partition entry (including pdi_md5 and pdi_size)
  */
-int iAPC_SetFptPartition( EVLSignal *pxSignal,
-                          APC_BOOT_DEVICES xBootDevice,
-                          int iPartition,
-                          uint8_t *pucPdiMd5,
-                          uint32_t ulPdiSize,
-                          uint32_t ulFlags )
+int iAPC_SetFptPartition(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	uint8_t* pucPdiMd5,
+	uint32_t ulPdiSize,
+	uint32_t ulFlags)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( TRUE == pxThis->iInitialised ) &&
-         ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-         ( NULL != pxSignal ) )
-    {
-        if ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries )
-        {
-            /* Update cached partition data (pdi_md5 and pdi_size only)
-             * Note: ulPartitionFlags is NOT updated here; it will be updated by
-             * iSetFptFlags() which also handles the flash write. This ensures
-             * the write-to-flash logic in iSetFptFlags() is triggered.
-             */
-            if ( NULL != pucPdiMd5 )
-            {
-                pvOSAL_MemCpy( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].pdi_md5,
-                               pucPdiMd5,
-                               sizeof( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].pdi_md5 ) );
-            }
-            pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPdiSize = ulPdiSize;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(MAX_APC_BOOT_DEVICES > xBootDevice) && (NULL != pxSignal)) {
+		if (iPartition < pxThis->pxFptHeader[xBootDevice].ucNumEntries) {
+			/* Update cached partition data (pdi_md5 and pdi_size only)
+			 * Note: ulPartitionFlags is NOT updated here; it will be updated by
+			 * iSetFptFlags() which also handles the flash write. This ensures
+			 * the write-to-flash logic in iSetFptFlags() is triggered.
+			 */
+			if (NULL != pucPdiMd5) {
+				pvOSAL_MemCpy(pxThis->ppxFptPartitions[xBootDevice][iPartition].pdi_md5,
+					pucPdiMd5,
+					sizeof(pxThis->ppxFptPartitions[xBootDevice][iPartition].pdi_md5));
+			}
+			pxThis->ppxFptPartitions[xBootDevice][iPartition].ulPdiSize = ulPdiSize;
 
-            /* Post message to update flash */
-            APCMboxMsg xMsg = { 0 };
-            xMsg.eMsgType                        = APC_MSG_TYPE_UPDATE_FPT_FLAGS;
-            xMsg.ucRequestId                     = pxSignal->ucInstance;
-            xMsg.xUpdateFptFlagsData.xBootDevice = xBootDevice;
-            xMsg.xUpdateFptFlagsData.iPartition  = iPartition;
-            xMsg.xUpdateFptFlagsData.ulFlags     = ulFlags;
+			/* Post message to update flash */
+			APCMboxMsg xMsg                      = { 0 };
+			xMsg.eMsgType                        = APC_MSG_TYPE_UPDATE_FPT_FLAGS;
+			xMsg.ucRequestId                     = pxSignal->ucInstance;
+			xMsg.xUpdateFptFlagsData.xBootDevice = xBootDevice;
+			xMsg.xUpdateFptFlagsData.iPartition  = iPartition;
+			xMsg.xUpdateFptFlagsData.ulFlags     = ulFlags;
 
-            if ( OSAL_ERRORS_NONE == iOSAL_MBox_Post( pxThis->pvOsalMBoxHdl,
-                                                     ( void* )&xMsg,
-                                                     OSAL_TIMEOUT_NO_WAIT ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST )
-                iStatus = OK;
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
+			if (OSAL_ERRORS_NONE ==
+				iOSAL_MBox_Post(pxThis->pvOsalMBoxHdl, (void*)&xMsg, OSAL_TIMEOUT_NO_WAIT)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_POST)
+				iStatus = OK;
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_UPDATE_FPT_FLAGS_POST_FAILED)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
 
-    return iStatus;
+	return iStatus;
 }
 
 /**
  * @brief   Gets the current state of the proxy
  */
-int iAPC_GetState( MODULE_STATE *pxState )
+int iAPC_GetState(MODULE_STATE* pxState)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-        ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-        ( NULL != pxState ) )
-    {
-        if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_TASK_WAIT_MS ) )
-        {
-            *pxState = pxThis->xState;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (NULL != pxState)) {
+		if (OSAL_ERRORS_NONE ==
+			iOSAL_Mutex_Take(pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_TASK_WAIT_MS)) {
+			*pxState = pxThis->xState;
 
-            INC_STAT_COUNTER( APC_PROXY_STATS_STATUS_RETRIEVAL )
+			INC_STAT_COUNTER(APC_PROXY_STATS_STATUS_RETRIEVAL)
 
-            iStatus = OK;
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
-        }
+			iStatus = OK;
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)
+		}
 
-        if ( OSAL_ERRORS_NONE != iOSAL_Mutex_Release( pxThis->pvOsalMutexHdl ) )
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
-            iStatus = ERROR;
-        }
-        else
-        {
-            INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
-    return iStatus;
+		if (OSAL_ERRORS_NONE != iOSAL_Mutex_Release(pxThis->pvOsalMutexHdl)) {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)
+			iStatus = ERROR;
+		} else {
+			INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_RELEASE)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Read raw bytes from flash
  */
-int iAPC_ReadFlashRaw( APC_BOOT_DEVICES xBootDevice,
-                       uint32_t ulOffset,
-                       uint8_t *pucBuffer,
-                       uint32_t ulLength )
+int iAPC_ReadFlashRaw(APC_BOOT_DEVICES xBootDevice,
+	uint32_t ulOffset,
+	uint8_t* pucBuffer,
+	uint32_t ulLength)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( UPPER_FIREWALL == pxThis->ulUpperFirewall ) &&
-         ( LOWER_FIREWALL == pxThis->ulLowerFirewall ) &&
-         ( TRUE == pxThis->iInitialised ) &&
-         ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-         ( NULL != pucBuffer ) &&
-         ( 0 < ulLength ) )
-    {
-        uint32_t ulReadLen = ulLength;
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised) &&
+		(MAX_APC_BOOT_DEVICES > xBootDevice) && (NULL != pucBuffer) && (0 < ulLength)) {
+		uint32_t ulReadLen = ulLength;
 
-        if ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->read( pxThis->ppxFwIf[ xBootDevice ],
-                                                                        ( uint64_t )ulOffset,
-                                                                        pucBuffer,
-                                                                        &ulReadLen,
-                                                                        0 ) )
-        {
-            if ( ulReadLen == ulLength )
-            {
-                iStatus = OK;
-            }
-            else
-            {
-                PLL_WRN( APC_NAME, "Partial read: requested %d, got %d bytes\r\n", ulLength, ulReadLen );
-                iStatus = OK;  /* Still return OK for partial reads */
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_READ_FAILED )
-            PLL_ERR( APC_NAME, "Failed to read %d bytes from offset 0x%08X\r\n", ulLength, ulOffset );
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_VALIDATION_FAILED )
-    }
+		if (FW_IF_ERRORS_NONE ==
+			pxThis->ppxFwIf[xBootDevice]->read(pxThis->ppxFwIf[xBootDevice],
+				(uint64_t)ulOffset,
+				pucBuffer,
+				&ulReadLen,
+				0)) {
+			if (ulReadLen == ulLength) {
+				iStatus = OK;
+			} else {
+				PLL_WRN(APC_NAME,
+					"Partial read: requested %d, got %d bytes\r\n",
+					ulLength,
+					ulReadLen);
+				iStatus = OK; /* Still return OK for partial reads */
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_READ_FAILED)
+			PLL_ERR(APC_NAME, "Failed to read %d bytes from offset 0x%08X\r\n", ulLength, ulOffset);
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_VALIDATION_FAILED)
+	}
 
-    return iStatus;
+	return iStatus;
 }
 
 /******************************************************************************/
@@ -1319,1159 +1146,1004 @@ int iAPC_ReadFlashRaw( APC_BOOT_DEVICES xBootDevice,
 /**
  * @brief   APC proxy task
  */
-static void vProxyDriverTask( void *pArg )
+static void vProxyDriverTask(void* pArg)
 {
-    APCMboxMsg xMBoxData = { 0 };
+	APCMboxMsg xMBoxData = { 0 };
 
-    uint32_t ulStartMs = 0;
+	uint32_t ulStartMs = 0;
 
-    for ( ;; )
-    {
-        ulStartMs = ulOSAL_GetUptimeMs();
-        if ( OSAL_ERRORS_NONE == iOSAL_MBox_Pend( pxThis->pvOsalMBoxHdl,
-                                                 ( void* )&xMBoxData,
-                                                 OSAL_TIMEOUT_WAIT_FOREVER ) )
-        {
-            EVLSignal xSignal =
-            {
-                pxThis->ucMyId, 0, xMBoxData.ucRequestId, 0
-            };
+	for (;;) {
+		ulStartMs = ulOSAL_GetUptimeMs();
+		if (OSAL_ERRORS_NONE ==
+			iOSAL_MBox_Pend(pxThis->pvOsalMBoxHdl, (void*)&xMBoxData, OSAL_TIMEOUT_WAIT_FOREVER)) {
+			EVLSignal xSignal = { pxThis->ucMyId, 0, xMBoxData.ucRequestId, 0 };
 
-            switch ( xMBoxData.eMsgType )
-            {
-            case APC_MSG_TYPE_DOWNLOAD_PDI:
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_PEND )
+			switch (xMBoxData.eMsgType) {
+			case APC_MSG_TYPE_DOWNLOAD_PDI:
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_DOWNLOAD_PEND)
 
-                xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_STARTED;
-                if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                }
-                else
-                {
-                    if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalFlashLockHdl, OSAL_TIMEOUT_NO_WAIT ) )
-                    {
-                        INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_TAKE )
+				xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_STARTED;
+				if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+				} else {
+					if (OSAL_ERRORS_NONE ==
+						iOSAL_Mutex_Take(pxThis->pvOsalFlashLockHdl, OSAL_TIMEOUT_NO_WAIT)) {
+						INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_TAKE)
 
-                        if ( OK == iDownloadImage( &xMBoxData.xDownloadImageData ) )
-                        {
-                            /* Check if we need to update FPT */
-                            if ( ( TRUE == xMBoxData.xDownloadImageData.iLastPacket ) &&
-                                 ( TRUE == xMBoxData.xDownloadImageData.iUpdateFpt ) )
-                            {
-                                INC_STAT_COUNTER( APC_PROXY_STATS_FPT_UPDATE )
+						if (OK == iDownloadImage(&xMBoxData.xDownloadImageData)) {
+							/* Check if we need to update FPT */
+							if ((TRUE == xMBoxData.xDownloadImageData.iLastPacket) &&
+								(TRUE == xMBoxData.xDownloadImageData.iUpdateFpt)) {
+								INC_STAT_COUNTER(APC_PROXY_STATS_FPT_UPDATE)
 
-                                if ( OK == iRefreshFptData( xMBoxData.xDownloadImageData.xBootDevice ) )
-                                {
-                                    xSignal.ucEventType = APC_PROXY_DRIVER_E_FPT_UPDATE;
+								if (OK ==
+									iRefreshFptData(xMBoxData.xDownloadImageData.xBootDevice)) {
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_FPT_UPDATE;
 
-                                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                                    {
-                                        INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED )
-                                        INC_ERROR_COUNTER( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                                        xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
-                                    }
-                                    else
-                                    {
-                                        INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
-                                        xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
-                                    }
-                                }
-                                else
-                                {
-                                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_FAILED )
-                                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
-                                    xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
-                                }
-                            }
-                            else if ( TRUE == xMBoxData.xDownloadImageData.iLastPacket )
-                            {
-                                /* Last packet - update FPT partition with pdi_md5 and pdi_size */
-                                APC_BOOT_DEVICES xBootDevice = xMBoxData.xDownloadImageData.xBootDevice;
-                                int iPartition = xMBoxData.xDownloadImageData.iPartition;
-                                PLL_DBG( APC_NAME, "Updated FPT partition %d with pdi_md5 and pdi_size=%u\r\n",
-                                    iPartition, xMBoxData.xDownloadImageData.ulPdiSize );
-                                /* Update cached FPT partition entry */
-                                pvOSAL_MemCpy( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].pdi_md5,
-                                               xMBoxData.xDownloadImageData.pucPdiMd5,
-                                               sizeof( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].pdi_md5 ) );
-                                pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPdiSize =
-                                    xMBoxData.xDownloadImageData.ulPdiSize;
+									if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+										INC_ERROR_COUNTER(APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED)
+										INC_ERROR_COUNTER(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+										xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+									} else {
+										INC_STAT_COUNTER(APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE)
+										xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
+									}
+								} else {
+									INC_ERROR_COUNTER(APC_PROXY_ERRORS_FPT_UPDATE_FAILED)
+									INC_ERROR_COUNTER(APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED)
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+								}
+							} else if (TRUE == xMBoxData.xDownloadImageData.iLastPacket) {
+								/* Last packet - update FPT partition with pdi_md5 and pdi_size */
+								APC_BOOT_DEVICES xBootDevice =
+									xMBoxData.xDownloadImageData.xBootDevice;
+								int iPartition = xMBoxData.xDownloadImageData.iPartition;
+								PLL_DBG(APC_NAME,
+									"Updated FPT partition %d with pdi_md5 and pdi_size=%u\r\n",
+									iPartition,
+									xMBoxData.xDownloadImageData.ulPdiSize);
+								/* Update cached FPT partition entry */
+								pvOSAL_MemCpy(
+									pxThis->ppxFptPartitions[xBootDevice][iPartition].pdi_md5,
+									xMBoxData.xDownloadImageData.pucPdiMd5,
+									sizeof(
+										pxThis->ppxFptPartitions[xBootDevice][iPartition].pdi_md5));
+								pxThis->ppxFptPartitions[xBootDevice][iPartition].ulPdiSize =
+									xMBoxData.xDownloadImageData.ulPdiSize;
 
-                                /* Write updated FPT partition to flash */
-                                if ( OK == iWriteFptPartitionToFlash( xBootDevice, iPartition ) )
-                                {
-                                    PLL_DBG( APC_NAME, "Updated FPT partition %d with pdi_md5 and pdi_size=%u\r\n",
-                                             iPartition, xMBoxData.xDownloadImageData.ulPdiSize );
-                                    INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
-                                    xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
-                                }
-                                else
-                                {
-                                    PLL_ERR( APC_NAME, "Failed to write FPT partition %d to flash\r\n", iPartition );
-                                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_FAILED )
-                                    INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
-                                    xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
-                                }
-                            }
-                            else
-                            {
-                                INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
-                                xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
-                            }
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
-                            xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
-                        }
+								/* Write updated FPT partition to flash */
+								if (OK == iWriteFptPartitionToFlash(xBootDevice, iPartition)) {
+									PLL_DBG(APC_NAME,
+										"Updated FPT partition %d with pdi_md5 and pdi_size=%u\r\n",
+										iPartition,
+										xMBoxData.xDownloadImageData.ulPdiSize);
+									INC_STAT_COUNTER(APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE)
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
+								} else {
+									PLL_ERR(APC_NAME,
+										"Failed to write FPT partition %d to flash\r\n",
+										iPartition);
+									INC_ERROR_COUNTER(APC_PROXY_ERRORS_FPT_UPDATE_FAILED)
+									INC_STAT_COUNTER(APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE)
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
+								}
+							} else {
+								INC_STAT_COUNTER(APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE)
+								xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
+							}
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED)
+							xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+						}
 
-                        if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( pxThis->pvOsalFlashLockHdl ) )
-                        {
-                            INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
-                        }
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
-                        xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_BUSY;
-                    }
+						if (OSAL_ERRORS_NONE == iOSAL_Mutex_Release(pxThis->pvOsalFlashLockHdl)) {
+							INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_RELEASE)
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)
+						}
+					} else {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)
+						xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_BUSY;
+					}
 
-                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                    }
-                }
-                break;
+					if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+					}
+				}
+				break;
 
-            case APC_MSG_TYPE_PROGRAM_PDI:
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_DOWNLOAD_PEND )
+			case APC_MSG_TYPE_PROGRAM_PDI:
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_DOWNLOAD_PEND)
 
-                xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_STARTED;
-                if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                }
-                else
-                {
-                    if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalFlashLockHdl, OSAL_TIMEOUT_NO_WAIT ) )
-                    {
-                        INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_TAKE )
+				xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_STARTED;
+				if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+				} else {
+					if (OSAL_ERRORS_NONE ==
+						iOSAL_Mutex_Take(pxThis->pvOsalFlashLockHdl, OSAL_TIMEOUT_NO_WAIT)) {
+						INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_TAKE)
 
-                        if ( OK == iDownloadPdiImage( &xMBoxData.xDownloadImageData ) )
-                        {
-                            PLL_DBG( APC_NAME, "Download packet num %d\r\n",
-                                xMBoxData.xDownloadImageData.usPacketNum );
-                            /* Check if we need to program pdi image */
-                            if ( ( TRUE == xMBoxData.xDownloadImageData.iLastPacket ) &&
-                                ( ( TRUE == xMBoxData.xDownloadImageData.iPdiProgram ) ||
-                                  ( TRUE == xMBoxData.xDownloadImageData.iApuPdiProgram ) ||
-                                  ( TRUE == xMBoxData.xDownloadImageData.iRpuPdiProgram ) ) )
-                            {
-                                INC_STAT_COUNTER( APC_PROXY_STATS_FPT_UPDATE )
+						if (OK == iDownloadPdiImage(&xMBoxData.xDownloadImageData)) {
+							PLL_DBG(APC_NAME,
+								"Download packet num %d\r\n",
+								xMBoxData.xDownloadImageData.usPacketNum);
+							/* Check if we need to program pdi image */
+							if ((TRUE == xMBoxData.xDownloadImageData.iLastPacket) &&
+								((TRUE == xMBoxData.xDownloadImageData.iPdiProgram) ||
+									(TRUE == xMBoxData.xDownloadImageData.iApuPdiProgram) ||
+									(TRUE == xMBoxData.xDownloadImageData.iRpuPdiProgram))) {
+								INC_STAT_COUNTER(APC_PROXY_STATS_FPT_UPDATE)
 
-                                xSignal.ucEventType = APC_PROXY_DRIVER_E_PROGRAM_STARTED;
+								xSignal.ucEventType = APC_PROXY_DRIVER_E_PROGRAM_STARTED;
 
-                                if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                                {
-                                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED )
-                                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                                    xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
-                                }
-                                else
-                                {
-                                    INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
-                                    xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
-                                }
-                            }
-                            else
-                            {
-                                INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE )
-                                xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
-                            }
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
-                            xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
-                        }
+								if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+									INC_ERROR_COUNTER(APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED)
+									INC_ERROR_COUNTER(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+								} else {
+									INC_STAT_COUNTER(APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE)
+									xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
+								}
+							} else {
+								INC_STAT_COUNTER(APC_PROXY_STATS_IMAGE_DOWNLOAD_COMPLETE)
+								xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE;
+							}
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED)
+							xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_FAILED;
+						}
 
-                        if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( pxThis->pvOsalFlashLockHdl ) )
-                        {
-                            INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
-                        }
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
-                        xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_BUSY;
-                    }
+						if (OSAL_ERRORS_NONE == iOSAL_Mutex_Release(pxThis->pvOsalFlashLockHdl)) {
+							INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_RELEASE)
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)
+						}
+					} else {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)
+						xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_BUSY;
+					}
 
-                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                    }
-                }
-                break;
+					if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+					}
+				}
+				break;
 
-            case APC_MSG_TYPE_COPY_PDI:
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_COPY_PEND )
+			case APC_MSG_TYPE_COPY_PDI:
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_COPY_PEND)
 
-                xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_STARTED;
-                if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                }
-                else
-                {
-                    if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalFlashLockHdl, OSAL_TIMEOUT_NO_WAIT ) )
-                    {
-                        INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_TAKE )
+				xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_STARTED;
+				if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+				} else {
+					if (OSAL_ERRORS_NONE ==
+						iOSAL_Mutex_Take(pxThis->pvOsalFlashLockHdl, OSAL_TIMEOUT_NO_WAIT)) {
+						INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_TAKE)
 
-                        if ( OK == iCopyImage( &xMBoxData.xCopyImageData ) )
-                        {
-                            INC_STAT_COUNTER( APC_PROXY_STATS_IMAGE_COPY_COMPLETE )
-                            xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_COMPLETE;
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_COPY_FAILED )
-                            xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_FAILED;
-                        }
+						if (OK == iCopyImage(&xMBoxData.xCopyImageData)) {
+							INC_STAT_COUNTER(APC_PROXY_STATS_IMAGE_COPY_COMPLETE)
+							xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_COMPLETE;
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_COPY_FAILED)
+							xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_FAILED;
+						}
 
-                        if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( pxThis->pvOsalFlashLockHdl ) )
-                        {
-                            INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
-                        }
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
-                        xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_BUSY;
-                    }
+						if (OSAL_ERRORS_NONE == iOSAL_Mutex_Release(pxThis->pvOsalFlashLockHdl)) {
+							INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_RELEASE)
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)
+						}
+					} else {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)
+						xSignal.ucEventType = APC_PROXY_DRIVER_E_COPY_BUSY;
+					}
 
-                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                    }
-                }
-                break;
+					if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+					}
+				}
+				break;
 
-            case APC_MSG_TYPE_PARTITION_SELECT:
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_PTN_SELECT_PEND )
+			case APC_MSG_TYPE_PARTITION_SELECT:
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_PTN_SELECT_PEND)
 
-                if ( OK == iSelectPartition( xMBoxData.iSelectedPartition ) )
-                {
-                    INC_STAT_COUNTER( APC_PROXY_STATS_PARTITION_SELECTED )
-                    xSignal.ucEventType = APC_PROXY_DRIVER_E_PARTITION_SELECTED;
-                }
-                else
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED )
-                    xSignal.ucEventType = APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED;
-                }
+				if (OK == iSelectPartition(xMBoxData.iSelectedPartition)) {
+					INC_STAT_COUNTER(APC_PROXY_STATS_PARTITION_SELECTED)
+					xSignal.ucEventType = APC_PROXY_DRIVER_E_PARTITION_SELECTED;
+				} else {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED)
+					xSignal.ucEventType = APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED;
+				}
 
-                if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                }
-                break;
+				if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+				}
+				break;
 
-            case APC_MSG_TYPE_SYSTEM_POR:
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_SYSTEM_POR_PEND )
+			case APC_MSG_TYPE_SYSTEM_POR:
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_SYSTEM_POR_PEND)
 
-                iOSAL_Task_SleepMs( APC_POR_DELAY_MS );
+				iOSAL_Task_SleepMs(APC_POR_DELAY_MS);
 
-                PLL_INF( APC_NAME, "Triggering system POR via XilPM\r\n" );
-                if ( XST_SUCCESS != XPm_SystemShutdown( PM_SHUTDOWN_TYPE_RESET,
-                                                        PM_SHUTDOWN_SUBTYPE_RST_SYSTEM ) )
-                {
-                    PLL_ERR( APC_NAME, "ERROR: XPm_SystemShutdown POR failed\r\n" );
-                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_POR_FAILED )
-                    xSignal.ucEventType = APC_PROXY_DRIVER_E_POR_FAILED;
+				PLL_INF(APC_NAME, "Triggering system POR via XilPM\r\n");
+				if (XST_SUCCESS !=
+					XPm_SystemShutdown(PM_SHUTDOWN_TYPE_RESET, PM_SHUTDOWN_SUBTYPE_RST_SYSTEM)) {
+					PLL_ERR(APC_NAME, "ERROR: XPm_SystemShutdown POR failed\r\n");
+					INC_ERROR_COUNTER(APC_PROXY_ERRORS_POR_FAILED)
+					xSignal.ucEventType = APC_PROXY_DRIVER_E_POR_FAILED;
 
-                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                    }
-                }
-                else
-                {
-                    INC_STAT_COUNTER( APC_PROXY_STATS_POR_TRIGGERED )
-                }
-                break;
+					if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+					}
+				} else {
+					INC_STAT_COUNTER(APC_PROXY_STATS_POR_TRIGGERED)
+				}
+				break;
 
-            case APC_MSG_TYPE_UPDATE_FPT_FLAGS:
-                INC_STAT_COUNTER( APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND )
+			case APC_MSG_TYPE_UPDATE_FPT_FLAGS:
+				INC_STAT_COUNTER(APC_PROXY_STATS_MBOX_UPDATE_FPT_FLAGS_PEND)
 
-                if ( (OK == iSetFptFlags( xMBoxData.xUpdateFptFlagsData.xBootDevice,
-                                    xMBoxData.xUpdateFptFlagsData.iPartition,
-                                    xMBoxData.xUpdateFptFlagsData.ulFlags )) &&
-                     ( OK == iRefreshFptData(0) ))
-                {
-                    xSignal.ucEventType = APC_PROXY_DRIVER_E_FPT_FLAGS_UPDATED;
+				if ((OK ==
+						iSetFptFlags(xMBoxData.xUpdateFptFlagsData.xBootDevice,
+							xMBoxData.xUpdateFptFlagsData.iPartition,
+							xMBoxData.xUpdateFptFlagsData.ulFlags)) &&
+					(OK == iRefreshFptData(0))) {
+					xSignal.ucEventType = APC_PROXY_DRIVER_E_FPT_FLAGS_UPDATED;
 
-                    if ( OK != iEVL_RaiseEvent( pxThis->pxEvlRecord, &xSignal ) )
-                    {
-                        INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED )
-                        INC_ERROR_COUNTER( APC_PROXY_ERRORS_RAISE_EVENT_FAILED )
-                    }
-                    else
-                    {
-                        INC_STAT_COUNTER( APC_PROXY_STATS_FPT_FLAGS_UPDATED )
-                    }
-                }
-                else
-                {
-                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_FAILED )
-                    INC_ERROR_COUNTER( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
-                }
-                break;
+					if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
+						INC_ERROR_COUNTER(APC_PROXY_ERRORS_FPT_UPDATE_EVENT_FAILED)
+						INC_ERROR_COUNTER(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
+					} else {
+						INC_STAT_COUNTER(APC_PROXY_STATS_FPT_FLAGS_UPDATED)
+					}
+				} else {
+					INC_ERROR_COUNTER(APC_PROXY_ERRORS_FPT_UPDATE_FAILED)
+					INC_ERROR_COUNTER(APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED)
+				}
+				break;
 
-            default:
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_MBOX_PEND_FAILED )
-                PLL_ERR( APC_NAME, "Error: unknown command type (%d)\r\n", xMBoxData.eMsgType );
-                break;
-            }
-        }
-        pxThis->pulStats[ APC_PROXY_STATS_TASK_TIME_MS ] = UTIL_ELAPSED_TIME_MS( ulStartMs )
-                                                           iOSAL_Task_SleepMs( APC_TASK_SLEEP_MS );
-    }
+			default:
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_MBOX_PEND_FAILED)
+				PLL_ERR(APC_NAME, "Error: unknown command type (%d)\r\n", xMBoxData.eMsgType);
+				break;
+			}
+		}
+		pxThis->pulStats[APC_PROXY_STATS_TASK_TIME_MS] =
+			UTIL_ELAPSED_TIME_MS(ulStartMs) iOSAL_Task_SleepMs(APC_TASK_SLEEP_MS);
+	}
 }
 
 /**
  * @brief   Refresh FPT data from flash/boot device
  */
-static int iRefreshFptData( APC_BOOT_DEVICES xBootDevice )
+static int iRefreshFptData(APC_BOOT_DEVICES xBootDevice)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( MAX_APC_BOOT_DEVICES > xBootDevice )
-    {
-        if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Take( pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_WAIT_FOREVER ) )
-        {
-            INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_TAKE )
+	if (MAX_APC_BOOT_DEVICES > xBootDevice) {
+		if (OSAL_ERRORS_NONE ==
+			iOSAL_Mutex_Take(pxThis->pvOsalMutexHdl, OSAL_TIMEOUT_WAIT_FOREVER)) {
+			INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_TAKE)
 
-            pvOSAL_MemSet( &pxThis->pxFptHeader[ xBootDevice ], 0x00, sizeof( pxThis->pxFptHeader[ xBootDevice ] ) );
+			pvOSAL_MemSet(&pxThis->pxFptHeader[xBootDevice],
+				0x00,
+				sizeof(pxThis->pxFptHeader[xBootDevice]));
 
-            if ( NULL != pxThis->ppxFptPartitions[ xBootDevice ] )
-            {
-                vOSAL_MemFree( ( void** )&pxThis->ppxFptPartitions[ xBootDevice ] );
-            }
+			if (NULL != pxThis->ppxFptPartitions[xBootDevice]) {
+				vOSAL_MemFree((void**)&pxThis->ppxFptPartitions[xBootDevice]);
+			}
 
-            iStatus = iLoadFpt( xBootDevice );
+			iStatus = iLoadFpt(xBootDevice);
 
-            if ( OSAL_ERRORS_NONE == iOSAL_Mutex_Release( pxThis->pvOsalMutexHdl ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_MUTEX_RELEASE )
-            }
-            else
-            {
-                INC_ERROR_COUNTER( APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER( APC_PROXY_ERRORS_MUTEX_TAKE_FAILED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_INVALID_BOOT_DEVICE )
-    }
-    return iStatus;
+			if (OSAL_ERRORS_NONE == iOSAL_Mutex_Release(pxThis->pvOsalMutexHdl)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_MUTEX_RELEASE)
+			} else {
+				INC_ERROR_COUNTER(APC_PROXY_ERRORS_MUTEX_RELEASE_FAILED)
+			}
+		} else {
+			INC_ERROR_COUNTER(APC_PROXY_ERRORS_MUTEX_TAKE_FAILED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_INVALID_BOOT_DEVICE)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Load entire FPT from Flash
  */
-static int iLoadFpt( APC_BOOT_DEVICES xBootDevice )
+static int iLoadFpt(APC_BOOT_DEVICES xBootDevice)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( MAX_APC_BOOT_DEVICES > xBootDevice )
-    {
-        APCProxyDriverFptHeader xFptHeader = { 0 };
-        uint32_t ulFptLen = sizeof( xFptHeader );
+	if (MAX_APC_BOOT_DEVICES > xBootDevice) {
+		APCProxyDriverFptHeader xFptHeader = { 0 };
+		uint32_t ulFptLen                  = sizeof(xFptHeader);
 
-        if ( ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->read( pxThis->ppxFwIf[ xBootDevice ],
-                                                                         0,
-                                                                         ( uint8_t* )&xFptHeader,
-                                                                         &ulFptLen,
-                                                                         0 ) ) &&
-            ( sizeof( xFptHeader ) == ulFptLen ) )
-        {
-            pvOSAL_MemCpy( &pxThis->pxFptHeader[ xBootDevice ],
-                           &xFptHeader,
-                           sizeof( pxThis->pxFptHeader[ xBootDevice ] ) );
+		if ((FW_IF_ERRORS_NONE ==
+				pxThis->ppxFwIf[xBootDevice]
+					->read(pxThis->ppxFwIf[xBootDevice], 0, (uint8_t*)&xFptHeader, &ulFptLen, 0)) &&
+			(sizeof(xFptHeader) == ulFptLen)) {
+			pvOSAL_MemCpy(&pxThis->pxFptHeader[xBootDevice],
+				&xFptHeader,
+				sizeof(pxThis->pxFptHeader[xBootDevice]));
 
-            if ( ( APC_FPT_HDR_MAGIC_NUM == xFptHeader.ulMagicNum ) &&
-                 ( APC_FPT_HDR_SIZE == xFptHeader.ucFptHeaderSize ) )
-            {
-                INC_STAT_COUNTER( APC_PROXY_STATS_FPT_HEADER_LOADED )
-                pxThis->piValidFpt[ xBootDevice ] = TRUE;
+			if ((APC_FPT_HDR_MAGIC_NUM == xFptHeader.ulMagicNum) &&
+				(APC_FPT_HDR_SIZE == xFptHeader.ucFptHeaderSize)) {
+				INC_STAT_COUNTER(APC_PROXY_STATS_FPT_HEADER_LOADED)
+				pxThis->piValidFpt[xBootDevice] = TRUE;
 
-                if ( 0 != pxThis->pxFptHeader[ xBootDevice ].ucNumEntries )
-                {
-                    pxThis->ppxFptPartitions[ xBootDevice ] =
-                        pvOSAL_MemAlloc( sizeof( APCProxyDriverFptPartition ) *
-                                         pxThis->pxFptHeader[ xBootDevice ].
-                                         ucNumEntries );
-                    if ( NULL != pxThis->ppxFptPartitions[ xBootDevice ] )
-                    {
-                        int i        = 0;
-                        uint32_t ulOffset = APC_FPT_PTN_OFFSET;
+				if (0 != pxThis->pxFptHeader[xBootDevice].ucNumEntries) {
+					pxThis->ppxFptPartitions[xBootDevice] =
+						pvOSAL_MemAlloc(sizeof(APCProxyDriverFptPartition) *
+							pxThis->pxFptHeader[xBootDevice].ucNumEntries);
+					if (NULL != pxThis->ppxFptPartitions[xBootDevice]) {
+						int i             = 0;
+						uint32_t ulOffset = APC_FPT_PTN_OFFSET;
 
-                        INC_STAT_COUNTER( APC_PROXY_STATS_FPT_CREATED )
-                        iStatus = OK;
+						INC_STAT_COUNTER(APC_PROXY_STATS_FPT_CREATED)
+						iStatus = OK;
 
-                        for ( i = 0; i < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries; i++ )
-                        {
-                            iStatus = iLoadFptPartition( xBootDevice, i, ulOffset );
-                            if ( OK != iStatus )
-                            {
-                                break;
-                            }
+						for (i = 0; i < pxThis->pxFptHeader[xBootDevice].ucNumEntries; i++) {
+							iStatus = iLoadFptPartition(xBootDevice, i, ulOffset);
+							if (OK != iStatus) {
+								break;
+							}
 
-                            ulOffset += APC_FPT_PTN_OFFSET;
-                        }
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FPT_NOT_CREATED )
-                    }
-                }
-                else
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FPT_NO_ENTRIES )
-                }
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FPT_INVALID_HEADER )
-            }
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_READ_FAILED )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER( APC_PROXY_ERRORS_INVALID_BOOT_DEVICE )
-    }
-    return iStatus;
+							ulOffset += APC_FPT_PTN_OFFSET;
+						}
+					} else {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FPT_NOT_CREATED)
+					}
+				} else {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FPT_NO_ENTRIES)
+				}
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FPT_INVALID_HEADER)
+			}
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_READ_FAILED)
+		}
+	} else {
+		INC_ERROR_COUNTER(APC_PROXY_ERRORS_INVALID_BOOT_DEVICE)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Load an FPT partition entry from flash
  */
-static int iLoadFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulPartitionAddr )
+static int iLoadFptPartition(APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulPartitionAddr)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( MAX_APC_BOOT_DEVICES > xBootDevice ) && ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries ) )
-    {
-        APCProxyDriverFptPartition xFptPartition = { 0 };
-        uint32_t ulFptLen = sizeof( APCProxyDriverFptPartition );
+	if ((MAX_APC_BOOT_DEVICES > xBootDevice) &&
+		(iPartition < pxThis->pxFptHeader[xBootDevice].ucNumEntries)) {
+		APCProxyDriverFptPartition xFptPartition = { 0 };
+		uint32_t ulFptLen                        = sizeof(APCProxyDriverFptPartition);
 
-        if ( ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->read( pxThis->ppxFwIf[ xBootDevice ],
-                                                                         ( uint64_t )ulPartitionAddr,
-                                                                         ( uint8_t* )&xFptPartition,
-                                                                         &ulFptLen,
-                                                                         0 ) ) &&
-            ( ulFptLen == sizeof( APCProxyDriverFptPartition ) ) )
-        {
-            INC_STAT_COUNTER( APC_PROXY_STATS_FPT_PARTITION_LOADED )
-            pvOSAL_MemCpy( &pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ],
-                           &xFptPartition,
-                           sizeof( APCProxyDriverFptPartition ) );
-            iStatus = OK;
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FPT_INVALID_PARTITION )
-        }
-    }
-    else
-    {
-        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-    }
-    return iStatus;
+		if ((FW_IF_ERRORS_NONE ==
+				pxThis->ppxFwIf[xBootDevice]->read(pxThis->ppxFwIf[xBootDevice],
+					(uint64_t)ulPartitionAddr,
+					(uint8_t*)&xFptPartition,
+					&ulFptLen,
+					0)) &&
+			(ulFptLen == sizeof(APCProxyDriverFptPartition))) {
+			INC_STAT_COUNTER(APC_PROXY_STATS_FPT_PARTITION_LOADED)
+			pvOSAL_MemCpy(&pxThis->ppxFptPartitions[xBootDevice][iPartition],
+				&xFptPartition,
+				sizeof(APCProxyDriverFptPartition));
+			iStatus = OK;
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FPT_INVALID_PARTITION)
+		}
+	} else {
+		INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Download new image to flash and update metadata
  */
-static int iDownloadImage( APCMboxDownloadImage *pxImageData )
+static int iDownloadImage(APCMboxDownloadImage* pxImageData)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( NULL != pxImageData ) && ( MAX_APC_BOOT_DEVICES > pxImageData->xBootDevice ) )
-    {
-        int iPartition  = pxImageData->iPartition;
-        uint32_t ulImageSize = pxImageData->ulImageSize;
-        uint8_t  *pucPdiData = ( uint8_t* )( uintptr_t )( pxImageData->ulSrcAddr );
+	if ((NULL != pxImageData) && (MAX_APC_BOOT_DEVICES > pxImageData->xBootDevice)) {
+		int iPartition       = pxImageData->iPartition;
+		uint32_t ulImageSize = pxImageData->ulImageSize;
+		uint8_t* pucPdiData  = (uint8_t*)(uintptr_t)(pxImageData->ulSrcAddr);
 
-        HAL_FLUSH_CACHE_DATA( ( uintptr_t )( pxImageData->ulSrcAddr ), ulImageSize ); /* flush shared memory buff before use */
+		HAL_FLUSH_CACHE_DATA((uintptr_t)(pxImageData->ulSrcAddr),
+			ulImageSize); /* flush shared memory buff before use */
 
-        /* Check if image is smaller than a chunk */
-        if ( ulImageSize < ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) )
-        {
-            PLL_WRN( APC_NAME,
-                     "Image size (%d) is smaller than the chunk size (%d)\r\n",
-                     ulImageSize,
-                     ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) );
-        }
+		/* Check if image is smaller than a chunk */
+		if (ulImageSize < (pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE)) {
+			PLL_WRN(APC_NAME,
+				"Image size (%d) is smaller than the chunk size (%d)\r\n",
+				ulImageSize,
+				(pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE));
+		}
 
-        /* Check partition size if we are not updating the FPT.  */
-        if ( ( FALSE == pxImageData->iUpdateFpt ) &&
-             ( ulImageSize > pxThis->ppxFptPartitions[ pxImageData->xBootDevice ][ iPartition ].ulPartitionSize ) )
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_SIZE_ERROR )
-            PLL_ERR( APC_NAME,
-                     "ERROR: %d bytes is bigger than allocated %d bytes\r\n",
-                     ulImageSize,
-                     pxThis->ppxFptPartitions[ pxImageData->xBootDevice ][ iPartition ].ulPartitionSize );
-        }
-        else if ( 0 == pxImageData->ulPacketSize )
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_PACKET_SIZE_ERROR )
-            PLL_ERR( APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->ulPacketSize );
-        }
-        else
-        {
-            uint32_t ulDestAddr = pxImageData->usPacketNum * ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE );
-            uint32_t ulStartMs  = ulOSAL_GetUptimeMs();
+		/* Check partition size if we are not updating the FPT.  */
+		if ((FALSE == pxImageData->iUpdateFpt) &&
+			(ulImageSize >
+				pxThis->ppxFptPartitions[pxImageData->xBootDevice][iPartition].ulPartitionSize)) {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_SIZE_ERROR)
+			PLL_ERR(APC_NAME,
+				"ERROR: %d bytes is bigger than allocated %d bytes\r\n",
+				ulImageSize,
+				pxThis->ppxFptPartitions[pxImageData->xBootDevice][iPartition].ulPartitionSize);
+		} else if (0 == pxImageData->ulPacketSize) {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_PACKET_SIZE_ERROR)
+			PLL_ERR(APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->ulPacketSize);
+		} else {
+			uint32_t ulDestAddr =
+				pxImageData->usPacketNum * (pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE);
+			uint32_t ulStartMs = ulOSAL_GetUptimeMs();
 
-            if ( FALSE == pxImageData->iUpdateFpt )
-            {
-                ulDestAddr += pxThis->ppxFptPartitions[ pxImageData->xBootDevice ][ iPartition ].ulPartitionBaseAddr;
+			if (FALSE == pxImageData->iUpdateFpt) {
+				ulDestAddr += pxThis->ppxFptPartitions[pxImageData->xBootDevice][iPartition]
+								  .ulPartitionBaseAddr;
 
-                PLL_DBG( APC_NAME,
-                         "Downloading %d bytes to FPT partition %d\r\n",
-                         ulImageSize,
-                         iPartition );
-            }
-            else
-            {
-                PLL_DBG( APC_NAME,
-                         "Downloading %d bytes - updating FPT;"
-                         " ignore partition numbers in debug output\r\n",
-                         ulImageSize );
-            }
+				PLL_DBG(APC_NAME,
+					"Downloading %d bytes to FPT partition %d\r\n",
+					ulImageSize,
+					iPartition);
+			} else {
+				PLL_DBG(APC_NAME,
+					"Downloading %d bytes - updating FPT;"
+					" ignore partition numbers in debug output\r\n",
+					ulImageSize);
+			}
 
-            PLL_DBG( APC_NAME, "Src:  0x%08x\r\n", pxImageData->ulSrcAddr );
-            PLL_DBG( APC_NAME, "Dest: 0x%08x\r\n", ulDestAddr );
-            PLL_DBG( APC_NAME, "===== Writing P.%d =====\r\n", iPartition );
+			PLL_DBG(APC_NAME, "Src:  0x%08x\r\n", pxImageData->ulSrcAddr);
+			PLL_DBG(APC_NAME, "Dest: 0x%08x\r\n", ulDestAddr);
+			PLL_DBG(APC_NAME, "===== Writing P.%d =====\r\n", iPartition);
 
-            if ( ( TRUE == pxImageData->iUpdateFpt ) ||
-                 ( ( ulDestAddr + ulImageSize ) <=
-                   ( pxThis->ppxFptPartitions[ pxImageData->xBootDevice ][ iPartition ].ulPartitionBaseAddr +
-                     pxThis->ppxFptPartitions[ pxImageData->xBootDevice ][ iPartition ].ulPartitionSize ) ) )
-            {
-                if ( FW_IF_ERRORS_NONE ==
-                    pxThis->ppxFwIf[ pxImageData->xBootDevice ]->write( pxThis->ppxFwIf[ pxImageData->xBootDevice ],
-                                                                        ( uint64_t )ulDestAddr,
-                                                                        pucPdiData,
-                                                                        ulImageSize,
-                                                                        0 ) )
-                {
-                    PLL_DBG( APC_NAME, "===== Verifying write =====\r\n" );
-                    if ( OK == iVerifyDownload( pxImageData ) )
-                    {
-                        iStatus = OK;
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )
-                    }
+			if ((TRUE == pxImageData->iUpdateFpt) ||
+				((ulDestAddr + ulImageSize) <=
+					(pxThis->ppxFptPartitions[pxImageData->xBootDevice][iPartition]
+							.ulPartitionBaseAddr +
+						pxThis->ppxFptPartitions[pxImageData->xBootDevice][iPartition]
+							.ulPartitionSize))) {
+				if (FW_IF_ERRORS_NONE ==
+					pxThis->ppxFwIf[pxImageData->xBootDevice]->write(
+						pxThis->ppxFwIf[pxImageData->xBootDevice],
+						(uint64_t)ulDestAddr,
+						pucPdiData,
+						ulImageSize,
+						0)) {
+					PLL_DBG(APC_NAME, "===== Verifying write =====\r\n");
+					if (OK == iVerifyDownload(pxImageData)) {
+						iStatus = OK;
+					} else {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_WRITE_FAILED)
+					}
 
-                    /* Invalidate FPT */
-                    if ( ( TRUE == pxImageData->iUpdateFpt ) && ( 0 == pxImageData->usPacketNum ) )
-                    {
-                        /* Will need to reset this when the download is complete */
-                        pxThis->piValidFpt[ pxImageData->xBootDevice ] = FALSE;
-                    }
+					/* Invalidate FPT */
+					if ((TRUE == pxImageData->iUpdateFpt) && (0 == pxImageData->usPacketNum)) {
+						/* Will need to reset this when the download is complete */
+						pxThis->piValidFpt[pxImageData->xBootDevice] = FALSE;
+					}
 
-                    PLL_DBG( APC_NAME,
-                             "Write %d %s - %dms\r\n",
-                             iPartition,
-                             ( OK == iStatus )?( "complete" ):( "failure" ),
-                             ulOSAL_GetUptimeMs() - ulStartMs );
-                }
-                else
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )
-                    PLL_ERR( APC_NAME, "ERROR writing to flash\r\n" );
-                }
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_SIZE_ERROR )
-                PLL_ERR( APC_NAME, "ERROR: %d bytes will overwrite partition\r\n", ulImageSize );
-            }
-        }
-    }
-    return iStatus;
+					PLL_DBG(APC_NAME,
+						"Write %d %s - %dms\r\n",
+						iPartition,
+						(OK == iStatus) ? ("complete") : ("failure"),
+						ulOSAL_GetUptimeMs() - ulStartMs);
+				} else {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_WRITE_FAILED)
+					PLL_ERR(APC_NAME, "ERROR writing to flash\r\n");
+				}
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_SIZE_ERROR)
+				PLL_ERR(APC_NAME, "ERROR: %d bytes will overwrite partition\r\n", ulImageSize);
+			}
+		}
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Download pdi image and update metadata
  */
-static int iDownloadPdiImage( APCMboxDownloadImage *pxImageData )
+static int iDownloadPdiImage(APCMboxDownloadImage* pxImageData)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( NULL != pxImageData )
-    {
-        uint32_t ulImageSize = pxImageData->ulImageSize;
+	if (NULL != pxImageData) {
+		uint32_t ulImageSize = pxImageData->ulImageSize;
 
-        /* flush shared memory buff before use */
-        HAL_FLUSH_CACHE_DATA( ( uintptr_t )( pxImageData->ulSrcAddr ), ulImageSize );
+		/* flush shared memory buff before use */
+		HAL_FLUSH_CACHE_DATA((uintptr_t)(pxImageData->ulSrcAddr), ulImageSize);
 
-        /* Check if image is smaller than a chunk */
-        if ( ulImageSize < ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) )
-        {
-            PLL_WRN( APC_NAME,
-                    "Image size (%d) is smaller than the chunk size (%d)\r\n",
-                    ulImageSize,
-                    ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE ) );
-        }
+		/* Check if image is smaller than a chunk */
+		if (ulImageSize < (pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE)) {
+			PLL_WRN(APC_NAME,
+				"Image size (%d) is smaller than the chunk size (%d)\r\n",
+				ulImageSize,
+				(pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE));
+		}
 
-        if ( 0 == pxImageData->ulPacketSize )
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_PACKET_SIZE_ERROR )
-            PLL_ERR( APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->ulPacketSize );
-        }
-        else
-        {
-            uint32_t ulDestAddr = pxImageData->usPacketNum * ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE );
-            uint32_t ulStartMs  = ulOSAL_GetUptimeMs();
+		if (0 == pxImageData->ulPacketSize) {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_PACKET_SIZE_ERROR)
+			PLL_ERR(APC_NAME, "ERROR: packet size set to %d KB\r\n", pxImageData->ulPacketSize);
+		} else {
+			uint32_t ulDestAddr =
+				pxImageData->usPacketNum * (pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE);
+			uint32_t ulStartMs = ulOSAL_GetUptimeMs();
 
-            PLL_DBG( APC_NAME, "Downloading PDI %d bytes\r\n", ulImageSize );
+			PLL_DBG(APC_NAME, "Downloading PDI %d bytes\r\n", ulImageSize);
 
-            PLL_DBG( APC_NAME, "Src:  0x%08x\r\n", pxImageData->ulSrcAddr );
-            PLL_DBG( APC_NAME, "Dest: 0x%08x\r\n", ulDestAddr );
+			PLL_DBG(APC_NAME, "Src:  0x%08x\r\n", pxImageData->ulSrcAddr);
+			PLL_DBG(APC_NAME, "Dest: 0x%08x\r\n", ulDestAddr);
 
-            if ( ( TRUE == pxImageData->iPdiProgram ) ||
-                 ( TRUE == pxImageData->iApuPdiProgram ) ||
-                 ( TRUE == pxImageData->iRpuPdiProgram ) )
-            {
-                iStatus = OK;
+			if ((TRUE == pxImageData->iPdiProgram) || (TRUE == pxImageData->iApuPdiProgram) ||
+				(TRUE == pxImageData->iRpuPdiProgram)) {
+				iStatus = OK;
 
-                pvOSAL_MemCpy((void *)( HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr ),
-                    (const void*)(pxImageData->ulSrcAddr), ulImageSize);
-                    HAL_FLUSH_CACHE_DATA( ( HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr ), ulImageSize );
+				pvOSAL_MemCpy((void*)(HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr),
+					(const void*)(pxImageData->ulSrcAddr),
+					ulImageSize);
+				HAL_FLUSH_CACHE_DATA((HAL_RPU_MEMORY_BUFFER_BASE + ulDestAddr), ulImageSize);
 
-                if ( 1 == pxImageData->iLastPacket )
-                {
-                    if (NULL == pxThis->pXLoaderInst)
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
-                        PLL_ERR( APC_NAME, "ERROR: Xloader instance NULL \r\n" );
-                    }
-                    else
-                    {
-                        uint32_t ulPdiLoadStatus = 0U;
+				if (1 == pxImageData->iLastPacket) {
+					if (NULL == pxThis->pXLoaderInst) {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED)
+						PLL_ERR(APC_NAME, "ERROR: Xloader instance NULL \r\n");
+					} else {
+						uint32_t ulPdiLoadStatus = 0U;
 
-                        /* Power down RPU1 (0x1c000007) */
-                        if ( TRUE == pxImageData->iRpuPdiProgram )
-                        {
-                            PLL_DBG( APC_NAME, "Force power down RPU1 subsystem\r\n" );
-                            iStatus = XPm_ForcePowerDown(0x1c000007U, REQUEST_ACK_BLOCKING);
-                            if (XST_SUCCESS != iStatus)
-                            {
-                                PLL_ERR( APC_NAME, "ERROR: Failed to force power down RPU1 subsystem 0x%X\r\n",
-                                            ( unsigned )iStatus );
-                            }
-                        }
+						/* Power down RPU1 (0x1c000007) */
+						if (TRUE == pxImageData->iRpuPdiProgram) {
+							PLL_DBG(APC_NAME, "Force power down RPU1 subsystem\r\n");
+							iStatus = XPm_ForcePowerDown(0x1c000007U, REQUEST_ACK_BLOCKING);
+							if (XST_SUCCESS != iStatus) {
+								PLL_ERR(APC_NAME,
+									"ERROR: Failed to force power down RPU1 subsystem 0x%X\r\n",
+									(unsigned)iStatus);
+							}
+						}
 
-                        if ( TRUE == pxImageData->iApuPdiProgram )
-                        {
-                            /* Power down APU (0x1c000008) */
-                            PLL_DBG( APC_NAME, "Force power down APU subsystem\r\n" );
-                            iStatus = XPm_ForcePowerDown( 0x1c000008U, REQUEST_ACK_BLOCKING );
-                            if (XST_SUCCESS != iStatus)
-                            {
-                                PLL_ERR( APC_NAME, "ERROR: Failed to force power down APU subsystem 0x%X\r\n",
-                                         ( unsigned )iStatus );
-                            }
-                        }
+						if (TRUE == pxImageData->iApuPdiProgram) {
+							/* Power down APU (0x1c000008) */
+							PLL_DBG(APC_NAME, "Force power down APU subsystem\r\n");
+							iStatus = XPm_ForcePowerDown(0x1c000008U, REQUEST_ACK_BLOCKING);
+							if (XST_SUCCESS != iStatus) {
+								PLL_ERR(APC_NAME,
+									"ERROR: Failed to force power down APU subsystem 0x%X\r\n",
+									(unsigned)iStatus);
+							}
+						}
 
-                        iStatus = XLoader_LoadPartialPdi(pxThis->pXLoaderInst,
-                                                    XLOADER_PDI_DDR,
-                                                    (u64)HAL_RPU_MEMORY_BUFFER_BASE,
-                                                    &ulPdiLoadStatus);
-                        if (XST_SUCCESS == iStatus)
-                        {
-                            PLL_DBG( APC_NAME, "PDI Program successfull!!\r\n");
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED )
-                            PLL_ERR( APC_NAME, "ERROR: PDI programming error status 0x%X \r\n", ulPdiLoadStatus );
-                        }
-                    }
-                }
+						iStatus = XLoader_LoadPartialPdi(pxThis->pXLoaderInst,
+							XLOADER_PDI_DDR,
+							(u64)HAL_RPU_MEMORY_BUFFER_BASE,
+							&ulPdiLoadStatus);
+						if (XST_SUCCESS == iStatus) {
+							PLL_DBG(APC_NAME, "PDI Program successfull!!\r\n");
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_DOWNLOAD_FAILED)
+							PLL_ERR(APC_NAME,
+								"ERROR: PDI programming error status 0x%X \r\n",
+								ulPdiLoadStatus);
+						}
+					}
+				}
 
-                PLL_DBG( APC_NAME,
-                            "Write %s - %dms\r\n",
-                            ( OK == iStatus )?( "complete" ):( "failure" ),
-                            ulOSAL_GetUptimeMs() - ulStartMs );
-            }
-            else
-            {
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_SIZE_ERROR )
-                PLL_ERR( APC_NAME, "ERROR: %d bytes will overwrite\r\n", ulImageSize );
-            }
-        }
-    }
+				PLL_DBG(APC_NAME,
+					"Write %s - %dms\r\n",
+					(OK == iStatus) ? ("complete") : ("failure"),
+					ulOSAL_GetUptimeMs() - ulStartMs);
+			} else {
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_SIZE_ERROR)
+				PLL_ERR(APC_NAME, "ERROR: %d bytes will overwrite\r\n", ulImageSize);
+			}
+		}
+	}
 
-    return iStatus;
+	return iStatus;
 }
 
 /**
  * @brief   Copy image from one partition to another
  */
-static int iCopyImage( APCMboxCopyImage *pxCopyData )
+static int iCopyImage(APCMboxCopyImage* pxCopyData)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( NULL != pxCopyData ) &&
-        ( MAX_APC_BOOT_DEVICES > pxCopyData->xSrcBootDevice ) &&
-        ( MAX_APC_BOOT_DEVICES > pxCopyData->xDestBootDevice ) )
-    {
-        uint32_t ulAllocatedSize = pxCopyData->ulAllocatedSize;
-        uint8_t          *pucCpyData     = ( uint8_t* )( uintptr_t )( pxCopyData->ulCpyAddr );
-        APC_BOOT_DEVICES xSrcBootDevice  = pxCopyData->xSrcBootDevice;
-        int iSrcPartition   = pxCopyData->iSrcPartition;
-        APC_BOOT_DEVICES xDestBootDevice = pxCopyData->xDestBootDevice;
-        int iDestPartition  = pxCopyData->iDestPartition;
+	if ((NULL != pxCopyData) && (MAX_APC_BOOT_DEVICES > pxCopyData->xSrcBootDevice) &&
+		(MAX_APC_BOOT_DEVICES > pxCopyData->xDestBootDevice)) {
+		uint32_t ulAllocatedSize         = pxCopyData->ulAllocatedSize;
+		uint8_t* pucCpyData              = (uint8_t*)(uintptr_t)(pxCopyData->ulCpyAddr);
+		APC_BOOT_DEVICES xSrcBootDevice  = pxCopyData->xSrcBootDevice;
+		int iSrcPartition                = pxCopyData->iSrcPartition;
+		APC_BOOT_DEVICES xDestBootDevice = pxCopyData->xDestBootDevice;
+		int iDestPartition               = pxCopyData->iDestPartition;
 
-        if ( pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize >
-             pxThis->ppxFptPartitions[ xDestBootDevice ][ iDestPartition ].ulPartitionSize )
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_SIZE_ERROR )
-            PLL_ERR( APC_NAME,
-                     "ERROR: %d bytes is bigger than allocated %d bytes\r\n",
-                     pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize,
-                     pxThis->ppxFptPartitions[ xDestBootDevice ][ iDestPartition ].ulPartitionSize );
-        }
-        else if ( pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize > ulAllocatedSize )
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_IMAGE_SIZE_ERROR )
-            PLL_ERR( APC_NAME, "ERROR: insufficient memory (%d bytes) reserved for copy\r\n", ulAllocatedSize );
-        }
-        else
-        {
-            uint32_t ulCopySize = 0;
-            uint32_t ulSrcAddr  =
-                pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionBaseAddr;
-            uint32_t ulStartMs           = ulOSAL_GetUptimeMs();
-            uint32_t ulTotalBytesWritten = 0;
-            uint32_t ulBootTag           = 0;
-            APCMboxDownloadImage xImageData =
-            {
-                .xBootDevice  = xSrcBootDevice,
-                .iPartition   = iSrcPartition,
-                .ulImageSize  = APC_COPY_PACKET_SIZE_KB * APC_BASE_PACKET_SIZE,
-                .ulSrcAddr    = pxCopyData->ulCpyAddr,
-                .usPacketNum  = 0,
-                .ulPacketSize = APC_COPY_PACKET_SIZE_KB
-            };
+		if (pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPartitionSize >
+			pxThis->ppxFptPartitions[xDestBootDevice][iDestPartition].ulPartitionSize) {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_SIZE_ERROR)
+			PLL_ERR(APC_NAME,
+				"ERROR: %d bytes is bigger than allocated %d bytes\r\n",
+				pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPartitionSize,
+				pxThis->ppxFptPartitions[xDestBootDevice][iDestPartition].ulPartitionSize);
+		} else if (pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPartitionSize >
+			ulAllocatedSize) {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_IMAGE_SIZE_ERROR)
+			PLL_ERR(APC_NAME,
+				"ERROR: insufficient memory (%d bytes) reserved for copy\r\n",
+				ulAllocatedSize);
+		} else {
+			uint32_t ulCopySize = 0;
+			uint32_t ulSrcAddr =
+				pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPartitionBaseAddr;
+			uint32_t ulStartMs              = ulOSAL_GetUptimeMs();
+			uint32_t ulTotalBytesWritten    = 0;
+			uint32_t ulBootTag              = 0;
+			APCMboxDownloadImage xImageData = {
+				.xBootDevice  = xSrcBootDevice,
+				.iPartition   = iSrcPartition,
+				.ulImageSize  = APC_COPY_PACKET_SIZE_KB * APC_BASE_PACKET_SIZE,
+				.ulSrcAddr    = pxCopyData->ulCpyAddr,
+				.usPacketNum  = 0,
+				.ulPacketSize = APC_COPY_PACKET_SIZE_KB,
+			};
 
-            /* ensure that the smallest safe value is copied */
-            if ( ulAllocatedSize < pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize )
-            {
-                ulCopySize = ulAllocatedSize;
-            }
-            else
-            {
-                ulCopySize = pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize;
-            }
+			/* ensure that the smallest safe value is copied */
+			if (ulAllocatedSize <
+				pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPartitionSize) {
+				ulCopySize = ulAllocatedSize;
+			} else {
+				ulCopySize =
+					pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPartitionSize;
+			}
 
-            while( ulCopySize > ulTotalBytesWritten )
-            {
-                /* set packet size */
-                if ( ulCopySize < ( ulTotalBytesWritten + ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) )
-                {
-                    xImageData.ulImageSize = ulCopySize - ulTotalBytesWritten; /* remaining bytes */
-                }
-                else
-                {
-                    xImageData.ulImageSize = xImageData.ulPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
-                }
+			while (ulCopySize > ulTotalBytesWritten) {
+				/* set packet size */
+				if (ulCopySize <
+					(ulTotalBytesWritten + (xImageData.ulPacketSize * APC_BASE_PACKET_SIZE))) {
+					xImageData.ulImageSize = ulCopySize - ulTotalBytesWritten; /* remaining bytes */
+				} else {
+					xImageData.ulImageSize =
+						xImageData.ulPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
+				}
 
-                /* Read each packet into the shared memory */
-                PLL_DBG( APC_NAME,
-                         "===== Reading packet %d from P.%d to RAM =====\r\n",
-                         xImageData.usPacketNum,
-                         iSrcPartition );
-                if ( ( FW_IF_ERRORS_NONE ==
-                    pxThis->ppxFwIf[ xSrcBootDevice ]->read( pxThis->ppxFwIf[ xSrcBootDevice ],
-                        ( uint64_t )( ulSrcAddr + ( xImageData. usPacketNum * ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) ),
-                        ( pucCpyData + ( xImageData.usPacketNum * ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) ),
-                        &xImageData.ulImageSize,
-                        0 ) ) &&
-                    ( xImageData.ulImageSize <= pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPartitionSize ) &&
-                    ( xImageData.ulImageSize <= ulAllocatedSize ) &&
-                    ( 0 < xImageData.ulImageSize ) )
-                {
-                    if ( 0 != xImageData.usPacketNum )
-                    {
-                        xImageData.ulSrcAddr   = ( pxCopyData->ulCpyAddr +
-                                                   ( xImageData.usPacketNum * ( xImageData.ulPacketSize * APC_BASE_PACKET_SIZE ) ) );
-                        xImageData.xBootDevice = xSrcBootDevice;
-                        xImageData.iPartition  = iSrcPartition;
+				/* Read each packet into the shared memory */
+				PLL_DBG(APC_NAME,
+					"===== Reading packet %d from P.%d to RAM =====\r\n",
+					xImageData.usPacketNum,
+					iSrcPartition);
+				if ((FW_IF_ERRORS_NONE ==
+						pxThis->ppxFwIf[xSrcBootDevice]->read(pxThis->ppxFwIf[xSrcBootDevice],
+							(uint64_t)(ulSrcAddr +
+								(xImageData.usPacketNum *
+									(xImageData.ulPacketSize * APC_BASE_PACKET_SIZE))),
+							(pucCpyData +
+								(xImageData.usPacketNum *
+									(xImageData.ulPacketSize * APC_BASE_PACKET_SIZE))),
+							&xImageData.ulImageSize,
+							0)) &&
+					(xImageData.ulImageSize <=
+						pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPartitionSize) &&
+					(xImageData.ulImageSize <= ulAllocatedSize) && (0 < xImageData.ulImageSize)) {
+					if (0 != xImageData.usPacketNum) {
+						xImageData.ulSrcAddr   = (pxCopyData->ulCpyAddr +
+                            (xImageData.usPacketNum *
+                                (xImageData.ulPacketSize * APC_BASE_PACKET_SIZE)));
+						xImageData.xBootDevice = xSrcBootDevice;
+						xImageData.iPartition  = iSrcPartition;
 
-                        PLL_DBG( APC_NAME, "===== Verifying packet %d =====\r\n", xImageData.usPacketNum );
-                        if ( OK == iVerifyDownload( &xImageData ) )
-                        {
-                            PLL_DBG( APC_NAME,
-                                     "Packet %d of partition %d successfully copied to RAM\r\n",
-                                     xImageData.usPacketNum,
-                                     iSrcPartition );
+						PLL_DBG(APC_NAME,
+							"===== Verifying packet %d =====\r\n",
+							xImageData.usPacketNum);
+						if (OK == iVerifyDownload(&xImageData)) {
+							PLL_DBG(APC_NAME,
+								"Packet %d of partition %d successfully copied to RAM\r\n",
+								xImageData.usPacketNum,
+								iSrcPartition);
 
-                            xImageData.xBootDevice = xDestBootDevice;
-                            xImageData.iPartition  = iDestPartition;
-                            if ( OK == iDownloadImage( &xImageData ) )
-                            {
-                                PLL_DBG( APC_NAME,
-                                         "Packet %d of RAM contents successfully copied to partition %d\r\n",
-                                         xImageData.usPacketNum,
-                                         iDestPartition );
-                                ulTotalBytesWritten += xImageData.ulImageSize;
-                            }
-                            else
-                            {
-                                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )
-                                PLL_ERR( APC_NAME,
-                                         "ERROR copying packet %d of RAM contents to partition %d\r\n",
-                                         xImageData.usPacketNum,
-                                         iDestPartition );
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_READ_FAILED )
-                            PLL_ERR( APC_NAME, "ERROR copying partition %d to RAM\r\n", iSrcPartition );
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        /* invalidate the PDI magic number, to ensure it isn't bootable until complete */
-                        ulBootTag = APC_PMC_BOOT_TAG( pucCpyData ); /* save boot tag */
-                        APC_PMC_BOOT_TAG( pucCpyData ) = APC_INVALID_PDI_TAG; /* invalidate boot tag */
-                        xImageData.ulSrcAddr           = pxCopyData->ulCpyAddr;
-                        xImageData.xBootDevice         = xDestBootDevice;
-                        xImageData.iPartition          = iDestPartition;
+							xImageData.xBootDevice = xDestBootDevice;
+							xImageData.iPartition  = iDestPartition;
+							if (OK == iDownloadImage(&xImageData)) {
+								PLL_DBG(APC_NAME,
+									"Packet %d of RAM contents successfully copied to partition "
+									"%d\r\n",
+									xImageData.usPacketNum,
+									iDestPartition);
+								ulTotalBytesWritten += xImageData.ulImageSize;
+							} else {
+								INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_WRITE_FAILED)
+								PLL_ERR(APC_NAME,
+									"ERROR copying packet %d of RAM contents to partition %d\r\n",
+									xImageData.usPacketNum,
+									iDestPartition);
+								break;
+							}
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_READ_FAILED)
+							PLL_ERR(APC_NAME,
+								"ERROR copying partition %d to RAM\r\n",
+								iSrcPartition);
+							break;
+						}
+					} else {
+						/* invalidate the PDI magic number, to ensure it isn't bootable until
+						 * complete */
+						ulBootTag = APC_PMC_BOOT_TAG(pucCpyData); /* save boot tag */
+						APC_PMC_BOOT_TAG(pucCpyData) =
+							APC_INVALID_PDI_TAG; /* invalidate boot tag */
+						xImageData.ulSrcAddr   = pxCopyData->ulCpyAddr;
+						xImageData.xBootDevice = xDestBootDevice;
+						xImageData.iPartition  = iDestPartition;
 
-                        if ( OK == iDownloadImage( &xImageData ) )
-                        {
-                            PLL_DBG( APC_NAME,
-                                     "Packet %d (with invalidated PDI magic number) of RAM contents successfully copied to partition %d\r\n",
-                                     xImageData.usPacketNum,
-                                     iDestPartition );
-                            ulTotalBytesWritten += xImageData.ulImageSize;
-                        }
-                        else
-                        {
-                            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )
-                            PLL_ERR( APC_NAME,
-                                     "ERROR copying packet %d of RAM contents to partition %d\r\n",
-                                     xImageData.usPacketNum,
-                                     iDestPartition );
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_READ_FAILED )
-                    PLL_ERR( APC_NAME, "ERROR reading to 0x%08x from 0x%08x\r\n", pxCopyData->ulCpyAddr, ulSrcAddr );
-                    break;
-                }
-                xImageData.usPacketNum++;
-                iOSAL_Task_SleepMs( 1 );
-            }
+						if (OK == iDownloadImage(&xImageData)) {
+							PLL_DBG(APC_NAME,
+								"Packet %d (with invalidated PDI magic number) of RAM contents "
+								"successfully copied to partition %d\r\n",
+								xImageData.usPacketNum,
+								iDestPartition);
+							ulTotalBytesWritten += xImageData.ulImageSize;
+						} else {
+							INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_WRITE_FAILED)
+							PLL_ERR(APC_NAME,
+								"ERROR copying packet %d of RAM contents to partition %d\r\n",
+								xImageData.usPacketNum,
+								iDestPartition);
+							break;
+						}
+					}
+				} else {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_READ_FAILED)
+					PLL_ERR(APC_NAME,
+						"ERROR reading to 0x%08x from 0x%08x\r\n",
+						pxCopyData->ulCpyAddr,
+						ulSrcAddr);
+					break;
+				}
+				xImageData.usPacketNum++;
+				iOSAL_Task_SleepMs(1);
+			}
 
-            if ( ulCopySize == ulTotalBytesWritten )
-            {
-                /* PDI is now bootable - re-validate the PDI magic number - re-download first packet */
-                APC_PMC_BOOT_TAG( pucCpyData ) = ulBootTag;
-                PLL_DBG( APC_NAME, "Tag:  0x%08x\r\n", APC_PMC_BOOT_TAG( pucCpyData ) );
+			if (ulCopySize == ulTotalBytesWritten) {
+				/* PDI is now bootable - re-validate the PDI magic number - re-download first packet
+				 */
+				APC_PMC_BOOT_TAG(pucCpyData) = ulBootTag;
+				PLL_DBG(APC_NAME, "Tag:  0x%08x\r\n", APC_PMC_BOOT_TAG(pucCpyData));
 
-                xImageData.xBootDevice = xSrcBootDevice;
-                xImageData.iPartition  = iSrcPartition;
-                xImageData.usPacketNum = 0;
-                xImageData.ulSrcAddr   = pxCopyData->ulCpyAddr;
-                xImageData.ulImageSize = xImageData.ulPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
+				xImageData.xBootDevice = xSrcBootDevice;
+				xImageData.iPartition  = iSrcPartition;
+				xImageData.usPacketNum = 0;
+				xImageData.ulSrcAddr   = pxCopyData->ulCpyAddr;
+				xImageData.ulImageSize =
+					xImageData.ulPacketSize * APC_BASE_PACKET_SIZE; /* full packet size */
 
-                PLL_DBG( APC_NAME, "===== Verifying packet %d =====\r\n", xImageData.usPacketNum );
-                if ( OK == iVerifyDownload( &xImageData ) )
-                {
-                    PLL_DBG( APC_NAME,
-                             "Packet %d of partition %d successfully copied to RAM\r\n",
-                             xImageData.usPacketNum,
-                             iSrcPartition );
+				PLL_DBG(APC_NAME, "===== Verifying packet %d =====\r\n", xImageData.usPacketNum);
+				if (OK == iVerifyDownload(&xImageData)) {
+					PLL_DBG(APC_NAME,
+						"Packet %d of partition %d successfully copied to RAM\r\n",
+						xImageData.usPacketNum,
+						iSrcPartition);
 
-                    xImageData.xBootDevice = xDestBootDevice;
-                    xImageData.iPartition  = iDestPartition;
-                    if ( OK == iDownloadImage( &xImageData ) )
-                    {
-                        PLL_DBG( APC_NAME,
-                                 "Packet %d of RAM contents successfully copied to partition %d\r\n",
-                                 xImageData.usPacketNum,
-                                 iDestPartition );
+					xImageData.xBootDevice = xDestBootDevice;
+					xImageData.iPartition  = iDestPartition;
+					if (OK == iDownloadImage(&xImageData)) {
+						PLL_DBG(APC_NAME,
+							"Packet %d of RAM contents successfully copied to partition %d\r\n",
+							xImageData.usPacketNum,
+							iDestPartition);
 
-                        /* Copy pdi_md5 and pdi_size from source to destination partition */
-                        pvOSAL_MemCpy( pxThis->ppxFptPartitions[ xDestBootDevice ][ iDestPartition ].pdi_md5,
-                                       pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].pdi_md5,
-                                       sizeof( pxThis->ppxFptPartitions[ xDestBootDevice ][ iDestPartition ].pdi_md5 ) );
-                        pxThis->ppxFptPartitions[ xDestBootDevice ][ iDestPartition ].ulPdiSize =
-                            pxThis->ppxFptPartitions[ xSrcBootDevice ][ iSrcPartition ].ulPdiSize;
+						/* Copy pdi_md5 and pdi_size from source to destination partition */
+						pvOSAL_MemCpy(
+							pxThis->ppxFptPartitions[xDestBootDevice][iDestPartition].pdi_md5,
+							pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].pdi_md5,
+							sizeof(
+								pxThis->ppxFptPartitions[xDestBootDevice][iDestPartition].pdi_md5));
+						pxThis->ppxFptPartitions[xDestBootDevice][iDestPartition].ulPdiSize =
+							pxThis->ppxFptPartitions[xSrcBootDevice][iSrcPartition].ulPdiSize;
 
-                        /* Write updated destination FPT partition to flash */
-                        if ( OK == iWriteFptPartitionToFlash( xDestBootDevice, iDestPartition ) )
-                        {
-                            PLL_DBG( APC_NAME,
-                                     "Copied pdi_md5 and pdi_size to destination partition %d\r\n",
-                                     iDestPartition );
-                            iStatus = OK;
-                        }
-                        else
-                        {
-                            PLL_ERR( APC_NAME,
-                                     "Failed to write FPT partition %d to flash after copy\r\n",
-                                     iDestPartition );
-                            INC_ERROR_COUNTER( APC_PROXY_ERRORS_FPT_UPDATE_FAILED )
-                            iStatus = OK; /* Copy succeeded, only FPT update failed */
-                        }
-                    }
-                    else
-                    {
-                        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )
-                        PLL_ERR( APC_NAME,
-                                 "ERROR copying packet %d of RAM contents to partition %d\r\n",
-                                 xImageData.usPacketNum,
-                                 iDestPartition );
-                    }
-                }
-                else
-                {
-                    INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_READ_FAILED )
-                    PLL_ERR( APC_NAME, "ERROR copying partition %d to RAM\r\n", iSrcPartition );
-                }
-            }
-            else
-            {
-                PLL_ERR( APC_NAME, "ERROR copying RAM contents to partition %d\r\n", iDestPartition );
-            }
+						/* Write updated destination FPT partition to flash */
+						if (OK == iWriteFptPartitionToFlash(xDestBootDevice, iDestPartition)) {
+							PLL_DBG(APC_NAME,
+								"Copied pdi_md5 and pdi_size to destination partition %d\r\n",
+								iDestPartition);
+							iStatus = OK;
+						} else {
+							PLL_ERR(APC_NAME,
+								"Failed to write FPT partition %d to flash after copy\r\n",
+								iDestPartition);
+							INC_ERROR_COUNTER(APC_PROXY_ERRORS_FPT_UPDATE_FAILED)
+							iStatus = OK; /* Copy succeeded, only FPT update failed */
+						}
+					} else {
+						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_WRITE_FAILED)
+						PLL_ERR(APC_NAME,
+							"ERROR copying packet %d of RAM contents to partition %d\r\n",
+							xImageData.usPacketNum,
+							iDestPartition);
+					}
+				} else {
+					INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_READ_FAILED)
+					PLL_ERR(APC_NAME, "ERROR copying partition %d to RAM\r\n", iSrcPartition);
+				}
+			} else {
+				PLL_ERR(APC_NAME, "ERROR copying RAM contents to partition %d\r\n", iDestPartition);
+			}
 
-            PLL_DBG( APC_NAME,
-                     "Copy %d-->%d %s - %dms\r\n",
-                     iSrcPartition,
-                     iDestPartition,
-                     ( OK == iStatus ) ? "complete" : "failure",
-                     ulOSAL_GetUptimeMs() - ulStartMs );
-        }
-    }
-    return iStatus;
+			PLL_DBG(APC_NAME,
+				"Copy %d-->%d %s - %dms\r\n",
+				iSrcPartition,
+				iDestPartition,
+				(OK == iStatus) ? "complete" : "failure",
+				ulOSAL_GetUptimeMs() - ulStartMs);
+		}
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Select partition to boot from next
  */
-static int iSelectPartition( int iPartition )
+static int iSelectPartition(int iPartition)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( iPartition < pxThis->pxFptHeader[ APC_BOOT_DEVICE_PRIMARY ].ucNumEntries )
-    {
-        pxThis->ulNextBootAddr = pxThis->ppxFptPartitions[ APC_BOOT_DEVICE_PRIMARY ][ iPartition ].ulPartitionBaseAddr;
+	if (iPartition < pxThis->pxFptHeader[APC_BOOT_DEVICE_PRIMARY].ucNumEntries) {
+		pxThis->ulNextBootAddr =
+			pxThis->ppxFptPartitions[APC_BOOT_DEVICE_PRIMARY][iPartition].ulPartitionBaseAddr;
 
-        if ( NULL != pxThis->pXLoaderInst )
-        {
-            if ( XST_SUCCESS != XLoader_UpdateMultiboot( pxThis->pXLoaderInst,
-                                                         XLOADER_PDI_OSPI,
-                                                         XLOADER_FLASH_RAW,
-                                                         pxThis->ulNextBootAddr ) )
-            {
-                PLL_ERR( APC_NAME, "ERROR: XLoader_UpdateMultiboot failed\r\n" );
-                INC_ERROR_COUNTER( APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED )
-                return iStatus;
-            }
-        }
-        else
-        {
-            PLL_ERR( APC_NAME, "ERROR: XLoader instance not initialised\r\n" );
-            return iStatus;
-        }
+		if (NULL != pxThis->pXLoaderInst) {
+			if (XST_SUCCESS !=
+				XLoader_UpdateMultiboot(pxThis->pXLoaderInst,
+					XLOADER_PDI_OSPI,
+					XLOADER_FLASH_RAW,
+					pxThis->ulNextBootAddr)) {
+				PLL_ERR(APC_NAME, "ERROR: XLoader_UpdateMultiboot failed\r\n");
+				INC_ERROR_COUNTER(APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED)
+				return iStatus;
+			}
+		} else {
+			PLL_ERR(APC_NAME, "ERROR: XLoader instance not initialised\r\n");
+			return iStatus;
+		}
 
-        PLL_DBG( APC_NAME,
-                 "Next boot address: 0x%08x [0x%08x] (partition %d) - actual 0x%08x\r\n",
-                 pxThis->ulNextBootAddr,
-                 APC_MULTIBOOT_OFFSET( pxThis->ulNextBootAddr ),
-                 iPartition,
-                 HAL_IO_READ32( HAL_APC_PMC_BOOT_REG ) );
+		PLL_DBG(APC_NAME,
+			"Next boot address: 0x%08x [0x%08x] (partition %d) - actual 0x%08x\r\n",
+			pxThis->ulNextBootAddr,
+			APC_MULTIBOOT_OFFSET(pxThis->ulNextBootAddr),
+			iPartition,
+			HAL_IO_READ32(HAL_APC_PMC_BOOT_REG));
 
-        iStatus = OK;
-    }
-    return iStatus;
+		iStatus = OK;
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Set FPT flags in flash
  */
-static int iSetFptFlags( APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulFlags )
+static int iSetFptFlags(APC_BOOT_DEVICES xBootDevice, int iPartition, uint32_t ulFlags)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( MAX_APC_BOOT_DEVICES > xBootDevice ) && ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries ) )
-    {
-        if ( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPartitionFlags != ulFlags )
-        {
-            pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ].ulPartitionFlags = ulFlags;
-            if ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->write( pxThis->ppxFwIf[ xBootDevice ],
-                                                                         ( uint64_t )APC_FPT_PTN_OFFSET + ( iPartition * APC_FPT_PTN_OFFSET ),
-                                                                         ( uint8_t* )&pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ],
-                                                                         sizeof( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ] ),
-                                                                         0 ) )
-            {
-                iStatus = OK;
-            }
-        }
-        else
-        {
-            iStatus = OK;
-        }
-    }
-    else
-    {
-        PLL_ERR( APC_NAME, "Invalid FPT partition requested for setting flags\r\n" );
-        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-    }
-    return iStatus;
+	if ((MAX_APC_BOOT_DEVICES > xBootDevice) &&
+		(iPartition < pxThis->pxFptHeader[xBootDevice].ucNumEntries)) {
+		if (pxThis->ppxFptPartitions[xBootDevice][iPartition].ulPartitionFlags != ulFlags) {
+			pxThis->ppxFptPartitions[xBootDevice][iPartition].ulPartitionFlags = ulFlags;
+			if (FW_IF_ERRORS_NONE ==
+				pxThis->ppxFwIf[xBootDevice]->write(pxThis->ppxFwIf[xBootDevice],
+					(uint64_t)APC_FPT_PTN_OFFSET + (iPartition * APC_FPT_PTN_OFFSET),
+					(uint8_t*)&pxThis->ppxFptPartitions[xBootDevice][iPartition],
+					sizeof(pxThis->ppxFptPartitions[xBootDevice][iPartition]),
+					0)) {
+				iStatus = OK;
+			}
+		} else {
+			iStatus = OK;
+		}
+	} else {
+		PLL_ERR(APC_NAME, "Invalid FPT partition requested for setting flags\r\n");
+		INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Write FPT partition entry to flash
  */
-static int iWriteFptPartitionToFlash( APC_BOOT_DEVICES xBootDevice, int iPartition )
+static int iWriteFptPartitionToFlash(APC_BOOT_DEVICES xBootDevice, int iPartition)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( MAX_APC_BOOT_DEVICES > xBootDevice ) &&
-         ( iPartition < pxThis->pxFptHeader[ xBootDevice ].ucNumEntries ) )
-    {
-        /* Write the entire partition entry to flash */
-        if ( FW_IF_ERRORS_NONE == pxThis->ppxFwIf[ xBootDevice ]->write( pxThis->ppxFwIf[ xBootDevice ],
-                                                                     ( uint64_t )APC_FPT_PTN_OFFSET + ( iPartition * APC_FPT_PTN_OFFSET ),
-                                                                     ( uint8_t* )&pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ],
-                                                                     sizeof( pxThis->ppxFptPartitions[ xBootDevice ][ iPartition ] ),
-                                                                     0 ) )
-        {
-            iStatus = OK;
-        }
-        else
-        {
-            INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_WRITE_FAILED )
-        }
-    }
-    else
-    {
-        PLL_ERR( APC_NAME, "Invalid FPT partition requested for write\r\n" );
-        INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED )
-    }
-    return iStatus;
+	if ((MAX_APC_BOOT_DEVICES > xBootDevice) &&
+		(iPartition < pxThis->pxFptHeader[xBootDevice].ucNumEntries)) {
+		/* Write the entire partition entry to flash */
+		if (FW_IF_ERRORS_NONE ==
+			pxThis->ppxFwIf[xBootDevice]->write(pxThis->ppxFwIf[xBootDevice],
+				(uint64_t)APC_FPT_PTN_OFFSET + (iPartition * APC_FPT_PTN_OFFSET),
+				(uint8_t*)&pxThis->ppxFptPartitions[xBootDevice][iPartition],
+				sizeof(pxThis->ppxFptPartitions[xBootDevice][iPartition]),
+				0)) {
+			iStatus = OK;
+		} else {
+			INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_WRITE_FAILED)
+		}
+	} else {
+		PLL_ERR(APC_NAME, "Invalid FPT partition requested for write\r\n");
+		INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_INVALID_FPT_PARTITION_REQUESTED)
+	}
+	return iStatus;
 }
 
 /**
  * @brief   Verify that the values downloaded to flash match the source
  */
-static int iVerifyDownload( APCMboxDownloadImage *pxImageData )
+static int iVerifyDownload(APCMboxDownloadImage* pxImageData)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if ( ( NULL != pxImageData ) && ( MAX_APC_BOOT_DEVICES > pxImageData->xBootDevice ) )
-    {
-        uint8_t  *pucPdiData   = ( uint8_t* )( uintptr_t )( pxImageData->ulSrcAddr );
-        uint8_t  *pucSrcOffset = &pucPdiData[ 0 ];
-        uint32_t ulDestOffset  = pxImageData->usPacketNum * ( pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE );
-        uint32_t ulImageSize   = pxImageData->ulImageSize;
-        uint32_t ulRemLen      = ulImageSize;
-        uint32_t ulVerLen      = APC_COPY_CHUNK_LEN;
-        uint32_t ulStartMs     = ulOSAL_GetUptimeMs();
+	if ((NULL != pxImageData) && (MAX_APC_BOOT_DEVICES > pxImageData->xBootDevice)) {
+		uint8_t* pucPdiData   = (uint8_t*)(uintptr_t)(pxImageData->ulSrcAddr);
+		uint8_t* pucSrcOffset = &pucPdiData[0];
+		uint32_t ulDestOffset =
+			pxImageData->usPacketNum * (pxImageData->ulPacketSize * APC_BASE_PACKET_SIZE);
+		uint32_t ulImageSize = pxImageData->ulImageSize;
+		uint32_t ulRemLen    = ulImageSize;
+		uint32_t ulVerLen    = APC_COPY_CHUNK_LEN;
+		uint32_t ulStartMs   = ulOSAL_GetUptimeMs();
 
-        if ( FALSE == pxImageData->iUpdateFpt )
-        {
-            ulDestOffset +=
-                pxThis->ppxFptPartitions[ pxImageData->xBootDevice ][ pxImageData->iPartition ].ulPartitionBaseAddr;
-        }
+		if (FALSE == pxImageData->iUpdateFpt) {
+			ulDestOffset +=
+				pxThis->ppxFptPartitions[pxImageData->xBootDevice][pxImageData->iPartition]
+					.ulPartitionBaseAddr;
+		}
 
-        pvOSAL_MemSet( pxThis->pucChunkBuffer, 0x00, APC_COPY_CHUNK_LEN );
-        while( 0 < ulRemLen )
-        {
-            if ( ulRemLen < APC_COPY_CHUNK_LEN )
-            {
-                ulVerLen = ulRemLen;
-            }
-            else
-            {
-                ulVerLen = APC_COPY_CHUNK_LEN;
-            }
+		pvOSAL_MemSet(pxThis->pucChunkBuffer, 0x00, APC_COPY_CHUNK_LEN);
+		while (0 < ulRemLen) {
+			if (ulRemLen < APC_COPY_CHUNK_LEN) {
+				ulVerLen = ulRemLen;
+			} else {
+				ulVerLen = APC_COPY_CHUNK_LEN;
+			}
 
-            if ( ( FW_IF_ERRORS_NONE ==
-                  pxThis->ppxFwIf[ pxImageData->xBootDevice ]->read( pxThis->ppxFwIf[ pxImageData->xBootDevice ],
-                                                                     ( uint64_t )ulDestOffset, pxThis->pucChunkBuffer,
-                                                                     &ulVerLen, 0 ) ) &&
-                ( 0 < ulVerLen ) )
-            {
-                HAL_FLUSH_CACHE_DATA((uintptr_t)pxThis->pucChunkBuffer, ulVerLen);
-                if ( 0 == iOSAL_MemCmp( pxThis->pucChunkBuffer, pucSrcOffset, ulVerLen ) )
-                {
-                    ulRemLen     -= ulVerLen;
-                    pucSrcOffset += ulVerLen;
-                    ulDestOffset += ulVerLen;
-                    iStatus       = OK;
-                }
-                else
-                {
-                    PLL_DBG( APC_NAME,
-                             "Bytes at offset 0x%08x (flash) and 0x%08x (RAM) differ (%d remaining)\r\n",
-                             ulDestOffset,
-                             ( uint32_t )( uintptr_t )pucSrcOffset,
-                             ulRemLen );
-                    iStatus = ERROR;
-                    break;
-                }
-            }
-            else
-            {
-                PLL_ERR( APC_NAME, "Read ERROR (%d bytes) with %d bytes remaining\r\n", ulVerLen, ulRemLen );
-                INC_ERROR_COUNTER_WITH_STATE( APC_PROXY_ERRORS_FW_IF_READ_FAILED )
-            }
-        }
+			if ((FW_IF_ERRORS_NONE ==
+					pxThis->ppxFwIf[pxImageData->xBootDevice]->read(
+						pxThis->ppxFwIf[pxImageData->xBootDevice],
+						(uint64_t)ulDestOffset,
+						pxThis->pucChunkBuffer,
+						&ulVerLen,
+						0)) &&
+				(0 < ulVerLen)) {
+				HAL_FLUSH_CACHE_DATA((uintptr_t)pxThis->pucChunkBuffer, ulVerLen);
+				if (0 == iOSAL_MemCmp(pxThis->pucChunkBuffer, pucSrcOffset, ulVerLen)) {
+					ulRemLen -= ulVerLen;
+					pucSrcOffset += ulVerLen;
+					ulDestOffset += ulVerLen;
+					iStatus = OK;
+				} else {
+					PLL_DBG(APC_NAME,
+						"Bytes at offset 0x%08x (flash) and 0x%08x (RAM) differ (%d remaining)\r\n",
+						ulDestOffset,
+						(uint32_t)(uintptr_t)pucSrcOffset,
+						ulRemLen);
+					iStatus = ERROR;
+					break;
+				}
+			} else {
+				PLL_ERR(APC_NAME,
+					"Read ERROR (%d bytes) with %d bytes remaining\r\n",
+					ulVerLen,
+					ulRemLen);
+				INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_FW_IF_READ_FAILED)
+			}
+		}
 
-        PLL_DBG( APC_NAME,
-                 "Verification %s - %dms\r\n",
-                 ( OK == iStatus )?( "complete" ):( "failure" ),
-                 ulOSAL_GetUptimeMs() - ulStartMs );
-    }
-    return iStatus;
+		PLL_DBG(APC_NAME,
+			"Verification %s - %dms\r\n",
+			(OK == iStatus) ? ("complete") : ("failure"),
+			ulOSAL_GetUptimeMs() - ulStartMs);
+	}
+	return iStatus;
 }

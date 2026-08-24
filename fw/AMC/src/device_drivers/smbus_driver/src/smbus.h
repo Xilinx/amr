@@ -12,8 +12,7 @@
 #define _SMBUS_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stdint.h>
@@ -21,14 +20,14 @@ extern "C"
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/
-#define SMBUS_DATA_SIZE_MIN             ( 0 )
-#define SMBUS_DATA_SIZE_MAX             ( 256 ) /* 255 bytes of data + 1 byte block size */
-#define SMBUS_UDID_LENGTH               ( 16 )
-#define SMBUS_MAX_CIRCULAR_LOG_ENTRIES  ( 5000 )
-#define SMBUS_NUM_INSTANCES             ( 8 )
-#define SMBUS_NUM_NON_ARP_INSTANCES     ( 7 )
-#define SMBUS_INVALID_INSTANCE          ( 99 )
-#define SMBUS_MAX_EVENT_ELEMENTS        ( 300 )
+#define SMBUS_DATA_SIZE_MIN            (0)
+#define SMBUS_DATA_SIZE_MAX            (256) /* 255 bytes of data + 1 byte block size */
+#define SMBUS_UDID_LENGTH              (16)
+#define SMBUS_MAX_CIRCULAR_LOG_ENTRIES (5000)
+#define SMBUS_NUM_INSTANCES            (8)
+#define SMBUS_NUM_NON_ARP_INSTANCES    (7)
+#define SMBUS_INVALID_INSTANCE         (99)
+#define SMBUS_MAX_EVENT_ELEMENTS       (300)
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -38,12 +37,11 @@ extern "C"
  * @enum SMBUS_FREQ_CLASS
  * @brief Enumeration of SMBUS frequency values
  */
-typedef enum
-{
-    SMBUS_FREQ_100KHZ = 0,
-    SMBUS_FREQ_400KHZ = 1,
-    SMBUS_FREQ_1MHZ   = 2,
-    SMBUS_FREQ_MAX    = 3,
+typedef enum {
+	SMBUS_FREQ_100KHZ = 0,
+	SMBUS_FREQ_400KHZ = 1,
+	SMBUS_FREQ_1MHZ   = 2,
+	SMBUS_FREQ_MAX    = 3,
 
 } SMBUS_FREQ_CLASS;
 
@@ -51,10 +49,9 @@ typedef enum
  * @enum SMBUS_ERROR_TYPE
  * @brief Enumeration of SMBUS return values
  */
-typedef enum
-{
-    SMBUS_SUCCESS = 0,
-    SMBUS_ERROR   = 1,
+typedef enum {
+	SMBUS_SUCCESS = 0,
+	SMBUS_ERROR   = 1,
 
 } SMBUS_ERROR_TYPE;
 
@@ -62,13 +59,12 @@ typedef enum
  * @enum SMBUS_ARP_CAPABILITY
  * @brief Enumeration of SMBUS ARP settings
  */
-typedef enum
-{
-    SMBUS_ARP_CAPABILITY_UNKNOWN     = 0,
-    SMBUS_ARP_CAPABLE                = 1,
-    SMBUS_ARP_FIXED_AND_DISCOVERABLE = 2,
-    SMBUS_ARP_FIXED_NOT_DISCOVERABLE = 3,
-    SMBUS_ARP_NON_ARP_CAPABLE        = 4,
+typedef enum {
+	SMBUS_ARP_CAPABILITY_UNKNOWN     = 0,
+	SMBUS_ARP_CAPABLE                = 1,
+	SMBUS_ARP_FIXED_AND_DISCOVERABLE = 2,
+	SMBUS_ARP_FIXED_NOT_DISCOVERABLE = 3,
+	SMBUS_ARP_NON_ARP_CAPABLE        = 4,
 
 } SMBUS_ARP_CAPABILITY;
 
@@ -77,36 +73,35 @@ typedef enum
  * @enum SMBUS_COMMAND_PROTOCOL
  * @brief Enumeration of SMBUS command protocols
  */
-typedef enum
-{
-    SMBUS_PROTOCOL_QUICK_CMD_LO       = 0,
-    SMBUS_PROTOCOL_QUICK_CMD_HI       = 1,
-    SMBUS_PROTOCOL_SEND_BYTE          = 2,
-    SMBUS_PROTOCOL_RECEIVE_BYTE       = 3,
-    SMBUS_PROTOCOL_WRITE_BYTE         = 4,
-    SMBUS_PROTOCOL_WRITE_WORD         = 5,
-    SMBUS_PROTOCOL_READ_BYTE          = 6,
-    SMBUS_PROTOCOL_READ_WORD          = 7,
-    SMBUS_PROTOCOL_PROCESS_CALL       = 8,
-    SMBUS_PROTOCOL_BLOCK_WRITE        = 9,
-    SMBUS_PROTOCOL_BLOCK_READ         = 10,
-    SMBUS_PROTOCOL_BLK_WRITE_BLK_RD_PROCESS_CALL = 11,
-    SMBUS_PROTOCOL_HOST_NOTIFY        = 12,
-    SMBUS_PROTOCOL_WRITE_32           = 13,
-    SMBUS_PROTOCOL_READ_32            = 14,
-    SMBUS_PROTOCOL_WRITE_64           = 15,
-    SMBUS_PROTOCOL_READ_64            = 16,
-    SMBUS_ARP_PROTOCOL_PREPARE_TO_ARP = 17,
-    SMBUS_ARP_PROTOCOL_RESET_DEVICE   = 18,
-    SMBUS_ARP_PROTOCOL_GET_UDID       = 19,
-    SMBUS_ARP_PROTOCOL_ASSIGN_ADDRESS = 20,
-    SMBUS_ARP_PROTOCOL_GET_UDID_DIRECTED = 21,
-    SMBUS_ARP_PROTO_RESET_DEVICE_DIRECTED = 22,
-    SMBUS_PROTOCOL_NONE               = 23,
-    I2C_PROTOCOL_WRITE                = 24,
-    I2C_PROTOCOL_READ                 = 25,
-    I2C_PROTOCOL_WRITE_READ           = 26,
-    I2C_PROTOCOL_NONE                 = 27,
+typedef enum {
+	SMBUS_PROTOCOL_QUICK_CMD_LO                  = 0,
+	SMBUS_PROTOCOL_QUICK_CMD_HI                  = 1,
+	SMBUS_PROTOCOL_SEND_BYTE                     = 2,
+	SMBUS_PROTOCOL_RECEIVE_BYTE                  = 3,
+	SMBUS_PROTOCOL_WRITE_BYTE                    = 4,
+	SMBUS_PROTOCOL_WRITE_WORD                    = 5,
+	SMBUS_PROTOCOL_READ_BYTE                     = 6,
+	SMBUS_PROTOCOL_READ_WORD                     = 7,
+	SMBUS_PROTOCOL_PROCESS_CALL                  = 8,
+	SMBUS_PROTOCOL_BLOCK_WRITE                   = 9,
+	SMBUS_PROTOCOL_BLOCK_READ                    = 10,
+	SMBUS_PROTOCOL_BLK_WRITE_BLK_RD_PROCESS_CALL = 11,
+	SMBUS_PROTOCOL_HOST_NOTIFY                   = 12,
+	SMBUS_PROTOCOL_WRITE_32                      = 13,
+	SMBUS_PROTOCOL_READ_32                       = 14,
+	SMBUS_PROTOCOL_WRITE_64                      = 15,
+	SMBUS_PROTOCOL_READ_64                       = 16,
+	SMBUS_ARP_PROTOCOL_PREPARE_TO_ARP            = 17,
+	SMBUS_ARP_PROTOCOL_RESET_DEVICE              = 18,
+	SMBUS_ARP_PROTOCOL_GET_UDID                  = 19,
+	SMBUS_ARP_PROTOCOL_ASSIGN_ADDRESS            = 20,
+	SMBUS_ARP_PROTOCOL_GET_UDID_DIRECTED         = 21,
+	SMBUS_ARP_PROTO_RESET_DEVICE_DIRECTED        = 22,
+	SMBUS_PROTOCOL_NONE                          = 23,
+	I2C_PROTOCOL_WRITE                           = 24,
+	I2C_PROTOCOL_READ                            = 25,
+	I2C_PROTOCOL_WRITE_READ                      = 26,
+	I2C_PROTOCOL_NONE                            = 27,
 
 } SMBUS_COMMAND_PROTOCOL;
 
@@ -114,17 +109,16 @@ typedef enum
  * @enum SMBUS_LOG_EVENT
  * @brief Enumeration of SMBus logging types
  */
-typedef enum
-{
-    SMBUS_LOG_EVENT_INTERRUPT_EVENT = 1,
-    SMBUS_LOG_EVENT_FSM_EVENT       = 2,
-    SMBUS_LOG_EVENT_ERROR           = 3,
-    SMBUS_LOG_EVENT_HW_READ         = 4,
-    SMBUS_LOG_EVENT_HW_WRITE        = 5,
-    SMBUS_LOG_EVENT_PROTOCOL        = 6,
-    SMBUS_LOG_EVENT_DEBUG           = 7,
-    SMBUS_LOG_EVENT_TRYREAD         = 8,
-    SMBUS_LOG_EVENT_TRYWRITE        = 9,
+typedef enum {
+	SMBUS_LOG_EVENT_INTERRUPT_EVENT = 1,
+	SMBUS_LOG_EVENT_FSM_EVENT       = 2,
+	SMBUS_LOG_EVENT_ERROR           = 3,
+	SMBUS_LOG_EVENT_HW_READ         = 4,
+	SMBUS_LOG_EVENT_HW_WRITE        = 5,
+	SMBUS_LOG_EVENT_PROTOCOL        = 6,
+	SMBUS_LOG_EVENT_DEBUG           = 7,
+	SMBUS_LOG_EVENT_TRYREAD         = 8,
+	SMBUS_LOG_EVENT_TRYWRITE        = 9,
 
 } SMBUS_LOG_EVENT;
 
@@ -132,14 +126,13 @@ typedef enum
  * @enum SMBUS_LOG_LEVEL
  * @brief Enumeration of SMBUS logging levels
  */
-typedef enum
-{
-    SMBUS_LOG_LEVEL_NONE    = 0,
-    SMBUS_LOG_LEVEL_ERROR   = 1,
-    SMBUS_LOG_LEVEL_WARNING = 2,
-    SMBUS_LOG_LEVEL_INFO    = 3,
-    SMBUS_LOG_LEVEL_DEBUG   = 4,
-    SMBUS_LOG_LEVEL_MAX     = 5,
+typedef enum {
+	SMBUS_LOG_LEVEL_NONE    = 0,
+	SMBUS_LOG_LEVEL_ERROR   = 1,
+	SMBUS_LOG_LEVEL_WARNING = 2,
+	SMBUS_LOG_LEVEL_INFO    = 3,
+	SMBUS_LOG_LEVEL_DEBUG   = 4,
+	SMBUS_LOG_LEVEL_MAX     = 5,
 
 } SMBUS_LOG_LEVEL;
 
@@ -157,8 +150,8 @@ typedef enum
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_GET_PROTOCOL_TYPE )( uint8_t ucCommand,
-                SMBUS_COMMAND_PROTOCOL* xProtocol );
+typedef void (
+	*SMBUS_USER_ENV_GET_PROTOCOL_TYPE)(uint8_t ucCommand, SMBUS_COMMAND_PROTOCOL* xProtocol);
 
 /*
  * @typedef SMBUS_USER_ENV_GET_DATA_TYPE
@@ -171,8 +164,8 @@ typedef void ( *SMBUS_USER_ENV_GET_PROTOCOL_TYPE )( uint8_t ucCommand,
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_GET_DATA_TYPE )( uint8_t ucCommand, uint8_t* pucData,
-                uint16_t* Data_Size );
+typedef void (
+	*SMBUS_USER_ENV_GET_DATA_TYPE)(uint8_t ucCommand, uint8_t* pucData, uint16_t* Data_Size);
 
 /*
  * @typedef SMBUS_USER_ENV_WRITE_DATA_TYPE
@@ -186,8 +179,10 @@ typedef void ( *SMBUS_USER_ENV_GET_DATA_TYPE )( uint8_t ucCommand, uint8_t* pucD
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_WRITE_DATA_TYPE )( uint8_t ucCommand, uint8_t* pucData,
-                uint16_t Data_Size, uint32_t ulTransactionID );
+typedef void (*SMBUS_USER_ENV_WRITE_DATA_TYPE)(uint8_t ucCommand,
+	uint8_t* pucData,
+	uint16_t Data_Size,
+	uint32_t ulTransactionID);
 
 /*
  * @typedef SMBUS_USER_ENV_CMD_COMPLETE
@@ -200,8 +195,8 @@ typedef void ( *SMBUS_USER_ENV_WRITE_DATA_TYPE )( uint8_t ucCommand, uint8_t* pu
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_CMD_COMPLETE )( uint8_t ucCommand, uint32_t ulTransactionID,
-                uint32_t Status );
+typedef void (
+	*SMBUS_USER_ENV_CMD_COMPLETE)(uint8_t ucCommand, uint32_t ulTransactionID, uint32_t Status);
 
 /*
  * @typedef SMBUS_USER_ENV_ARP_ADDR_CHANGE
@@ -212,7 +207,7 @@ typedef void ( *SMBUS_USER_ENV_CMD_COMPLETE )( uint8_t ucCommand, uint32_t ulTra
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_ARP_ADDR_CHANGE )( uint8_t ucNewAddr );
+typedef void (*SMBUS_USER_ENV_ARP_ADDR_CHANGE)(uint8_t ucNewAddr);
 
 /*
  * @typedef SMBUS_USER_ENV_BUS_ERROR
@@ -223,7 +218,7 @@ typedef void ( *SMBUS_USER_ENV_ARP_ADDR_CHANGE )( uint8_t ucNewAddr );
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_BUS_ERROR )( uint8_t ucError );
+typedef void (*SMBUS_USER_ENV_BUS_ERROR)(uint8_t ucError);
 
 /*
  * @typedef SMBUS_USER_ENV_BUS_WARNING
@@ -234,7 +229,7 @@ typedef void ( *SMBUS_USER_ENV_BUS_ERROR )( uint8_t ucError );
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_BUS_WARNING )( uint8_t ucWarning );
+typedef void (*SMBUS_USER_ENV_BUS_WARNING)(uint8_t ucWarning);
 
 /*
  * @typedef SMBUS_USER_ENV_READ_TICKS
@@ -245,7 +240,7 @@ typedef void ( *SMBUS_USER_ENV_BUS_WARNING )( uint8_t ucWarning );
  *
  * @return  void
  */
-typedef void ( *SMBUS_USER_ENV_READ_TICKS )( uint32_t* pulTicks );
+typedef void (*SMBUS_USER_ENV_READ_TICKS)(uint32_t* pulTicks);
 
 /******************************************************************************/
 /* Structs                                                                    */
@@ -256,10 +251,9 @@ typedef void ( *SMBUS_USER_ENV_READ_TICKS )( uint32_t* pulTicks );
  * @struct SMBus_Log
  * @brief  Structure to hold SMBus message logging information
  */
-typedef struct
-{
-    uint32_t   ulMessagesComplete[SMBUS_PROTOCOL_NONE];
-    uint32_t   ulMessagesInitiated[SMBUS_PROTOCOL_NONE];
+typedef struct {
+	uint32_t ulMessagesComplete[SMBUS_PROTOCOL_NONE];
+	uint32_t ulMessagesInitiated[SMBUS_PROTOCOL_NONE];
 
 } SMBus_Log;
 
@@ -268,15 +262,14 @@ typedef struct
  * @struct SMBus_Version
  * @brief  Structure to hold the SMBus driver version informatin
  */
-typedef struct
-{
-    uint16_t    usIpVerMajor;
-    uint16_t    usIpVerMinor;
-    uint8_t     ucSwVerMajor;
-    uint8_t     ucSwVerMinor;
-    uint8_t     ucSwVerPatch;
-    uint8_t     ucSwDevBuild;
-    uint8_t     ucSwTestBuild;
+typedef struct {
+	uint16_t usIpVerMajor;
+	uint16_t usIpVerMinor;
+	uint8_t ucSwVerMajor;
+	uint8_t ucSwVerMinor;
+	uint8_t ucSwVerPatch;
+	uint8_t ucSwDevBuild;
+	uint8_t ucSwTestBuild;
 
 } SMBus_Version;
 
@@ -301,16 +294,17 @@ typedef struct SMBusProfile SMBusProfile;
  *           100KHz, 400KHz or 1MHz.
  * @param    pvBaseAddr is the address of the SMBus IP block
  * @param    xLogLevel is the level of logging detail required
- * @param    pFnReadTicks is an optional function pointer that supplies a tick count for logging purposes
+ * @param    pFnReadTicks is an optional function pointer that supplies a tick count for logging
+ * purposes
  *
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xInitSMBus( SMBusProfile** ppxSMBusProfile,
-                             SMBUS_FREQ_CLASS xFrequencyClass,
-                             void * pvBaseAddr,
-                             SMBUS_LOG_LEVEL xLogLevel,
-                             SMBUS_USER_ENV_READ_TICKS pFnReadTicks );
+SMBUS_ERROR_TYPE xInitSMBus(SMBusProfile** ppxSMBusProfile,
+	SMBUS_FREQ_CLASS xFrequencyClass,
+	void* pvBaseAddr,
+	SMBUS_LOG_LEVEL xLogLevel,
+	SMBUS_USER_ENV_READ_TICKS pFnReadTicks);
 
 
 /**
@@ -322,7 +316,7 @@ SMBUS_ERROR_TYPE xInitSMBus( SMBusProfile** ppxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xDeinitSMBus( SMBusProfile** ppxSMBusProfile );
+SMBUS_ERROR_TYPE xDeinitSMBus(SMBusProfile** ppxSMBusProfile);
 
 
 /**
@@ -347,18 +341,18 @@ SMBUS_ERROR_TYPE xDeinitSMBus( SMBusProfile** ppxSMBusProfile );
  * @return   - SMBUS_INVALID_INSTANCE ID ( 99 ) if error
  *           - Instance ID ( 0 - 6 ) if successful
  */
-uint8_t ucCreateSMBusInstance( SMBusProfile* pxSMBusProfile,
-                               uint8_t ucSMBusAddr,
-                               uint8_t ucUDID[SMBUS_UDID_LENGTH],
-                               SMBUS_ARP_CAPABILITY xARPCapability,
-                               SMBUS_USER_ENV_GET_PROTOCOL_TYPE pFnGetProtocol,
-                               SMBUS_USER_ENV_GET_DATA_TYPE pFnGetData,
-                               SMBUS_USER_ENV_WRITE_DATA_TYPE pFnWriteData,
-                               SMBUS_USER_ENV_CMD_COMPLETE pFnAnnounceResult,
-                               SMBUS_USER_ENV_ARP_ADDR_CHANGE pFnArpAddrChange,
-                               SMBUS_USER_ENV_BUS_ERROR pFnBusError,
-                               SMBUS_USER_ENV_BUS_WARNING pFnBusWarning,
-                               uint8_t  ucSimpleDevice );
+uint8_t ucCreateSMBusInstance(SMBusProfile* pxSMBusProfile,
+	uint8_t ucSMBusAddr,
+	uint8_t ucUDID[SMBUS_UDID_LENGTH],
+	SMBUS_ARP_CAPABILITY xARPCapability,
+	SMBUS_USER_ENV_GET_PROTOCOL_TYPE pFnGetProtocol,
+	SMBUS_USER_ENV_GET_DATA_TYPE pFnGetData,
+	SMBUS_USER_ENV_WRITE_DATA_TYPE pFnWriteData,
+	SMBUS_USER_ENV_CMD_COMPLETE pFnAnnounceResult,
+	SMBUS_USER_ENV_ARP_ADDR_CHANGE pFnArpAddrChange,
+	SMBUS_USER_ENV_BUS_ERROR pFnBusError,
+	SMBUS_USER_ENV_BUS_WARNING pFnBusWarning,
+	uint8_t ucSimpleDevice);
 
 
 /**
@@ -373,8 +367,7 @@ uint8_t ucCreateSMBusInstance( SMBusProfile* pxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBusProfile* pxSMBusProfile,
-                                        uint8_t ucSMBusInstanceID );
+SMBUS_ERROR_TYPE xDestroySMBusInstance(SMBusProfile* pxSMBusProfile, uint8_t ucSMBusInstanceID);
 
 
 /**
@@ -393,15 +386,15 @@ SMBUS_ERROR_TYPE xDestroySMBusInstance( SMBusProfile* pxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBusProfile* pxSMBusProfile,
-                                                  uint8_t ucSMBusInstance,
-                                                  uint8_t ucSMBusDestAddr,
-                                                  uint8_t ucCommand,
-                                                  SMBUS_COMMAND_PROTOCOL xProtocol,
-                                                  uint16_t usDataSize,
-                                                  uint8_t* pucData,
-                                                  uint8_t ucPecRequiredForTransaction,
-                                                  uint32_t* pulTransactionID );
+SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand(SMBusProfile* pxSMBusProfile,
+	uint8_t ucSMBusInstance,
+	uint8_t ucSMBusDestAddr,
+	uint8_t ucCommand,
+	SMBUS_COMMAND_PROTOCOL xProtocol,
+	uint16_t usDataSize,
+	uint8_t* pucData,
+	uint8_t ucPecRequiredForTransaction,
+	uint32_t* pulTransactionID);
 
 
 /**
@@ -417,9 +410,9 @@ SMBUS_ERROR_TYPE xSMBusControllerInitiateCommand( SMBusProfile* pxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusGetLog( SMBusProfile* pxSMBusProfile,
-                               char* pcLogBuffer,
-                               uint32_t* pulLogSizeBytes );
+SMBUS_ERROR_TYPE xSMBusGetLog(SMBusProfile* pxSMBusProfile,
+	char* pcLogBuffer,
+	uint32_t* pulLogSizeBytes);
 
 
 /**
@@ -430,7 +423,7 @@ SMBUS_ERROR_TYPE xSMBusGetLog( SMBusProfile* pxSMBusProfile,
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusLogReset( SMBusProfile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusLogReset(SMBusProfile* pxSMBusProfile);
 
 
 /**
@@ -441,7 +434,7 @@ SMBUS_ERROR_TYPE xSMBusLogReset( SMBusProfile* pxSMBusProfile );
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBusProfile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts(SMBusProfile* pxSMBusProfile);
 
 
 /**
@@ -452,7 +445,7 @@ SMBUS_ERROR_TYPE xSMBusInterruptDisableAndClearInterrupts( SMBusProfile* pxSMBus
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBusProfile* pxSMBusProfile );
+SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts(SMBusProfile* pxSMBusProfile);
 
 
 /**
@@ -465,7 +458,7 @@ SMBUS_ERROR_TYPE xSMBusInterruptEnableInterrupts( SMBusProfile* pxSMBusProfile )
  *
  * @return   void
  */
-void vSMBusInterruptHandler( void* pvCallBackRef );
+void vSMBusInterruptHandler(void* pvCallBackRef);
 
 
 /**
@@ -478,8 +471,7 @@ void vSMBusInterruptHandler( void* pvCallBackRef );
  * @return   - SMBUS_ERROR if error
  *           - SMBUS_SUCCESS if successful
  */
-SMBUS_ERROR_TYPE xSMBusGetVersion( SMBusProfile* pxSMBusProfile,
-    SMBus_Version* pxSMBusVersion );
+SMBUS_ERROR_TYPE xSMBusGetVersion(SMBusProfile* pxSMBusProfile, SMBus_Version* pxSMBusVersion);
 
 #ifdef __cplusplus
 }

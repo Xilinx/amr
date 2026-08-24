@@ -5,7 +5,7 @@
  * This file contains the public API of the Printing and Logging Library (PLL)
  *
  * @file pll.h
-  */
+ */
 #ifndef _PLL_H_
 #define _PLL_H_
 
@@ -18,25 +18,35 @@
 /******************************************************************************/
 
 #ifndef PRINT_BUFFER_SIZE
-#define PRINT_BUFFER_SIZE    ( 256 )
+#define PRINT_BUFFER_SIZE (256)
 #endif
 
-#define PLL_LOG_ENTRY_SIZE   ( 96 )
-#define PLL_LOG_MAX_RECS     ( 50 )
+#define PLL_LOG_ENTRY_SIZE (96)
+#define PLL_LOG_MAX_RECS   (50)
 
 #ifdef DEBUG_PRINT
-#define PLL_PRINTF( l, t, m, ...) vPLL_Output( l, "[" t "] " m, ##__VA_ARGS__)
+#define PLL_PRINTF(l, t, m, ...) vPLL_Output(l, "[" t "] " m, ##__VA_ARGS__)
 #else
-#define PLL_PRINTF( m )
+#define PLL_PRINTF(m)
 #endif
 
-#define PLL_INF( t, m, ... ) vPLL_Output( PLL_OUTPUT_LEVEL_INFO,    "[" t "] " m, ##__VA_ARGS__ )  /* used for stats - always print */
-#define PLL_ERR( t, m, ... ) vPLL_Output( PLL_OUTPUT_LEVEL_ERROR,   "[" t "] " m, ##__VA_ARGS__ )  /* used for errors               */
-#define PLL_WRN( t, m, ... ) vPLL_Output( PLL_OUTPUT_LEVEL_WARNING, "[" t "] " m, ##__VA_ARGS__ )  /* used for warnings             */
-#define PLL_LOG( t, m, ... ) vPLL_Output( PLL_OUTPUT_LEVEL_LOGGING, "[" t "] " m, ##__VA_ARGS__ )  /* used for general printing     */
-#define PLL_DBG( t, m, ... ) vPLL_Output( PLL_OUTPUT_LEVEL_DEBUG,   "[" t "] " m, ##__VA_ARGS__ )  /* used for debug prints         */
+#define PLL_INF(t, m, ...)             \
+	vPLL_Output(PLL_OUTPUT_LEVEL_INFO, \
+		"[" t "] " m,                  \
+		##__VA_ARGS__) /* used for stats - always print */
+#define PLL_ERR(t, m, ...) \
+	vPLL_Output(PLL_OUTPUT_LEVEL_ERROR, "[" t "] " m, ##__VA_ARGS__) /* used for errors */
+#define PLL_WRN(t, m, ...) \
+	vPLL_Output(PLL_OUTPUT_LEVEL_WARNING, "[" t "] " m, ##__VA_ARGS__) /* used for warnings */
+#define PLL_LOG(t, m, ...)                \
+	vPLL_Output(PLL_OUTPUT_LEVEL_LOGGING, \
+		"[" t "] " m,                     \
+		##__VA_ARGS__) /* used for general printing     */
+#define PLL_DBG(t, m, ...) \
+	vPLL_Output(PLL_OUTPUT_LEVEL_DEBUG, "[" t "] " m, ##__VA_ARGS__) /* used for debug prints */
 
-#define PLL_DAL( t, m, ... ) vPLL_Printf( "[" t "] " m, ##__VA_ARGS__ )  /* used for DAL - ignores verbosity */
+#define PLL_DAL(t, m, ...) \
+	vPLL_Printf("[" t "] " m, ##__VA_ARGS__) /* used for DAL - ignores verbosity */
 
 
 /******************************************************************************/
@@ -47,12 +57,11 @@
  * @struct PLLLogMsg
  * @brief  Structure to hold the log message.
  */
-typedef struct
-{
-	char	pcBuff[ PLL_LOG_ENTRY_SIZE ];
+typedef struct {
+	char pcBuff[PLL_LOG_ENTRY_SIZE];
 } PLLLogMsg;
 
-#define PLL_LOG_BUF_LEN ( sizeof(PLLLogMsg) * PLL_LOG_MAX_RECS )
+#define PLL_LOG_BUF_LEN (sizeof(PLLLogMsg) * PLL_LOG_MAX_RECS)
 
 
 /******************************************************************************/
@@ -63,15 +72,14 @@ typedef struct
  * @enum    PLL_OUTPUT_LEVEL
  * @brief   Output verbosity levels for the PLL
  */
-typedef enum
-{
-    PLL_OUTPUT_LEVEL_LOGGING = 0, /* used for printing to the log */
-    PLL_OUTPUT_LEVEL_INFO,        /* used for stats - always print */
-    PLL_OUTPUT_LEVEL_ERROR,       /* used for errors               */
-    PLL_OUTPUT_LEVEL_WARNING,     /* used for warnings             */
-    PLL_OUTPUT_LEVEL_DEBUG,       /* used for debug prints         */
+typedef enum {
+	PLL_OUTPUT_LEVEL_LOGGING = 0, /* used for printing to the log */
+	PLL_OUTPUT_LEVEL_INFO,        /* used for stats - always print */
+	PLL_OUTPUT_LEVEL_ERROR,       /* used for errors               */
+	PLL_OUTPUT_LEVEL_WARNING,     /* used for warnings             */
+	PLL_OUTPUT_LEVEL_DEBUG,       /* used for debug prints         */
 
-    MAX_PLL_OUTPUT_LEVEL
+	MAX_PLL_OUTPUT_LEVEL
 
 } PLL_OUTPUT_LEVEL;
 
@@ -89,7 +97,7 @@ typedef enum
  * @return  OK     if PLL is initialised and running successfully
  *          ERROR  if the PLL is not initialised
  */
-int iPLL_Initialise( PLL_OUTPUT_LEVEL xOutputLevel, PLL_OUTPUT_LEVEL xLoggingLevel );
+int iPLL_Initialise(PLL_OUTPUT_LEVEL xOutputLevel, PLL_OUTPUT_LEVEL xLoggingLevel);
 
 /**
  * @brief   Globally sets the PLL output verbosity level
@@ -99,7 +107,7 @@ int iPLL_Initialise( PLL_OUTPUT_LEVEL xOutputLevel, PLL_OUTPUT_LEVEL xLoggingLev
  * @return  OK     if Level set correctly
  *          ERROR  if level not set
  */
-int iPLL_SetOutputLevel( PLL_OUTPUT_LEVEL xOutputLevel );
+int iPLL_SetOutputLevel(PLL_OUTPUT_LEVEL xOutputLevel);
 
 /**
  * @brief   Gets current PLL output verbosity level
@@ -109,7 +117,7 @@ int iPLL_SetOutputLevel( PLL_OUTPUT_LEVEL xOutputLevel );
  * @return  OK     if level retrieved successful
  *          ERROR  if level not retrieved successful
  */
-int iPLL_GetOutputLevel( PLL_OUTPUT_LEVEL *pxOutputLevel );
+int iPLL_GetOutputLevel(PLL_OUTPUT_LEVEL* pxOutputLevel);
 
 /**
  * @brief   Globally sets the PLL logging verbosity level
@@ -119,7 +127,7 @@ int iPLL_GetOutputLevel( PLL_OUTPUT_LEVEL *pxOutputLevel );
  * @return  OK     if Level set correctly
  *          ERROR  if level not set
  */
-int iPLL_SetLoggingLevel( PLL_OUTPUT_LEVEL xLoggingLevel );
+int iPLL_SetLoggingLevel(PLL_OUTPUT_LEVEL xLoggingLevel);
 
 /**
  * @brief   Gets current PLL logging verbosity level
@@ -129,7 +137,7 @@ int iPLL_SetLoggingLevel( PLL_OUTPUT_LEVEL xLoggingLevel );
  * @return  OK     if level retrieved successful
  *          ERROR  if level not retrieved successful
  */
-int iPLL_GetLoggingLevel( PLL_OUTPUT_LEVEL *pxLoggingLevel );
+int iPLL_GetLoggingLevel(PLL_OUTPUT_LEVEL* pxLoggingLevel);
 
 /**
  * @brief   Function for task/thread safe prints.
@@ -138,7 +146,7 @@ int iPLL_GetLoggingLevel( PLL_OUTPUT_LEVEL *pxLoggingLevel );
  *
  * @param   pcFormat      C string that contains the text to be written.
  */
-void vPLL_Output( PLL_OUTPUT_LEVEL xOutputLevel, const char *pcFormat, ... );
+void vPLL_Output(PLL_OUTPUT_LEVEL xOutputLevel, const char* pcFormat, ...);
 
 /**
  * @brief   Function for task/thread safe prints.
@@ -148,7 +156,7 @@ void vPLL_Output( PLL_OUTPUT_LEVEL xOutputLevel, const char *pcFormat, ... );
  * @note    Print function that overwrites the set PLL_OUTPUT_LEVEL, used ...
  *          for the likes of the DAL.
  */
-void vPLL_Printf( const char *pcFormat, ... );
+void vPLL_Printf(const char* pcFormat, ...);
 
 /**
  * @brief    Dumps logs from shared memory.
@@ -156,7 +164,7 @@ void vPLL_Printf( const char *pcFormat, ... );
  * @return   OK if successful
  *           ERROR if not successful.
  */
-int iPLL_DumpLog( void );
+int iPLL_DumpLog(void);
 
 /**
  * @brief    Clears shared memory log buffer.
@@ -164,7 +172,7 @@ int iPLL_DumpLog( void );
  * @return   OK if successful
  *           ERROR if not successful.
  */
-int iPLL_ClearLog( void );
+int iPLL_ClearLog(void);
 
 /**
  * @brief    Reads and dumps the FSBL (First-Stage Bootloader) log
@@ -172,7 +180,7 @@ int iPLL_ClearLog( void );
  * @return   OK if successful
  *           ERROR if not successful.
  */
-int iPLL_DumpFsblLog( void );
+int iPLL_DumpFsblLog(void);
 
 /**
  * @brief    Sends collected AMC boot records to the log once communciation is available
@@ -180,7 +188,7 @@ int iPLL_DumpFsblLog( void );
  * @return   OK if successful
  *           ERROR if not successful.
  */
-int iPLL_SendBootRecords( void );
+int iPLL_SendBootRecords(void);
 
 /**
  * @brief   Print all the stats gathered by the library
@@ -189,7 +197,7 @@ int iPLL_SendBootRecords( void );
  *          ERROR  Stats not retrieved successfully
  *
  */
-int iPLL_PrintStatistics( void );
+int iPLL_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the library
@@ -198,6 +206,6 @@ int iPLL_PrintStatistics( void );
  *          ERROR  Stats not cleared successfully
  *
  */
-int iPLL_ClearStatistics( void );
+int iPLL_ClearStatistics(void);
 
 #endif /* _PLL_H_ */

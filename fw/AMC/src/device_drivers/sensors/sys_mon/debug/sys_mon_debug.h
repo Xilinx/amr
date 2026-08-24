@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the System Monitoring (SYS_MON) debug access
@@ -24,7 +24,6 @@
  *
  * @return  N/A
  */
-void vSYS_MON_DebugInit( DAL_HDL pxParentHandle );
+void vSYS_MON_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _SYS_MON_DEBUG_H_ */
-

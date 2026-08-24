@@ -17,7 +17,7 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define FW_IF_GCQ_UDID_LEN                  ( 16 )
+#define FW_IF_GCQ_UDID_LEN (16)
 
 
 /*****************************************************************************/
@@ -28,12 +28,11 @@
  * @enum FW_IF_GCQ_MODE_TYPE
  * @brief Enumeration of sGCQ mode as 'producer' or a 'consumer'
  */
-typedef enum
-{
-    FW_IF_GCQ_MODE_PRODUCER = 0,
-    FW_IF_GCQ_MODE_CONSUMER = 1,
+typedef enum {
+	FW_IF_GCQ_MODE_PRODUCER = 0,
+	FW_IF_GCQ_MODE_CONSUMER = 1,
 
-    MAX_FW_IF_GCQ_MODE
+	MAX_FW_IF_GCQ_MODE
 
 } FW_IF_GCQ_MODE_TYPE;
 
@@ -41,25 +40,24 @@ typedef enum
  * @enum FW_IF_GCQ_ERROR_TYPE
  * @brief Enumeration of sGCQ return values
  */
-typedef enum
-{
-    FW_IF_GCQ_ERRORS_NONE             = FW_IF_ERRORS_NONE,
-    FW_IF_GCQ_ERRORS_NO_FREE_PROFILES = MAX_FW_IF_ERROR,
-    FW_IF_GCQ_ERRORS_INVALID_PROFILE,
-    FW_IF_GCQ_ERRORS_NOT_SUPPORTED,
-    FW_IF_GCQ_ERRORS_DRIVER_NOT_INITIALISED,
-    FW_IF_GCQ_ERRORS_DRIVER_NO_FREE_INSTANCES,
-    FW_IF_GCQ_ERRORS_DRIVER_INVALID_INSTANCE,
-    FW_IF_GCQ_ERRORS_DRIVER_INVALID_ARG,
-    FW_IF_GCQ_ERRORS_DRIVER_INVALID_SLOT_SIZE,
-    FW_IF_GCQ_ERRORS_DRIVER_INVALID_VERSION,
-    FW_IF_GCQ_ERRORS_DRIVER_INVALID_NUM_SLOTS,
-    FW_IF_GCQ_ERRORS_DRIVER_CONSUMER_NOT_ATTACHED,
-    FW_IF_GCQ_ERRORS_DRIVER_CONSUMER_NOT_AVAILABLE,
-    FW_IF_GCQ_ERRORS_DRIVER_CONSUMER_NO_DATA_RECEIVED,
-    FW_IF_GCQ_ERRORS_DRIVER_PRODUCER_NO_FREE_SLOTS,
+typedef enum {
+	FW_IF_GCQ_ERRORS_NONE             = FW_IF_ERRORS_NONE,
+	FW_IF_GCQ_ERRORS_NO_FREE_PROFILES = MAX_FW_IF_ERROR,
+	FW_IF_GCQ_ERRORS_INVALID_PROFILE,
+	FW_IF_GCQ_ERRORS_NOT_SUPPORTED,
+	FW_IF_GCQ_ERRORS_DRIVER_NOT_INITIALISED,
+	FW_IF_GCQ_ERRORS_DRIVER_NO_FREE_INSTANCES,
+	FW_IF_GCQ_ERRORS_DRIVER_INVALID_INSTANCE,
+	FW_IF_GCQ_ERRORS_DRIVER_INVALID_ARG,
+	FW_IF_GCQ_ERRORS_DRIVER_INVALID_SLOT_SIZE,
+	FW_IF_GCQ_ERRORS_DRIVER_INVALID_VERSION,
+	FW_IF_GCQ_ERRORS_DRIVER_INVALID_NUM_SLOTS,
+	FW_IF_GCQ_ERRORS_DRIVER_CONSUMER_NOT_ATTACHED,
+	FW_IF_GCQ_ERRORS_DRIVER_CONSUMER_NOT_AVAILABLE,
+	FW_IF_GCQ_ERRORS_DRIVER_CONSUMER_NO_DATA_RECEIVED,
+	FW_IF_GCQ_ERRORS_DRIVER_PRODUCER_NO_FREE_SLOTS,
 
-    MAX_FW_IF_GCQ_ERROR
+	MAX_FW_IF_GCQ_ERROR
 
 } FW_IF_GCQ_ERRORS_TYPE;
 
@@ -67,12 +65,11 @@ typedef enum
  * @enum _FW_IF_GCQ_IOCTL_TYPE
  * @brief ioctrl options for sGCQ interfaces (generic across all sGCQ interfaces)
  */
-typedef enum
-{
-    FW_IF_GCQ_IOCTRL_SET_OPAQUE_HANDLE = MAX_FW_IF_COMMON_IOCTRL_OPTION,
-    FW_IF_GCQ_IOCTRL_GET_OPAQUE_HANDLE,
+typedef enum {
+	FW_IF_GCQ_IOCTRL_SET_OPAQUE_HANDLE = MAX_FW_IF_COMMON_IOCTRL_OPTION,
+	FW_IF_GCQ_IOCTRL_GET_OPAQUE_HANDLE,
 
-    MAX_FW_IF_GCQ_IOCTRL_OPTION
+	MAX_FW_IF_GCQ_IOCTRL_OPTION
 
 } FW_IF_GCQ_IOCTL_TYPE;
 
@@ -86,9 +83,8 @@ typedef enum
  * @brief   config options for sGCQ initialisation (generic across all sGCQ
  *          interfaces)
  */
-typedef struct
-{
-    void    *pvIOAccess;
+typedef struct {
+	void* pvIOAccess;
 
 } FWIfGCQInitCfg;
 
@@ -96,17 +92,16 @@ typedef struct
  * @struct  FWIfGCQCfg
  * @brief   config options for sGCQ interfaces (generic across all sGCQ interfaces)
  */
-typedef struct
-{
-    uint64_t            ullBaseAddress;
-    FW_IF_GCQ_MODE_TYPE xMode;
-    uint64_t            ullRingAddress;
-    uint32_t            ulRingLength;
-    uint32_t            ulCompletionQueueSlotSize;
-    uint32_t            ulSubmissionQueueSlotSize;
-    uint8_t             udid[ FW_IF_GCQ_UDID_LEN ];
+typedef struct {
+	uint64_t ullBaseAddress;
+	FW_IF_GCQ_MODE_TYPE xMode;
+	uint64_t ullRingAddress;
+	uint32_t ulRingLength;
+	uint32_t ulCompletionQueueSlotSize;
+	uint32_t ulSubmissionQueueSlotSize;
+	uint8_t udid[FW_IF_GCQ_UDID_LEN];
 
-    void                *pvProfile;      /* opaque handle to store internal context */
+	void* pvProfile; /* opaque handle to store internal context */
 
 } FWIfGCQCfg;
 
@@ -123,7 +118,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_GCQ_Init( FWIfGCQInitCfg *pxInitCfg );
+uint32_t ulFW_IF_GCQ_Init(FWIfGCQInitCfg* pxInitCfg);
 
 /**
  * @brief   creates an instance of the sGCQ interface
@@ -133,7 +128,7 @@ uint32_t ulFW_IF_GCQ_Init( FWIfGCQInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_GCQ_Create( FWIfCfg *pxFwIf, FWIfGCQCfg *pxGCQCfg );
+uint32_t ulFW_IF_GCQ_Create(FWIfCfg* pxFwIf, FWIfGCQCfg* pxGCQCfg);
 
 /**
  * @brief    Print all the stats gathered by the interface
@@ -141,7 +136,7 @@ uint32_t ulFW_IF_GCQ_Create( FWIfCfg *pxFwIf, FWIfGCQCfg *pxGCQCfg );
  * @return   OK         Stats retrieved from gcq successfully
  *           ERROR      Stats not retrieved successfully
  */
-int iFW_IF_GCQ_PrintStatistics( void );
+int iFW_IF_GCQ_PrintStatistics(void);
 
 /**
  * @brief    Clears all the stats gathered by the interface
@@ -149,6 +144,6 @@ int iFW_IF_GCQ_PrintStatistics( void );
  * @return   OK         Stats cleared successfully
  *           ERROR      Stats not cleared successfully
  */
-int iFW_IF_GCQ_ClearStatistics( void );
+int iFW_IF_GCQ_ClearStatistics(void);
 
 #endif /* _FW_IF_GCQ_H_ */

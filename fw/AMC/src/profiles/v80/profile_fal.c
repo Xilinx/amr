@@ -47,17 +47,17 @@
 /******************************************************************************/
 
 #define FAL_PROFILE_NAME      "PROFILE_FAL"
-#define EMMC_RPU_BASE_ADDRESS ( 0x0 )
-#define EMMC_RPU_LENGTH       ( ( uint64_t )HAL_EMMC_MAX_BLOCKS * ( uint64_t )HAL_EMMC_BLOCK_SIZE ) /* 64Gb */
+#define EMMC_RPU_BASE_ADDRESS (0x0)
+#define EMMC_RPU_LENGTH       ((uint64_t)HAL_EMMC_MAX_BLOCKS * (uint64_t)HAL_EMMC_BLOCK_SIZE) /* 64Gb */
 
 /* Enable SMBus PCIe link */
-#define TCA6416AR_BIT_3                 ( 1 << 3 )
-#define TCA6416AR_ADDRESS               ( 0x20 )
-#define TCA6416AR_CONFIGURATION_0       ( 0x06 )
-#define TCA6416AR_OUTPUT_PORT_0         ( 0x02 )
-#define TCA6416AR_READ_BUFF_SIZE        ( 1 )
-#define TCA6416AR_READ_BYTES_TO_RECEIVE ( 1 )
-#define TCA6416AR_WRITE_BUFF_SIZE       ( 2 )
+#define TCA6416AR_BIT_3                 (1 << 3)
+#define TCA6416AR_ADDRESS               (0x20)
+#define TCA6416AR_CONFIGURATION_0       (0x06)
+#define TCA6416AR_OUTPUT_PORT_0         (0x02)
+#define TCA6416AR_READ_BUFF_SIZE        (1)
+#define TCA6416AR_READ_BYTES_TO_RECEIVE (1)
+#define TCA6416AR_WRITE_BUFF_SIZE       (2)
 
 
 /*****************************************************************************/
@@ -65,203 +65,166 @@
 /*****************************************************************************/
 
 /* FAL objects */
-FWIfCfg xGcqIf   = { 0 };
-FWIfCfg xOspiIf  = { 0 };
-FWIfCfg xEmmcIf  = { 0 };
+FWIfCfg xGcqIf  = { 0 };
+FWIfCfg xOspiIf = { 0 };
+FWIfCfg xEmmcIf = { 0 };
 
 FWIfCfg xQsfpIf1 = { 0 };
 FWIfCfg xQsfpIf2 = { 0 };
 FWIfCfg xQsfpIf3 = { 0 };
 FWIfCfg xQsfpIf4 = { 0 };
 
-FWIfCfg xDimmIf  = { 0 };
+FWIfCfg xDimmIf = { 0 };
 
 FWIfCfg xSMBusIf = { 0 };
 
 
-FWIfCfg *pxEmmcIf  = &xEmmcIf;
-FWIfCfg *pxOspiIf  = &xOspiIf;
-FWIfCfg *pxSMBusIf = &xSMBusIf;
+FWIfCfg* pxEmmcIf  = &xEmmcIf;
+FWIfCfg* pxOspiIf  = &xOspiIf;
+FWIfCfg* pxSMBusIf = &xSMBusIf;
 
 /*****************************************************************************/
 /* Local variables                                                           */
 /*****************************************************************************/
 
-static FW_IF_MUXED_DEVICE_CFG xQsfpCfg1 =
-{
-    FW_IF_DEVICE_QSFP,
-    QSFP_POWER_IO_EXPANDER_I2C_ADDR,
-    QSFP_1_REG_BIT_OFFSET,
-    MUXED_DEVICE_MUX_1_ADDR,
-    {
-        MUXED_DEVICE_MUX_2_ADDR, MUXED_DEVICE_MUX_3_ADDR
-    },
-    MUXED_DEVICE_MUX_REG_BIT_1,
-    MUXED_DEVICE_MUX_REG_BIT_2,
-    QSFP_IO_EXPANDER_I2C_ADDR,
-    QSFP_I2C_ADDR,
-    FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
-};                                                  /* QSFP 1 */
+static FW_IF_MUXED_DEVICE_CFG xQsfpCfg1 = {
+	FW_IF_DEVICE_QSFP,
+	QSFP_POWER_IO_EXPANDER_I2C_ADDR,
+	QSFP_1_REG_BIT_OFFSET,
+	MUXED_DEVICE_MUX_1_ADDR,
+	{ MUXED_DEVICE_MUX_2_ADDR, MUXED_DEVICE_MUX_3_ADDR },
+	MUXED_DEVICE_MUX_REG_BIT_1,
+	MUXED_DEVICE_MUX_REG_BIT_2,
+	QSFP_IO_EXPANDER_I2C_ADDR,
+	QSFP_I2C_ADDR,
+	FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
+}; /* QSFP 1 */
 
-static FW_IF_MUXED_DEVICE_CFG xQsfpCfg2 =
-{
-    FW_IF_DEVICE_QSFP,
-    QSFP_POWER_IO_EXPANDER_I2C_ADDR,
-    QSFP_2_REG_BIT_OFFSET,
-    MUXED_DEVICE_MUX_1_ADDR,
-    {
-        MUXED_DEVICE_MUX_2_ADDR, MUXED_DEVICE_MUX_3_ADDR
-    },
-    MUXED_DEVICE_MUX_REG_BIT_3,
-    MUXED_DEVICE_MUX_REG_BIT_4,
-    QSFP_IO_EXPANDER_I2C_ADDR,
-    QSFP_I2C_ADDR,
-    FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
-};                                                  /* QSFP 2 */
+static FW_IF_MUXED_DEVICE_CFG xQsfpCfg2 = {
+	FW_IF_DEVICE_QSFP,
+	QSFP_POWER_IO_EXPANDER_I2C_ADDR,
+	QSFP_2_REG_BIT_OFFSET,
+	MUXED_DEVICE_MUX_1_ADDR,
+	{ MUXED_DEVICE_MUX_2_ADDR, MUXED_DEVICE_MUX_3_ADDR },
+	MUXED_DEVICE_MUX_REG_BIT_3,
+	MUXED_DEVICE_MUX_REG_BIT_4,
+	QSFP_IO_EXPANDER_I2C_ADDR,
+	QSFP_I2C_ADDR,
+	FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
+}; /* QSFP 2 */
 
-static FW_IF_MUXED_DEVICE_CFG xQsfpCfg3 =
-{
-    FW_IF_DEVICE_QSFP,
-    QSFP_POWER_IO_EXPANDER_I2C_ADDR,
-    QSFP_3_REG_BIT_OFFSET,
-    MUXED_DEVICE_MUX_2_ADDR,
-    {
-        MUXED_DEVICE_MUX_1_ADDR, MUXED_DEVICE_MUX_3_ADDR
-    },
-    MUXED_DEVICE_MUX_REG_BIT_1,
-    MUXED_DEVICE_MUX_REG_BIT_2,
-    QSFP_IO_EXPANDER_I2C_ADDR,
-    QSFP_I2C_ADDR,
-    FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
-};                                                  /* QSFP 3 */
+static FW_IF_MUXED_DEVICE_CFG xQsfpCfg3 = {
+	FW_IF_DEVICE_QSFP,
+	QSFP_POWER_IO_EXPANDER_I2C_ADDR,
+	QSFP_3_REG_BIT_OFFSET,
+	MUXED_DEVICE_MUX_2_ADDR,
+	{ MUXED_DEVICE_MUX_1_ADDR, MUXED_DEVICE_MUX_3_ADDR },
+	MUXED_DEVICE_MUX_REG_BIT_1,
+	MUXED_DEVICE_MUX_REG_BIT_2,
+	QSFP_IO_EXPANDER_I2C_ADDR,
+	QSFP_I2C_ADDR,
+	FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
+}; /* QSFP 3 */
 
-static FW_IF_MUXED_DEVICE_CFG xQsfpCfg4 =
-{
-    FW_IF_DEVICE_QSFP,
-    QSFP_POWER_IO_EXPANDER_I2C_ADDR,
-    QSFP_4_REG_BIT_OFFSET,
-    MUXED_DEVICE_MUX_2_ADDR,
-    {
-        MUXED_DEVICE_MUX_1_ADDR, MUXED_DEVICE_MUX_3_ADDR
-    },
-    MUXED_DEVICE_MUX_REG_BIT_3,
-    MUXED_DEVICE_MUX_REG_BIT_4,
-    QSFP_IO_EXPANDER_I2C_ADDR,
-    QSFP_I2C_ADDR,
-    FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
-};                                                  /* QSFP 4 */
+static FW_IF_MUXED_DEVICE_CFG xQsfpCfg4 = {
+	FW_IF_DEVICE_QSFP,
+	QSFP_POWER_IO_EXPANDER_I2C_ADDR,
+	QSFP_4_REG_BIT_OFFSET,
+	MUXED_DEVICE_MUX_2_ADDR,
+	{ MUXED_DEVICE_MUX_1_ADDR, MUXED_DEVICE_MUX_3_ADDR },
+	MUXED_DEVICE_MUX_REG_BIT_3,
+	MUXED_DEVICE_MUX_REG_BIT_4,
+	QSFP_IO_EXPANDER_I2C_ADDR,
+	QSFP_I2C_ADDR,
+	FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
+}; /* QSFP 4 */
 
-static FW_IF_MUXED_DEVICE_CFG xDimmCfg =
-{
-    FW_IF_DEVICE_DIMM,
-    0,
-    0,
-    MUXED_DEVICE_MUX_3_ADDR,
-    {
-        MUXED_DEVICE_MUX_1_ADDR, MUXED_DEVICE_MUX_2_ADDR
-    },
-    MUXED_DEVICE_MUX_REG_BIT_4,
-    0,
-    0,
-    DIMM_I2C_ADDR,
-    FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP
-};                                                  /* DIMM */
+static FW_IF_MUXED_DEVICE_CFG xDimmCfg = {
+	FW_IF_DEVICE_DIMM,
+	0,
+	0,
+	MUXED_DEVICE_MUX_3_ADDR,
+	{ MUXED_DEVICE_MUX_1_ADDR, MUXED_DEVICE_MUX_2_ADDR },
+	MUXED_DEVICE_MUX_REG_BIT_4,
+	0,
+	0,
+	DIMM_I2C_ADDR,
+	FW_IF_MUXED_DEVICE_HW_LEVEL_MEMORY_MAP,
+}; /* DIMM */
 
-static FWIfGCQCfg xGcqCfg =
-{
-    ( uint64_t )HAL_GCQ_SHARED_BASEADDR,
-    FW_IF_GCQ_MODE_PRODUCER,
-    ( uint64_t )HAL_RPU_RING_BUFFER_BASE,
-    HAL_RPU_RING_BUFFER_LEN,
-    AMI_PROXY_RESPONSE_SIZE,
-    AMI_PROXY_REQUEST_SIZE,
-    ""
+static FWIfGCQCfg xGcqCfg = {
+	(uint64_t)HAL_GCQ_SHARED_BASEADDR,
+	FW_IF_GCQ_MODE_PRODUCER,
+	(uint64_t)HAL_RPU_RING_BUFFER_BASE,
+	HAL_RPU_RING_BUFFER_LEN,
+	AMI_PROXY_RESPONSE_SIZE,
+	AMI_PROXY_REQUEST_SIZE,
+	"",
 };
 
-static FWIfGCQInitCfg myGcqIf =
-{
-    NULL
+static FWIfGCQInitCfg myGcqIf = { NULL };
+
+static FWIfOspiCfg xOspiCfg = {
+	HAL_OSPI_RPU_BASE_ADDR,
+	HAL_OSPI_RPU_LENGTH,
+	TRUE, /* Enable erase before write */
+	FW_IF_OSPI_STATE_INIT,
 };
 
-static FWIfOspiCfg xOspiCfg =
-{
-    HAL_OSPI_RPU_BASE_ADDR,
-    HAL_OSPI_RPU_LENGTH,
-    TRUE,                               /* Enable erase before write */
-    FW_IF_OSPI_STATE_INIT
+static FWIfEmmcCfg xEmmcCfg = {
+	0,
+	"EmmcCfg",
+	EMMC_RPU_BASE_ADDRESS,
+	EMMC_RPU_LENGTH,
+	FW_IF_EMMC_STATE_ERROR,
 };
 
-static FWIfEmmcCfg xEmmcCfg =
-{
-    0,
-    "EmmcCfg",
-    EMMC_RPU_BASE_ADDRESS,
-    EMMC_RPU_LENGTH,
-    FW_IF_EMMC_STATE_ERROR
+static FWIfSMBusCfg xSMBusCfg = {
+	HAL_SMBUS_ADDR,                  /* SMBus address */
+	FW_IF_SMBUS_ROLE_CONTROLLER,     /* initial SMBus role */
+	FW_IF_SMBUS_ARP_NON_ARP_CAPABLE, /* SMBus ARP capability */
+	FW_IF_SMBUS_PROTOCOL_SMBUS,      /* driver protocol */
+	{ 0 },                           /* UDID */
+	FW_IF_SMBUS_STATE_ERROR,         /* Current FAL State */
+	SMBUS_INVALID_INSTANCE,          /* SMBus instance */
+	FW_IF_SMBUS_PEC_ENABLED,         /* SMBus PEC capability */
 };
 
-static FWIfSMBusCfg xSMBusCfg =
-{
-    HAL_SMBUS_ADDR,                     /* SMBus address */
-    FW_IF_SMBUS_ROLE_CONTROLLER,        /* initial SMBus role */
-    FW_IF_SMBUS_ARP_NON_ARP_CAPABLE,    /* SMBus ARP capability */
-    FW_IF_SMBUS_PROTOCOL_SMBUS,         /* driver protocol */
-    {
-        0
-    },                                  /* UDID */
-    FW_IF_SMBUS_STATE_ERROR,            /* Current FAL State */
-    SMBUS_INVALID_INSTANCE,             /* SMBus instance */
-    FW_IF_SMBUS_PEC_ENABLED             /* SMBus PEC capability */
-};
+static FWIfOspiInitCfg myOspiIf = { HAL_OSPI_0_DEVICE_ID, HAL_OSPI_PAGE_SIZE };
 
-static FWIfOspiInitCfg myOspiIf =
-{
-    HAL_OSPI_0_DEVICE_ID,
-    HAL_OSPI_PAGE_SIZE
-};
+static FWIfEmmcInitCfg myEmmcIf = { "EmmcIfCfg", HAL_EMMC_BASE_ADDR };
 
-static FWIfEmmcInitCfg myEmmcIf =
-{
-    "EmmcIfCfg",
-    HAL_EMMC_BASE_ADDR
-};
+static FWIfMuxedDeviceInitCfg myQsfpIf = { "QsfpIfCfg", HAL_I2C_BUS_1_DEVICE_ID };
 
-static FWIfMuxedDeviceInitCfg myQsfpIf =
-{
-    "QsfpIfCfg",
-    HAL_I2C_BUS_1_DEVICE_ID
-};
-
-static FWIfSMBusInitCfg mySMBusIf =
-{
-    HAL_SMBUS_BASE_ADDR,
-    SMBUS_FREQ_100KHZ,
-    {
-        FW_IF_SMBUS_CMD_CODE_QUICK_COMMAND_LO,
-        FW_IF_SMBUS_CMD_CODE_QUICK_COMMAND_HI,
-        FW_IF_SMBUS_CMD_CODE_SEND_BYTE,
-        FW_IF_SMBUS_CMD_CODE_RECEIVE_BYTE,
-        FW_IF_SMBUS_CMD_CODE_WRITE_BYTE,
-        FW_IF_SMBUS_CMD_CODE_WRITE_WORD,
-        FW_IF_SMBUS_CMD_CODE_READ_BYTE,
-        FW_IF_SMBUS_CMD_CODE_READ_WORD,
-        FW_IF_SMBUS_CMD_CODE_PROCESS_CALL,
-        FW_IF_SMBUS_CMD_CODE_BLK_WRITE,
-        FW_IF_SMBUS_CMD_CODE_BLK_READ,
-        FW_IF_SMBUS_CMD_CODE_BLK_WRITE_BLK_READ_PROCESS_CALL,
-        FW_IF_SMBUS_CMD_CODE_HOST_NOTIFY,
-        FW_IF_SMBUS_CMD_CODE_WRITE_32,
-        FW_IF_SMBUS_CMD_CODE_READ_32,
-        FW_IF_SMBUS_CMD_CODE_WRITE_64,
-        FW_IF_SMBUS_CMD_CODE_READ_64,
-        FW_IF_SMBUS_CMD_CODE_PREPARE_TO_ARP,
-        FW_IF_SMBUS_CMD_CODE_RESET_DEVICE,
-        FW_IF_SMBUS_CMD_CODE_GET_UDID,
-        FW_IF_SMBUS_CMD_CODE_ASSIGN_ADDRESS,
-        FW_IF_SMBUS_CMD_CODE_GET_UDID_DIRECTED,
-        FW_IF_SMBUS_CMD_CODE_RESET_DEVICE_DIRECTED,
-        FW_IF_SMBUS_CMD_CODE_NONE
-    }
+static FWIfSMBusInitCfg mySMBusIf = {
+	HAL_SMBUS_BASE_ADDR,
+	SMBUS_FREQ_100KHZ,
+	{
+		FW_IF_SMBUS_CMD_CODE_QUICK_COMMAND_LO,
+		FW_IF_SMBUS_CMD_CODE_QUICK_COMMAND_HI,
+		FW_IF_SMBUS_CMD_CODE_SEND_BYTE,
+		FW_IF_SMBUS_CMD_CODE_RECEIVE_BYTE,
+		FW_IF_SMBUS_CMD_CODE_WRITE_BYTE,
+		FW_IF_SMBUS_CMD_CODE_WRITE_WORD,
+		FW_IF_SMBUS_CMD_CODE_READ_BYTE,
+		FW_IF_SMBUS_CMD_CODE_READ_WORD,
+		FW_IF_SMBUS_CMD_CODE_PROCESS_CALL,
+		FW_IF_SMBUS_CMD_CODE_BLK_WRITE,
+		FW_IF_SMBUS_CMD_CODE_BLK_READ,
+		FW_IF_SMBUS_CMD_CODE_BLK_WRITE_BLK_READ_PROCESS_CALL,
+		FW_IF_SMBUS_CMD_CODE_HOST_NOTIFY,
+		FW_IF_SMBUS_CMD_CODE_WRITE_32,
+		FW_IF_SMBUS_CMD_CODE_READ_32,
+		FW_IF_SMBUS_CMD_CODE_WRITE_64,
+		FW_IF_SMBUS_CMD_CODE_READ_64,
+		FW_IF_SMBUS_CMD_CODE_PREPARE_TO_ARP,
+		FW_IF_SMBUS_CMD_CODE_RESET_DEVICE,
+		FW_IF_SMBUS_CMD_CODE_GET_UDID,
+		FW_IF_SMBUS_CMD_CODE_ASSIGN_ADDRESS,
+		FW_IF_SMBUS_CMD_CODE_GET_UDID_DIRECTED,
+		FW_IF_SMBUS_CMD_CODE_RESET_DEVICE_DIRECTED,
+		FW_IF_SMBUS_CMD_CODE_NONE,
+	},
 };
 
 
@@ -281,10 +244,10 @@ static FWIfSMBusInitCfg mySMBusIf =
  *          ERROR            Error reading register value
  *
  */
-static uint8_t ucTca6416aRegisterRead( uint8_t ucI2cNum,
-                                       uint8_t ucSlaveAddr,
-                                       uint8_t ucRegister,
-                                       uint8_t *pucRegisterValue );
+static uint8_t ucTca6416aRegisterRead(uint8_t ucI2cNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucRegister,
+	uint8_t* pucRegisterValue);
 
 /**
  * @brief   Write to Tca6416a register via i2c.
@@ -298,10 +261,10 @@ static uint8_t ucTca6416aRegisterRead( uint8_t ucI2cNum,
  *          ERROR            Error writting register value
  *
  */
-static uint8_t ucTca6416aRegisterWrite( uint8_t ucI2cNum,
-                                        uint8_t ucSlaveAddr,
-                                        uint8_t ucRegister,
-                                        uint8_t ucRegisterValue );
+static uint8_t ucTca6416aRegisterWrite(uint8_t ucI2cNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucRegister,
+	uint8_t ucRegisterValue);
 
 /**
  * @brief   Enable SMBus PCIe Link.
@@ -310,7 +273,7 @@ static uint8_t ucTca6416aRegisterWrite( uint8_t ucI2cNum,
  *          ERROR            Error enabling SMBus PCIe Link
  *
  */
-static uint8_t ucEnableSMBusPcieLink( void );
+static uint8_t ucEnableSMBusPcieLink(void);
 
 
 /******************************************************************************/
@@ -320,81 +283,89 @@ static uint8_t ucEnableSMBusPcieLink( void );
 /**
  * @brief   Read from Tca6416a register via i2c.
  */
-uint8_t ucTca6416aRegisterRead( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegister, uint8_t *pucRegisterValue )
+uint8_t ucTca6416aRegisterRead(uint8_t ucI2cNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucRegister,
+	uint8_t* pucRegisterValue)
 {
-    uint8_t ucStatus = ERROR;
-    uint8_t pucSendData[ TCA6416AR_READ_BUFF_SIZE ] = { 0 };
+	uint8_t ucStatus                              = ERROR;
+	uint8_t pucSendData[TCA6416AR_READ_BUFF_SIZE] = { 0 };
 
-    if( NULL != pucRegisterValue )
-    {
-        pucSendData[ 0 ] = ucRegister;
+	if (NULL != pucRegisterValue) {
+		pucSendData[0] = ucRegister;
 
-        ucStatus = iI2C_SendRecv( ucI2cNum,
-                                  ucSlaveAddr,
-                                  pucSendData,
-                                  TCA6416AR_READ_BUFF_SIZE,
-                                  pucRegisterValue,
-                                  TCA6416AR_READ_BYTES_TO_RECEIVE );
-    }
+		ucStatus = iI2C_SendRecv(ucI2cNum,
+			ucSlaveAddr,
+			pucSendData,
+			TCA6416AR_READ_BUFF_SIZE,
+			pucRegisterValue,
+			TCA6416AR_READ_BYTES_TO_RECEIVE);
+	}
 
-    return ucStatus;
+	return ucStatus;
 }
 
 /**
  * @brief   Write to Tca6416a register via i2c.
  */
-uint8_t ucTca6416aRegisterWrite( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucRegister, uint8_t ucRegisterValue )
+uint8_t ucTca6416aRegisterWrite(uint8_t ucI2cNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucRegister,
+	uint8_t ucRegisterValue)
 {
-    uint8_t ucStatus = ERROR;
-    uint8_t pucSendData[ TCA6416AR_WRITE_BUFF_SIZE ] = { 0 };
+	uint8_t ucStatus                               = ERROR;
+	uint8_t pucSendData[TCA6416AR_WRITE_BUFF_SIZE] = { 0 };
 
-    pucSendData[ 0 ] = ucRegister;
-    pucSendData[ 1 ] = ucRegisterValue;
+	pucSendData[0] = ucRegister;
+	pucSendData[1] = ucRegisterValue;
 
-    ucStatus = iI2C_Send( ucI2cNum, ucSlaveAddr, pucSendData, TCA6416AR_WRITE_BUFF_SIZE );
+	ucStatus = iI2C_Send(ucI2cNum, ucSlaveAddr, pucSendData, TCA6416AR_WRITE_BUFF_SIZE);
 
-    return ucStatus;
+	return ucStatus;
 }
 
 /**
  * @brief   Enable SMBus PCIe Link.
  */
-uint8_t ucEnableSMBusPcieLink( void )
+uint8_t ucEnableSMBusPcieLink(void)
 {
-    uint8_t ucStatus        = ERROR;
-    uint8_t ucI2cNum        = HAL_I2C_BUS_0_DEVICE_ID;
-    uint8_t ucRegisterValue = 0;
+	uint8_t ucStatus        = ERROR;
+	uint8_t ucI2cNum        = HAL_I2C_BUS_0_DEVICE_ID;
+	uint8_t ucRegisterValue = 0;
 
-    /* Read Configuration 0 Register - Command Byte 06 */
-    ucStatus = ucTca6416aRegisterRead( ucI2cNum, TCA6416AR_ADDRESS, TCA6416AR_CONFIGURATION_0, &ucRegisterValue );
+	/* Read Configuration 0 Register - Command Byte 06 */
+	ucStatus = ucTca6416aRegisterRead(ucI2cNum,
+		TCA6416AR_ADDRESS,
+		TCA6416AR_CONFIGURATION_0,
+		&ucRegisterValue);
 
-    if( OK == ucStatus )
-    {
-        /* Write Configuration 0 Register setting bit 3 to 0 - Command Byte 06 */
-        ucRegisterValue = ( ucRegisterValue & ~( TCA6416AR_BIT_3 ) );
-        ucStatus        = ucTca6416aRegisterWrite( ucI2cNum,
-                                                   TCA6416AR_ADDRESS,
-                                                   TCA6416AR_CONFIGURATION_0,
-                                                   ucRegisterValue );
+	if (OK == ucStatus) {
+		/* Write Configuration 0 Register setting bit 3 to 0 - Command Byte 06 */
+		ucRegisterValue = (ucRegisterValue & ~(TCA6416AR_BIT_3));
+		ucStatus        = ucTca6416aRegisterWrite(ucI2cNum,
+            TCA6416AR_ADDRESS,
+            TCA6416AR_CONFIGURATION_0,
+            ucRegisterValue);
 
-        if( OK == ucStatus )
-        {
-            /* Read Output 0 Register - Command Byte 02 */
-            ucStatus = ucTca6416aRegisterRead( ucI2cNum, TCA6416AR_ADDRESS, TCA6416AR_OUTPUT_PORT_0, &ucRegisterValue );
+		if (OK == ucStatus) {
+			/* Read Output 0 Register - Command Byte 02 */
+			ucStatus = ucTca6416aRegisterRead(ucI2cNum,
+				TCA6416AR_ADDRESS,
+				TCA6416AR_OUTPUT_PORT_0,
+				&ucRegisterValue);
 
-            if( OK == ucStatus )
-            {
-                /* Write Output 0 Register setting bit 3 to 1 - Command Byte 02 */
-                ucRegisterValue = ( ucRegisterValue | ( TCA6416AR_BIT_3 ) );
-                ucStatus        = ucTca6416aRegisterWrite( ucI2cNum,
-                                                           TCA6416AR_ADDRESS,
-                                                           TCA6416AR_OUTPUT_PORT_0,
-                                                           ucRegisterValue );
-            }
-        }
-    }
+			if (OK == ucStatus) {
+				/* Write Output 0 Register setting bit 3 to 1 - Command Byte 02 */
+				ucRegisterValue = (ucRegisterValue | (TCA6416AR_BIT_3));
+				ucStatus        = ucTca6416aRegisterWrite(ucI2cNum,
+                    TCA6416AR_ADDRESS,
+                    TCA6416AR_OUTPUT_PORT_0,
+                    ucRegisterValue);
+			}
+		}
+	}
 
-    return ucStatus;
+	return ucStatus;
 }
 
 
@@ -405,289 +376,218 @@ uint8_t ucEnableSMBusPcieLink( void )
 /**
  * @brief   Initialise FAL layer
  */
-int iFAL_Initialise( uint64_t *pullAmcInitStatus )
+int iFAL_Initialise(uint64_t* pullAmcInitStatus)
 {
-    int     iStatus                         = OK;
-    int     iMuxedDeviceStatus              = OK;
-    uint8_t ucUuidSize                      = 0;
-    uint8_t pucUuid[ FW_IF_SMBUS_UDID_LEN ] =
-    {
-        0
-    };
+	int iStatus                           = OK;
+	int iMuxedDeviceStatus                = OK;
+	uint8_t ucUuidSize                    = 0;
+	uint8_t pucUuid[FW_IF_SMBUS_UDID_LEN] = { 0 };
 
-    if( NULL != pullAmcInitStatus )
-    {
-        if( AMC_CFG_I2C_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
-        {
-            /* Enable SMBus PCIe link */
-            if( OK == ucEnableSMBusPcieLink() )
-            {
-                PLL_LOG( FAL_PROFILE_NAME, "PCIe SMBus link enabled\n\r" );
-                *pullAmcInitStatus |= AMC_CFG_SMBUS_PCIE_LINK_INITIALISED;
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error enabling PCIe SMBus link \n\r" );
-                iStatus = ERROR;
-            }
-        }
+	if (NULL != pullAmcInitStatus) {
+		if (AMC_CFG_I2C_INITIALISED == (*pullAmcInitStatus & AMC_CFG_I2C_INITIALISED)) {
+			/* Enable SMBus PCIe link */
+			if (OK == ucEnableSMBusPcieLink()) {
+				PLL_LOG(FAL_PROFILE_NAME, "PCIe SMBus link enabled\n\r");
+				*pullAmcInitStatus |= AMC_CFG_SMBUS_PCIE_LINK_INITIALISED;
+			} else {
+				PLL_ERR(FAL_PROFILE_NAME, "Error enabling PCIe SMBus link \n\r");
+				iStatus = ERROR;
+			}
+		}
 
-        /* Init the Muxed Device FAL */
-        if( AMC_CFG_I2C_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_I2C_INITIALISED ) )
-        {
-            if( 0 != MAX_NUM_EXTERNAL_DEVICES )
-            {
-                if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Init( &myQsfpIf ) )
-                {
-                    PLL_DBG( FAL_PROFILE_NAME, "Muxed Device FAL initialised OK\r\n" );
-                    *pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_INITIALISED;
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error initialising Muxed Device FAL\r\n" );
-                    iStatus = ERROR;
-                }
-            }
-            else
-            {
-                *pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_INITIALISED;
-            }
-        }
+		/* Init the Muxed Device FAL */
+		if (AMC_CFG_I2C_INITIALISED == (*pullAmcInitStatus & AMC_CFG_I2C_INITIALISED)) {
+			if (0 != MAX_NUM_EXTERNAL_DEVICES) {
+				if (FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Init(&myQsfpIf)) {
+					PLL_DBG(FAL_PROFILE_NAME, "Muxed Device FAL initialised OK\r\n");
+					*pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_INITIALISED;
+				} else {
+					PLL_ERR(FAL_PROFILE_NAME, "Error initialising Muxed Device FAL\r\n");
+					iStatus = ERROR;
+				}
+			} else {
+				*pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_INITIALISED;
+			}
+		}
 
-        /* Init the sGCQ FAL */
-        PLL_LOG( FAL_PROFILE_NAME, "sGCQ service: starting\r\n" );
-        if( FW_IF_ERRORS_NONE == ulFW_IF_GCQ_Init( &myGcqIf ) )
-        {
-            PLL_DBG( FAL_PROFILE_NAME, "sGCQ FAL initialised OK\r\n" );
-            PLL_LOG( FAL_PROFILE_NAME, "sGCQ service: ready\r\n" );
-            *pullAmcInitStatus |= AMC_CFG_GCQ_FAL_INITIALISED;
-        }
-        else
-        {
-            PLL_ERR( FAL_PROFILE_NAME, "Error initialising sGCQ FAL\r\n" );
-            PLL_LOG( FAL_PROFILE_NAME, "sGCQ service: error initialising\r\n" );
-            iStatus = ERROR;
-        }
+		/* Init the sGCQ FAL */
+		PLL_LOG(FAL_PROFILE_NAME, "sGCQ service: starting\r\n");
+		if (FW_IF_ERRORS_NONE == ulFW_IF_GCQ_Init(&myGcqIf)) {
+			PLL_DBG(FAL_PROFILE_NAME, "sGCQ FAL initialised OK\r\n");
+			PLL_LOG(FAL_PROFILE_NAME, "sGCQ service: ready\r\n");
+			*pullAmcInitStatus |= AMC_CFG_GCQ_FAL_INITIALISED;
+		} else {
+			PLL_ERR(FAL_PROFILE_NAME, "Error initialising sGCQ FAL\r\n");
+			PLL_LOG(FAL_PROFILE_NAME, "sGCQ service: error initialising\r\n");
+			iStatus = ERROR;
+		}
 
-        /* Init the OSPI FAL */
-        PLL_LOG( FAL_PROFILE_NAME, "OSPI driver: starting\r\n" );
-        if( FW_IF_ERRORS_NONE == ulFW_IF_OSPI_Init( &myOspiIf ) )
-        {
-            PLL_DBG( FAL_PROFILE_NAME, "OSPI FAL initialised OK\r\n" );
-            PLL_LOG( FAL_PROFILE_NAME, "OSPI driver: ready\r\n" );
-            *pullAmcInitStatus |= AMC_CFG_OSPI_FAL_INITIALISED;
-        }
-        else
-        {
-            PLL_ERR( FAL_PROFILE_NAME, "Error initialising OSPI FAL\r\n" );
-            PLL_LOG( FAL_PROFILE_NAME, "OSPI driver: error initialising\r\n" );
-            iStatus = ERROR;
-        }
+		/* Init the OSPI FAL */
+		PLL_LOG(FAL_PROFILE_NAME, "OSPI driver: starting\r\n");
+		if (FW_IF_ERRORS_NONE == ulFW_IF_OSPI_Init(&myOspiIf)) {
+			PLL_DBG(FAL_PROFILE_NAME, "OSPI FAL initialised OK\r\n");
+			PLL_LOG(FAL_PROFILE_NAME, "OSPI driver: ready\r\n");
+			*pullAmcInitStatus |= AMC_CFG_OSPI_FAL_INITIALISED;
+		} else {
+			PLL_ERR(FAL_PROFILE_NAME, "Error initialising OSPI FAL\r\n");
+			PLL_LOG(FAL_PROFILE_NAME, "OSPI driver: error initialising\r\n");
+			iStatus = ERROR;
+		}
 
-        /* Init the eMMC FAL */
-        if( FW_IF_ERRORS_NONE == ulFW_IF_EMMC_Init( &myEmmcIf ) )
-        {
-            PLL_DBG( FAL_PROFILE_NAME, "eMMC FAL initialised OK\r\n" );
-            *pullAmcInitStatus |= AMC_CFG_EMMC_FAL_INITIALISED;
-        }
-        else
-        {
-            PLL_ERR( FAL_PROFILE_NAME, "Error initialising eMMC FAL\r\n" );
-            iStatus = ERROR;
-        }
+		/* Init the eMMC FAL */
+		if (FW_IF_ERRORS_NONE == ulFW_IF_EMMC_Init(&myEmmcIf)) {
+			PLL_DBG(FAL_PROFILE_NAME, "eMMC FAL initialised OK\r\n");
+			*pullAmcInitStatus |= AMC_CFG_EMMC_FAL_INITIALISED;
+		} else {
+			PLL_ERR(FAL_PROFILE_NAME, "Error initialising eMMC FAL\r\n");
+			iStatus = ERROR;
+		}
 
-        /* Init the SMBus FAL */
-        if( FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Init( &mySMBusIf ) )
-        {
-            PLL_DBG( FAL_PROFILE_NAME, "SMBus FAL initialised OK\r\n" );
-            *pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_INITIALISED;
-        }
-        else
-        {
-            PLL_ERR( FAL_PROFILE_NAME, "Error initialising SMBus FAL\r\n" );
-            iStatus = ERROR;
-        }
+		/* Init the SMBus FAL */
+		if (FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Init(&mySMBusIf)) {
+			PLL_DBG(FAL_PROFILE_NAME, "SMBus FAL initialised OK\r\n");
+			*pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_INITIALISED;
+		} else {
+			PLL_ERR(FAL_PROFILE_NAME, "Error initialising SMBus FAL\r\n");
+			iStatus = ERROR;
+		}
 
-        if( AMC_CFG_MUXED_DEVICE_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ) )
-        {
-            if( 0 != MAX_NUM_EXTERNAL_DEVICES )
-            {
-                if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create( &xQsfpIf1, &xQsfpCfg1 ) )
-                {
-                    PLL_DBG( FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n" );
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n" );
-                    iStatus            = ERROR;
-                    iMuxedDeviceStatus = ERROR;
-                }
+		if (AMC_CFG_MUXED_DEVICE_FAL_INITIALISED ==
+			(*pullAmcInitStatus & AMC_CFG_MUXED_DEVICE_FAL_INITIALISED)) {
+			if (0 != MAX_NUM_EXTERNAL_DEVICES) {
+				if (FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create(&xQsfpIf1, &xQsfpCfg1)) {
+					PLL_DBG(FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n");
+				} else {
+					PLL_ERR(FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n");
+					iStatus            = ERROR;
+					iMuxedDeviceStatus = ERROR;
+				}
 
-                if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create( &xQsfpIf2, &xQsfpCfg2 ) )
-                {
-                    PLL_DBG( FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n" );
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n" );
-                    iStatus            = ERROR;
-                    iMuxedDeviceStatus = ERROR;
-                }
+				if (FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create(&xQsfpIf2, &xQsfpCfg2)) {
+					PLL_DBG(FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n");
+				} else {
+					PLL_ERR(FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n");
+					iStatus            = ERROR;
+					iMuxedDeviceStatus = ERROR;
+				}
 
-                if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create( &xQsfpIf3, &xQsfpCfg3 ) )
-                {
-                    PLL_DBG( FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n" );
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n" );
-                    iStatus            = ERROR;
-                    iMuxedDeviceStatus = ERROR;
-                }
+				if (FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create(&xQsfpIf3, &xQsfpCfg3)) {
+					PLL_DBG(FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n");
+				} else {
+					PLL_ERR(FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n");
+					iStatus            = ERROR;
+					iMuxedDeviceStatus = ERROR;
+				}
 
-                if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create( &xQsfpIf4, &xQsfpCfg4 ) )
-                {
-                    PLL_DBG( FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n" );
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n" );
-                    iStatus            = ERROR;
-                    iMuxedDeviceStatus = ERROR;
-                }
+				if (FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create(&xQsfpIf4, &xQsfpCfg4)) {
+					PLL_DBG(FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n");
+				} else {
+					PLL_ERR(FAL_PROFILE_NAME, "Error creating QSFP FAL handle\r\n");
+					iStatus            = ERROR;
+					iMuxedDeviceStatus = ERROR;
+				}
 
-                if( FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create( &xDimmIf, &xDimmCfg ) )
-                {
-                    PLL_DBG( FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n" );
-                }
-                else
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error creating DIMM FAL handle\r\n" );
-                    iStatus            = ERROR;
-                    iMuxedDeviceStatus = ERROR;
-                }
+				if (FW_IF_ERRORS_NONE == ulFW_IF_MUXED_DEVICE_Create(&xDimmIf, &xDimmCfg)) {
+					PLL_DBG(FAL_PROFILE_NAME, "ulFW_IF_MUXED_DEVICE_Create created OK\r\n");
+				} else {
+					PLL_ERR(FAL_PROFILE_NAME, "Error creating DIMM FAL handle\r\n");
+					iStatus            = ERROR;
+					iMuxedDeviceStatus = ERROR;
+				}
 
-                if( OK == iMuxedDeviceStatus )
-                {
-                    *pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_CREATED;
-                }
-            }
-            else
-            {
-                *pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_CREATED;
-            }
-        }
+				if (OK == iMuxedDeviceStatus) {
+					*pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_CREATED;
+				}
+			} else {
+				*pullAmcInitStatus |= AMC_CFG_MUXED_DEVICE_FAL_CREATED;
+			}
+		}
 
-        /* Create instance of the sGCQ based on the global configuration */
-        if( AMC_CFG_GCQ_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED ) )
-        {
-            if( FW_IF_ERRORS_NONE == ulFW_IF_GCQ_Create( &xGcqIf, &xGcqCfg ) )
-            {
-                PLL_DBG( FAL_PROFILE_NAME, "sGCQ created OK\r\n" );
-                *pullAmcInitStatus |= AMC_CFG_GCQ_FAL_CREATED;
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error creating sGCQ\r\n" );
-                iStatus = ERROR;
-            }
-        }
+		/* Create instance of the sGCQ based on the global configuration */
+		if (AMC_CFG_GCQ_FAL_INITIALISED == (*pullAmcInitStatus & AMC_CFG_GCQ_FAL_INITIALISED)) {
+			if (FW_IF_ERRORS_NONE == ulFW_IF_GCQ_Create(&xGcqIf, &xGcqCfg)) {
+				PLL_DBG(FAL_PROFILE_NAME, "sGCQ created OK\r\n");
+				*pullAmcInitStatus |= AMC_CFG_GCQ_FAL_CREATED;
+			} else {
+				PLL_ERR(FAL_PROFILE_NAME, "Error creating sGCQ\r\n");
+				iStatus = ERROR;
+			}
+		}
 
-        /* Create instance of the OSPI based on the global configuration */
-        if( AMC_CFG_OSPI_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED ) )
-        {
-            if( FW_IF_ERRORS_NONE == ulFW_IF_OSPI_Create( &xOspiIf, &xOspiCfg ) )
-            {
-                PLL_DBG( FAL_PROFILE_NAME, "OSPI created OK\r\n" );
-                *pullAmcInitStatus |= AMC_CFG_OSPI_FAL_CREATED;
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error creating OSPI\r\n" );
-                iStatus = ERROR;
-            }
-        }
+		/* Create instance of the OSPI based on the global configuration */
+		if (AMC_CFG_OSPI_FAL_INITIALISED == (*pullAmcInitStatus & AMC_CFG_OSPI_FAL_INITIALISED)) {
+			if (FW_IF_ERRORS_NONE == ulFW_IF_OSPI_Create(&xOspiIf, &xOspiCfg)) {
+				PLL_DBG(FAL_PROFILE_NAME, "OSPI created OK\r\n");
+				*pullAmcInitStatus |= AMC_CFG_OSPI_FAL_CREATED;
+			} else {
+				PLL_ERR(FAL_PROFILE_NAME, "Error creating OSPI\r\n");
+				iStatus = ERROR;
+			}
+		}
 
-        /* Create instance of the eMMC based on the global configuration */
-        if( AMC_CFG_EMMC_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED ) )
-        {
-            if( FW_IF_ERRORS_NONE == ulFW_IF_EMMC_Create( &xEmmcIf, &xEmmcCfg ) )
-            {
-                PLL_DBG( FAL_PROFILE_NAME, "eMMC created OK\r\n" );
-                *pullAmcInitStatus |= AMC_CFG_EMMC_FAL_CREATED;
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error creating eMMC\r\n" );
-                iStatus = ERROR;
-            }
-        }
+		/* Create instance of the eMMC based on the global configuration */
+		if (AMC_CFG_EMMC_FAL_INITIALISED == (*pullAmcInitStatus & AMC_CFG_EMMC_FAL_INITIALISED)) {
+			if (FW_IF_ERRORS_NONE == ulFW_IF_EMMC_Create(&xEmmcIf, &xEmmcCfg)) {
+				PLL_DBG(FAL_PROFILE_NAME, "eMMC created OK\r\n");
+				*pullAmcInitStatus |= AMC_CFG_EMMC_FAL_CREATED;
+			} else {
+				PLL_ERR(FAL_PROFILE_NAME, "Error creating eMMC\r\n");
+				iStatus = ERROR;
+			}
+		}
 
-        /* Get UUID */
-        if( AMC_CFG_EEPROM_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_EEPROM_INITIALISED ) )
-        {
-            /* If EEPROM is ok use the UUID from it */
-            if( OK == iEEPROM_GetUuid( pucUuid, &ucUuidSize ) )
-            {
-                if( FW_IF_SMBUS_UDID_LEN != ucUuidSize )
-                {
-                    PLL_ERR( FAL_PROFILE_NAME, "Error UUID size incorrect\n\r" );
-                    iStatus = ERROR;
-                }
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error getting UUID\r\n" );
-                iStatus = ERROR;
-            }
-        }
+		/* Get UUID */
+		if (AMC_CFG_EEPROM_INITIALISED == (*pullAmcInitStatus & AMC_CFG_EEPROM_INITIALISED)) {
+			/* If EEPROM is ok use the UUID from it */
+			if (OK == iEEPROM_GetUuid(pucUuid, &ucUuidSize)) {
+				if (FW_IF_SMBUS_UDID_LEN != ucUuidSize) {
+					PLL_ERR(FAL_PROFILE_NAME, "Error UUID size incorrect\n\r");
+					iStatus = ERROR;
+				}
+			} else {
+				PLL_ERR(FAL_PROFILE_NAME, "Error getting UUID\r\n");
+				iStatus = ERROR;
+			}
+		}
 
-        /* Lets use the UUID in place of the UDID for a unique identifier */
-        pvOSAL_MemCpy( &( xSMBusCfg.pucUdid[ 0 ] ), pucUuid, FW_IF_SMBUS_UDID_LEN );
+		/* Lets use the UUID in place of the UDID for a unique identifier */
+		pvOSAL_MemCpy(&(xSMBusCfg.pucUdid[0]), pucUuid, FW_IF_SMBUS_UDID_LEN);
 
-        if( AMC_CFG_SMBUS_FAL_INITIALISED == ( *pullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED ) )
-        {
-            /* Create instance of the SMBus based on the global configuration */
-            if( FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Create( &xSMBusIf, &xSMBusCfg ) )
-            {
-                PLL_DBG( FAL_PROFILE_NAME, "SMBus created OK\r\n" );
-                *pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_CREATED;
-            }
-            else
-            {
-                PLL_ERR( FAL_PROFILE_NAME, "Error creating SMBus\r\n" );
-                iStatus = ERROR;
-            }
-        }
-    }
-    else
-    {
-        iStatus = ERROR;
-    }
+		if (AMC_CFG_SMBUS_FAL_INITIALISED == (*pullAmcInitStatus & AMC_CFG_SMBUS_FAL_INITIALISED)) {
+			/* Create instance of the SMBus based on the global configuration */
+			if (FW_IF_ERRORS_NONE == ulFW_IF_SMBUS_Create(&xSMBusIf, &xSMBusCfg)) {
+				PLL_DBG(FAL_PROFILE_NAME, "SMBus created OK\r\n");
+				*pullAmcInitStatus |= AMC_CFG_SMBUS_FAL_CREATED;
+			} else {
+				PLL_ERR(FAL_PROFILE_NAME, "Error creating SMBus\r\n");
+				iStatus = ERROR;
+			}
+		}
+	} else {
+		iStatus = ERROR;
+	}
 
-    return iStatus;
-
+	return iStatus;
 }
 
 /**
  * @brief   Initialise FAL Debug monitoring
  */
-void vFAL_DebugInitialise( void )
+void vFAL_DebugInitialise(void)
 {
 #ifdef DEBUG_BUILD
-    /* FALs */
-    static DAL_HDL pxFwIfTop = NULL;
-    pxFwIfTop = pxDAL_NewDirectory( "fw_if" );
+	/* FALs */
+	static DAL_HDL pxFwIfTop = NULL;
+	pxFwIfTop                = pxDAL_NewDirectory("fw_if");
 
-    vFW_IF_GCQ_DebugInit( pxFwIfTop );
-    vFW_IF_OSPI_DebugInit( pxFwIfTop );
-    vFW_IF_EMMC_DebugInit( pxFwIfTop );
+	vFW_IF_GCQ_DebugInit(pxFwIfTop);
+	vFW_IF_OSPI_DebugInit(pxFwIfTop);
+	vFW_IF_EMMC_DebugInit(pxFwIfTop);
 
-    if( 0 != MAX_NUM_EXTERNAL_DEVICES )
-    {
-        vFW_IF_MUXED_DEVICE_DebugInit( pxFwIfTop );
-    }
+	if (0 != MAX_NUM_EXTERNAL_DEVICES) {
+		vFW_IF_MUXED_DEVICE_DebugInit(pxFwIfTop);
+	}
 
-    vFW_IF_SMBUS_DebugInit( pxFwIfTop );
+	vFW_IF_SMBUS_DebugInit(pxFwIfTop);
 #endif /* DEBUG_BUILD */
 }

@@ -16,12 +16,12 @@
 #include "xloader_client.h"
 
 /* PDI Load on Power-up Configuration */
-#define USER_PDI_POWERUP_BOOT_DEVICE   ( 0 ) /* 0 = Primary (OSPI), 1 = Secondary */
-#define USER_PDI_POWERUP_PARTITION     ( 2 )
-#define USER_PDI_POWERUP_FLAG          ( 1 << 0 )    /* User PDI power on load flag */
-#define USER_PDI_POWERUP_NOT_LOADED    ( 0x0 << 16 ) /* Power on load user partition not loaded */
-#define USER_PDI_POWERUP_LOADED        ( 0x1 << 16 ) /* Power on load user partition loaded */
-#define USER_PDI_POWERUP_ERROR         ( 0x2 << 16 ) /* Power on load user partition error */
+#define USER_PDI_POWERUP_BOOT_DEVICE (0) /* 0 = Primary (OSPI), 1 = Secondary */
+#define USER_PDI_POWERUP_PARTITION   (2)
+#define USER_PDI_POWERUP_FLAG        (1 << 0)    /* User PDI power on load flag */
+#define USER_PDI_POWERUP_NOT_LOADED  (0x0 << 16) /* Power on load user partition not loaded */
+#define USER_PDI_POWERUP_LOADED      (0x1 << 16) /* Power on load user partition loaded */
+#define USER_PDI_POWERUP_ERROR       (0x2 << 16) /* Power on load user partition error */
 
 /******************************************************************************/
 /* Enums                                                                      */
@@ -31,27 +31,26 @@
  * @enum    APC_PROXY_DRIVER_EVENTS
  * @brief   Events raised by this proxy driver
  */
-typedef enum
-{
-    APC_PROXY_DRIVER_E_DOWNLOAD_STARTED   = 0,
-    APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE  = 1,
-    APC_PROXY_DRIVER_E_DOWNLOAD_BUSY      = 2,
-    APC_PROXY_DRIVER_E_DOWNLOAD_FAILED    = 3,
-    APC_PROXY_DRIVER_E_FPT_UPDATE         = 4,
-    APC_PROXY_DRIVER_E_COPY_STARTED       = 5,
-    APC_PROXY_DRIVER_E_COPY_COMPLETE      = 6,
-    APC_PROXY_DRIVER_E_COPY_BUSY          = 7,
-    APC_PROXY_DRIVER_E_COPY_FAILED        = 8,
-    APC_PROXY_DRIVER_E_PARTITION_SELECTED = 9,
-    APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED = 10,
-    APC_PROXY_DRIVER_E_FPT_FLAGS_UPDATED  = 11,
-    APC_PROXY_DRIVER_E_PROGRAM_STARTED    = 12,
-    APC_PROXY_DRIVER_E_PROGRAM_COMPLETE   = 13,
-    APC_PROXY_DRIVER_E_PROGRAM_BUSY       = 14,
-    APC_PROXY_DRIVER_E_PROGRAM_FAILED     = 15,
-    APC_PROXY_DRIVER_E_POR_TRIGGERED      = 16,
-    APC_PROXY_DRIVER_E_POR_FAILED         = 17,
-    MAX_APC_PROXY_DRIVER_EVENTS
+typedef enum {
+	APC_PROXY_DRIVER_E_DOWNLOAD_STARTED           = 0,
+	APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE          = 1,
+	APC_PROXY_DRIVER_E_DOWNLOAD_BUSY              = 2,
+	APC_PROXY_DRIVER_E_DOWNLOAD_FAILED            = 3,
+	APC_PROXY_DRIVER_E_FPT_UPDATE                 = 4,
+	APC_PROXY_DRIVER_E_COPY_STARTED               = 5,
+	APC_PROXY_DRIVER_E_COPY_COMPLETE              = 6,
+	APC_PROXY_DRIVER_E_COPY_BUSY                  = 7,
+	APC_PROXY_DRIVER_E_COPY_FAILED                = 8,
+	APC_PROXY_DRIVER_E_PARTITION_SELECTED         = 9,
+	APC_PROXY_DRIVER_E_PARTITION_SELECTION_FAILED = 10,
+	APC_PROXY_DRIVER_E_FPT_FLAGS_UPDATED          = 11,
+	APC_PROXY_DRIVER_E_PROGRAM_STARTED            = 12,
+	APC_PROXY_DRIVER_E_PROGRAM_COMPLETE           = 13,
+	APC_PROXY_DRIVER_E_PROGRAM_BUSY               = 14,
+	APC_PROXY_DRIVER_E_PROGRAM_FAILED             = 15,
+	APC_PROXY_DRIVER_E_POR_TRIGGERED              = 16,
+	APC_PROXY_DRIVER_E_POR_FAILED                 = 17,
+	MAX_APC_PROXY_DRIVER_EVENTS
 
 } APC_PROXY_DRIVER_EVENTS;
 
@@ -59,12 +58,11 @@ typedef enum
  * @enum    APC_BOOT_DEVICES
  * @brief   Enumeration of boot devices available
  */
-typedef enum
-{
-    APC_BOOT_DEVICE_PRIMARY = 0,
-    APC_BOOT_DEVICE_SECONDARY,
+typedef enum {
+	APC_BOOT_DEVICE_PRIMARY = 0,
+	APC_BOOT_DEVICE_SECONDARY,
 
-    MAX_APC_BOOT_DEVICES
+	MAX_APC_BOOT_DEVICES
 
 } APC_BOOT_DEVICES;
 
@@ -72,8 +70,7 @@ typedef enum
  * @enum    APC_FPT_TYPE
  * @brief   FPT partition types
  */
-typedef enum
-{
+typedef enum {
 	APC_FPT_TYPE_FPT             = 0xFFFF,
 	APC_FPT_TYPE_RECOVERY_FPT    = 0xFFFE,
 	APC_FPT_TYPE_EXTENSION_FPT   = 0xFFFD,
@@ -98,13 +95,12 @@ typedef enum
  * @struct  APCProxyDriverFptHeader
  * @brief   Structure to hold the FPT Header
  */
-typedef struct
-{
-    uint32_t    ulMagicNum;
-    uint8_t     ucFptVersion;
-    uint8_t     ucFptHeaderSize;
-    uint8_t     ucEntrySize;
-    uint8_t     ucNumEntries;
+typedef struct {
+	uint32_t ulMagicNum;
+	uint8_t ucFptVersion;
+	uint8_t ucFptHeaderSize;
+	uint8_t ucEntrySize;
+	uint8_t ucNumEntries;
 
 } APCProxyDriverFptHeader;
 
@@ -112,30 +108,29 @@ typedef struct
  * @struct  APCProxyDriverFptPartition
  * @brief   Structure to hold a single FPT partition
  */
-typedef struct
-{
-    uint32_t    ulPartitionType;
-    uint32_t    ulPartitionBaseAddr;
-    uint32_t    ulPartitionSize;
-    uint8_t     pdi_md5[MD5_SIZE];
-    uint32_t    ulPdiSize;
-    union {
-        uint32_t ulPartitionFlags;     /* User defined flags */
-        struct {
-            uint32_t powerup_flag:1;    /* Power on load user partition flag
-                                           0: Disabled, 1: Enabled */
-            uint32_t reserved1:15;      /* Reserved for future use */
-            uint32_t powerup_error:2;   /* Power on load user partition error flag
-                                           0: Not Loaded, 1: Loaded, 2: Error */
-            uint32_t reserved2:14;      /* Reserved for future use */
-        } user;
-    };
+typedef struct {
+	uint32_t ulPartitionType;
+	uint32_t ulPartitionBaseAddr;
+	uint32_t ulPartitionSize;
+	uint8_t pdi_md5[MD5_SIZE];
+	uint32_t ulPdiSize;
+	union {
+		uint32_t ulPartitionFlags; /* User defined flags */
+		struct {
+			uint32_t powerup_flag : 1;  /* Power on load user partition flag
+			                               0: Disabled, 1: Enabled */
+			uint32_t reserved1 : 15;    /* Reserved for future use */
+			uint32_t powerup_error : 2; /* Power on load user partition error flag
+			                               0: Not Loaded, 1: Loaded, 2: Error */
+			uint32_t reserved2 : 14;    /* Reserved for future use */
+		} user;
+	};
 
 } APCProxyDriverFptPartition;
 
 typedef struct AMIProxyPdiDownloadRequest AMIProxyPdiDownloadRequest;
 
-extern uint32_t ulUserPdiLoadStatus;    /* User PDI power on load status 0: Success */
+extern uint32_t ulUserPdiLoadStatus; /* User PDI power on load status 0: Success */
 
 /******************************************************************************/
 /* Function declarations                                                      */
@@ -158,11 +153,12 @@ extern uint32_t ulUserPdiLoadStatus;    /* User PDI power on load status 0: Succ
  *          the secondary Firmware Interface handle however is optional
  *          and can be set to NULL.
  */
-int iAPC_Initialise( uint8_t ucProxyId,
-                     FWIfCfg *pxPrimaryFwIf,
-                     FWIfCfg *pxSecondaryFwIf,
-                     XLoader_ClientInstance *pXLoaderInst,
-                     uint32_t ulTaskPrio, uint32_t ulTaskStack );
+int iAPC_Initialise(uint8_t ucProxyId,
+	FWIfCfg* pxPrimaryFwIf,
+	FWIfCfg* pxSecondaryFwIf,
+	XLoader_ClientInstance* pXLoaderInst,
+	uint32_t ulTaskPrio,
+	uint32_t ulTaskStack);
 
 /**
  * iAPC_BindCallback() - Bind into this proxy driver
@@ -172,7 +168,7 @@ int iAPC_Initialise( uint8_t ucProxyId,
  * @return  OK       Callback successfully bound
  *          ERROR    Callback not bound
  */
-int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
+int iAPC_BindCallback(EVL_CALLBACK* pxCallback);
 
 /**
  * iAPC_DownloadImage() - Download an image to a location in NV memory
@@ -191,16 +187,16 @@ int iAPC_BindCallback( EVL_CALLBACK *pxCallback );
  * @return  OK    Image downloaded successfully
  *          ERROR Image not downloaded successfully
  */
-int iAPC_DownloadImage( EVLSignal *pxSignal,
-                        APC_BOOT_DEVICES xBootDevice,
-                        int iPartition,
-                        uint32_t ulSrcAddr,
-                        uint32_t ulImageSize,
-                        uint16_t usPacketNum,
-                        uint32_t ulPacketSize,
-                        uint8_t *pucPdiMd5,
-                        uint32_t ulPdiSize,
-                        int iLastPacket );
+int iAPC_DownloadImage(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	uint32_t ulSrcAddr,
+	uint32_t ulImageSize,
+	uint16_t usPacketNum,
+	uint32_t ulPacketSize,
+	uint8_t* pucPdiMd5,
+	uint32_t ulPdiSize,
+	int iLastPacket);
 
 /**
  * iAPC_UpdateFpt() - Download an image with an FPT to a location in NV memory
@@ -216,13 +212,13 @@ int iAPC_DownloadImage( EVLSignal *pxSignal,
  * @return  OK    Image downloaded successfully
  *          ERROR Image not downloaded successfully
  */
-int iAPC_UpdateFpt( EVLSignal *pxSignal,
-                    APC_BOOT_DEVICES xBootDevice,
-                    uint32_t ulSrcAddr,
-                    uint32_t ulImageSize,
-                    uint16_t usPacketNum,
-                    uint32_t ulPacketSize,
-                    int iLastPacket );
+int iAPC_UpdateFpt(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	uint32_t ulSrcAddr,
+	uint32_t ulImageSize,
+	uint16_t usPacketNum,
+	uint32_t ulPacketSize,
+	int iLastPacket);
 
 /**
  * iAPC_CopyImage() - Copy an image from one partition to another
@@ -238,13 +234,13 @@ int iAPC_UpdateFpt( EVLSignal *pxSignal,
  * @return  OK       Image copied successfully
  *          ERROR    Image not copied successfully
  */
-int iAPC_CopyImage( EVLSignal *pxSignal,
-                    APC_BOOT_DEVICES xSrcBootDevice,
-                    int iSrcPartition,
-                    APC_BOOT_DEVICES xDestBootDevice,
-                    int iDestPartition,
-                    uint32_t ulCpyAddr,
-                    uint32_t ulAllocatedSize );
+int iAPC_CopyImage(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xSrcBootDevice,
+	int iSrcPartition,
+	APC_BOOT_DEVICES xDestBootDevice,
+	int iDestPartition,
+	uint32_t ulCpyAddr,
+	uint32_t ulAllocatedSize);
 
 /**
  * iAPC_PdiProgram() - Program PDI image to a location in memory
@@ -256,9 +252,9 @@ int iAPC_CopyImage( EVLSignal *pxSignal,
  * @return  OK    PDI programmed successfully
  *          ERROR PDI programming failed
  */
-int iAPC_PdiProgram( EVLSignal *pxSignal,
-                     const AMIProxyPdiDownloadRequest *pxDownloadRequest,
-                     uint32_t ulSrcAddr );
+int iAPC_PdiProgram(EVLSignal* pxSignal,
+	const AMIProxyPdiDownloadRequest* pxDownloadRequest,
+	uint32_t ulSrcAddr);
 
 /**
  * iAPC_SetNextPartition() - Select which partition (from primary boot device) to boot from
@@ -269,7 +265,7 @@ int iAPC_PdiProgram( EVLSignal *pxSignal,
  * @return  OK    Partition successfully selected
  *          ERROR Partition not selected
  */
-int iAPC_SetNextPartition( EVLSignal *pxSignal, int iPartition );
+int iAPC_SetNextPartition(EVLSignal* pxSignal, int iPartition);
 
 /**
  * iAPC_TriggerSystemPOR() - Trigger a system Power-On Reset via XilPM
@@ -279,7 +275,7 @@ int iAPC_SetNextPartition( EVLSignal *pxSignal, int iPartition );
  * @return  OK    POR request successfully posted
  *          ERROR POR request not posted
  */
-int iAPC_TriggerSystemPOR( EVLSignal *pxSignal );
+int iAPC_TriggerSystemPOR(EVLSignal* pxSignal);
 
 /**
  * iAPC_GetFptHeader() - Get the Flash Partition Table (FPT) Header
@@ -291,8 +287,7 @@ int iAPC_TriggerSystemPOR( EVLSignal *pxSignal );
  *          ERROR FPT header not retrieved successfully
  *
  */
-int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice,
-    APCProxyDriverFptHeader *pxFptHeader );
+int iAPC_GetFptHeader(APC_BOOT_DEVICES xBootDevice, APCProxyDriverFptHeader* pxFptHeader);
 
 /**
  * iAPC_GetFptPartition() - Get a Flash Partition Table (FPT) Partition
@@ -304,8 +299,9 @@ int iAPC_GetFptHeader( APC_BOOT_DEVICES xBootDevice,
  * @return  OK      FPT partition retrieved successfully
  *          ERROR   FPT partition not retrieved successfully
  */
-int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
-    APCProxyDriverFptPartition *pxFptPartition );
+int iAPC_GetFptPartition(APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	APCProxyDriverFptPartition* pxFptPartition);
 
 /**
  * iAPC_SetFptPartitionFlags() - Set/Update the flags of a Flash Partition Table (FPT) Partition
@@ -321,10 +317,10 @@ int iAPC_GetFptPartition( APC_BOOT_DEVICES xBootDevice, int iPartition,
  * @note    This function updates the partition flags in both the cached copy
  *          and the flash storage
  */
-int iAPC_SetFptPartitionFlags( EVLSignal *pxSignal,
-                               APC_BOOT_DEVICES xBootDevice,
-                               int iPartition,
-                               uint32_t ulFlags );
+int iAPC_SetFptPartitionFlags(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	uint32_t ulFlags);
 
 /**
  * iAPC_SetFptPartition() - Set/Update an FPT Partition entry
@@ -342,12 +338,12 @@ int iAPC_SetFptPartitionFlags( EVLSignal *pxSignal,
  * @note    This function updates the partition in both the cached copy
  *          and the flash storage
  */
-int iAPC_SetFptPartition( EVLSignal *pxSignal,
-                          APC_BOOT_DEVICES xBootDevice,
-                          int iPartition,
-                          uint8_t *pucPdiMd5,
-                          uint32_t ulPdiSize,
-                          uint32_t ulFlags );
+int iAPC_SetFptPartition(EVLSignal* pxSignal,
+	APC_BOOT_DEVICES xBootDevice,
+	int iPartition,
+	uint8_t* pucPdiMd5,
+	uint32_t ulPdiSize,
+	uint32_t ulFlags);
 
 /**
  * iAPC_ReadFlashRaw() - Read raw bytes from flash
@@ -360,10 +356,10 @@ int iAPC_SetFptPartition( EVLSignal *pxSignal,
  * @return  OK      Data read successfully
  *          ERROR   Data not read successfully
  */
-int iAPC_ReadFlashRaw( APC_BOOT_DEVICES xBootDevice,
-                       uint32_t ulOffset,
-                       uint8_t *pucBuffer,
-                       uint32_t ulLength );
+int iAPC_ReadFlashRaw(APC_BOOT_DEVICES xBootDevice,
+	uint32_t ulOffset,
+	uint8_t* pucBuffer,
+	uint32_t ulLength);
 
 /**
  * iAPC_PrintStatistics() - Print all the stats gathered by the proxy driver
@@ -372,7 +368,7 @@ int iAPC_ReadFlashRaw( APC_BOOT_DEVICES xBootDevice,
  *          ERROR Stats not retrieved successfully
  *
  */
-int iAPC_PrintStatistics( void );
+int iAPC_PrintStatistics(void);
 
 /**
  * iAPC_ClearStatistics() - Clear all the stats in the proxy driver
@@ -380,7 +376,7 @@ int iAPC_PrintStatistics( void );
  * @return  OK    Stats cleared successfully
  *          ERROR Stats not cleared successfully
  */
-int iAPC_ClearStatistics( void );
+int iAPC_ClearStatistics(void);
 
 /**
  * iAPC_GetState() - Gets the current state of the proxy driver
@@ -390,6 +386,6 @@ int iAPC_ClearStatistics( void );
  * @return  OK    If successful
  *          ERROR If not successful
  */
-int iAPC_GetState( MODULE_STATE *pxState );
+int iAPC_GetState(MODULE_STATE* pxState);
 
 #endif /* _APC_PROXY_DRIVER_H_ */
