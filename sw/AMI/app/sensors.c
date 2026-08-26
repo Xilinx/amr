@@ -97,7 +97,7 @@ static int parse_extra(struct app_option *options, int *extra)
 
 	while (opt) {
 		if (opt->val == 'x') {
-			str = (char*)malloc(strlen(opt->arg));
+			str = (char*)malloc(strlen(opt->arg) + 1);
 
 			if (!str) {
 				ret = EXIT_FAILURE;
@@ -811,7 +811,7 @@ static int populate_sensor_values(ami_device *dev, void *values,
 		if (!sensors)
 			return EXIT_FAILURE;
 
-		strcpy(sensors->name, sensor_data->sensor);
+		snprintf(sensors->name, sizeof(sensors->name), "%s", sensor_data->sensor);
 		sensors->next = NULL;
 		n_groups = 1;
 	} else {

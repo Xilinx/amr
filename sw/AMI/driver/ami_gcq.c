@@ -344,7 +344,7 @@ static inline bool gcq_can_consume(const GCQInstance *pxGCQInstance,
 {
 	bool ulStatus = false;
 
-	if ((NULL != pxGCQInstance) ||
+	if ((NULL != pxGCQInstance) &&
 		(NULL != pxRing))
 	{
 		/* Check for errors */
@@ -638,7 +638,8 @@ static GCQ_ERRORS_TYPE xGCQConsumeData(GCQInstance *pxGCQInstance,
 			xStatus = GCQ_ERRORS_INVALID_ARG;
 		}
 
-		if (ulDataLen > pxGCQInstance->ulConsumerSlotSize) {
+		if ((NULL != pxGCQInstance) &&
+			(ulDataLen > pxGCQInstance->ulConsumerSlotSize)) {
 			GCQ_DEBUG(" Error: length 0x%x specified is larger than slot configured\r\n", ulDataLen);
 			xStatus = GCQ_ERRORS_INVALID_ARG;
 		}
@@ -708,7 +709,8 @@ static GCQ_ERRORS_TYPE gcq_produce_data(GCQInstance *pxGCQInstance,
 			xStatus = GCQ_ERRORS_INVALID_ARG;
 		}
 
-		if (ulDataLen > pxGCQInstance->ulProducerSlotSize) {
+		if ((NULL != pxGCQInstance) &&
+			(ulDataLen > pxGCQInstance->ulProducerSlotSize)) {
 			GCQ_DEBUG(" Error: length 0x%x specified is larger than slot configured\r\n", ulDataLen);
 			xStatus = GCQ_ERRORS_INVALID_ARG;
 		}

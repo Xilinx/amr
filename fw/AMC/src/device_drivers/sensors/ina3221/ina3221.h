@@ -30,7 +30,10 @@
  *          ERROR          Voltage not read successfully
  *
  */
-int iINA3221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfVoltageInMV );
+int iINA3221_ReadVoltage(uint8_t ucBusNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucChannelNum,
+	float* pfVoltageInMV);
 
 /**
  * @brief   Read current using INA3221 sensor
@@ -44,7 +47,10 @@ int iINA3221_ReadVoltage( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChann
  *          ERROR          Current not read successfully
  *
  */
-int iINA3221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfCurrentInmA );
+int iINA3221_ReadCurrent(uint8_t ucBusNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucChannelNum,
+	float* pfCurrentInmA);
 
 /**
  * @brief   Calculate power using INA3221 voltage and current reads
@@ -58,7 +64,10 @@ int iINA3221_ReadCurrent( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChann
  *          ERROR         Power not read successfully
  *
  */
-int iINA3221_ReadPower( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfPowerInmW );
+int iINA3221_ReadPower(uint8_t ucBusNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucChannelNum,
+	float* pfPowerInmW);
 
 /**
  * @brief   Print all the stats gathered by the driver
@@ -67,7 +76,7 @@ int iINA3221_ReadPower( uint8_t ucBusNum, uint8_t ucSlaveAddr, uint8_t ucChannel
  *          ERROR               Stats not retrieved successfully
  *
  */
-int iINA3221_PrintStatistics( void );
+int iINA3221_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the driver
@@ -76,6 +85,6 @@ int iINA3221_PrintStatistics( void );
  *          ERROR               Stats not cleared successfully
  *
  */
-int iINA3221_ClearStatistics( void );
+int iINA3221_ClearStatistics(void);
 
 #endif /* _INA3221_H_ */

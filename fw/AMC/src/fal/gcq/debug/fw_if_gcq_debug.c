@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the sGCQ debug implementation.
@@ -21,14 +21,14 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define FW_IF_GCQ_DBG_NAME        "FW_IF_GCQ_DBG"
+#define FW_IF_GCQ_DBG_NAME "FW_IF_GCQ_DBG"
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static int iIsInitialised = FALSE;
+static int iIsInitialised   = FALSE;
 static DAL_HDL pxFwIfGcqTop = NULL;
 
 
@@ -39,12 +39,12 @@ static DAL_HDL pxFwIfGcqTop = NULL;
 /**
  * @brief   Debug function to print this module's stats.
  */
-static void vPrintStats( void );
+static void vPrintStats(void);
 
 /**
  * @brief   Debug function to clear this module's stats.
  */
-static void vClearStats( void );
+static void vClearStats(void);
 
 
 /******************************************************************************/
@@ -54,27 +54,22 @@ static void vClearStats( void );
 /**
  * @brief   Initialise the sGCQ debug access.
  */
-void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle )
+void vFW_IF_GCQ_DebugInit(DAL_HDL pxParentHandle)
 {
-    if ( FALSE == iIsInitialised )
-    {
-        if ( NULL == pxParentHandle )
-        {
-            pxFwIfGcqTop = pxDAL_NewDirectory( "fw_if_gcq" );
-        }
-        else
-        {
-            pxFwIfGcqTop = pxDAL_NewSubDirectory( "fw_if_gcq", pxParentHandle );
-        }
+	if (FALSE == iIsInitialised) {
+		if (NULL == pxParentHandle) {
+			pxFwIfGcqTop = pxDAL_NewDirectory("fw_if_gcq");
+		} else {
+			pxFwIfGcqTop = pxDAL_NewSubDirectory("fw_if_gcq", pxParentHandle);
+		}
 
-        if ( NULL != pxFwIfGcqTop )
-        {
-            pxDAL_NewDebugFunction( "print_all_stats", pxFwIfGcqTop, vPrintStats );
-            pxDAL_NewDebugFunction( "clear_all_stats", pxFwIfGcqTop, vClearStats );
-        }
+		if (NULL != pxFwIfGcqTop) {
+			pxDAL_NewDebugFunction("print_all_stats", pxFwIfGcqTop, vPrintStats);
+			pxDAL_NewDebugFunction("clear_all_stats", pxFwIfGcqTop, vClearStats);
+		}
 
-        iIsInitialised = TRUE;
-    }
+		iIsInitialised = TRUE;
+	}
 }
 
 
@@ -85,21 +80,19 @@ void vFW_IF_GCQ_DebugInit( DAL_HDL pxParentHandle )
 /**
  * @brief   Debug function to print this module's stats.
  */
-static void vPrintStats( void )
+static void vPrintStats(void)
 {
-    if ( OK != iFW_IF_GCQ_PrintStatistics() )
-    {
-        PLL_DAL( FW_IF_GCQ_DBG_NAME, "Error printing statistics\r\n" );
-    }
+	if (OK != iFW_IF_GCQ_PrintStatistics()) {
+		PLL_DAL(FW_IF_GCQ_DBG_NAME, "Error printing statistics\r\n");
+	}
 }
 
 /**
  * @brief   Debug function to clear this module's stats.
  */
-static void vClearStats( void )
+static void vClearStats(void)
 {
-    if ( OK != iFW_IF_GCQ_ClearStatistics() )
-    {
-        PLL_DAL( FW_IF_GCQ_DBG_NAME, "Error printing statistics\r\n" );
-    }
+	if (OK != iFW_IF_GCQ_ClearStatistics()) {
+		PLL_DAL(FW_IF_GCQ_DBG_NAME, "Error printing statistics\r\n");
+	}
 }

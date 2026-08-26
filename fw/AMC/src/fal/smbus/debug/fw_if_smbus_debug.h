@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the FW IF SMBUS debug access
@@ -24,7 +24,6 @@
  *
  * @return  N/A
  */
-void vFW_IF_SMBUS_DebugInit( DAL_HDL pxParentHandle );
+void vFW_IF_SMBUS_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _FW_IF_SMBUS_DEBUG_H_ */
-

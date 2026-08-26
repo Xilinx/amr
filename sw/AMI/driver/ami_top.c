@@ -179,8 +179,10 @@ int my_krealloc(void **buf, int old_size, int new_size, gfp_t flags)
 	*buf = NULL;
 
 	*buf = kmalloc(new_size, flags);
-	if (!(*buf))
+	if (!(*buf)) {
+		kfree(tmp);
 		return -ENOMEM;
+	}
 
 	memcpy(*buf, tmp, tmp_size);
 
@@ -784,10 +786,8 @@ static int create_map_str(char **map_str, int *map_str_sz)
 	char *map = NULL;
 	int map_sz = 1;
 
-	if (!map_str || !map_str_sz || (*map_str) || (*map_str_sz != 0)) {
-		ret = -EINVAL;
-		goto fail;
-	}
+	if (!map_str || !map_str_sz || (*map_str) || (*map_str_sz != 0))
+		return -EINVAL;
 
 	map_sz = 1;
 	map = kzalloc(map_sz, GFP_KERNEL);

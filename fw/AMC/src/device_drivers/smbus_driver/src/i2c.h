@@ -16,22 +16,20 @@
 #define _I2C_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stdint.h>
-
 
 
 /******************************************************************************/
 /* defines                                                                    */
 /******************************************************************************/
 
-#define I2C_SUCCESS             (   0 )
-#define I2C_ERROR               (  -1 )
-#define I2C_MAX_BUFFER_LEN      ( 256 )
-#define I2C_READ_DATA_SIZE_MIN  (   1 )
+#define I2C_SUCCESS            (0)
+#define I2C_ERROR              (-1)
+#define I2C_MAX_BUFFER_LEN     (256)
+#define I2C_READ_DATA_SIZE_MIN (1)
 
 
 /*
@@ -53,7 +51,7 @@ typedef struct I2CProfile I2CProfile;
  *
  * @return  void
  */
-typedef void ( *I2C_USER_ENV_GET_DATA_TYPE )( uint8_t* pucData, uint16_t* pusDataSize );
+typedef void (*I2C_USER_ENV_GET_DATA_TYPE)(uint8_t* pucData, uint16_t* pusDataSize);
 
 /*
  * @typedef I2C_USER_ENV_WRITE_DATA_TYPE
@@ -64,7 +62,7 @@ typedef void ( *I2C_USER_ENV_GET_DATA_TYPE )( uint8_t* pucData, uint16_t* pusDat
  *
  * @return  void
  */
-typedef void ( *I2C_USER_ENV_WRITE_DATA_TYPE )( uint8_t* pucData, uint16_t usDataSize );
+typedef void (*I2C_USER_ENV_WRITE_DATA_TYPE)(uint8_t* pucData, uint16_t usDataSize);
 
 /*
  * @typedef I2C_USER_ENV_COMMAND_COMPLETE
@@ -74,7 +72,7 @@ typedef void ( *I2C_USER_ENV_WRITE_DATA_TYPE )( uint8_t* pucData, uint16_t usDat
  *
  * @return  void
  */
-typedef void ( *I2C_USER_ENV_COMMAND_COMPLETE )( uint32_t ulStatus );
+typedef void (*I2C_USER_ENV_COMMAND_COMPLETE)(uint32_t ulStatus);
 
 /*
  * @typedef I2C_USER_SUPPLIED_ENV_BUS_ERROR
@@ -84,7 +82,7 @@ typedef void ( *I2C_USER_ENV_COMMAND_COMPLETE )( uint32_t ulStatus );
  *
  * @return  void
  */
-typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_ERROR )( uint8_t ucError );
+typedef void (*I2C_USER_SUPPLIED_ENV_BUS_ERROR)(uint8_t ucError);
 
 /*
  * @typedef I2C_USER_SUPPLIED_ENV_BUS_WARNING
@@ -95,7 +93,7 @@ typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_ERROR )( uint8_t ucError );
  *
  * @return  void
  */
-typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_WARNING )( uint8_t ucWarning );
+typedef void (*I2C_USER_SUPPLIED_ENV_BUS_WARNING)(uint8_t ucWarning);
 
 /******************************************************************************/
 /* function declarations                                                      */
@@ -119,13 +117,13 @@ typedef void ( *I2C_USER_SUPPLIED_ENV_BUS_WARNING )( uint8_t ucWarning );
  *              See ucCreateSMBusInstance() in smbus.h for more information.
  *              xInitSMBus() must have been successfully called before this.
  */
-uint8_t ucI2CCreateDevice( I2CProfile* pxI2cProfile,
-                           uint8_t ucAddr,
-                           I2C_USER_ENV_GET_DATA_TYPE     pFnGetData,
-                           I2C_USER_ENV_WRITE_DATA_TYPE   pFnWriteData,
-                           I2C_USER_ENV_COMMAND_COMPLETE  pFnAnnounceResult,
-                           I2C_USER_SUPPLIED_ENV_BUS_ERROR         pFnBusError,
-                           I2C_USER_SUPPLIED_ENV_BUS_WARNING       pFnBusWarning );
+uint8_t ucI2CCreateDevice(I2CProfile* pxI2cProfile,
+	uint8_t ucAddr,
+	I2C_USER_ENV_GET_DATA_TYPE pFnGetData,
+	I2C_USER_ENV_WRITE_DATA_TYPE pFnWriteData,
+	I2C_USER_ENV_COMMAND_COMPLETE pFnAnnounceResult,
+	I2C_USER_SUPPLIED_ENV_BUS_ERROR pFnBusError,
+	I2C_USER_SUPPLIED_ENV_BUS_WARNING pFnBusWarning);
 
 
 /*!
@@ -137,8 +135,7 @@ uint8_t ucI2CCreateDevice( I2CProfile* pxI2cProfile,
  *  @return I2C_SUCCESS - the device has been successfully destroyed
  *          I2C_ERROR   - the device has not been destroyed
  */
-uint8_t ucI2CDestroyDevice( I2CProfile* pxI2cProfile,
-                            uint8_t ucDeviceId );
+uint8_t ucI2CDestroyDevice(I2CProfile* pxI2cProfile, uint8_t ucDeviceId);
 
 
 /*!
@@ -154,11 +151,11 @@ uint8_t ucI2CDestroyDevice( I2CProfile* pxI2cProfile,
  *          I2C_ERROR   - an error occurred attempting to write
  *
  */
-uint8_t ucI2CWriteData( I2CProfile* pxI2cProfile,
-                        uint8_t  ucDeviceId,
-                        uint8_t  ucAddr,
-                        uint8_t* pucData,
-                        uint16_t usNumBytes );
+uint8_t ucI2CWriteData(I2CProfile* pxI2cProfile,
+	uint8_t ucDeviceId,
+	uint8_t ucAddr,
+	uint8_t* pucData,
+	uint16_t usNumBytes);
 
 /*!
  *  @brief  Reads data from a remote slave as a master
@@ -173,10 +170,10 @@ uint8_t ucI2CWriteData( I2CProfile* pxI2cProfile,
  *          I2C_ERROR   - an error occurred attempting to read
  *
  */
-uint8_t ucI2CReadData( I2CProfile* pxI2cProfile,
-                       uint8_t   ucDeviceId,
-                       uint8_t   ucAddr,
-                       uint16_t  usNumBytes );
+uint8_t ucI2CReadData(I2CProfile* pxI2cProfile,
+	uint8_t ucDeviceId,
+	uint8_t ucAddr,
+	uint16_t usNumBytes);
 
 /*!
  *  @brief  Writes data to a remote slave as a master and then reads from it
@@ -192,11 +189,11 @@ uint8_t ucI2CReadData( I2CProfile* pxI2cProfile,
  *          I2C_ERROR   - an error occurred attempting to write
  *
  */
-uint8_t ucI2CWriteReadData( I2CProfile* pxI2cProfile,
-                            uint8_t   ucDeviceId,
-                            uint8_t   ucAddr,
-                            uint8_t*  pucWriteData,
-                            uint16_t  usNumWriteBytes,
-                            uint16_t  usNumReadBytes );
+uint8_t ucI2CWriteReadData(I2CProfile* pxI2cProfile,
+	uint8_t ucDeviceId,
+	uint8_t ucAddr,
+	uint8_t* pucWriteData,
+	uint16_t usNumWriteBytes,
+	uint16_t usNumReadBytes);
 
 #endif /* _I2C_H_ */

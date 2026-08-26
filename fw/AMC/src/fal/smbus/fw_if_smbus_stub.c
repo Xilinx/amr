@@ -1,11 +1,11 @@
 /**
-* Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
-* SPDX-License-Identifier: MIT
-*
-* This file contains the FW IF SMBus interface implementation stub.
-*
-* @file fw_if_smbus_stub.c
-*/
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * This file contains the FW IF SMBus interface implementation stub.
+ *
+ * @file fw_if_smbus_stub.c
+ */
 
 #include "profile_hal.h"
 
@@ -24,11 +24,26 @@
 /* defines                                                                   */
 /*****************************************************************************/
 
-#define CHECK_DRIVER            if( FW_IF_FALSE == iInitialised ) return FW_IF_ERRORS_DRIVER_NOT_INITIALISED
-#define CHECK_FIREWALLS( f )    if( ( f->upperFirewall != UPPER_FIREWALL ) &&\
-                                    ( f->lowerFirewall != LOWER_FIREWALL ) ) return FW_IF_ERRORS_INVALID_HANDLE
-#define CHECK_HDL( f )          if( NULL == f ) return FW_IF_ERRORS_INVALID_HANDLE
-#define CHECK_CFG( f )          if( NULL == ( f )->cfg  ) return FW_IF_ERRORS_INVALID_CFG
+#define CHECK_DRIVER                                    \
+	{                                                   \
+		if (FW_IF_FALSE == iInitialised)                \
+			return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; \
+	}
+#define CHECK_FIREWALLS(f)                                                                \
+	{                                                                                     \
+		if ((f->upperFirewall != UPPER_FIREWALL) && (f->lowerFirewall != LOWER_FIREWALL)) \
+			return FW_IF_ERRORS_INVALID_HANDLE;                                           \
+	}
+#define CHECK_HDL(f)                            \
+	{                                           \
+		if (NULL == f)                          \
+			return FW_IF_ERRORS_INVALID_HANDLE; \
+	}
+#define CHECK_CFG(f)                         \
+	{                                        \
+		if (NULL == (f)->cfg)                \
+			return FW_IF_ERRORS_INVALID_CFG; \
+	}
 
 
 /*****************************************************************************/
@@ -49,170 +64,165 @@ static int iInitialised = FW_IF_FALSE;
 /**
  * @brief   Local implementation of FW_IF_open
  */
-static uint32_t ulSmbusOpen( void *pvFwIf )
+static uint32_t ulSmbusOpen(void* pvFwIf)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    CHECK_HDL( pxThisIf );
-    CHECK_CFG( pxThisIf );
-    CHECK_FIREWALLS( pxThisIf );
-    CHECK_DRIVER;
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	CHECK_HDL(pxThisIf);
+	CHECK_CFG(pxThisIf);
+	CHECK_FIREWALLS(pxThisIf);
+	CHECK_DRIVER;
 
-    return status;
+	return status;
 }
 
 /**
  * @brief   Local implementation of FW_IF_close
  */
-static uint32_t ulSmbusClose( void *pvFwIf )
+static uint32_t ulSmbusClose(void* pvFwIf)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    CHECK_HDL( pxThisIf );
-    CHECK_CFG( pxThisIf );
-    CHECK_FIREWALLS( pxThisIf );
-    CHECK_DRIVER;
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	CHECK_HDL(pxThisIf);
+	CHECK_CFG(pxThisIf);
+	CHECK_FIREWALLS(pxThisIf);
+	CHECK_DRIVER;
 
 
-    return status;
+	return status;
 }
 
 
 /**
  * @brief   Local implementation of FW_IF_write
  */
-static uint32_t ulSmbusWrite( void *pvFwIf, uint64_t ullDstPort, uint8_t *pucData, uint32_t ulSize, uint32_t ulTimeoutMs )
+static uint32_t ulSmbusWrite(void* pvFwIf,
+	uint64_t ullDstPort,
+	uint8_t* pucData,
+	uint32_t ulSize,
+	uint32_t ulTimeoutMs)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    CHECK_HDL( pxThisIf );
-    CHECK_CFG( pxThisIf );
-    CHECK_FIREWALLS( pxThisIf );
-    CHECK_DRIVER;
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	CHECK_HDL(pxThisIf);
+	CHECK_CFG(pxThisIf);
+	CHECK_FIREWALLS(pxThisIf);
+	CHECK_DRIVER;
 
-    if( ( NULL != pucData ) && ( FW_IF_SMBUS_MAX_DATA >=ulSize ) )
-    {
+	if ((NULL != pucData) && (FW_IF_SMBUS_MAX_DATA >= ulSize)) {
+		/*
+		 * this is where the SMBus data would be tx'd
+		 *
+		 *  - Controller: initiate a WRITE command
+		 *  - Target    : load the response data
+		 */
 
-        /*
-         * this is where the SMBus data would be tx'd
-         *
-         *  - Controller: initiate a WRITE command
-         *  - Target    : load the response data
-         */
+	} else {
+		status = FW_IF_ERRORS_PARAMS;
+	}
 
-    }
-    else
-    {
-        status = FW_IF_ERRORS_PARAMS;
-    }
-
-    return status;
+	return status;
 }
 
 /**
  * @brief   Local implementation of FW_IF_read
  */
-static uint32_t ulSmbusRead( void *pvFwIf, uint64_t ullSrcPort, uint8_t *pucData, uint32_t *pulSize, uint32_t ulTimeoutMs )
+static uint32_t ulSmbusRead(void* pvFwIf,
+	uint64_t ullSrcPort,
+	uint8_t* pucData,
+	uint32_t* pulSize,
+	uint32_t ulTimeoutMs)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    CHECK_HDL( pxThisIf );
-    CHECK_CFG( pxThisIf );
-    CHECK_FIREWALLS( pxThisIf );
-    CHECK_DRIVER;
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	CHECK_HDL(pxThisIf);
+	CHECK_CFG(pxThisIf);
+	CHECK_FIREWALLS(pxThisIf);
+	CHECK_DRIVER;
 
-    if( ( NULL != pucData ) && ( NULL != pulSize ) && ( FW_IF_SMBUS_MAX_DATA >= *pulSize ) )
-    {
+	if ((NULL != pucData) && (NULL != pulSize) && (FW_IF_SMBUS_MAX_DATA >= *pulSize)) {
+		/*
+		 * this is where the SMBus data would be rx'd
+		 *
+		 *  - Controller: initiate a READ command
+		 *  - Target    : retrieve any unread received data
+		 */
 
-        /*
-         * this is where the SMBus data would be rx'd
-         *
-         *  - Controller: initiate a READ command
-         *  - Target    : retrieve any unread received data
-         */
+	} else {
+		status = FW_IF_ERRORS_PARAMS;
+	}
 
-    }
-    else
-    {
-        status = FW_IF_ERRORS_PARAMS;
-    }
-
-    return status;
+	return status;
 }
 
 /**
  * @brief   Local implementation of FW_IF_ioctrl
  */
-static uint32_t ulSmbusIoctrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
+static uint32_t ulSmbusIoctrl(void* pvFwIf, uint32_t ulOption, void* pvValue)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    CHECK_HDL( pxThisIf );
-    CHECK_CFG( pxThisIf );
-    CHECK_FIREWALLS( pxThisIf );
-    CHECK_DRIVER;
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	CHECK_HDL(pxThisIf);
+	CHECK_CFG(pxThisIf);
+	CHECK_FIREWALLS(pxThisIf);
+	CHECK_DRIVER;
 
-    FWIfSMBusCfg *pxThisSmbusCfg = ( FWIfSMBusCfg* )pxThisIf->cfg;
-
-
-    switch( ulOption )
-    {
-        case FW_IF_COMMON_IOCTRL_FLUSH_TX:
-        case FW_IF_COMMON_IOCTRL_FLUSH_RX:
-            break;
-
-        case FW_IF_COMMON_IOCTRL_GET_RX_MODE:
-            *(uint8_t* )pvValue = myRxMode;
-            break;
-
-        case FW_IF_SMBUS_IOCTRL_SET_CONTROLLER:
-            pxThisSmbusCfg->xRole = FW_IF_SMBUS_ROLE_CONTROLLER;
-            break;
-
-        case FW_IF_SMBUS_IOCTRL_SET_TARGET:
-            pxThisSmbusCfg->xRole = FW_IF_SMBUS_ROLE_TARGET;
-            break;
-
-        default:
-            status = FW_IF_ERRORS_UNRECOGNISED_OPTION;
-            break;
-    }
+	FWIfSMBusCfg* pxThisSmbusCfg = (FWIfSMBusCfg*)pxThisIf->cfg;
 
 
-    return status;
+	switch (ulOption) {
+	case FW_IF_COMMON_IOCTRL_FLUSH_TX:
+	case FW_IF_COMMON_IOCTRL_FLUSH_RX:
+		break;
+
+	case FW_IF_COMMON_IOCTRL_GET_RX_MODE:
+		*(uint8_t*)pvValue = myRxMode;
+		break;
+
+	case FW_IF_SMBUS_IOCTRL_SET_CONTROLLER:
+		pxThisSmbusCfg->xRole = FW_IF_SMBUS_ROLE_CONTROLLER;
+		break;
+
+	case FW_IF_SMBUS_IOCTRL_SET_TARGET:
+		pxThisSmbusCfg->xRole = FW_IF_SMBUS_ROLE_TARGET;
+		break;
+
+	default:
+		status = FW_IF_ERRORS_UNRECOGNISED_OPTION;
+		break;
+	}
+
+
+	return status;
 }
 
 /**
  * @brief   Local implementation of FW_IF_bindCallback
  */
-static uint32_t ulSmbusBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
+static uint32_t ulSmbusBindCallback(void* pvFwIf, FW_IF_callback* pxNewFunc)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    CHECK_HDL( pxThisIf );
-    CHECK_CFG( pxThisIf );
-    CHECK_FIREWALLS( pxThisIf );
-    CHECK_DRIVER;
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	CHECK_HDL(pxThisIf);
+	CHECK_CFG(pxThisIf);
+	CHECK_FIREWALLS(pxThisIf);
+	CHECK_DRIVER;
 
-    if( NULL != pxNewFunc )
-    {
+	if (NULL != pxNewFunc) {
+		pxThisIf->raiseEvent = pxNewFunc;
 
-        pxThisIf->raiseEvent = pxNewFunc;
-
-    }
-    else
-    {
-        status = FW_IF_ERRORS_PARAMS;
-    }
+	} else {
+		status = FW_IF_ERRORS_PARAMS;
+	}
 
 
-    return status;
+	return status;
 }
 
 
@@ -223,99 +233,86 @@ static uint32_t ulSmbusBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
 /**
  * @brief   initialisation function for smbus interfaces (generic across all smbus interfaces)
  */
-uint32_t ulFW_IF_SMBUS_Init( FWIfSMBusInitCfg *pxCfg )
+uint32_t ulFW_IF_SMBUS_Init(FWIfSMBusInitCfg* pxCfg)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    if( FW_IF_FALSE != iInitialised )
-    {
-        status = FW_IF_ERRORS_DRIVER_IN_USE;
-    }
-    else if ( NULL == pxCfg )
-    {
-        status = FW_IF_ERRORS_PARAMS;
-    }
-    else
-    {
-        /*
-         * This is where the SMBus driver would be initialised
-         */
+	if (FW_IF_FALSE != iInitialised) {
+		status = FW_IF_ERRORS_DRIVER_IN_USE;
+	} else if (NULL == pxCfg) {
+		status = FW_IF_ERRORS_PARAMS;
+	} else {
+		/*
+		 * This is where the SMBus driver would be initialised
+		 */
 
-        pvOSAL_MemCpy( &myLocalCfg, pxCfg, sizeof(FWIfSMBusInitCfg) );
-        iInitialised = FW_IF_TRUE;
+		pvOSAL_MemCpy(&myLocalCfg, pxCfg, sizeof(FWIfSMBusInitCfg));
+		iInitialised = FW_IF_TRUE;
+	}
 
-    }
-
-    return status;
+	return status;
 }
 
 /**
  * @brief   opens an instance of the smbus interface
  */
-uint32_t ulFW_IF_SMBUS_Create( FWIfCfg *pvFwIf, FWIfSMBusCfg *pxSmbusCfg )
+uint32_t ulFW_IF_SMBUS_Create(FWIfCfg* pvFwIf, FWIfSMBusCfg* pxSmbusCfg)
 {
-    uint32_t status = FW_IF_ERRORS_NONE;
+	uint32_t status = FW_IF_ERRORS_NONE;
 
-    CHECK_DRIVER;
+	CHECK_DRIVER;
 
-    if( ( NULL != pvFwIf ) && ( NULL != pxSmbusCfg ) )
-    {
-        if( MAX_FW_IF_SMBUS_ROLE > pxSmbusCfg->xRole )
-        {
-            FWIfCfg myLocalIf =
-            {
-                .upperFirewall  = UPPER_FIREWALL,
-                .open           = &ulSmbusOpen,
-                .close          = &ulSmbusClose,
-                .write          = &ulSmbusWrite,
-                .read           = &ulSmbusRead,
-                .ioctrl         = &ulSmbusIoctrl,
-                .bindCallback   = &ulSmbusBindCallback,
-                .cfg            = ( void* )pxSmbusCfg,
-                .lowerFirewall  = LOWER_FIREWALL
-            };
+	if ((NULL != pvFwIf) && (NULL != pxSmbusCfg)) {
+		if (MAX_FW_IF_SMBUS_ROLE > pxSmbusCfg->xRole) {
+			FWIfCfg myLocalIf = {
+				.upperFirewall = UPPER_FIREWALL,
+				.open          = &ulSmbusOpen,
+				.close         = &ulSmbusClose,
+				.write         = &ulSmbusWrite,
+				.read          = &ulSmbusRead,
+				.ioctrl        = &ulSmbusIoctrl,
+				.bindCallback  = &ulSmbusBindCallback,
+				.cfg           = (void*)pxSmbusCfg,
+				.lowerFirewall = LOWER_FIREWALL,
+			};
 
-            pvOSAL_MemCpy( pvFwIf, &myLocalIf, sizeof( FWIfCfg ) );
-        }
-        else
-        {
-            status = FW_IF_ERRORS_INVALID_CFG;
-        }
-    }
-    else
-    {
-        status =  FW_IF_ERRORS_PARAMS;
-    }
+			pvOSAL_MemCpy(pvFwIf, &myLocalIf, sizeof(FWIfCfg));
+		} else {
+			status = FW_IF_ERRORS_INVALID_CFG;
+		}
+	} else {
+		status = FW_IF_ERRORS_PARAMS;
+	}
 
-    return status;
+	return status;
 }
 
 /**
  * @brief   Print all the stats gathered by the interface
  */
-int iFW_IF_SMBUS_PrintStatistics( void )
+int iFW_IF_SMBUS_PrintStatistics(void)
 {
-    int iStatus = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	int iStatus = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
 
-    /*
-     * This is where stats gathered by the interface get printed
-     */
+	/*
+	 * This is where stats gathered by the interface get printed
+	 */
 
-    return iStatus;
+	return iStatus;
 }
 
 /**
  *  @brief Clears all the stats gathered by the interface
  */
-int iFW_IF_SMBUS_ClearStatistics( void )
+int iFW_IF_SMBUS_ClearStatistics(void)
 {
-    int iStatus = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	int iStatus = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
 
-    /*
-     * This is where stats gathered by the interface get cleared
-     */
+	/*
+	 * This is where stats gathered by the interface get cleared
+	 */
 
-    return iStatus;
+	return iStatus;
 }
 
 #endif /* !HAL_SMBUS_FEATURE */

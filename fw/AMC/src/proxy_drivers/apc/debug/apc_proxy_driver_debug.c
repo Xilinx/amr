@@ -21,9 +21,9 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define APC_DBG_NAME    "APC_DBG"
+#define APC_DBG_NAME "APC_DBG"
 
-#define BUFFER_WIDTH    ( 16 )
+#define BUFFER_WIDTH (16)
 
 
 /******************************************************************************/
@@ -45,63 +45,63 @@ static DAL_HDL pxSetDir = NULL;
  *
  * @return  N/A
  */
-static void vPrintStats( void );
+static void vPrintStats(void);
 
 /**
  * @brief   Debug function to clear this module's stats
  *
  * @return  N/A
  */
-static void vClearStats( void );
+static void vClearStats(void);
 
 /**
  * @brief   Debug function to bind a callback to this module
  *
  * @return  N/A
  */
-static void vBindCallbacks( void );
+static void vBindCallbacks(void);
 
 /**
  * @brief   Debug function to download an image to flash
  *
  * @return  N/A
  */
-static void vSetDownloadImage( void );
+static void vSetDownloadImage(void);
 
 /**
  * @brief   Debug function to copy an image in flash
  *
  * @return  N/A
  */
-static void vSetCopyImage( void );
+static void vSetCopyImage(void);
 
 /**
  * @brief   Debug function to select the next boot partition
  *
  * @return  N/A
  */
-static void vSetNextPartition( void );
+static void vSetNextPartition(void);
 
 /**
  * @brief   Debug function to retrieve the FPT header
  *
  * @return  N/A
  */
-static void vGetFptHeader( void );
+static void vGetFptHeader(void);
 
 /**
  * @brief   Debug function to retrieve an FPT partition
  *
  * @return  N/A
  */
- static void vGetFptPartition( void );
+static void vGetFptPartition(void);
 
 /**
  * @brief   Debug function to dump raw bytes from OSPI flash
  *
  * @return  N/A
  */
-static void vDumpFlashBytes( void );
+static void vDumpFlashBytes(void);
 
 /***** Helper functions *****/
 
@@ -114,7 +114,7 @@ static void vDumpFlashBytes( void );
  *          ERROR if an error was raised in the callback
  *
  */
-static int iTestCallback( EVLSignal *pxSignal );
+static int iTestCallback(EVLSignal* pxSignal);
 
 
 /******************************************************************************/
@@ -124,401 +124,403 @@ static int iTestCallback( EVLSignal *pxSignal );
 /**
  * @brief   Initialise the APC debug access
  */
-void vAPC_DebugInit( DAL_HDL pxParentHandle )
+void vAPC_DebugInit(DAL_HDL pxParentHandle)
 {
-    if( FALSE == iIsInitialised )
-    {
-        if( NULL == pxParentHandle )
-        {
-            pxApcTop = pxDAL_NewDirectory( "apc" );
-        }
-        else
-        {
-            pxApcTop = pxDAL_NewSubDirectory( "apc", pxParentHandle );
-        }
+	if (FALSE == iIsInitialised) {
+		if (NULL == pxParentHandle) {
+			pxApcTop = pxDAL_NewDirectory("apc");
+		} else {
+			pxApcTop = pxDAL_NewSubDirectory("apc", pxParentHandle);
+		}
 
-        if( NULL != pxApcTop )
-        {
-            pxDAL_NewDebugFunction( "print_stats",    pxApcTop, vPrintStats );
-            pxDAL_NewDebugFunction( "clear_stats",    pxApcTop, vClearStats );
-            pxDAL_NewDebugFunction( "bind_callbacks", pxApcTop, vBindCallbacks );
-            pxSetDir = pxDAL_NewSubDirectory( "sets", pxApcTop );
-            pxGetDir = pxDAL_NewSubDirectory( "gets", pxApcTop );
+		if (NULL != pxApcTop) {
+			pxDAL_NewDebugFunction("print_stats", pxApcTop, vPrintStats);
+			pxDAL_NewDebugFunction("clear_stats", pxApcTop, vClearStats);
+			pxDAL_NewDebugFunction("bind_callbacks", pxApcTop, vBindCallbacks);
+			pxSetDir = pxDAL_NewSubDirectory("sets", pxApcTop);
+			pxGetDir = pxDAL_NewSubDirectory("gets", pxApcTop);
 
-            if( NULL != pxSetDir )
-            {
-                pxDAL_NewDebugFunction( "set_download_image", pxSetDir, vSetDownloadImage );
-                pxDAL_NewDebugFunction( "set_copy_image",     pxSetDir, vSetCopyImage );
-                pxDAL_NewDebugFunction( "set_next_partition", pxSetDir, vSetNextPartition );
-            }
-            if( NULL != pxGetDir )
-            {
-                pxDAL_NewDebugFunction( "get_fpt_header",    pxGetDir, vGetFptHeader );
-                pxDAL_NewDebugFunction( "get_fpt_partition", pxGetDir, vGetFptPartition );
-                pxDAL_NewDebugFunction( "dump_flash_bytes",  pxGetDir, vDumpFlashBytes );
-            }
-        }
-        iIsInitialised = TRUE;
-    }
+			if (NULL != pxSetDir) {
+				pxDAL_NewDebugFunction("set_download_image", pxSetDir, vSetDownloadImage);
+				pxDAL_NewDebugFunction("set_copy_image", pxSetDir, vSetCopyImage);
+				pxDAL_NewDebugFunction("set_next_partition", pxSetDir, vSetNextPartition);
+			}
+			if (NULL != pxGetDir) {
+				pxDAL_NewDebugFunction("get_fpt_header", pxGetDir, vGetFptHeader);
+				pxDAL_NewDebugFunction("get_fpt_partition", pxGetDir, vGetFptPartition);
+				pxDAL_NewDebugFunction("dump_flash_bytes", pxGetDir, vDumpFlashBytes);
+			}
+		}
+		iIsInitialised = TRUE;
+	}
 }
 
 /**
  * @brief   Debug function to print this module's stats
  */
-static void vPrintStats( void )
+static void vPrintStats(void)
 {
-    if( OK != iAPC_PrintStatistics() )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error printing statistics\r\n" );
-    }
+	if (OK != iAPC_PrintStatistics()) {
+		PLL_DAL(APC_DBG_NAME, "Error printing statistics\r\n");
+	}
 }
 
 /**
  * @brief   Debug function to clear this module's stats
  */
-static void vClearStats( void )
+static void vClearStats(void)
 {
-    if( OK != iAPC_ClearStatistics() )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error clearing statistics\r\n" );
-    }
+	if (OK != iAPC_ClearStatistics()) {
+		PLL_DAL(APC_DBG_NAME, "Error clearing statistics\r\n");
+	}
 }
 
 /**
  * @brief   Debug function to bind a callback to this module
  */
-static void vBindCallbacks( void )
+static void vBindCallbacks(void)
 {
-    if( OK != iAPC_BindCallback( &iTestCallback ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error binding callback\r\n" );
-    }
-    else
-    {
-        PLL_DAL( APC_DBG_NAME, "Callback bound\r\n" );
-    }
+	if (OK != iAPC_BindCallback(&iTestCallback)) {
+		PLL_DAL(APC_DBG_NAME, "Error binding callback\r\n");
+	} else {
+		PLL_DAL(APC_DBG_NAME, "Callback bound\r\n");
+	}
 }
 
 /**
  * @brief   Debug function to download an image to flash
  */
-static void vSetDownloadImage( void )
+static void vSetDownloadImage(void)
 {
-    int iInstance      = 0;
-    int xBootDevice    = 0;
-    int iPartition     = 0;
-    int iImageSize     = 0;
-    uint32_t ulSrcAddr = 0;
-    int iPacketNum     = 0;
-    int iPacketSize    = 0;
+	int iInstance      = 0;
+	int xBootDevice    = 0;
+	int iPartition     = 0;
+	int iImageSize     = 0;
+	uint32_t ulSrcAddr = 0;
+	int iPacketNum     = 0;
+	int iPacketSize    = 0;
 
-    if( OK != iDAL_GetIntInRange( "Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving instance\r\n" );
-    }
-    else if( OK != iDAL_GetIntInRange( "Enter boot device:", &xBootDevice, APC_BOOT_DEVICE_PRIMARY, MAX_APC_BOOT_DEVICES ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving boot device\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter partition num:", &iPartition ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving partition number\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter number of bytes:", &iImageSize ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving image size\r\n" );
-    }
-    else if( OK != iDAL_GetHex( "Enter source (RAM) address:", &ulSrcAddr ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving source address\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter packet number:", &iPacketNum ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving packet number\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter packet size:", &iPacketSize ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving packet size\r\n" );
-    }
-    else
-    {
-        EVLSignal xSignal = { 0 };
-        xSignal.ucInstance = iInstance;
+	if (OK != iDAL_GetIntInRange("Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving instance\r\n");
+	} else if (OK !=
+		iDAL_GetIntInRange("Enter boot device:",
+			&xBootDevice,
+			APC_BOOT_DEVICE_PRIMARY,
+			MAX_APC_BOOT_DEVICES)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving boot device\r\n");
+	} else if (OK != iDAL_GetInt("Enter partition num:", &iPartition)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving partition number\r\n");
+	} else if (OK != iDAL_GetInt("Enter number of bytes:", &iImageSize)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving image size\r\n");
+	} else if (OK != iDAL_GetHex("Enter source (RAM) address:", &ulSrcAddr)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving source address\r\n");
+	} else if (OK != iDAL_GetInt("Enter packet number:", &iPacketNum)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving packet number\r\n");
+	} else if (OK != iDAL_GetInt("Enter packet size:", &iPacketSize)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving packet size\r\n");
+	} else {
+		EVLSignal xSignal  = { 0 };
+		xSignal.ucInstance = iInstance;
 
-        if( OK != iAPC_DownloadImage( &xSignal, ( APC_BOOT_DEVICES )xBootDevice, iPartition, ulSrcAddr, ( uint32_t )iImageSize,
-                                      ( uint16_t )iPacketNum, ( uint16_t )iPacketSize, NULL, 0, FALSE ) )
-        {
-            PLL_DAL( APC_DBG_NAME, "Error writing %d bytes to partition %d\r\n", iImageSize, iPartition );
-        }
-        else
-        {
-            PLL_DAL( APC_DBG_NAME, "%d bytes written from 0x%08X to partition %d\r\n",
-                     iImageSize, ulSrcAddr, iPartition );
-        }
-    }
+		if (OK !=
+			iAPC_DownloadImage(&xSignal,
+				(APC_BOOT_DEVICES)xBootDevice,
+				iPartition,
+				ulSrcAddr,
+				(uint32_t)iImageSize,
+				(uint16_t)iPacketNum,
+				(uint16_t)iPacketSize,
+				NULL,
+				0,
+				FALSE)) {
+			PLL_DAL(APC_DBG_NAME,
+				"Error writing %d bytes to partition %d\r\n",
+				iImageSize,
+				iPartition);
+		} else {
+			PLL_DAL(APC_DBG_NAME,
+				"%d bytes written from 0x%08X to partition %d\r\n",
+				iImageSize,
+				ulSrcAddr,
+				iPartition);
+		}
+	}
 }
 
 /**
  * @brief   Debug function to download an image to flash
  */
-static void vSetCopyImage( void )
+static void vSetCopyImage(void)
 {
-    int iInstance       = 0;
-    int xSrcBootDevice  = 0;
-    int iSrcPartition   = 0;
-    int xDestBootDevice = 0;
-    int iDestPartition  = 0;
-    int iImageSize      = 0;
-    uint32_t ulSrcAddr  = 0;
+	int iInstance       = 0;
+	int xSrcBootDevice  = 0;
+	int iSrcPartition   = 0;
+	int xDestBootDevice = 0;
+	int iDestPartition  = 0;
+	int iImageSize      = 0;
+	uint32_t ulSrcAddr  = 0;
 
-    if( OK != iDAL_GetIntInRange( "Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving instance\r\n" );
-    }
-    else if( OK != iDAL_GetIntInRange( "Enter source boot device:", &xSrcBootDevice, APC_BOOT_DEVICE_PRIMARY, MAX_APC_BOOT_DEVICES ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving source boot device\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter source partition num:", &iSrcPartition ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving source partition number\r\n" );
-    }
-    else if( OK != iDAL_GetIntInRange( "Enter destination boot device:", &xDestBootDevice, APC_BOOT_DEVICE_PRIMARY, MAX_APC_BOOT_DEVICES ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving destination boot device\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter destination partition num:", &iDestPartition ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving destination partition number\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter maximum number of bytes:", &iImageSize ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving maximum image size\r\n" );
-    }
-    else if( OK != iDAL_GetHex( "Enter source (RAM) address:", &ulSrcAddr ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving source address\r\n" );
-    }
-    else
-    {
-        EVLSignal xSignal  = { 0 };
-        xSignal.ucInstance = iInstance;
+	if (OK != iDAL_GetIntInRange("Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving instance\r\n");
+	} else if (OK !=
+		iDAL_GetIntInRange("Enter source boot device:",
+			&xSrcBootDevice,
+			APC_BOOT_DEVICE_PRIMARY,
+			MAX_APC_BOOT_DEVICES)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving source boot device\r\n");
+	} else if (OK != iDAL_GetInt("Enter source partition num:", &iSrcPartition)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving source partition number\r\n");
+	} else if (OK !=
+		iDAL_GetIntInRange("Enter destination boot device:",
+			&xDestBootDevice,
+			APC_BOOT_DEVICE_PRIMARY,
+			MAX_APC_BOOT_DEVICES)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving destination boot device\r\n");
+	} else if (OK != iDAL_GetInt("Enter destination partition num:", &iDestPartition)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving destination partition number\r\n");
+	} else if (OK != iDAL_GetInt("Enter maximum number of bytes:", &iImageSize)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving maximum image size\r\n");
+	} else if (OK != iDAL_GetHex("Enter source (RAM) address:", &ulSrcAddr)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving source address\r\n");
+	} else {
+		EVLSignal xSignal  = { 0 };
+		xSignal.ucInstance = iInstance;
 
-        if( OK != iAPC_CopyImage( &xSignal, ( APC_BOOT_DEVICES )xSrcBootDevice, iSrcPartition, ( APC_BOOT_DEVICES )xDestBootDevice, iDestPartition, ulSrcAddr, ( uint32_t )iImageSize ) )
-        {
-            PLL_DAL( APC_DBG_NAME, "Error copying partition %d partition %d\r\n", iSrcPartition, iDestPartition );
-        }
-        else
-        {
-            PLL_DAL( APC_DBG_NAME, "Partition %d copied to partition %d\r\n",
-                     iSrcPartition, iDestPartition );
-        }
-    }
+		if (OK !=
+			iAPC_CopyImage(&xSignal,
+				(APC_BOOT_DEVICES)xSrcBootDevice,
+				iSrcPartition,
+				(APC_BOOT_DEVICES)xDestBootDevice,
+				iDestPartition,
+				ulSrcAddr,
+				(uint32_t)iImageSize)) {
+			PLL_DAL(APC_DBG_NAME,
+				"Error copying partition %d partition %d\r\n",
+				iSrcPartition,
+				iDestPartition);
+		} else {
+			PLL_DAL(APC_DBG_NAME,
+				"Partition %d copied to partition %d\r\n",
+				iSrcPartition,
+				iDestPartition);
+		}
+	}
 }
 /**
  * @brief   Debug function to select the next boot partition (from primary boot device)
  */
-static void vSetNextPartition( void )
+static void vSetNextPartition(void)
 {
-    int iInstance  = 0;
-    int iPartition = 0;
+	int iInstance  = 0;
+	int iPartition = 0;
 
-    if( OK != iDAL_GetIntInRange( "Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8 ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving instance\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter partition num:", &iPartition ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving partition number\r\n" );
-    }
-    else
-    {
-        EVLSignal xSignal  = { 0 };
-        xSignal.ucInstance = iInstance;
+	if (OK != iDAL_GetIntInRange("Enter request instance:", &iInstance, 0, UTIL_MAX_UINT8)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving instance\r\n");
+	} else if (OK != iDAL_GetInt("Enter partition num:", &iPartition)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving partition number\r\n");
+	} else {
+		EVLSignal xSignal  = { 0 };
+		xSignal.ucInstance = iInstance;
 
-        if( OK != iAPC_SetNextPartition( &xSignal, iPartition ) )
-        {
-            PLL_DAL( APC_DBG_NAME, "Error selecting partition %d\r\n", iPartition );
-        }
-        else
-        {
-            PLL_DAL( APC_DBG_NAME, "Selected partition %d\r\n", iPartition );
-        }
-    }
+		if (OK != iAPC_SetNextPartition(&xSignal, iPartition)) {
+			PLL_DAL(APC_DBG_NAME, "Error selecting partition %d\r\n", iPartition);
+		} else {
+			PLL_DAL(APC_DBG_NAME, "Selected partition %d\r\n", iPartition);
+		}
+	}
 }
 
 /**
  * @brief   Debug function to retrieve the FPT header
  */
-static void vGetFptHeader( void )
+static void vGetFptHeader(void)
 {
-    int xBootDevice = 0;
+	int xBootDevice = 0;
 
-    if( OK != iDAL_GetIntInRange( "Enter boot device:", &xBootDevice, APC_BOOT_DEVICE_PRIMARY, MAX_APC_BOOT_DEVICES ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving boot device\r\n" );
-    }
-    else
-    {
-        APCProxyDriverFptHeader xFptHeader = { 0 };
+	if (OK !=
+		iDAL_GetIntInRange("Enter boot device:",
+			&xBootDevice,
+			APC_BOOT_DEVICE_PRIMARY,
+			MAX_APC_BOOT_DEVICES)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving boot device\r\n");
+	} else {
+		APCProxyDriverFptHeader xFptHeader = { 0 };
 
-        if( OK != iAPC_GetFptHeader( ( APC_BOOT_DEVICES )xBootDevice, &xFptHeader ) )
-        {
-            PLL_DAL( APC_DBG_NAME, "Error retrieving FPT header\r\n" );
-        }
-        else
-        {
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
-            PLL_DAL( APC_DBG_NAME, "FPT header:\r\n" );
-            PLL_DAL( APC_DBG_NAME, "\tMagic number . . . . . : 0x%08X\r\n", xFptHeader.ulMagicNum );
-            PLL_DAL( APC_DBG_NAME, "\tFPT version. . . . . . : 0x%02X\r\n", xFptHeader.ucFptVersion );
-            PLL_DAL( APC_DBG_NAME, "\tFPT header size. . . . : 0x%02X\r\n", xFptHeader.ucFptHeaderSize );
-            PLL_DAL( APC_DBG_NAME, "\tEntry size . . . . . . : 0x%02X\r\n", xFptHeader.ucEntrySize );
-            PLL_DAL( APC_DBG_NAME, "\tNum entries. . . . . . : 0x%02X\r\n", xFptHeader.ucNumEntries );
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
-        }
-    }
+		if (OK != iAPC_GetFptHeader((APC_BOOT_DEVICES)xBootDevice, &xFptHeader)) {
+			PLL_DAL(APC_DBG_NAME, "Error retrieving FPT header\r\n");
+		} else {
+			PLL_DAL(APC_DBG_NAME,
+				"======================================================================\r\n");
+			PLL_DAL(APC_DBG_NAME, "FPT header:\r\n");
+			PLL_DAL(APC_DBG_NAME, "\tMagic number . . . . . : 0x%08X\r\n", xFptHeader.ulMagicNum);
+			PLL_DAL(APC_DBG_NAME, "\tFPT version. . . . . . : 0x%02X\r\n", xFptHeader.ucFptVersion);
+			PLL_DAL(APC_DBG_NAME,
+				"\tFPT header size. . . . : 0x%02X\r\n",
+				xFptHeader.ucFptHeaderSize);
+			PLL_DAL(APC_DBG_NAME, "\tEntry size . . . . . . : 0x%02X\r\n", xFptHeader.ucEntrySize);
+			PLL_DAL(APC_DBG_NAME, "\tNum entries. . . . . . : 0x%02X\r\n", xFptHeader.ucNumEntries);
+			PLL_DAL(APC_DBG_NAME,
+				"======================================================================\r\n");
+		}
+	}
 }
 
 /**
  * @brief   Debug function to retrieve a FPT partition
  */
-static void vGetFptPartition( void )
+static void vGetFptPartition(void)
 {
-    int xBootDevice = 0;
-    int iPartition = 0;
+	int xBootDevice = 0;
+	int iPartition  = 0;
 
-    if( OK != iDAL_GetIntInRange( "Enter boot device:", &xBootDevice, APC_BOOT_DEVICE_PRIMARY, MAX_APC_BOOT_DEVICES ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving boot device\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter partition num:", &iPartition ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving partition number\r\n" );
-    }
-    else
-    {
-        APCProxyDriverFptPartition xFptPartition = { 0 };
+	if (OK !=
+		iDAL_GetIntInRange("Enter boot device:",
+			&xBootDevice,
+			APC_BOOT_DEVICE_PRIMARY,
+			MAX_APC_BOOT_DEVICES)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving boot device\r\n");
+	} else if (OK != iDAL_GetInt("Enter partition num:", &iPartition)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving partition number\r\n");
+	} else {
+		APCProxyDriverFptPartition xFptPartition = { 0 };
 
-        if( OK != iAPC_GetFptPartition( ( APC_BOOT_DEVICES )xBootDevice, iPartition, &xFptPartition ) )
-        {
-            PLL_DAL( APC_DBG_NAME, "Error retrieving FPT Partition %d\r\n", iPartition );
-        }
-        else
-        {
-            int i = 0;
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
-            PLL_DAL( APC_DBG_NAME, "FPT partition %d:\r\n", iPartition );
-            PLL_DAL( APC_DBG_NAME, "\tPartition type . . . . : 0x%08X\r\n", xFptPartition.ulPartitionType );
-            PLL_DAL( APC_DBG_NAME, "\tPartition base address : 0x%08X\r\n", xFptPartition.ulPartitionBaseAddr );
-            PLL_DAL( APC_DBG_NAME, "\tPartition size . . . . : 0x%08X\r\n", xFptPartition.ulPartitionSize );
-            PLL_DAL( APC_DBG_NAME, "\tPDI MD5. . . . . . . . : " );
-            for( i = 0; i < 16; i++ )
-            {
-                PLL_DAL( APC_DBG_NAME, "%02X", xFptPartition.pdi_md5[i] );
-            }
-            PLL_DAL( APC_DBG_NAME, "\r\n" );
-            PLL_DAL( APC_DBG_NAME, "\tPDI size . . . . . . . : 0x%08X\r\n", xFptPartition.ulPdiSize );
-            PLL_DAL( APC_DBG_NAME, "\tPartition flags . . .  : 0x%08X\r\n", xFptPartition.ulPartitionFlags |
-                          (xFptPartition.ulPartitionType == APC_FPT_TYPE_PDI_USER) ? ulUserPdiLoadStatus : 0);
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
-        }
-    }
+		if (OK != iAPC_GetFptPartition((APC_BOOT_DEVICES)xBootDevice, iPartition, &xFptPartition)) {
+			PLL_DAL(APC_DBG_NAME, "Error retrieving FPT Partition %d\r\n", iPartition);
+		} else {
+			int i = 0;
+			PLL_DAL(APC_DBG_NAME,
+				"======================================================================\r\n");
+			PLL_DAL(APC_DBG_NAME, "FPT partition %d:\r\n", iPartition);
+			PLL_DAL(APC_DBG_NAME,
+				"\tPartition type . . . . : 0x%08X\r\n",
+				xFptPartition.ulPartitionType);
+			PLL_DAL(APC_DBG_NAME,
+				"\tPartition base address : 0x%08X\r\n",
+				xFptPartition.ulPartitionBaseAddr);
+			PLL_DAL(APC_DBG_NAME,
+				"\tPartition size . . . . : 0x%08X\r\n",
+				xFptPartition.ulPartitionSize);
+			PLL_DAL(APC_DBG_NAME, "\tPDI MD5. . . . . . . . : ");
+			for (i = 0; i < 16; i++) {
+				PLL_DAL(APC_DBG_NAME, "%02X", xFptPartition.pdi_md5[i]);
+			}
+			PLL_DAL(APC_DBG_NAME, "\r\n");
+			PLL_DAL(APC_DBG_NAME, "\tPDI size . . . . . . . : 0x%08X\r\n", xFptPartition.ulPdiSize);
+			PLL_DAL(APC_DBG_NAME,
+				"\tPartition flags . . .  : 0x%08X\r\n",
+				xFptPartition.ulPartitionFlags |
+						(xFptPartition.ulPartitionType == APC_FPT_TYPE_PDI_USER) ?
+					ulUserPdiLoadStatus :
+					0);
+			PLL_DAL(APC_DBG_NAME,
+				"======================================================================\r\n");
+		}
+	}
 }
 
 /**
  * @brief   Debug function to dump raw bytes from OSPI flash
  */
-static void vDumpFlashBytes( void )
+static void vDumpFlashBytes(void)
 {
-    int xBootDevice = 0;
-    uint32_t ulOffset = 0;
-    int iNumBytes = 104;  /* Default: 104 bytes */
+	int xBootDevice   = 0;
+	uint32_t ulOffset = 0;
+	int iNumBytes     = 104; /* Default: 104 bytes */
 
-    if( OK != iDAL_GetIntInRange( "Enter boot device (0=primary, 1=secondary):", &xBootDevice, APC_BOOT_DEVICE_PRIMARY, MAX_APC_BOOT_DEVICES ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving boot device\r\n" );
-    }
-    else if( OK != iDAL_GetHex( "Enter flash offset (hex):", &ulOffset ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving offset\r\n" );
-    }
-    else if( OK != iDAL_GetInt( "Enter number of bytes to read:", &iNumBytes ) )
-    {
-        PLL_DAL( APC_DBG_NAME, "Error retrieving byte count, using default 104\r\n" );
-        iNumBytes = 104;
-    }
-    else
-    {
-        uint8_t pucBuffer[256] = { 0 };  /* Max 256 bytes per dump */
-        int i = 0;
+	if (OK !=
+		iDAL_GetIntInRange("Enter boot device (0=primary, 1=secondary):",
+			&xBootDevice,
+			APC_BOOT_DEVICE_PRIMARY,
+			MAX_APC_BOOT_DEVICES)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving boot device\r\n");
+	} else if (OK != iDAL_GetHex("Enter flash offset (hex):", &ulOffset)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving offset\r\n");
+	} else if (OK != iDAL_GetInt("Enter number of bytes to read:", &iNumBytes)) {
+		PLL_DAL(APC_DBG_NAME, "Error retrieving byte count, using default 104\r\n");
+		iNumBytes = 104;
+	} else {
+		uint8_t pucBuffer[256] = { 0 }; /* Max 256 bytes per dump */
+		int i                  = 0;
 
-        if( iNumBytes > 256 )
-        {
-            PLL_DAL( APC_DBG_NAME, "Limiting read to 256 bytes\r\n" );
-            iNumBytes = 256;
-        }
+		if (iNumBytes > 256) {
+			PLL_DAL(APC_DBG_NAME, "Limiting read to 256 bytes\r\n");
+			iNumBytes = 256;
+		}
 
-        if( OK != iAPC_ReadFlashRaw( ( APC_BOOT_DEVICES )xBootDevice, ulOffset, pucBuffer, ( uint32_t )iNumBytes ) )
-        {
-            PLL_DAL( APC_DBG_NAME, "Error reading %d bytes from offset 0x%08X\r\n", iNumBytes, ulOffset );
-        }
-        else
-        {
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
-            PLL_DAL( APC_DBG_NAME, "Flash dump: %d bytes from offset 0x%08X (boot device %d)\r\n",
-                     iNumBytes, ulOffset, xBootDevice );
-            PLL_DAL( APC_DBG_NAME, "----------------------------------------------------------------------\r\n" );
+		if (OK !=
+			iAPC_ReadFlashRaw((APC_BOOT_DEVICES)xBootDevice,
+				ulOffset,
+				pucBuffer,
+				(uint32_t)iNumBytes)) {
+			PLL_DAL(APC_DBG_NAME,
+				"Error reading %d bytes from offset 0x%08X\r\n",
+				iNumBytes,
+				ulOffset);
+		} else {
+			PLL_DAL(APC_DBG_NAME,
+				"======================================================================\r\n");
+			PLL_DAL(APC_DBG_NAME,
+				"Flash dump: %d bytes from offset 0x%08X (boot device %d)\r\n",
+				iNumBytes,
+				ulOffset,
+				xBootDevice);
+			PLL_DAL(APC_DBG_NAME,
+				"----------------------------------------------------------------------\r\n");
 
-            /* Print hex dump with 16 bytes per line */
-            for( i = 0; i < iNumBytes; i += BUFFER_WIDTH )
-            {
-                int j = 0;
-                int iLineLen = ( ( iNumBytes - i ) < BUFFER_WIDTH ) ? ( iNumBytes - i ) : BUFFER_WIDTH;
+			/* Print hex dump with 16 bytes per line */
+			for (i = 0; i < iNumBytes; i += BUFFER_WIDTH) {
+				int j        = 0;
+				int iLineLen = ((iNumBytes - i) < BUFFER_WIDTH) ? (iNumBytes - i) : BUFFER_WIDTH;
 
-                /* Print offset */
-                PLL_DAL( APC_DBG_NAME, "%08X: ", ulOffset + i );
+				/* Print offset */
+				PLL_DAL(APC_DBG_NAME, "%08X: ", ulOffset + i);
 
-                /* Print hex values */
-                for( j = 0; j < iLineLen; j++ )
-                {
-                    PLL_DAL( APC_DBG_NAME, "%02X ", pucBuffer[i + j] );
-                }
+				/* Print hex values */
+				for (j = 0; j < iLineLen; j++) {
+					PLL_DAL(APC_DBG_NAME, "%02X ", pucBuffer[i + j]);
+				}
 
-                /* Pad if less than 16 bytes */
-                for( j = iLineLen; j < BUFFER_WIDTH; j++ )
-                {
-                    PLL_DAL( APC_DBG_NAME, "   " );
-                }
+				/* Pad if less than 16 bytes */
+				for (j = iLineLen; j < BUFFER_WIDTH; j++) {
+					PLL_DAL(APC_DBG_NAME, "   ");
+				}
 
-                /* Print ASCII representation */
-                PLL_DAL( APC_DBG_NAME, " |" );
-                for( j = 0; j < iLineLen; j++ )
-                {
-                    uint8_t c = pucBuffer[i + j];
-                    PLL_DAL( APC_DBG_NAME, "%c", ( c >= 0x20 && c <= 0x7E ) ? c : '.' );
-                }
-                PLL_DAL( APC_DBG_NAME, "|\r\n" );
-            }
+				/* Print ASCII representation */
+				PLL_DAL(APC_DBG_NAME, " |");
+				for (j = 0; j < iLineLen; j++) {
+					uint8_t c = pucBuffer[i + j];
+					PLL_DAL(APC_DBG_NAME, "%c", (c >= 0x20 && c <= 0x7E) ? c : '.');
+				}
+				PLL_DAL(APC_DBG_NAME, "|\r\n");
+			}
 
-            PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
+			PLL_DAL(APC_DBG_NAME,
+				"======================================================================\r\n");
 
-            /* Also print as FPT partition structure interpretation */
-            if( iNumBytes >= 36 )
-            {
-                uint32_t *pul = ( uint32_t* )pucBuffer;
-                PLL_DAL( APC_DBG_NAME, "\r\nInterpreted as FPT partition entry:\r\n" );
-                PLL_DAL( APC_DBG_NAME, "  Partition type . . . . : 0x%08X\r\n", pul[0] );
-                PLL_DAL( APC_DBG_NAME, "  Base address . . . . . : 0x%08X\r\n", pul[1] );
-                PLL_DAL( APC_DBG_NAME, "  Partition size . . . . : 0x%08X\r\n", pul[2] );
-                PLL_DAL( APC_DBG_NAME, "  PDI MD5. . . . . . . . : %08X%08X%08X%08X\r\n",
-                    pul[3],    pul[4],  pul[5],  pul[6] );
-                PLL_DAL( APC_DBG_NAME, "  PDI size . . . . . . . : 0x%08X\r\n", pul[7] );  /* offset 28 */
-                PLL_DAL( APC_DBG_NAME, "  Partition flags. . . . : 0x%08X\r\n", pul[8] );  /* offset 32 */
-                PLL_DAL( APC_DBG_NAME, "======================================================================\r\n" );
-            }
-        }
-    }
+			/* Also print as FPT partition structure interpretation */
+			if (iNumBytes >= 36) {
+				uint32_t* pul = (uint32_t*)pucBuffer;
+				PLL_DAL(APC_DBG_NAME, "\r\nInterpreted as FPT partition entry:\r\n");
+				PLL_DAL(APC_DBG_NAME, "  Partition type . . . . : 0x%08X\r\n", pul[0]);
+				PLL_DAL(APC_DBG_NAME, "  Base address . . . . . : 0x%08X\r\n", pul[1]);
+				PLL_DAL(APC_DBG_NAME, "  Partition size . . . . : 0x%08X\r\n", pul[2]);
+				PLL_DAL(APC_DBG_NAME,
+					"  PDI MD5. . . . . . . . : %08X%08X%08X%08X\r\n",
+					pul[3],
+					pul[4],
+					pul[5],
+					pul[6]);
+				PLL_DAL(APC_DBG_NAME,
+					"  PDI size . . . . . . . : 0x%08X\r\n",
+					pul[7]); /* offset 28 */
+				PLL_DAL(APC_DBG_NAME,
+					"  Partition flags. . . . : 0x%08X\r\n",
+					pul[8]); /* offset 32 */
+				PLL_DAL(APC_DBG_NAME,
+					"======================================================================\r\n");
+			}
+		}
+	}
 }
 
 /***** Helper functions *****/
@@ -526,17 +528,18 @@ static void vDumpFlashBytes( void )
 /**
  * @brief   EVL Callback for binding test prints
  */
-static int iTestCallback( EVLSignal *pxSignal )
+static int iTestCallback(EVLSignal* pxSignal)
 {
-    int iStatus = ERROR;
+	int iStatus = ERROR;
 
-    if( NULL != pxSignal )
-    {
-        PLL_DAL( APC_DBG_NAME, "APC Signal raised: Module[%d], Type[%d], Instance[%d]\r\n",
-                 pxSignal->ucModule, pxSignal->ucEventType, pxSignal->ucInstance );
-        iStatus = OK;
-    }
+	if (NULL != pxSignal) {
+		PLL_DAL(APC_DBG_NAME,
+			"APC Signal raised: Module[%d], Type[%d], Instance[%d]\r\n",
+			pxSignal->ucModule,
+			pxSignal->ucEventType,
+			pxSignal->ucInstance);
+		iStatus = OK;
+	}
 
-    return iStatus;
+	return iStatus;
 }
-

@@ -1,11 +1,11 @@
 /**
-* Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
-* SPDX-License-Identifier: MIT
-*
-* This header file contains the FW IF EMMC abstraction definitions.
-*
-* @file fw_if_emmc.h
-*/
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * This header file contains the FW IF EMMC abstraction definitions.
+ *
+ * @file fw_if_emmc.h
+ */
 
 #ifndef _FW_IF_EMMC_H_
 #define _FW_IF_EMMC_H_
@@ -21,13 +21,12 @@
  * @enum FW_IF_EMMC_ERRORS
  * @brief Enumeration of EMMC return values
  */
-typedef enum
-{
-    FW_IF_EMMC_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
-    FW_IF_EMMC_ERRORS_DRIVER_FAILURE,
-    FW_IF_EMMC_ERRORS_DRIVER_INVALID_ADDRESS,
+typedef enum {
+	FW_IF_EMMC_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
+	FW_IF_EMMC_ERRORS_DRIVER_FAILURE,
+	FW_IF_EMMC_ERRORS_DRIVER_INVALID_ADDRESS,
 
-    MAX_FW_IF_EMMC_ERRORS
+	MAX_FW_IF_EMMC_ERRORS
 
 } FW_IF_EMMC_ERRORS;
 
@@ -35,12 +34,11 @@ typedef enum
  * @enum    FW_IF_EMMC_IOCTRL
  * @brief   ioctrl options for EMMC interfaces (generic across all EMMC interfaces)
  */
-typedef enum
-{
-    FW_IF_EMMC_IOCTRL_PRINT_INSTANCE_DETAILS = MAX_FW_IF_COMMON_IOCTRL_OPTION,
-    FW_IF_EMMC_IOCTRL_ERASE_ALL,
+typedef enum {
+	FW_IF_EMMC_IOCTRL_PRINT_INSTANCE_DETAILS = MAX_FW_IF_COMMON_IOCTRL_OPTION,
+	FW_IF_EMMC_IOCTRL_ERASE_ALL,
 
-    MAX_FW_IF_EMMC_IOCTRL_OPTION
+	MAX_FW_IF_EMMC_IOCTRL_OPTION
 
 } FW_IF_EMMC_IOCTRL;
 
@@ -48,14 +46,13 @@ typedef enum
  * @enum FW_IF_EMMC_STATE
  * @brief EMMC interface states (generic across all EMMC interfaces)
  */
-typedef enum
-{
-    FW_IF_EMMC_STATE_CREATED,
-    FW_IF_EMMC_STATE_OPENED,
-    FW_IF_EMMC_STATE_CLOSED,
-    FW_IF_EMMC_STATE_ERROR,
+typedef enum {
+	FW_IF_EMMC_STATE_CREATED,
+	FW_IF_EMMC_STATE_OPENED,
+	FW_IF_EMMC_STATE_CLOSED,
+	FW_IF_EMMC_STATE_ERROR,
 
-    MAX_FW_IF_EMMC_STATE
+	MAX_FW_IF_EMMC_STATE
 
 } FW_IF_EMMC_STATE;
 
@@ -70,10 +67,9 @@ typedef enum
  * @struct  FWIfEmmcInitCfg
  * @brief   config options for EMMC initialisation (generic across all EMMC interfaces)
  */
-typedef struct
-{
-    char            *pcDriverName;
-    uint32_t        ulBaseAddr;             /* The EMMC device base address */
+typedef struct {
+	char* pcDriverName;
+	uint32_t ulBaseAddr; /* The EMMC device base address */
 
 } FWIfEmmcInitCfg;
 
@@ -81,13 +77,12 @@ typedef struct
  * @struct  FWIfEmmcCfg
  * @brief   config options for EMMC interfaces (generic across all EMMC interfaces)
  */
-typedef struct
-{
-    uint32_t         ulIfId;                 /* Interface ID */
-    char             *pcIfName;              /* Interface name */
-    uint64_t         ullBaseAddress;         /* RPU base addr */
-    uint64_t         ullLength;              /* RPU length */
-    FW_IF_EMMC_STATE xState;                 /* Current FAL state */
+typedef struct {
+	uint32_t ulIfId;         /* Interface ID */
+	char* pcIfName;          /* Interface name */
+	uint64_t ullBaseAddress; /* RPU base addr */
+	uint64_t ullLength;      /* RPU length */
+	FW_IF_EMMC_STATE xState; /* Current FAL state */
 
 } FWIfEmmcCfg;
 
@@ -103,7 +98,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_EMMC_Init( FWIfEmmcInitCfg *pxInitCfg );
+uint32_t ulFW_IF_EMMC_Init(FWIfEmmcInitCfg* pxInitCfg);
 
 /**
  * @brief   creates an instance of the EMMC interface
@@ -113,7 +108,7 @@ uint32_t ulFW_IF_EMMC_Init( FWIfEmmcInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_EMMC_Create( FWIfCfg *pxFwIf, FWIfEmmcCfg *pxEmmcCfg );
+uint32_t ulFW_IF_EMMC_Create(FWIfCfg* pxFwIf, FWIfEmmcCfg* pxEmmcCfg);
 
 /**
  *
@@ -122,7 +117,7 @@ uint32_t ulFW_IF_EMMC_Create( FWIfCfg *pxFwIf, FWIfEmmcCfg *pxEmmcCfg );
  * @return   OK                  Stats retrieved from fw_if_emmc successfully
  *           ERROR               Stats not retrieved successfully
  */
-int iFW_IF_EMMC_PrintStatistics( void );
+int iFW_IF_EMMC_PrintStatistics(void);
 
 /**
  *
@@ -131,6 +126,6 @@ int iFW_IF_EMMC_PrintStatistics( void );
  * @return   OK                  Stats cleared successfully
  *           ERROR               Stats not cleared successfully
  */
-int iFW_IF_EMMC_ClearStatistics( void );
+int iFW_IF_EMMC_ClearStatistics(void);
 
 #endif /* _FW_IF_EMMC_H_ */

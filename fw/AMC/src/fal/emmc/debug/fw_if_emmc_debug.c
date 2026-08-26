@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the EMMC debug implementation.
@@ -21,14 +21,14 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define FW_IF_EMMC_DBG_NAME       "FW_IF_EMMC_DBG"
+#define FW_IF_EMMC_DBG_NAME "FW_IF_EMMC_DBG"
 
 
 /******************************************************************************/
 /* Local variables                                                            */
 /******************************************************************************/
 
-static int iInitialised = FALSE;
+static int iInitialised      = FALSE;
 static DAL_HDL pxFwIfEmmcTop = NULL;
 
 
@@ -39,12 +39,12 @@ static DAL_HDL pxFwIfEmmcTop = NULL;
 /**
  * @brief   Debug function to print this module's stats.
  */
-static void vPrintStats( void );
+static void vPrintStats(void);
 
 /**
  * @brief   Debug function to clear this module's stats.
  */
-static void vClearStats( void );
+static void vClearStats(void);
 
 
 /******************************************************************************/
@@ -54,29 +54,23 @@ static void vClearStats( void );
 /**
  * @brief    Initialise the FW IF EMMC debug access
  */
-void vFW_IF_EMMC_DebugInit( DAL_HDL pxParentHandle )
+void vFW_IF_EMMC_DebugInit(DAL_HDL pxParentHandle)
 {
-    if( FALSE == iInitialised )
-    {
-        if( NULL == pxParentHandle )
-        {
-            pxFwIfEmmcTop = pxDAL_NewDirectory( "fw_if_emmc" );
-        }
-        else
-        {
-            pxFwIfEmmcTop = pxDAL_NewSubDirectory( "fw_if_emmc", pxParentHandle );
-        }
+	if (FALSE == iInitialised) {
+		if (NULL == pxParentHandle) {
+			pxFwIfEmmcTop = pxDAL_NewDirectory("fw_if_emmc");
+		} else {
+			pxFwIfEmmcTop = pxDAL_NewSubDirectory("fw_if_emmc", pxParentHandle);
+		}
 
-        if( NULL != pxFwIfEmmcTop )
-        {
-            pxDAL_NewDebugFunction( "print_all_stats", pxFwIfEmmcTop, vPrintStats );
-            pxDAL_NewDebugFunction( "clear_all_stats", pxFwIfEmmcTop, vClearStats );
-        }
+		if (NULL != pxFwIfEmmcTop) {
+			pxDAL_NewDebugFunction("print_all_stats", pxFwIfEmmcTop, vPrintStats);
+			pxDAL_NewDebugFunction("clear_all_stats", pxFwIfEmmcTop, vClearStats);
+		}
 
-        iInitialised = TRUE;
-    }
+		iInitialised = TRUE;
+	}
 }
-
 
 
 /******************************************************************************/
@@ -86,22 +80,19 @@ void vFW_IF_EMMC_DebugInit( DAL_HDL pxParentHandle )
 /**
  * @brief   Debug function to print this module's stats.
  */
-static void vPrintStats( void )
+static void vPrintStats(void)
 {
-    if( OK != iFW_IF_EMMC_PrintStatistics() )
-    {
-        PLL_DAL( FW_IF_EMMC_DBG_NAME, "Error printing statistics\r\n" );
-    }
+	if (OK != iFW_IF_EMMC_PrintStatistics()) {
+		PLL_DAL(FW_IF_EMMC_DBG_NAME, "Error printing statistics\r\n");
+	}
 }
 
 /**
  * @brief   Debug function to clear this module's stats.
  */
-static void vClearStats( void )
+static void vClearStats(void)
 {
-    if( OK != iFW_IF_EMMC_ClearStatistics() )
-    {
-        PLL_DAL( FW_IF_EMMC_DBG_NAME, "Error clearing statistics\r\n" );
-    }
+	if (OK != iFW_IF_EMMC_ClearStatistics()) {
+		PLL_DAL(FW_IF_EMMC_DBG_NAME, "Error clearing statistics\r\n");
+	}
 }
-

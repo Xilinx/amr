@@ -26,13 +26,12 @@
  * @enum FW_IF_OSPI_ERRORS
  * @brief Enumeration of OSPI return values
  */
-typedef enum
-{
-    FW_IF_OSPI_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
-    FW_IF_OSPI_ERRORS_DRIVER_FAILURE,
-    FW_IF_OSPI_ERRORS_DRIVER_INVALID_ADDRESS,
+typedef enum {
+	FW_IF_OSPI_ERRORS_INVALID_STATE = MAX_FW_IF_ERROR,
+	FW_IF_OSPI_ERRORS_DRIVER_FAILURE,
+	FW_IF_OSPI_ERRORS_DRIVER_INVALID_ADDRESS,
 
-    MAX_FW_IF_OSPI_ERRORS
+	MAX_FW_IF_OSPI_ERRORS
 
 } FW_IF_OSPI_ERRORS;
 
@@ -40,11 +39,10 @@ typedef enum
  * @enum FW_IF_OSPI_IOCTL
  * @brief ioctrl options for OSPI interfaces (generic across all OSPI interfaces)
  */
-typedef enum
-{
-    FW_IF_OSPI_IOCTL_GET_PROGRESS = MAX_FW_IF_COMMON_IOCTRL_OPTION,
+typedef enum {
+	FW_IF_OSPI_IOCTL_GET_PROGRESS = MAX_FW_IF_COMMON_IOCTRL_OPTION,
 
-    MAX_FW_IF_OSPI_IOCTL
+	MAX_FW_IF_OSPI_IOCTL
 
 } FW_IF_OSPI_IOCTL;
 
@@ -53,14 +51,13 @@ typedef enum
  * @enum FW_IF_OSPI_STATE
  * @brief ioctrl options for OSPI interfaces (generic across all OSPI interfaces)
  */
-typedef enum
-{
-    FW_IF_OSPI_STATE_INIT,
-    FW_IF_OSPI_STATE_OPENED,
-    FW_IF_OSPI_STATE_CLOSED,
-    FW_IF_OSPI_STATE_ERROR,
+typedef enum {
+	FW_IF_OSPI_STATE_INIT,
+	FW_IF_OSPI_STATE_OPENED,
+	FW_IF_OSPI_STATE_CLOSED,
+	FW_IF_OSPI_STATE_ERROR,
 
-    MAX_FW_IF_OSPI_STATE
+	MAX_FW_IF_OSPI_STATE
 
 } FW_IF_OSPI_STATE;
 
@@ -73,10 +70,9 @@ typedef enum
  * @struct  FWIfOspiInitCfg
  * @brief   config options for OSPI initialisation (generic across all OSPI interfaces)
  */
-typedef struct
-{
-    uint32_t    ulOspiBaseAddress;
-    uint16_t    usPageSize;
+typedef struct {
+	uint32_t ulOspiBaseAddress;
+	uint16_t usPageSize;
 
 } FWIfOspiInitCfg;
 
@@ -84,12 +80,11 @@ typedef struct
  * @struct  FWIfOspiCfg
  * @brief   config options for OSPI interfaces (generic across all OSPI interfaces)
  */
-typedef struct
-{
-    uint32_t         ulBaseAddress;
-    uint32_t         ulLength;
-    uint8_t          ucEraseBeforeWriteFlag;
-    FW_IF_OSPI_STATE xState;
+typedef struct {
+	uint32_t ulBaseAddress;
+	uint32_t ulLength;
+	uint8_t ucEraseBeforeWriteFlag;
+	FW_IF_OSPI_STATE xState;
 
 } FWIfOspiCfg;
 
@@ -105,7 +100,7 @@ typedef struct
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *pxInitCfg );
+uint32_t ulFW_IF_OSPI_Init(FWIfOspiInitCfg* pxInitCfg);
 
 /**
  * @brief   creates an instance of the OSPI interface
@@ -115,7 +110,7 @@ uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *pxInitCfg );
  *
  * @return  See FW_IF_ERRORS
  */
-uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFWIf, FWIfOspiCfg *pxOspiCfg );
+uint32_t ulFW_IF_OSPI_Create(FWIfCfg* pxFWIf, FWIfOspiCfg* pxOspiCfg);
 
 /**
  *
@@ -124,7 +119,7 @@ uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFWIf, FWIfOspiCfg *pxOspiCfg );
  * @return   OK                  Stats retrieved from fw_if_ospi successfully
  *           ERROR               Stats not retrieved successfully
  */
-int iFW_IF_OSPI_PrintStatistics( void );
+int iFW_IF_OSPI_PrintStatistics(void);
 
 /**
  *
@@ -133,6 +128,6 @@ int iFW_IF_OSPI_PrintStatistics( void );
  * @return   OK                  Stats cleared successfully
  *           ERROR               Stats not cleared successfully
  */
-int iFW_IF_OSPI_ClearStatistics( void );
+int iFW_IF_OSPI_ClearStatistics(void);
 
 #endif /* _FW_IF_OSPI_H_ */

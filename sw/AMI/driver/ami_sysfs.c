@@ -705,7 +705,7 @@ static ssize_t read_mfg_field(struct device		*dev,
 		break;
 
 	case SYSFS_MFG_OEM_ID:
-		if (repo->bd_info->capability.len) {
+		if (repo->bd_info->oem_id.len) {
 			ret = sprintf(
 				buf,
 				"0x%02x%02x\n",

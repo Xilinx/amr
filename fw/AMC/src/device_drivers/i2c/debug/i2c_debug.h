@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the i2c driver debug access
@@ -24,7 +24,6 @@
  *
  * @return  N/A
  */
-void vI2C_DebugInit( DAL_HDL pxParentHandle );
+void vI2C_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _I2C_DEBUG_H_ */
-

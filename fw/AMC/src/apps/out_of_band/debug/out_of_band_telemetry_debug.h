@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the in band telemetry defintions
@@ -22,6 +22,6 @@
  *
  * @return  N/A
  */
-void vOUT_OF_BAND_TELEMETRY_DebugInit( DAL_HDL pxParentHandle );
+void vOUT_OF_BAND_TELEMETRY_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _OUT_OF_BAND_TELEMETRY_H_ */

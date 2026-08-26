@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the Event Library (EVL) debug access
@@ -24,7 +24,6 @@
  *
  * @return  N/A
  */
-void vEVL_DebugInit( DAL_HDL pxParentHandle );
+void vEVL_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _EVL_DEBUG_H_ */
-

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the in band telemetry debug access
@@ -25,7 +25,6 @@
  *
  * @return  N/A
  */
-void vIN_BAND_TELEMETRY_DebugInit( DAL_HDL pxParentHandle, uint64_t ullsharedMemBaseAddr );
+void vIN_BAND_TELEMETRY_DebugInit(DAL_HDL pxParentHandle, uint64_t ullsharedMemBaseAddr);
 
 #endif /* _IN_BAND_TELEMETRY_DEBUG_H_ */
-

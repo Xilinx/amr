@@ -26,7 +26,7 @@
  * @return  OK                  Driver successfully init
  *          ERROR               Driver init failed
  */
-int iEMMC_Initialise( uint32_t ulBaseAddr );
+int iEMMC_Initialise(uint32_t ulBaseAddr);
 
 /**
  * @brief   Read from the EMMC.
@@ -38,7 +38,7 @@ int iEMMC_Initialise( uint32_t ulBaseAddr );
  * @return  OK                  Read was successful
  *          ERROR               Read failed
  */
-int iEMMC_Read( uint64_t ullAddress, uint32_t ulBlockCount, uint8_t *pucReadBuff );
+int iEMMC_Read(uint64_t ullAddress, uint32_t ulBlockCount, uint8_t* pucReadBuff);
 
 /**
  * @brief   Write to the EMMC.
@@ -50,7 +50,7 @@ int iEMMC_Read( uint64_t ullAddress, uint32_t ulBlockCount, uint8_t *pucReadBuff
  * @return  OK                  Write was successful
  *          ERROR               Write failed
  */
-int iEMMC_Write( uint64_t ullAddress, uint32_t ulBlockCount, const uint8_t *pucWriteBuff );
+int iEMMC_Write(uint64_t ullAddress, uint32_t ulBlockCount, const uint8_t* pucWriteBuff);
 
 /**
  * @brief   Erase blocks in the EMMC.
@@ -61,7 +61,7 @@ int iEMMC_Write( uint64_t ullAddress, uint32_t ulBlockCount, const uint8_t *pucW
  * @return  OK                  Erase was successful
  *          ERROR               Erase failed
  */
-int iEMMC_Erase( uint64_t ullStartBlockAddress, uint64_t ullEndBlockAddress );
+int iEMMC_Erase(uint64_t ullStartBlockAddress, uint64_t ullEndBlockAddress);
 
 /**
  * @brief   Erase all the blocks in the EMMC.
@@ -69,7 +69,7 @@ int iEMMC_Erase( uint64_t ullStartBlockAddress, uint64_t ullEndBlockAddress );
  * @return  OK                  Erase was successful
  *          ERROR               Erase failed
  */
-int iEMMC_EraseAll( void );
+int iEMMC_EraseAll(void);
 
 /**
  * @brief   Print the EMMC detected device details.
@@ -77,7 +77,7 @@ int iEMMC_EraseAll( void );
  * @return  OK                  Details printed successfully
  *          ERROR               Details not printed
  */
-int iEMMC_PrintInstanceDetails( void );
+int iEMMC_PrintInstanceDetails(void);
 
 /**
  * @brief   Print all the stats gathered by the driver
@@ -86,7 +86,7 @@ int iEMMC_PrintInstanceDetails( void );
  *          ERROR               Stats not retrieved successfully
  *
  */
-int iEMMC_PrintStatistics( void );
+int iEMMC_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the driver
@@ -95,6 +95,6 @@ int iEMMC_PrintStatistics( void );
  *          ERROR               Stats not cleared successfully
  *
  */
-int iEMMC_ClearStatistics( void );
+int iEMMC_ClearStatistics(void);
 
 #endif /* _EMMC_H_ */

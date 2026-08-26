@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the PLDM support functions
@@ -22,7 +22,7 @@
  *
  * @return  Max number of PLDM Types
  */
-int getPldmTypeSupport( uint8_t *typeSupported );
+int getPldmTypeSupport(uint8_t* typeSupported);
 
 /**
  * @brief   Check if PLDM Command is supported
@@ -33,7 +33,7 @@ int getPldmTypeSupport( uint8_t *typeSupported );
  *
  * @return  Response size
  */
-int getPldmCmdSupport( const uint8_t type, const uint8_t *ver, uint8_t *cmdSupported );
+int getPldmCmdSupport(const uint8_t type, const uint8_t* ver, uint8_t* cmdSupported);
 
 /**
  * @brief   Check if PLDM Version is supported
@@ -46,11 +46,11 @@ int getPldmCmdSupport( const uint8_t type, const uint8_t *ver, uint8_t *cmdSuppo
  *
  * @return  1 Version supported, 0 if not supported
  */
-int getPldmVersionSupport( const uint8_t type,
-                           uint8_t *ver,
-                           const uint32_t start_version,
-                           const uint32_t num_version,
-                           int *moreAvailable );
+int getPldmVersionSupport(const uint8_t type,
+	uint8_t* ver,
+	const uint32_t start_version,
+	const uint32_t num_version,
+	int* moreAvailable);
 
 /**
  * @brief   Get PLDM Type Support
@@ -59,7 +59,7 @@ int getPldmVersionSupport( const uint8_t type,
  *
  * @return  1 Type supported, 0 if not supported
  */
-int IsPldmTypeSupported( const uint8_t type );
+int IsPldmTypeSupported(const uint8_t type);
 
 /**
  * @brief   Check if PLDM Version is supported
@@ -70,6 +70,6 @@ int IsPldmTypeSupported( const uint8_t type );
  *
  * @return  1 Version supported, 0 if not supported
  */
-int IsPldmVersionSupported( const uint8_t type, const uint8_t *ver );
+int IsPldmVersionSupported(const uint8_t type, const uint8_t* ver);
 
 #endif /* PLDM_COMMANDS_INTERNAL_H_*/

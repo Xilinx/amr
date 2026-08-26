@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the CAT34TS02 debug access
@@ -22,6 +22,6 @@
  *
  * @return  N/A
  */
-void vCAT34TS02_DebugInit( DAL_HDL pxParentHandle );
+void vCAT34TS02_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _CAT34TS02_DEBUG_H_ */

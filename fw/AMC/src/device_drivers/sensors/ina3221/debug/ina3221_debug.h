@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the INA3221 debug access
@@ -24,6 +24,6 @@
  *
  * @return  N/A
  */
-void vINA3221_DebugInit( DAL_HDL pxParentHandle );
+void vINA3221_DebugInit(DAL_HDL pxParentHandle);
 
 #endif /* _INA3221_DEBUG_H_ */

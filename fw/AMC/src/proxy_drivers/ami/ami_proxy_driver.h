@@ -19,8 +19,8 @@
 /* Defines                                                                    */
 /******************************************************************************/
 
-#define AMI_PROXY_REQUEST_SIZE              ( 512 )
-#define AMI_PROXY_RESPONSE_SIZE             ( 16 )
+#define AMI_PROXY_REQUEST_SIZE  (512)
+#define AMI_PROXY_RESPONSE_SIZE (16)
 
 
 /******************************************************************************/
@@ -31,21 +31,20 @@
  * @enum    AMI_PROXY_DRIVER_EVENTS
  * @brief   Events raised by this proxy driver
  */
-typedef enum
-{
-    AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START = 0,
-    AMI_PROXY_DRIVER_E_PDI_COPY_START,
-    AMI_PROXY_DRIVER_E_PDI_PROGRAM_START,
-    AMI_PROXY_DRIVER_E_SENSOR_READ,
-    AMI_PROXY_DRIVER_E_GET_IDENTITY,
-    AMI_PROXY_DRIVER_E_BOOT_SELECT,
-    AMI_PROXY_DRIVER_E_HEARTBEAT,
-    AMI_PROXY_DRIVER_E_EEPROM_READ_WRITE,
-    AMI_PROXY_DRIVER_E_MODULE_READ_WRITE,
-    AMI_PROXY_DRIVER_E_DEBUG_VERBOSITY,
-    AMI_PROXY_DRIVER_E_FPT_FLAGS,
+typedef enum {
+	AMI_PROXY_DRIVER_E_PDI_DOWNLOAD_START = 0,
+	AMI_PROXY_DRIVER_E_PDI_COPY_START,
+	AMI_PROXY_DRIVER_E_PDI_PROGRAM_START,
+	AMI_PROXY_DRIVER_E_SENSOR_READ,
+	AMI_PROXY_DRIVER_E_GET_IDENTITY,
+	AMI_PROXY_DRIVER_E_BOOT_SELECT,
+	AMI_PROXY_DRIVER_E_HEARTBEAT,
+	AMI_PROXY_DRIVER_E_EEPROM_READ_WRITE,
+	AMI_PROXY_DRIVER_E_MODULE_READ_WRITE,
+	AMI_PROXY_DRIVER_E_DEBUG_VERBOSITY,
+	AMI_PROXY_DRIVER_E_FPT_FLAGS,
 
-    MAX_AMI_PROXY_DRIVER_EVENTS
+	MAX_AMI_PROXY_DRIVER_EVENTS
 
 } AMI_PROXY_DRIVER_EVENTS;
 
@@ -53,14 +52,13 @@ typedef enum
  * @enum    AMI_PROXY_CMD_SENSOR_REQUEST
  * @brief   Sensor request types
  */
-typedef enum
-{
-    AMI_PROXY_CMD_SENSOR_REQUEST_GET_SIZE = 1,
-    AMI_PROXY_CMD_SENSOR_REQUEST_GET_SDR,
-    AMI_PROXY_CMD_SENSOR_REQUEST_GET_SINGLE_SDR,
-    AMI_PROXY_CMD_SENSOR_REQUEST_ALL_SDR,
+typedef enum {
+	AMI_PROXY_CMD_SENSOR_REQUEST_GET_SIZE = 1,
+	AMI_PROXY_CMD_SENSOR_REQUEST_GET_SDR,
+	AMI_PROXY_CMD_SENSOR_REQUEST_GET_SINGLE_SDR,
+	AMI_PROXY_CMD_SENSOR_REQUEST_ALL_SDR,
 
-    MAX_AMI_PROXY_CMD_SENSOR_REQUEST
+	MAX_AMI_PROXY_CMD_SENSOR_REQUEST
 
 } AMI_PROXY_CMD_SENSOR_REQUEST;
 
@@ -68,20 +66,19 @@ typedef enum
  * @enum    AMI_PROXY_CMD_SENSOR_REPO
  * @brief   Sensor repo request types
  */
-typedef enum
-{
-    AMI_PROXY_CMD_SENSOR_REPO_GET_SIZE = 0,
-    AMI_PROXY_CMD_SENSOR_REPO_BDINFO,
-    AMI_PROXY_CMD_SENSOR_REPO_TEMP,
-    AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE,
-    AMI_PROXY_CMD_SENSOR_REPO_CURRENT,
-    AMI_PROXY_CMD_SENSOR_REPO_POWER,
-    AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER,
-    AMI_PROXY_CMD_SENSOR_REPO_QSFP,
-    AMI_PROXY_CMD_SENSOR_REPO_FPT,
-    AMI_PROXY_CMD_SENSOR_REPO_ALL,
+typedef enum {
+	AMI_PROXY_CMD_SENSOR_REPO_GET_SIZE = 0,
+	AMI_PROXY_CMD_SENSOR_REPO_BDINFO,
+	AMI_PROXY_CMD_SENSOR_REPO_TEMP,
+	AMI_PROXY_CMD_SENSOR_REPO_VOLTAGE,
+	AMI_PROXY_CMD_SENSOR_REPO_CURRENT,
+	AMI_PROXY_CMD_SENSOR_REPO_POWER,
+	AMI_PROXY_CMD_SENSOR_REPO_TOTAL_POWER,
+	AMI_PROXY_CMD_SENSOR_REPO_QSFP,
+	AMI_PROXY_CMD_SENSOR_REPO_FPT,
+	AMI_PROXY_CMD_SENSOR_REPO_ALL,
 
-    MAX_AMI_PROXY_CMD_SENSOR_REPO
+	MAX_AMI_PROXY_CMD_SENSOR_REPO
 
 } AMI_PROXY_CMD_SENSOR_REPO;
 
@@ -89,12 +86,11 @@ typedef enum
  * @enum    AMI_PROXY_CMD_RW_REQUEST
  * @brief   Request type for commands which accept read/write requests
  */
-typedef enum
-{
-    AMI_PROXY_CMD_RW_REQUEST_READ = 0,
-    AMI_PROXY_CMD_RW_REQUEST_WRITE,
+typedef enum {
+	AMI_PROXY_CMD_RW_REQUEST_READ = 0,
+	AMI_PROXY_CMD_RW_REQUEST_WRITE,
 
-    MAX_AMI_PROXY_CMD_RW_REQUEST
+	MAX_AMI_PROXY_CMD_RW_REQUEST
 
 } AMI_PROXY_CMD_RW_REQUEST;
 
@@ -102,17 +98,16 @@ typedef enum
  * @enum    AMI_PROXY_RESPONSE_RESULT
  * @brief   The response result
  */
-typedef enum
-{
-    AMI_PROXY_RESULT_SUCCESS = 0,
-    AMI_PROXY_RESULT_FAILURE,
-    AMI_PROXY_RESULT_INVALID_VALUE,
-    AMI_PROXY_RESULT_GET_REQUEST_FAILED,
-    AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED,
-    AMI_PROXY_RESULT_ALREADY_IN_PROGRESS,
-    AMI_PROXY_RESULT_INVALID_CONFIGURATION,
+typedef enum {
+	AMI_PROXY_RESULT_SUCCESS = 0,
+	AMI_PROXY_RESULT_FAILURE,
+	AMI_PROXY_RESULT_INVALID_VALUE,
+	AMI_PROXY_RESULT_GET_REQUEST_FAILED,
+	AMI_PROXY_RESULT_PROCESS_REQUEST_FAILED,
+	AMI_PROXY_RESULT_ALREADY_IN_PROGRESS,
+	AMI_PROXY_RESULT_INVALID_CONFIGURATION,
 
-    MAX_AMI_PROXY_RESULT
+	MAX_AMI_PROXY_RESULT
 
 } AMI_PROXY_RESULT;
 
@@ -125,13 +120,12 @@ typedef enum
  * @struct  AMIProxySensorRequest
  * @brief   Sensor request
  */
-typedef struct
-{
-    AMI_PROXY_CMD_SENSOR_REQUEST xRequest;
-    AMI_PROXY_CMD_SENSOR_REPO xRepo;
-    uint32_t ulSensorId;
-    uint32_t ulLength;
-    uint64_t ullAddress;
+typedef struct {
+	AMI_PROXY_CMD_SENSOR_REQUEST xRequest;
+	AMI_PROXY_CMD_SENSOR_REPO xRepo;
+	uint32_t ulSensorId;
+	uint32_t ulLength;
+	uint64_t ullAddress;
 
 } AMIProxySensorRequest;
 
@@ -139,21 +133,20 @@ typedef struct
  * @struct  AMIProxyPdiDownloadRequest
  * @brief   PDI download request
  */
-typedef struct AMIProxyPdiDownloadRequest
-{
-    int      iBootDevice;
-    int      iUpdateFpt;
-    int      iPdiProgram;
-    int      iApuPdiProgram;
-    int      iRpuPdiProgram;
-    int      iLastPacket;
-    uint64_t ullAddress;
-    uint32_t ulLength;
-    uint32_t ulPartitionSel;
-    uint16_t usPacketNum;
-    uint32_t ulPacketSize;
-    uint8_t  pucPdiMd5[MD5_SIZE];
-    uint32_t ulPdiSize;
+typedef struct AMIProxyPdiDownloadRequest {
+	int iBootDevice;
+	int iUpdateFpt;
+	int iPdiProgram;
+	int iApuPdiProgram;
+	int iRpuPdiProgram;
+	int iLastPacket;
+	uint64_t ullAddress;
+	uint32_t ulLength;
+	uint32_t ulPartitionSel;
+	uint16_t usPacketNum;
+	uint32_t ulPacketSize;
+	uint8_t pucPdiMd5[MD5_SIZE];
+	uint32_t ulPdiSize;
 
 } AMIProxyPdiDownloadRequest;
 
@@ -161,17 +154,16 @@ typedef struct AMIProxyPdiDownloadRequest
  * @struct  AMIProxyPdiProgramRequest
  * @brief   PDI program request
  */
-typedef struct
-{
-    int      iBootDevice;
-    int      iUpdateFpt;
-    int      iPdiProgram;
-    int      iLastPacket;
-    uint64_t ullAddress;
-    uint32_t ulLength;
-    uint32_t ulPartitionSel;
-    uint16_t usPacketNum;
-    uint32_t ulPacketSize;
+typedef struct {
+	int iBootDevice;
+	int iUpdateFpt;
+	int iPdiProgram;
+	int iLastPacket;
+	uint64_t ullAddress;
+	uint32_t ulLength;
+	uint32_t ulPartitionSel;
+	uint16_t usPacketNum;
+	uint32_t ulPacketSize;
 
 } AMIProxyPdiProgramRequest;
 
@@ -179,14 +171,13 @@ typedef struct
  * @struct  AMIProxyPdiCopyRequest
  * @brief   PDI copy request
  */
-typedef struct
-{
-    uint64_t ullAddress;
-    uint32_t ulMaxLength;
-    uint32_t ulSrcDevice;
-    uint32_t ulSrcPartition;
-    uint32_t ulDestDevice;
-    uint32_t ulDestPartition;
+typedef struct {
+	uint64_t ullAddress;
+	uint32_t ulMaxLength;
+	uint32_t ulSrcDevice;
+	uint32_t ulSrcPartition;
+	uint32_t ulDestDevice;
+	uint32_t ulDestPartition;
 
 } AMIProxyPdiCopyRequest;
 
@@ -194,9 +185,8 @@ typedef struct
  * @struct  AMIProxyBootSelectRequest
  * @brief   Boot select request
  */
-typedef struct
-{
-    uint32_t ulPartitionSel;
+typedef struct {
+	uint32_t ulPartitionSel;
 
 } AMIProxyBootSelectRequest;
 
@@ -204,12 +194,11 @@ typedef struct
  * @struct  AMIProxyEepromRWRequest
  * @brief   Read from or write to the eeprom
  */
-typedef struct
-{
-    AMI_PROXY_CMD_RW_REQUEST xRequest;
-    uint64_t ullAddress;
-    uint32_t ulLength;
-    uint32_t ulOffset;
+typedef struct {
+	AMI_PROXY_CMD_RW_REQUEST xRequest;
+	uint64_t ullAddress;
+	uint32_t ulLength;
+	uint32_t ulOffset;
 
 } AMIProxyEepromRWRequest;
 
@@ -217,14 +206,13 @@ typedef struct
  * @struct  AMIProxyModuleRWRequest
  * @brief   Read from or write to a QSFP module
  */
-typedef struct
-{
-    AMI_PROXY_CMD_RW_REQUEST xRequest;
-    uint64_t ullAddress;
-    uint8_t  ucExDeviceId;
-    uint8_t  ucPage;
-    uint8_t  ucByteOffset;
-    uint8_t  ucLength;
+typedef struct {
+	AMI_PROXY_CMD_RW_REQUEST xRequest;
+	uint64_t ullAddress;
+	uint8_t ucExDeviceId;
+	uint8_t ucPage;
+	uint8_t ucByteOffset;
+	uint8_t ucLength;
 
 } AMIProxyModuleRWRequest;
 
@@ -232,17 +220,17 @@ typedef struct
  * @struct  AMIProxyFptFlagsRequest
  * @brief   Read or write FPT partition flags
  */
-typedef struct
-{
-    AMI_PROXY_CMD_RW_REQUEST xRequest;  /* Read or Write */
-    uint32_t ulBootDevice;              /* Primary or Secondary boot device */
-    uint32_t ulPartitionId;             /* Partition index */
-    uint32_t ulType;                    /* Partition type */
-    uint32_t ulBaseAddr;                /* Partition base address */
-    uint32_t ulSize;                    /* Partition size */
-    uint8_t  pdi_md5[MD5_SIZE];         /* MD5 checksum of the pdi file (16 bytes). Populated by the driver. */
-    uint32_t ulPdiSize;                 /* Size of the pdi file (in bytes). Populated by the driver. */
-    uint32_t ulFlags;                   /* Flags value (for write) */
+typedef struct {
+	AMI_PROXY_CMD_RW_REQUEST xRequest; /* Read or Write */
+	uint32_t ulBootDevice;             /* Primary or Secondary boot device */
+	uint32_t ulPartitionId;            /* Partition index */
+	uint32_t ulType;                   /* Partition type */
+	uint32_t ulBaseAddr;               /* Partition base address */
+	uint32_t ulSize;                   /* Partition size */
+	uint8_t pdi_md5[MD5_SIZE]; /* MD5 checksum of the pdi file (16 bytes). Populated by the driver.
+	                            */
+	uint32_t ulPdiSize;        /* Size of the pdi file (in bytes). Populated by the driver. */
+	uint32_t ulFlags;          /* Flags value (for write) */
 
 } AMIProxyFptFlagsRequest;
 
@@ -250,16 +238,15 @@ typedef struct
  * @struct  AMI_PROXY_IDENTITY_RESPONSE
  * @brief   Identity reponse
  */
-typedef struct
-{
-    uint8_t  ucVerMajor;        /* major version number */
-    uint8_t  ucVerMinor;        /* minor version number */
-    uint8_t  ucVerPatch;        /* patch number */
-    uint8_t  ucLocalChanges;    /* 0 for no changes, 1 for changes */
-    uint16_t usDevCommits;      /* number of commits since the version tag */
+typedef struct {
+	uint8_t ucVerMajor;     /* major version number */
+	uint8_t ucVerMinor;     /* minor version number */
+	uint8_t ucVerPatch;     /* patch number */
+	uint8_t ucLocalChanges; /* 0 for no changes, 1 for changes */
+	uint16_t usDevCommits;  /* number of commits since the version tag */
 
-    uint8_t  ucLinkVerMajor;    /* major version number of the comms link */
-    uint8_t  ucLinkVerMinor;    /* minor version number of the comms link */
+	uint8_t ucLinkVerMajor; /* major version number of the comms link */
+	uint8_t ucLinkVerMinor; /* minor version number of the comms link */
 
 } AMI_PROXY_IDENTITY_RESPONSE;
 
@@ -267,9 +254,8 @@ typedef struct
  * @struct  AMI_PROXY_HEARTBEAT_RESPONSE
  * @brief   Heartbeat response
  */
-typedef struct
-{
-    uint8_t ucHeartbeatCount;   /* return the value sent in the request */
+typedef struct {
+	uint8_t ucHeartbeatCount; /* return the value sent in the request */
 
 } AMI_PROXY_HEARTBEAT_RESPONSE;
 
@@ -294,8 +280,11 @@ typedef struct
  *
  * @note    Proxy drivers can have 0 or more firmware interfaces
  */
-int iAMI_Initialise( uint8_t ucProxyId, FWIfCfg *pxFwIf, uint32_t ulFwIfPort,
-                     uint32_t ulTaskPrio, uint32_t ulTaskStack );
+int iAMI_Initialise(uint8_t ucProxyId,
+	FWIfCfg* pxFwIf,
+	uint32_t ulFwIfPort,
+	uint32_t ulTaskPrio,
+	uint32_t ulTaskStack);
 
 /**
  * @brief   Bind into this proxy driver
@@ -305,7 +294,7 @@ int iAMI_Initialise( uint8_t ucProxyId, FWIfCfg *pxFwIf, uint32_t ulFwIfPort,
  * @return  OK          Callback successfully bound
  *          ERROR       Callback not bound
  */
-int iAMI_BindCallback( EVL_CALLBACK *pxCallback );
+int iAMI_BindCallback(EVL_CALLBACK* pxCallback);
 
 
 /* Set Functions **************************************************************/
@@ -319,7 +308,7 @@ int iAMI_BindCallback( EVL_CALLBACK *pxCallback );
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetPdiDownloadCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetPdiDownloadCompleteResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the response after the PDI copy has completed
@@ -330,7 +319,7 @@ int iAMI_SetPdiDownloadCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT x
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetPdiCopyCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetPdiCopyCompleteResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the response after the PDI program has completed
@@ -341,7 +330,7 @@ int iAMI_SetPdiCopyCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResu
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetPdiProgramCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetPdiProgramCompleteResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the response after the sensor request has completed
@@ -352,7 +341,7 @@ int iAMI_SetPdiProgramCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xR
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetSensorCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetSensorCompleteResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the identity response
@@ -364,9 +353,9 @@ int iAMI_SetSensorCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResul
  * @return  OK                      Data passed to proxy driver successfully
  *          ERROR                   Data not passed successfully
  */
-int iAMI_SetIdentityResponse( EVLSignal *pxSignal,
-                              AMI_PROXY_RESULT xResult,
-                              AMI_PROXY_IDENTITY_RESPONSE *pxIdentityResponse );
+int iAMI_SetIdentityResponse(EVLSignal* pxSignal,
+	AMI_PROXY_RESULT xResult,
+	AMI_PROXY_IDENTITY_RESPONSE* pxIdentityResponse);
 
 /**
  * @brief   Set the response after the Boot select has completed
@@ -377,7 +366,7 @@ int iAMI_SetIdentityResponse( EVLSignal *pxSignal,
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetBootSelectCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetBootSelectCompleteResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the response after the EEPROM read/write has completed
@@ -388,7 +377,7 @@ int iAMI_SetBootSelectCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xR
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetEepromReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetEepromReadWriteCompleteResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the response after the module read/write has completed
@@ -399,7 +388,7 @@ int iAMI_SetEepromReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESU
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetModuleReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetModuleReadWriteCompleteResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the response after the debug verbosity request has completed
@@ -410,7 +399,7 @@ int iAMI_SetModuleReadWriteCompleteResponse( EVLSignal *pxSignal, AMI_PROXY_RESU
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetDebugVerbosityResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult );
+int iAMI_SetDebugVerbosityResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult);
 
 /**
  * @brief   Set the response after the FPT flags request has completed
@@ -422,7 +411,7 @@ int iAMI_SetDebugVerbosityResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResul
  * @return  OK          Data passed to proxy driver successfully
  *          ERROR       Data not passed successfully
  */
-int iAMI_SetFptFlagsResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags );
+int iAMI_SetFptFlagsResponse(EVLSignal* pxSignal, AMI_PROXY_RESULT xResult, uint32_t ulFlags);
 
 /* Get Functions **************************************************************/
 
@@ -435,8 +424,7 @@ int iAMI_SetFptFlagsResponse( EVLSignal *pxSignal, AMI_PROXY_RESULT xResult, uin
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
-    AMIProxyPdiDownloadRequest *pxDownloadRequest );
+int iAMI_GetPdiDownloadRequest(EVLSignal* pxSignal, AMIProxyPdiDownloadRequest* pxDownloadRequest);
 
 /**
  * @brief   Get the PDI copy request
@@ -447,8 +435,7 @@ int iAMI_GetPdiDownloadRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
-    AMIProxyPdiCopyRequest *pxCopyRequest );
+int iAMI_GetPdiCopyRequest(EVLSignal* pxSignal, AMIProxyPdiCopyRequest* pxCopyRequest);
 /**
  * @brief   Get the PDI program request
  *
@@ -458,8 +445,7 @@ int iAMI_GetPdiCopyRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
-	AMIProxyPdiProgramRequest *pxProgramRequest );
+int iAMI_GetPdiProgramRequest(EVLSignal* pxSignal, AMIProxyPdiProgramRequest* pxProgramRequest);
 
 /**
  * @brief   Get the Sensor request
@@ -470,8 +456,7 @@ int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetSensorRequest( EVLSignal *pxSignal,
-    AMIProxySensorRequest *pxSensorRequest );
+int iAMI_GetSensorRequest(EVLSignal* pxSignal, AMIProxySensorRequest* pxSensorRequest);
 
 /**
  * @brief   Get the PDI program request
@@ -482,8 +467,7 @@ int iAMI_GetSensorRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
-	AMIProxyPdiProgramRequest *pxProgramRequest );
+int iAMI_GetPdiProgramRequest(EVLSignal* pxSignal, AMIProxyPdiProgramRequest* pxProgramRequest);
 
 /**
  * @brief   Get the Boot Select request
@@ -494,8 +478,7 @@ int iAMI_GetPdiProgramRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetBootSelectRequest( EVLSignal *pxSignal,
-    AMIProxyBootSelectRequest *pxBootSelectRequest );
+int iAMI_GetBootSelectRequest(EVLSignal* pxSignal, AMIProxyBootSelectRequest* pxBootSelectRequest);
 
 /**
  * @brief   Get the eeprom read write request
@@ -506,8 +489,8 @@ int iAMI_GetBootSelectRequest( EVLSignal *pxSignal,
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
  */
-int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
-    AMIProxyEepromRWRequest *pxEepromReadWriteRequest );
+int iAMI_GetEepromReadWriteRequest(EVLSignal* pxSignal,
+	AMIProxyEepromRWRequest* pxEepromReadWriteRequest);
 
 /**
  * @brief   Get the module read write request
@@ -518,8 +501,8 @@ int iAMI_GetEepromReadWriteRequest( EVLSignal *pxSignal,
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
  */
-int iAMI_GetModuleReadWriteRequest( EVLSignal *pxSignal,
-    AMIProxyModuleRWRequest *pxModuleReadWriteRequest );
+int iAMI_GetModuleReadWriteRequest(EVLSignal* pxSignal,
+	AMIProxyModuleRWRequest* pxModuleReadWriteRequest);
 
 /**
  * @brief   Get the debug verbosity request
@@ -530,8 +513,7 @@ int iAMI_GetModuleReadWriteRequest( EVLSignal *pxSignal,
  * @return  OK                          Data retrieved from proxy driver successfully
  *          ERROR                       Data not retrieved successfully
  */
-int iAMI_GetDebugVerbosityRequest( EVLSignal *pxSignal,
-                                   uint8_t *pucDebugVerbosityRequest );
+int iAMI_GetDebugVerbosityRequest(EVLSignal* pxSignal, uint8_t* pucDebugVerbosityRequest);
 
 /**
  * @brief   Get the FPT flags request
@@ -542,8 +524,7 @@ int iAMI_GetDebugVerbosityRequest( EVLSignal *pxSignal,
  * @return  OK                      Data retrieved from proxy driver successfully
  *          ERROR                   Data not retrieved successfully
  */
-int iAMI_GetFptFlagsRequest( EVLSignal *pxSignal,
-    AMIProxyFptFlagsRequest *pxFptFlagsRequest );
+int iAMI_GetFptFlagsRequest(EVLSignal* pxSignal, AMIProxyFptFlagsRequest* pxFptFlagsRequest);
 
 /**
  * @brief   Print all the stats gathered by the application
@@ -551,7 +532,7 @@ int iAMI_GetFptFlagsRequest( EVLSignal *pxSignal,
  * @return  OK          Stats retrieved from proxy driver successfully
  *          ERROR       Stats not retrieved successfully
  */
-int iAMI_PrintStatistics( void );
+int iAMI_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the application
@@ -560,7 +541,7 @@ int iAMI_PrintStatistics( void );
  *          ERROR       Stats not cleared successfully
  *
  */
-int iAMI_ClearStatistics( void );
+int iAMI_ClearStatistics(void);
 
 /**
  * @brief   Gets the current state of the proxy driver
@@ -570,6 +551,6 @@ int iAMI_ClearStatistics( void );
  * @return  OK              If successful
  *          ERROR           If not successful
  */
-int iAMI_GetState( MODULE_STATE *pxState );
+int iAMI_GetState(MODULE_STATE* pxState);
 
 #endif /* _AMI_PROXY_DRIVER_H_ */

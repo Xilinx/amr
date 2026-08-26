@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the defintion of the SMBus FInite State Machine
@@ -11,8 +11,7 @@
 #define _SMBUS_STATE_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include "smbus.h"
@@ -27,7 +26,7 @@ extern "C"
  *
  * @return   None
  */
-void vSMBusFSM( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent );
+void vSMBusFSM(SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent);
 
 /**
  * @brief    Is a conversion function from the state enum to character string
@@ -37,7 +36,7 @@ void vSMBusFSM( SMBus_Instance* pxSMBusInstance, uint8_t ucAnyEvent );
  *
  * @return   A character string
  */
-char* pcStateToString( uint8_t xState );
+char* pcStateToString(uint8_t xState);
 
 #ifdef __cplusplus
 }

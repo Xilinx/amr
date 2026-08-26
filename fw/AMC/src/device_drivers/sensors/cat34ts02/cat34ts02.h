@@ -30,7 +30,10 @@
  *          ERROR          Temperature not read successfully
  *
  */
-int iCAT34TS02_ReadTemperature( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t ucChannelNum, float *pfTemperature );
+int iCAT34TS02_ReadTemperature(uint8_t ucI2cNum,
+	uint8_t ucSlaveAddr,
+	uint8_t ucChannelNum,
+	float* pfTemperature);
 
 /**
  * @brief   Print all the stats gathered by the driver
@@ -39,7 +42,7 @@ int iCAT34TS02_ReadTemperature( uint8_t ucI2cNum, uint8_t ucSlaveAddr, uint8_t u
  *          ERROR  Stats not retrieved successfully
  *
  */
-int iCAT34TS02_PrintStatistics( void );
+int iCAT34TS02_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the driver
@@ -48,6 +51,6 @@ int iCAT34TS02_PrintStatistics( void );
  *          ERROR  Stats not cleared successfully
  *
  */
-int iCAT34TS02_ClearStatistics( void );
+int iCAT34TS02_ClearStatistics(void);
 
 #endif /* _CAT34TS02_H_ */

@@ -34,8 +34,6 @@ OS="freertos10_xilinx"
 SDT_DIR=$BSP_DIR/"emb_plus_sdt"
 CMAKE_PARAMS="-DDEBUG_BUILD=ON"
 
-STATIC_ANALYSIS=0
-
 SCRIPT_START_TIME=$SECONDS
 
 function print_help() {
@@ -45,7 +43,6 @@ function print_help() {
     echo "-xsa <abs_path_to_xsa>  : Path to the XSA file to generate BSP from"
     echo "-sdt                    : Path to SDT folder"
     echo "-amc                    : only builds the AMC application (BSP untouched)"
-    echo "-analysis               : triggers a static analysis check on AMC files"
     echo
     echo "Any additional arguments are passed directly into CMAKE"
     echo "Note:"
@@ -70,9 +67,6 @@ while [ $# -gt 0 ]; do
     -help)
         print_help
         exit 0;;
-    -analysis)
-        STATIC_ANALYSIS=1
-        ;;
     -amc)
         ### Build AMC application only, no BSP changes
         echo "Building AMC application only"
@@ -120,29 +114,6 @@ while [ $# -gt 0 ]; do
     esac
     shift ### shift to next passed option ###
 done
-
-# Static analysis function
-function static_analysis() {
-    # Static analysis Clean
-    SECTION_START=$SECONDS
-    echo "=== Static analysis clean ==="
-    cd $BUILD_DIR
-    make clean
-    rm -rf coverity/
-
-    echo "*** Cleaning took $((SECONDS - $SECTION_START)) S ***" |& tee -a $BUILD_LOG
-
-    # Static Analysis
-    echo "=== Static Analysis ===" |& tee -a $BUILD_LOG
-    SECTION_START=$SECONDS
-    if [ $PROFILE = "v80" ] || [ $PROFILE = "rave" ]; then
-        $SCRIPTS_DIR/cov_analysis.sh -b make amc
-    else
-        ### if unexpected profile for static analysis build ###
-        echo "Error: Please specify a valid profile"
-    fi
-    echo "*** Static analysis took $((SECONDS - $SECTION_START)) S ***" |& tee -a $BUILD_LOG
-}
 
 # Clean BSP function
 function clean_bsp() {
@@ -253,11 +224,6 @@ function build_amc() {
     SECTION_START=$SECONDS
     make -j8 |& tee -a $BUILD_LOG
     echo "*** Compiling took $((SECONDS - $SECTION_START)) S ***" |& tee -a $BUILD_LOG
-
-    # static_analysis
-    if [ $STATIC_ANALYSIS == 1 ]; then
-        static_analysis
-    fi
 
     # Complete
     OUTPUT_DIR=$(realpath .)

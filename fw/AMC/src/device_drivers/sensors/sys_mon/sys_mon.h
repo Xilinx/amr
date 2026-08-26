@@ -23,26 +23,25 @@
  * @enum    SYS_MON_VOLTAGES
  * @brief   Enumeration of available SYS_MON voltage values
  */
-typedef enum
-{
-    SYS_MON_VOLTAGES_VCCAUX     =  0,
+typedef enum {
+	SYS_MON_VOLTAGES_VCCAUX = 0,
 #ifdef HAL_PROFILE_RAVE
-    SYS_MON_VOLTAGES_VCCSOC     =  1,
-    SYS_MON_VOLTAGES_VCCO302    =  2,
-    SYS_MON_VOLTAGES_VCCAUXPMC  =  3,
-    SYS_MON_VOLTAGES_VCCO500    =  4,
-    SYS_MON_VOLTAGES_VCCPMC     =  5,
-    SYS_MON_VOLTAGES_VCCPSFP    =  6,
-    SYS_MON_VOLTAGES_VCCPSLP    =  7,
-    SYS_MON_VOLTAGES_VPVN       =  8,
-    SYS_MON_VOLTAGES_VCCO703    =  9,
-    SYS_MON_VOLTAGES_VAUXCH0    = 10,
-    SYS_MON_VOLTAGES_VCCAUXSMON = 11,
+	SYS_MON_VOLTAGES_VCCSOC     = 1,
+	SYS_MON_VOLTAGES_VCCO302    = 2,
+	SYS_MON_VOLTAGES_VCCAUXPMC  = 3,
+	SYS_MON_VOLTAGES_VCCO500    = 4,
+	SYS_MON_VOLTAGES_VCCPMC     = 5,
+	SYS_MON_VOLTAGES_VCCPSFP    = 6,
+	SYS_MON_VOLTAGES_VCCPSLP    = 7,
+	SYS_MON_VOLTAGES_VPVN       = 8,
+	SYS_MON_VOLTAGES_VCCO703    = 9,
+	SYS_MON_VOLTAGES_VAUXCH0    = 10,
+	SYS_MON_VOLTAGES_VCCAUXSMON = 11,
 #else
-    SYS_MON_VOLTAGES_VCCAUXSMON =  1,
-    SYS_MON_VOLTAGES_VCCAUXPMC  =  2,
+	SYS_MON_VOLTAGES_VCCAUXSMON = 1,
+	SYS_MON_VOLTAGES_VCCAUXPMC  = 2,
 #endif
-    MAX_SYS_MON_VOLTAGE
+	MAX_SYS_MON_VOLTAGE
 } SYS_MON_VOLTAGES;
 
 
@@ -57,7 +56,7 @@ typedef enum
  *          ERROR               SYS_MON was not initialised
  *
  */
-int iSYS_MON_Initialise( void );
+int iSYS_MON_Initialise(void);
 
 /**
  * @brief   Read temperature from System Monitor
@@ -68,7 +67,7 @@ int iSYS_MON_Initialise( void );
  *          ERROR               Temperature not read successfully
  *
  */
-int iSYS_MON_ReadTemperature( float *pfTemperatureInC );
+int iSYS_MON_ReadTemperature(float* pfTemperatureInC);
 
 /**
  * @brief   Read voltage from System Monitor
@@ -80,7 +79,7 @@ int iSYS_MON_ReadTemperature( float *pfTemperatureInC );
  *          ERROR               Voltage not read successfully
  *
  */
-int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES xVoltageType, float *pfVoltageInMV );
+int iSYS_MON_ReadVoltage(SYS_MON_VOLTAGES xVoltageType, float* pfVoltageInMV);
 
 /**
  * @brief   Print all the stats gathered by the driver
@@ -89,7 +88,7 @@ int iSYS_MON_ReadVoltage( SYS_MON_VOLTAGES xVoltageType, float *pfVoltageInMV );
  *          ERROR               Stats not retrieved successfully
  *
  */
-int iSYS_MON_PrintStatistics( void );
+int iSYS_MON_PrintStatistics(void);
 
 /**
  * @brief   Clear all the stats in the driver
@@ -98,6 +97,6 @@ int iSYS_MON_PrintStatistics( void );
  *          ERROR               Stats not cleared successfully
  *
  */
-int iSYS_MON_ClearStatistics( void );
+int iSYS_MON_ClearStatistics(void);
 
 #endif /* _SYS_MON_H_ */

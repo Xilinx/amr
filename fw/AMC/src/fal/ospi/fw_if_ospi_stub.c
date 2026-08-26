@@ -18,16 +18,16 @@
 /* Defines                                                                   */
 /*****************************************************************************/
 
-#define FW_IF_OSPI_NAME             "FW_IF_OSPI"
+#define FW_IF_OSPI_NAME "FW_IF_OSPI"
 
-#define CHECK_DRIVER                ( FW_IF_FALSE == iInitialised )
-#define CHECK_FIREWALLS( f )        ( ( f->upperFirewall != UPPER_FIREWALL ) && \
-                                      ( f->lowerFirewall != UPPER_FIREWALL ) )
+#define CHECK_DRIVER (FW_IF_FALSE == iInitialised)
+#define CHECK_FIREWALLS(f) \
+	((f->upperFirewall != UPPER_FIREWALL) && (f->lowerFirewall != UPPER_FIREWALL))
 
-#define CHECK_HDL( f )              ( NULL == f )
-#define CHECK_CFG( f )              ( NULL == ( f )->cfg )
+#define CHECK_HDL(f) (NULL == f)
+#define CHECK_CFG(f) (NULL == (f)->cfg)
 
-#define FAL_OSPI_STATE_ENTRY( _s )  [ FW_IF_OSPI_STATE_ ## _s ] = #_s
+#define FAL_OSPI_STATE_ENTRY(_s) [FW_IF_OSPI_STATE_##_s] = #_s
 
 
 /*****************************************************************************/
@@ -38,12 +38,11 @@ static FWIfOspiInitCfg xLocalCfg = { 0 };
 
 static int iInitialised = FW_IF_FALSE;
 
-static const char* const pcOspiStateModeStr[ ] =
-{
-    FAL_OSPI_STATE_ENTRY( INIT ),
-    FAL_OSPI_STATE_ENTRY( OPENED ),
-    FAL_OSPI_STATE_ENTRY( CLOSED ),
-    FAL_OSPI_STATE_ENTRY( ERROR )
+static const char* const pcOspiStateModeStr[] = {
+	FAL_OSPI_STATE_ENTRY(INIT),
+	FAL_OSPI_STATE_ENTRY(OPENED),
+	FAL_OSPI_STATE_ENTRY(CLOSED),
+	FAL_OSPI_STATE_ENTRY(ERROR),
 };
 
 
@@ -58,7 +57,7 @@ static const char* const pcOspiStateModeStr[ ] =
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulOspiOpen( void *pvFwIf );
+static uint32_t ulOspiOpen(void* pvFwIf);
 
 /**
  * @brief   Local implementation of FW_IF_close
@@ -67,7 +66,7 @@ static uint32_t ulOspiOpen( void *pvFwIf );
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulOspiClose( void *pvFwIf );
+static uint32_t ulOspiClose(void* pvFwIf);
 
 /**
  * @brief   Writes data from an instance of the specific fw_if
@@ -80,11 +79,11 @@ static uint32_t ulOspiClose( void *pvFwIf );
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulOspiWrite( void *pvFwIf,
-                              uint64_t ullAddrOffset,
-                              uint8_t *pucData,
-                              uint32_t ulLength,
-                              uint32_t ulTimeoutMs );
+static uint32_t ulOspiWrite(void* pvFwIf,
+	uint64_t ullAddrOffset,
+	uint8_t* pucData,
+	uint32_t ulLength,
+	uint32_t ulTimeoutMs);
 
 /**
  * @brief   Local implementation of FW_IF_read
@@ -98,11 +97,11 @@ static uint32_t ulOspiWrite( void *pvFwIf,
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulOspiRead( void *pvFwIf,
-                             uint64_t ullAddrOffset,
-                             uint8_t *pucData,
-                             uint32_t *pulLength,
-                             uint32_t ulTimeoutMs );
+static uint32_t ulOspiRead(void* pvFwIf,
+	uint64_t ullAddrOffset,
+	uint8_t* pucData,
+	uint32_t* pulLength,
+	uint32_t ulTimeoutMs);
 
 /**
  * @brief   Local implementation of FW_IF_ioctrl
@@ -113,7 +112,7 @@ static uint32_t ulOspiRead( void *pvFwIf,
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulOspiIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue );
+static uint32_t ulOspiIoCtrl(void* pvFwIf, uint32_t ulOption, void* pvValue);
 
 /**
  * @brief   Local implementation of FW_IF_bindCallback
@@ -123,7 +122,7 @@ static uint32_t ulOspiIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue );
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulOspiBindCallback( void *vFwIf, FW_IF_callback *pxNewFunc );
+static uint32_t ulOspiBindCallback(void* vFwIf, FW_IF_callback* pxNewFunc);
 
 /**
  * @brief   Validate the read/write access address is in range
@@ -134,7 +133,9 @@ static uint32_t ulOspiBindCallback( void *vFwIf, FW_IF_callback *pxNewFunc );
  *
  * @return  See FW_IF_ERRORS
  */
-static uint32_t ulValidateAddressRange( FWIfOspiCfg *pxCfg, uint32_t ulAddrOffset, uint32_t ulLength );
+static uint32_t ulValidateAddressRange(FWIfOspiCfg* pxCfg,
+	uint32_t ulAddrOffset,
+	uint32_t ulLength);
 
 
 /******************************************************************************/
@@ -144,83 +145,74 @@ static uint32_t ulValidateAddressRange( FWIfOspiCfg *pxCfg, uint32_t ulAddrOffse
 /**
  * @brief   initialisation function for OSPI interfaces (generic across all OSPI interfaces)
  */
-uint32_t ulFW_IF_OSPI_Init( FWIfOspiInitCfg *pxInitCfg )
+uint32_t ulFW_IF_OSPI_Init(FWIfOspiInitCfg* pxInitCfg)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    if( FW_IF_FALSE != iInitialised )
-    {
-        xRet = FW_IF_ERRORS_DRIVER_IN_USE;
-    }
-    else if ( NULL != pxInitCfg )
-    {
-        /*
-         * Initilise config data shared between all instances of OSPI.
-         */
-        pvOSAL_MemCpy( &xLocalCfg, pxInitCfg, sizeof( FWIfOspiInitCfg ) );
+	if (FW_IF_FALSE != iInitialised) {
+		xRet = FW_IF_ERRORS_DRIVER_IN_USE;
+	} else if (NULL != pxInitCfg) {
+		/*
+		 * Initilise config data shared between all instances of OSPI.
+		 */
+		pvOSAL_MemCpy(&xLocalCfg, pxInitCfg, sizeof(FWIfOspiInitCfg));
 
-        /*
-         * Initialise the driver based on the device id supplied in the xparameters.h
-         * and the page size 'ospi_flash_init()', The default page size in versal is 256.
-         */
-        PLL_DBG( FW_IF_OSPI_NAME, "Device Addr:%d\r\n", xLocalCfg.ulOspiBaseAddress );
-        PLL_DBG( FW_IF_OSPI_NAME, "Page Size:%d\r\n", xLocalCfg.usPageSize );
-        iInitialised = FW_IF_TRUE;
-    }
-    else
-    {
-        xRet = FW_IF_ERRORS_PARAMS;
-    }
+		/*
+		 * Initialise the driver based on the device id supplied in the xparameters.h
+		 * and the page size 'ospi_flash_init()', The default page size in versal is 256.
+		 */
+		PLL_DBG(FW_IF_OSPI_NAME, "Device Addr:%d\r\n", xLocalCfg.ulOspiBaseAddress);
+		PLL_DBG(FW_IF_OSPI_NAME, "Page Size:%d\r\n", xLocalCfg.usPageSize);
+		iInitialised = FW_IF_TRUE;
+	} else {
+		xRet = FW_IF_ERRORS_PARAMS;
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief   opens an instance of the OSPI interface
  */
-uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFwIf, FWIfOspiCfg *pxOspiCfg )
+uint32_t ulFW_IF_OSPI_Create(FWIfCfg* pxFwIf, FWIfOspiCfg* pxOspiCfg)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+	if (CHECK_DRIVER) {
+		return FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	}
 
-    if( ( NULL != pxFwIf ) &&
-        ( NULL != pxOspiCfg ) )
-    {
+	if ((NULL != pxFwIf) && (NULL != pxOspiCfg)) {
+		FWIfCfg myLocalIf = {
+			.upperFirewall = UPPER_FIREWALL,
+			.open          = &ulOspiOpen,
+			.close         = &ulOspiClose,
+			.write         = &ulOspiWrite,
+			.read          = &ulOspiRead,
+			.ioctrl        = &ulOspiIoCtrl,
+			.bindCallback  = &ulOspiBindCallback,
+			.cfg           = (void*)pxOspiCfg,
+			.lowerFirewall = UPPER_FIREWALL,
+		};
 
-        FWIfCfg myLocalIf =
-        {
-            .upperFirewall  = UPPER_FIREWALL,
-            .open           = &ulOspiOpen,
-            .close          = &ulOspiClose,
-            .write          = &ulOspiWrite,
-            .read           = &ulOspiRead,
-            .ioctrl         = &ulOspiIoCtrl,
-            .bindCallback   = &ulOspiBindCallback,
-            .cfg            = ( void* )pxOspiCfg,
-            .lowerFirewall  = UPPER_FIREWALL
-        };
+		pvOSAL_MemCpy(pxFwIf, &myLocalIf, sizeof(FWIfCfg));
 
-        pvOSAL_MemCpy( pxFwIf, &myLocalIf, sizeof( FWIfCfg ) );
+		FWIfOspiCfg* pxCfg = (FWIfOspiCfg*)pxFwIf->cfg;
 
-        FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxFwIf->cfg;
+		/*
+		 * Configuration options, start address will the offset to the RPU/APU
+		 * or SC address within the flash device
+		 */
+		PLL_DBG(FW_IF_OSPI_NAME, "Start Address: 0x%x\r\n", pxCfg->ulBaseAddress);
+		PLL_DBG(FW_IF_OSPI_NAME, "Length: 0x%x\r\n", pxCfg->ulLength);
+		PLL_DBG(FW_IF_OSPI_NAME, "Flag Erase Before Write: %d\r\n", pxCfg->ucEraseBeforeWriteFlag);
+		pxCfg->xState = FW_IF_OSPI_STATE_INIT;
+		xRet          = FW_IF_ERRORS_NONE;
+	} else {
+		xRet = FW_IF_ERRORS_PARAMS;
+	}
 
-        /*
-         * Configuration options, start address will the offset to the RPU/APU
-         * or SC address within the flash device
-         */
-        PLL_DBG( FW_IF_OSPI_NAME, "Start Address: 0x%x\r\n", pxCfg->ulBaseAddress );
-        PLL_DBG( FW_IF_OSPI_NAME, "Length: 0x%x\r\n", pxCfg->ulLength );
-        PLL_DBG( FW_IF_OSPI_NAME, "Flag Erase Before Write: %d\r\n", pxCfg->ucEraseBeforeWriteFlag );
-        pxCfg->xState = FW_IF_OSPI_STATE_INIT;
-        xRet = FW_IF_ERRORS_NONE;
-    }
-    else
-    {
-        xRet = FW_IF_ERRORS_PARAMS;
-    }
-
-    return xRet;
+	return xRet;
 }
 
 
@@ -231,287 +223,311 @@ uint32_t ulFW_IF_OSPI_Create( FWIfCfg *pxFwIf, FWIfOspiCfg *pxOspiCfg )
 /**
  * @brief   Local implementation of FW_IF_open
  */
-static uint32_t ulOspiOpen( void *pvFwIf )
+static uint32_t ulOspiOpen(void* pvFwIf)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_CFG( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
-    if( CHECK_FIREWALLS( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	if (CHECK_HDL(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_CFG(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_CFG;
+	}
+	if (CHECK_FIREWALLS(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_DRIVER) {
+		return FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	}
 
-    FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
-    if( FW_IF_OSPI_STATE_INIT == pxCfg->xState )
-    {
-        pxCfg->xState = FW_IF_OSPI_STATE_OPENED;
-        PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_open\r\n" );
-    }
-    else
-    {
-        xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
-        PLL_ERR( FW_IF_OSPI_NAME, "Error: open() should only be called from init state [%s]\r\n",
-                 pcOspiStateModeStr[ pxCfg->xState ] );
-    }
+	FWIfOspiCfg* pxCfg = (FWIfOspiCfg*)pxThisIf->cfg;
+	if (FW_IF_OSPI_STATE_INIT == pxCfg->xState) {
+		pxCfg->xState = FW_IF_OSPI_STATE_OPENED;
+		PLL_DBG(FW_IF_OSPI_NAME, "OSPI FW_IF_open\r\n");
+	} else {
+		xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
+		PLL_ERR(FW_IF_OSPI_NAME,
+			"Error: open() should only be called from init state [%s]\r\n",
+			pcOspiStateModeStr[pxCfg->xState]);
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief   Local implementation of FW_IF_close
  */
-static uint32_t ulOspiClose( void *pvFwIf )
+static uint32_t ulOspiClose(void* pvFwIf)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_CFG( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
-    if( CHECK_FIREWALLS( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	if (CHECK_HDL(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_CFG(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_CFG;
+	}
+	if (CHECK_FIREWALLS(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_DRIVER) {
+		return FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	}
 
-    FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
-    if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
-    {
-        pxCfg->xState = FW_IF_OSPI_STATE_CLOSED;
-        PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_close\r\n" );
-    }
-    else
-    {
-        xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
-        PLL_DBG( FW_IF_OSPI_NAME, "Error: close() should only be called from opened state [%s]\r\n",
-                 pcOspiStateModeStr[ pxCfg->xState ] );
-    }
+	FWIfOspiCfg* pxCfg = (FWIfOspiCfg*)pxThisIf->cfg;
+	if (FW_IF_OSPI_STATE_OPENED == pxCfg->xState) {
+		pxCfg->xState = FW_IF_OSPI_STATE_CLOSED;
+		PLL_DBG(FW_IF_OSPI_NAME, "OSPI FW_IF_close\r\n");
+	} else {
+		xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
+		PLL_DBG(FW_IF_OSPI_NAME,
+			"Error: close() should only be called from opened state [%s]\r\n",
+			pcOspiStateModeStr[pxCfg->xState]);
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief   Local implementation of FW_IF_write
  */
-static uint32_t ulOspiWrite( void *pvFwIf,
-                             uint64_t ullAddrOffset,
-                             uint8_t *pucData,
-                             uint32_t ulLength,
-                             uint32_t ulTimeoutMs )
+static uint32_t ulOspiWrite(void* pvFwIf,
+	uint64_t ullAddrOffset,
+	uint8_t* pucData,
+	uint32_t ulLength,
+	uint32_t ulTimeoutMs)
 {
-    FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
-    uint32_t ulAddrOffset = ( uint32_t )ullAddrOffset;
+	FW_IF_ERRORS xRet     = FW_IF_ERRORS_NONE;
+	uint32_t ulAddrOffset = (uint32_t)ullAddrOffset;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_CFG( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
-    if( CHECK_FIREWALLS( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	if (CHECK_HDL(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_CFG(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_CFG;
+	}
+	if (CHECK_FIREWALLS(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_DRIVER) {
+		return FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	}
 
-    FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
-    if( ( NULL != pucData ) )
-    {
-        if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
-        {
-            PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_write Offset:0x%x Addr:0x%x\r\n",
-                     ulAddrOffset,
-                     pxCfg->ulBaseAddress + ulAddrOffset);
+	FWIfOspiCfg* pxCfg = (FWIfOspiCfg*)pxThisIf->cfg;
+	if ((NULL != pucData)) {
+		if (FW_IF_OSPI_STATE_OPENED == pxCfg->xState) {
+			PLL_DBG(FW_IF_OSPI_NAME,
+				"OSPI FW_IF_write Offset:0x%x Addr:0x%x\r\n",
+				ulAddrOffset,
+				pxCfg->ulBaseAddress + ulAddrOffset);
 
-            xRet = ulValidateAddressRange( pxCfg, ulAddrOffset, ulLength );
-            if( FW_IF_ERRORS_NONE == xRet )
-            {
-                /* Check flag to see if erase if required before write */
-                if( FW_IF_TRUE == pxCfg->ucEraseBeforeWriteFlag )
-                {
-                    /* Call ospi function: ospi_flash_erase() */
-                    PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_write: erase before write\r\n" );
-                }
+			xRet = ulValidateAddressRange(pxCfg, ulAddrOffset, ulLength);
+			if (FW_IF_ERRORS_NONE == xRet) {
+				/* Check flag to see if erase if required before write */
+				if (FW_IF_TRUE == pxCfg->ucEraseBeforeWriteFlag) {
+					/* Call ospi function: ospi_flash_erase() */
+					PLL_DBG(FW_IF_OSPI_NAME, "OSPI FW_IF_write: erase before write\r\n");
+				}
 
-                /* Call ospi function: ospi_flash_write() */
-            }
-        }
-        else
-        {
-            xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
-            PLL_ERR( FW_IF_OSPI_NAME, "Error: write() should only be called from opened state [%s]\r\n",
-                     pcOspiStateModeStr[ pxCfg->xState ] );
-        }
-    }
-    else
-    {
-        xRet = FW_IF_ERRORS_PARAMS;
-    }
+				/* Call ospi function: ospi_flash_write() */
+			}
+		} else {
+			xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
+			PLL_ERR(FW_IF_OSPI_NAME,
+				"Error: write() should only be called from opened state [%s]\r\n",
+				pcOspiStateModeStr[pxCfg->xState]);
+		}
+	} else {
+		xRet = FW_IF_ERRORS_PARAMS;
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief   Local implementation of FW_IF_read
  */
-static uint32_t ulOspiRead( void *pvFwIf,
-                            uint64_t ullAddrOffset,
-                            uint8_t *pucData,
-                            uint32_t *pulLength,
-                            uint32_t ulTimeoutMs )
+static uint32_t ulOspiRead(void* pvFwIf,
+	uint64_t ullAddrOffset,
+	uint8_t* pucData,
+	uint32_t* pulLength,
+	uint32_t ulTimeoutMs)
 {
-    FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
-    uint32_t ulAddrOffset = ( uint32_t )ullAddrOffset;
+	FW_IF_ERRORS xRet     = FW_IF_ERRORS_NONE;
+	uint32_t ulAddrOffset = (uint32_t)ullAddrOffset;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) )       { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_CFG( pxThisIf ) )       { return FW_IF_ERRORS_INVALID_CFG; }
-    if( CHECK_FIREWALLS( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_DRIVER )                { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	if (CHECK_HDL(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_CFG(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_CFG;
+	}
+	if (CHECK_FIREWALLS(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_DRIVER) {
+		return FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	}
 
-    FWIfOspiCfg *pxCfg = ( FWIfOspiCfg* )pxThisIf->cfg;
+	FWIfOspiCfg* pxCfg = (FWIfOspiCfg*)pxThisIf->cfg;
 
-    if( ( NULL != pucData ) &&
-        ( NULL != pulLength ) )
-    {
-        if( FW_IF_OSPI_STATE_OPENED == pxCfg->xState )
-        {
-            PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_read Offset:0x%x Addr:0x%x\r\n",
-                     ulAddrOffset,
-                     pxCfg->ulBaseAddress + ulAddrOffset);
+	if ((NULL != pucData) && (NULL != pulLength)) {
+		if (FW_IF_OSPI_STATE_OPENED == pxCfg->xState) {
+			PLL_DBG(FW_IF_OSPI_NAME,
+				"OSPI FW_IF_read Offset:0x%x Addr:0x%x\r\n",
+				ulAddrOffset,
+				pxCfg->ulBaseAddress + ulAddrOffset);
 
-            xRet = ulValidateAddressRange( pxCfg, ulAddrOffset, *pulLength );
-            if( FW_IF_ERRORS_NONE == xRet )
-            {
-                /*
-                 * Call ospi function: ospi_flash_read() and return the number
-                 * of bytes read using ulSize
-                 */
-            }
-        }
-        else
-        {
-            xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
-            PLL_DBG( FW_IF_OSPI_NAME, "Error: read() should only be called from opened state [%s]\r\n",
-                     pcOspiStateModeStr[ pxCfg->xState ] );
-        }
-    }
-    else
-    {
-        xRet = FW_IF_ERRORS_PARAMS;
-    }
+			xRet = ulValidateAddressRange(pxCfg, ulAddrOffset, *pulLength);
+			if (FW_IF_ERRORS_NONE == xRet) {
+				/*
+				 * Call ospi function: ospi_flash_read() and return the number
+				 * of bytes read using ulSize
+				 */
+			}
+		} else {
+			xRet = FW_IF_OSPI_ERRORS_INVALID_STATE;
+			PLL_DBG(FW_IF_OSPI_NAME,
+				"Error: read() should only be called from opened state [%s]\r\n",
+				pcOspiStateModeStr[pxCfg->xState]);
+		}
+	} else {
+		xRet = FW_IF_ERRORS_PARAMS;
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief   Local implementation of FW_IF_ioctrl
  */
-static uint32_t ulOspiIoCtrl( void *pvFwIf, uint32_t ulOption, void *pvValue )
+static uint32_t ulOspiIoCtrl(void* pvFwIf, uint32_t ulOption, void* pvValue)
 {
-    FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
+	FW_IF_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_CFG( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
-    if( CHECK_FIREWALLS( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	if (CHECK_HDL(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_CFG(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_CFG;
+	}
+	if (CHECK_FIREWALLS(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_DRIVER) {
+		return FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	}
 
-    /*
-     * Specialization options supported outside definition of standard API.
-     */
-    switch( ulOption )
-    {
-    case FW_IF_COMMON_IOCTRL_FLUSH_TX:
-    case FW_IF_COMMON_IOCTRL_FLUSH_RX:
-    case FW_IF_COMMON_IOCTRL_GET_RX_MODE:
-        /*
-         * Handle common IOCTL's.
-         */
-        break;
+	/*
+	 * Specialization options supported outside definition of standard API.
+	 */
+	switch (ulOption) {
+	case FW_IF_COMMON_IOCTRL_FLUSH_TX:
+	case FW_IF_COMMON_IOCTRL_FLUSH_RX:
+	case FW_IF_COMMON_IOCTRL_GET_RX_MODE:
+		/*
+		 * Handle common IOCTL's.
+		 */
+		break;
 
-    case FW_IF_OSPI_IOCTL_GET_PROGRESS:
-        /*
-         * Will call ospi_flash_progress( ) to get the progress of the operation
-         */
-        break;
+	case FW_IF_OSPI_IOCTL_GET_PROGRESS:
+		/*
+		 * Will call ospi_flash_progress( ) to get the progress of the operation
+		 */
+		break;
 
-    default:
-        xRet = FW_IF_ERRORS_UNRECOGNISED_OPTION;
-        PLL_ERR( FW_IF_OSPI_NAME, "OSPI IOCTL - Unrecognised option\r\n" );
-        break;
-    }
+	default:
+		xRet = FW_IF_ERRORS_UNRECOGNISED_OPTION;
+		PLL_ERR(FW_IF_OSPI_NAME, "OSPI IOCTL - Unrecognised option\r\n");
+		break;
+	}
 
-    if( FW_IF_ERRORS_NONE == xRet )
-    {
-        PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_ioctl\r\n" );
-    }
+	if (FW_IF_ERRORS_NONE == xRet) {
+		PLL_DBG(FW_IF_OSPI_NAME, "OSPI FW_IF_ioctl\r\n");
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief   Local implementation of FW_IF_bindCallback
  */
-static uint32_t ulOspiBindCallback( void *pvFwIf, FW_IF_callback *pxNewFunc )
+static uint32_t ulOspiBindCallback(void* pvFwIf, FW_IF_callback* pxNewFunc)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_NONE;
 
-    FWIfCfg *pxThisIf = ( FWIfCfg* )pvFwIf;
-    if( CHECK_HDL( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_CFG( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_CFG; }
-    if( CHECK_FIREWALLS( pxThisIf ) ) { return FW_IF_ERRORS_INVALID_HANDLE; }
-    if( CHECK_DRIVER ) { return FW_IF_ERRORS_DRIVER_NOT_INITIALISED; }
+	FWIfCfg* pxThisIf = (FWIfCfg*)pvFwIf;
+	if (CHECK_HDL(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_CFG(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_CFG;
+	}
+	if (CHECK_FIREWALLS(pxThisIf)) {
+		return FW_IF_ERRORS_INVALID_HANDLE;
+	}
+	if (CHECK_DRIVER) {
+		return FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	}
 
-    if( NULL != pxNewFunc )
-    {
-        /*
-         * Binds in callback provided to the FW_IF.
-         * Callback will be invoked when by the driver when event occurs.
-         */
-        pxThisIf->raiseEvent = pxNewFunc;
-        PLL_DBG( FW_IF_OSPI_NAME, "OSPI FW_IF_bindCallback called\r\n" );
-    }
-    else
-    {
-        xRet = FW_IF_ERRORS_PARAMS;
-    }
+	if (NULL != pxNewFunc) {
+		/*
+		 * Binds in callback provided to the FW_IF.
+		 * Callback will be invoked when by the driver when event occurs.
+		 */
+		pxThisIf->raiseEvent = pxNewFunc;
+		PLL_DBG(FW_IF_OSPI_NAME, "OSPI FW_IF_bindCallback called\r\n");
+	} else {
+		xRet = FW_IF_ERRORS_PARAMS;
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief   Validate the read/write access address is in range
  */
-static uint32_t ulValidateAddressRange( FWIfOspiCfg *pxCfg, uint32_t ulAddrOffset, uint32_t ulLength )
+static uint32_t ulValidateAddressRange(FWIfOspiCfg* pxCfg, uint32_t ulAddrOffset, uint32_t ulLength)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_OSPI_ERRORS_DRIVER_INVALID_ADDRESS;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_OSPI_ERRORS_DRIVER_INVALID_ADDRESS;
 
-    if( NULL != pxCfg )
-    {
-        /*
-         * Test the offset plus the length is less than the total length
-         */
-        if( ( ulAddrOffset + ulLength ) <= pxCfg->ulLength )
-        {
-            xRet = FW_IF_ERRORS_NONE;
-        }
-    }
+	if (NULL != pxCfg) {
+		/*
+		 * Test the offset plus the length is less than the total length
+		 */
+		if ((ulAddrOffset + ulLength) <= pxCfg->ulLength) {
+			xRet = FW_IF_ERRORS_NONE;
+		}
+	}
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief    Print all the stats gathered by the driver
  */
-int iFW_IF_OSPI_PrintStatistics( void )
+int iFW_IF_OSPI_PrintStatistics(void)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
 
-    /* TODO implement print stats */
+	/* TODO implement print stats */
 
-    return xRet;
+	return xRet;
 }
 
 /**
  * @brief    Clears all the stats gathered by the driver
  */
-int iFW_IF_OSPI_ClearStatistics( void )
+int iFW_IF_OSPI_ClearStatistics(void)
 {
-    FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
+	FW_IF_OSPI_ERRORS xRet = FW_IF_ERRORS_DRIVER_NOT_INITIALISED;
 
-    /* TODO implement clear stats */
+	/* TODO implement clear stats */
 
-    return xRet;
+	return xRet;
 }
-

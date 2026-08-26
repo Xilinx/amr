@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the printing platform profile
@@ -13,7 +13,7 @@
 #include "xil_printf.h"
 
 #ifndef PRINT
-#define PRINT( ... ) ( xil_printf( __VA_ARGS__ ) )
+#define PRINT(...) (xil_printf(__VA_ARGS__))
 #endif
 
 #endif /* _PROFILE_PRINT_H_ */

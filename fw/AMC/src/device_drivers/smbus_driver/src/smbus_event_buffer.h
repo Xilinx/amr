@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the structs and function declarations for the event buffer functions
@@ -11,14 +11,13 @@
 #define _SMBUS_EVENT_BUFFER_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include "smbus.h"
 
-#define SMBUS_EVENT_BUFFER_SUCCESS          ( 0 )
-#define SMBUS_EVENT_BUFFER_FAIL             ( 1 )
+#define SMBUS_EVENT_BUFFER_SUCCESS (0)
+#define SMBUS_EVENT_BUFFER_FAIL    (1)
 
 /**
  * @brief    Walks through all elements of the event buffer. It sets all the elements to unoccupied
@@ -30,7 +29,9 @@ extern "C"
  *
  * @return   None
  */
-void vEventBufferInitialize( SMBus_EventBuf* pxContext, SMBus_EventBufElement* pxEventBuf, uint32_t ulMaxElements );
+void vEventBufferInitialize(SMBus_EventBuf* pxContext,
+	SMBus_EventBufElement* pxEventBuf,
+	uint32_t ulMaxElements);
 
 /**
  * @brief    If the write location is not occupied the event is written to that
@@ -44,7 +45,9 @@ void vEventBufferInitialize( SMBus_EventBuf* pxContext, SMBus_EventBufElement* p
  * @return   SMBUS_FALSE - if write fails
  *           SMBUS_TRUE  - if write succeeds
  */
-uint8_t ucEventBufferTryWrite( SMBus_EventBuf* pxContext, uint8_t ucAnyCharacter, uint32_t* pulWrite_Position );
+uint8_t ucEventBufferTryWrite(SMBus_EventBuf* pxContext,
+	uint8_t ucAnyCharacter,
+	uint32_t* pulWrite_Position);
 
 /**
  * @brief    If the read location is occupied the event at the location is read
@@ -57,7 +60,9 @@ uint8_t ucEventBufferTryWrite( SMBus_EventBuf* pxContext, uint8_t ucAnyCharacter
  * @return   SMBUS_FALSE - if read fails
  *           SMBUS_TRUE  - if write succeeds
  */
-uint8_t ucEventBufferTryRead( SMBus_EventBuf* pxContext, uint8_t* pucAnyCharacter, uint32_t* pulRead_Position );
+uint8_t ucEventBufferTryRead(SMBus_EventBuf* pxContext,
+	uint8_t* pucAnyCharacter,
+	uint32_t* pulRead_Position);
 
 #ifdef __cplusplus
 }

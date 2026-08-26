@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the function declarations for the action functions
@@ -11,21 +11,20 @@
 #define _SMBUS_ACTION_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include "smbus.h"
 
-#define A_SMBUS_NO_ACTION                           ( 0x00000000 )
-#define A_SMBUS_GET_PROTOCOL                        ( 0x00000001 )
-#define A_SMBUS_CREATE_EVENT_SEND_NEXT_BYTE         ( 0x00000002 )
-#define MAX_SMBUS_ACTIONS                           ( 3 )
-#define SMBUS_ARP_DIRECTED_COMMAND_MASK             ( 0x01 )
-#define SMBUS_ARP_UDID_DIRECTED_COMMAND             ( 0x01 )
-#define SMBUS_ARP_DIRECTED_COMMAND_ADDRESS_MASK     ( 0xFE )
-#define SMBUS_ACTION_ARP_PROTOCOL_DETERMINED        ( 0 )
-#define SMBUS_ACTION_ARP_PROTOCOL_UNDETERMINED      ( 1 )
+#define A_SMBUS_NO_ACTION                       (0x00000000)
+#define A_SMBUS_GET_PROTOCOL                    (0x00000001)
+#define A_SMBUS_CREATE_EVENT_SEND_NEXT_BYTE     (0x00000002)
+#define MAX_SMBUS_ACTIONS                       (3)
+#define SMBUS_ARP_DIRECTED_COMMAND_MASK         (0x01)
+#define SMBUS_ARP_UDID_DIRECTED_COMMAND         (0x01)
+#define SMBUS_ARP_DIRECTED_COMMAND_ADDRESS_MASK (0xFE)
+#define SMBUS_ACTION_ARP_PROTOCOL_DETERMINED    (0)
+#define SMBUS_ACTION_ARP_PROTOCOL_UNDETERMINED  (1)
 
 
 /**
@@ -35,7 +34,7 @@ extern "C"
  *
  * @return   None
  */
-void vSMBusClearAction( SMBus_Instance* pxSMBusInstance );
+void vSMBusClearAction(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Sets a specific actions against the specified instance
@@ -45,7 +44,7 @@ void vSMBusClearAction( SMBus_Instance* pxSMBusInstance );
  *
  * @return   None
  */
-void vSMBusAction( SMBus_Instance* pxSMBusInstance, uint32_t ulAnyAction );
+void vSMBusAction(SMBus_Instance* pxSMBusInstance, uint32_t ulAnyAction);
 
 /**
  * @brief    Resets all variables used during an SMBus message transaction back
@@ -56,7 +55,7 @@ void vSMBusAction( SMBus_Instance* pxSMBusInstance, uint32_t ulAnyAction );
  *
  * @return   None
  */
-void vSMBusHandleActionResetAllData( SMBus_Instance* pxSMBusInstance );
+void vSMBusHandleActionResetAllData(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Generates an E_IS_PEC_REQUIRED event against the specified instance
@@ -65,7 +64,7 @@ void vSMBusHandleActionResetAllData( SMBus_Instance* pxSMBusInstance );
  *
  * @return   None
  */
-void vSMBusHandleActionCreateEventIsPECRequired( SMBus_Instance* pxSMBusInstance );
+void vSMBusHandleActionCreateEventIsPECRequired(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Generates an E_SEND_NEXT_BYTE event against the specified instance
@@ -74,10 +73,10 @@ void vSMBusHandleActionCreateEventIsPECRequired( SMBus_Instance* pxSMBusInstance
  *
  * @return   None
  */
-void vSMBusHandleActionCreateEventSendNextByte( SMBus_Instance* pxSMBusInstance );
+void vSMBusHandleActionCreateEventSendNextByte(SMBus_Instance* pxSMBusInstance);
 
 /**
-* @brief    Reads the command byte from the Target RX FIFO, calls the callback function
+ * @brief    Reads the command byte from the Target RX FIFO, calls the callback function
  *           for the specified instance to get the SMBus protocol associated with the
  *           command byte and stores that protocol in the instance structure
  *
@@ -85,7 +84,7 @@ void vSMBusHandleActionCreateEventSendNextByte( SMBus_Instance* pxSMBusInstance 
  *
  * @return   None
  */
-void vSMBusHandleActionGetProtocol( SMBus_Instance* pxSMBusInstance );
+void vSMBusHandleActionGetProtocol(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Reads the command byte from the Target RX FIFO for the ARP instance,
@@ -97,7 +96,7 @@ void vSMBusHandleActionGetProtocol( SMBus_Instance* pxSMBusInstance );
  * @return   SMBUS_ACTION_ARP_PROTOCOL_UNDETERMINED  - If protocol could not be determined
  *           SMBUS_ACTION_ARP_PROTOCOL_DETERMINED    - If protocol was able to be determined
  */
-uint8_t ucSMBusHandleActionGetARPProtocol( SMBus_Instance* pxSMBusInstance );
+uint8_t ucSMBusHandleActionGetARPProtocol(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Checks if a callback function to read data from the application software
@@ -109,7 +108,7 @@ uint8_t ucSMBusHandleActionGetARPProtocol( SMBus_Instance* pxSMBusInstance );
  *
  * @return   None
  */
-void vSMBusHandleActionGetDataFromApplication( SMBus_Instance* pxSMBusInstance );
+void vSMBusHandleActionGetDataFromApplication(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Checks if a callback function to write data to the application software
@@ -122,7 +121,8 @@ void vSMBusHandleActionGetDataFromApplication( SMBus_Instance* pxSMBusInstance )
  *
  * @return   None
  */
-void vSMBusHandleActionWriteDataToApplication( SMBus_Instance* pxSMBusInstance, uint8_t ucTransactionID );
+void vSMBusHandleActionWriteDataToApplication(SMBus_Instance* pxSMBusInstance,
+	uint8_t ucTransactionID);
 
 /**
  * @brief    Checks if a callback function to announce the result of the SMBus transaction
@@ -136,8 +136,9 @@ void vSMBusHandleActionWriteDataToApplication( SMBus_Instance* pxSMBusInstance, 
  *
  * @return   None
  */
-void vSMBusHandleActionAnnounceResultToApplication( SMBus_Instance* pxSMBusInstance, uint8_t ucTransactionID,
-                                                        uint32_t ulStatus );
+void vSMBusHandleActionAnnounceResultToApplication(SMBus_Instance* pxSMBusInstance,
+	uint8_t ucTransactionID,
+	uint32_t ulStatus);
 
 /**
  * @brief    Checks if a callback function to announce that an ARP Assign Address
@@ -149,8 +150,8 @@ void vSMBusHandleActionAnnounceResultToApplication( SMBus_Instance* pxSMBusInsta
  *
  * @return   None
  */
-void vSMBusHandleActionNotifyAddressChangeToApplication( SMBus_Instance* pxSMBusInstance,
-                                                                uint8_t ucTransactionID );
+void vSMBusHandleActionNotifyAddressChangeToApplication(SMBus_Instance* pxSMBusInstance,
+	uint8_t ucTransactionID);
 
 /**
  * @brief    Checks if a callback function to announce an SMBuss Error
@@ -163,7 +164,7 @@ void vSMBusHandleActionNotifyAddressChangeToApplication( SMBus_Instance* pxSMBus
  *
  * @return   None
  */
-void vSMBusHandleActionBusError( SMBus_Instance* pxSMBusInstance, uint8_t ucError );
+void vSMBusHandleActionBusError(SMBus_Instance* pxSMBusInstance, uint8_t ucError);
 
 /**
  * @brief    Checks if a callback function to announce an SMBuss Warning
@@ -176,7 +177,7 @@ void vSMBusHandleActionBusError( SMBus_Instance* pxSMBusInstance, uint8_t ucErro
  *
  * @return   None
  */
-void vSMBusHandleActionBusWarning( SMBus_Instance* pxSMBusInstance, uint8_t ucWarning );
+void vSMBusHandleActionBusWarning(SMBus_Instance* pxSMBusInstance, uint8_t ucWarning);
 
 /**
  * @brief    Checks if a callback function to read data from the application software
@@ -188,7 +189,7 @@ void vSMBusHandleActionBusWarning( SMBus_Instance* pxSMBusInstance, uint8_t ucWa
  *
  * @return   None
  */
-void vSMBusHandleActionGetI2CDataFromApplication( SMBus_Instance* pxSMBusInstance );
+void vSMBusHandleActionGetI2CDataFromApplication(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Checks if a callback function to write data to the application software
@@ -200,7 +201,7 @@ void vSMBusHandleActionGetI2CDataFromApplication( SMBus_Instance* pxSMBusInstanc
  *
  * @return   None
  */
-void vSMBusHandleActionWriteI2CDataToApplication( SMBus_Instance* pxSMBusInstance );
+void vSMBusHandleActionWriteI2CDataToApplication(SMBus_Instance* pxSMBusInstance);
 
 /**
  * @brief    Checks if a callback function to announce the result of the I2C transaction
@@ -213,7 +214,8 @@ void vSMBusHandleActionWriteI2CDataToApplication( SMBus_Instance* pxSMBusInstanc
  *
  * @return   None
  */
-void vSMBusHandleActionAnnounceI2CResultToApplication( SMBus_Instance* pxSMBusInstance, uint32_t ulStatus );
+void vSMBusHandleActionAnnounceI2CResultToApplication(SMBus_Instance* pxSMBusInstance,
+	uint32_t ulStatus);
 
 
 #ifdef __cplusplus
