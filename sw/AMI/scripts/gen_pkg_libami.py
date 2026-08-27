@@ -35,6 +35,8 @@ class Options(object):
         log_info('GPKG-06', '\t--help           / -h: Display this message')
         log_info('GPKG-06', '\t--out_dir        / -o: Path to the output directory. Default: ./output/<date>_<time>')
         log_info('GPKG-06', '\t--pkg_release    / -r: Package release. Default <date>')
+        log_info('GPKG-06', '\t--driver         / -d: Driver profile (ami or vfio). Default: ami')
+        log_info('GPKG-06', '\t--format         / -F: Package format to build: deb or rpm. Default: detect host distro')
         log_info('GPKG-06', '\t--verbose        / -V: Turn on verbosity')
         log_info('GPKG-06', '\t--force          / -f: Override output directory if already existing')
         log_info('GPKG-06', '\t--version        / -v: Display version')
@@ -44,6 +46,8 @@ class Options(object):
         self.help = False
         self.out_dir = None
         self.pkg_release = None
+        self.driver = 'ami'
+        self.format = None
         self.force = False
         self.verbose = False
         self.version = False
@@ -53,11 +57,13 @@ class Options(object):
         try:
             options, remainder = getopt.gnu_getopt(
                 argv[1:],
-                'ho:r:Vfv',
+                'ho:r:d:F:Vfv',
                 [
                     'help',
                     'out_dir=',
                     'pkg_release=',
+                    'driver=',
+                    'format=',
                     'verbose',
                     'force',
                     'version'
@@ -83,6 +89,15 @@ class Options(object):
                 self.out_dir = abspath(self.out_dir)
             elif opt in ('--pkg_release', '-r'):
                 self.pkg_release = str(arg)
+            elif opt in ('--driver', '-d'):
+                self.driver = str(arg).lower()
+                if self.driver not in ['ami', 'vfio']:
+                    exit_error('GPKG-02', 'Invalid driver profile: ' + self.driver + '. Valid values: ami, vfio')
+            elif opt in ('--format', '-F'):
+                self.format = str(arg).lower()
+                if self.format not in ['deb', 'rpm']:
+                    self.printHelp()
+                    exit_error('GPKG-02', 'Invalid --format value: ' + str(arg) + '. Supported values are: deb, rpm')
             elif opt in ('--verbose', '-V'):
                 setup_verbose()
                 self.verbose = True
@@ -157,17 +172,23 @@ def main(args):
         config['system'] = {}
 
         # Get config['system']['dist_id']
-        cmd = ['lsb_release', '-is']
-        log_file_name = abspath(join(out_dir, 'lsb_release_is.log'))
-        log_info('GPKG-05', 'Get distribution ID')
-        exec_step_cmd('GPKG-15', step, cmd, log_file_name)
-        check_file_exists('GPKG-05', log_file_name)
+        # When --format is provided, force the target format instead of detecting the
+        # host distro. This lets a single host build both deb and rpm packages.
+        if opt.format is not None:
+            config['system']['dist_id'] = DIST_ID_UBUNTU if opt.format == 'deb' else DIST_ID_REDHAT
+            log_info('GPKG-05', 'Forcing package format via --format ' + opt.format + ' (dist_id: ' + config['system']['dist_id'] + ')')
+        else:
+            cmd = ['lsb_release', '-is']
+            log_file_name = abspath(join(out_dir, 'lsb_release_is.log'))
+            log_info('GPKG-05', 'Get distribution ID')
+            exec_step_cmd('GPKG-15', step, cmd, log_file_name)
+            check_file_exists('GPKG-05', log_file_name)
 
-        log_file = open(log_file_name, mode='r')
-        for line in log_file:
-            config['system']['dist_id'] = line.split('\n')[0]
-            break
-        log_file.close()
+            log_file = open(log_file_name, mode='r')
+            for line in log_file:
+                config['system']['dist_id'] = line.split('\n')[0]
+                break
+            log_file.close()
 
         if config['system']['dist_id'] not in SUPPORTED_DIST_ID:
             exit_error('GPKG-14', 'Invalid Distribution ID: ' + config['system']['dist_id'] + '. Supported values are ' + str(SUPPORTED_DIST_ID))
@@ -229,14 +250,18 @@ def main(args):
         step = 'build AMI library'
         start_time = start_step('BUILD_AMI_LIB', step)
 
-        build_api = 'cd api && make clean && make NO_SYSTEM_API=1'
+        # Map driver profile: ami -> kernel, vfio -> userspace
+        driver_profile = 'kernel' if opt.driver == 'ami' else 'userspace'
+        log_info('BUILD_LIBAMI', 'Building with driver profile: ' + opt.driver + ' (DRIVER_PROFILE=' + driver_profile + ')')
+
+        build_api = 'cd api && make clean && make NO_SYSTEM_API=1 DRIVER_PROFILE=' + driver_profile
         exec_step_cmd('BUILD_LIBAMI', step, build_api, shell=True, cwd=PROJECT_DIR)
         check_file_exists('BUILD_LIBAMI', join(PROJECT_DIR, 'api', 'build', 'libami.so'))
 
         end_step('BUILD_AMI_LIB', start_time)
 
         step = 'clean libami'
-        clean_lib_ami = 'cd api && make clean NO_SYSTEM_API=1'
+        clean_lib_ami = 'cd api && make clean'
         exec_step_cmd('CLEAN_LIB_AMI', step, clean_lib_ami, shell=True, cwd=PROJECT_DIR)
         end_step('CLEAN_LIB_AMI', start_time)
 
@@ -249,6 +274,19 @@ def main(args):
             for name in files:
                 api_srcs.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
 
+        # For VFIO driver, also include vfio-driver sources
+        if opt.driver == 'vfio':
+            vfio_driver_dir = join(PROJECT_DIR, 'api', 'vfio-driver')
+            if os.path.exists(vfio_driver_dir):
+                for path, _, files in walk(vfio_driver_dir):
+                    for name in files:
+                        api_srcs.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
+
+        # Also include headers in src directory for building
+        for path, _, files in walk(join(PROJECT_DIR, 'api', 'include')):
+            for name in files:
+                api_srcs.append(join(path, name).split(PROJECT_DIR)[-1].split('/', 1)[-1])
+
         for path, _, files in walk(join(PROJECT_DIR, 'api')):
             for name in files:
                 if name.endswith('Makefile'):
@@ -256,7 +294,6 @@ def main(args):
 
         config['pkg']              =  {}
         config['pkg']['name']      = 'libami'
-        config['pkg']['release']   = opt.pkg_release
         config['pkg']['summary']   = config['pkg']['name']  + ' libami.package'
         config['pkg']['changelog'] = config['pkg']['name']  + ' libami.package. Built on $build_date.'
         config['pkg']['descr']     = [config['pkg']['name'] + ' libami.package', 'Built on ' + build_date + '.']
@@ -289,6 +326,7 @@ def main(args):
             fdata = infile.read()
             fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
             fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
+            fdata = fdata.replace('DRIVER_PROFILE="$3"', 'DRIVER_PROFILE='+ driver_profile)
             config['pkg']['preinst'] = fdata.split('\n')
             with open(abspath(join(out_dir, 'preinst.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['preinst']))
@@ -298,6 +336,7 @@ def main(args):
             fdata = infile.read()
             fdata = fdata.replace('MOD_NAME="$1"',    'MOD_NAME='+ config['pkg']['name'])
             fdata = fdata.replace('MOD_VER_STR="$2"', 'MOD_VER_STR='+ config['pkg']['version'])
+            fdata = fdata.replace('DRIVER_PROFILE="$3"', 'DRIVER_PROFILE='+ driver_profile)
             config['pkg']['postinst'] = fdata.split('\n')
             with open(abspath(join(out_dir, 'postinst.sh')), 'w') as outfile:
                 outfile.write('\n'.join(config['pkg']['postinst']))
@@ -372,7 +411,7 @@ def main(args):
             SPEC_FILE += ['']
 
             SPEC_FILE += ['%pre']
-            SPEC_FILE += config['pkg']['prerm']
+            SPEC_FILE += config['pkg']['preinst']
             SPEC_FILE += ['']
 
             SPEC_FILE += ['%install']
@@ -397,6 +436,10 @@ def main(args):
 
             SPEC_FILE += ['%post']
             SPEC_FILE += config['pkg']['postinst']
+            SPEC_FILE += ['']
+
+            SPEC_FILE += ['%preun']
+            SPEC_FILE += config['pkg']['prerm']
             SPEC_FILE += ['']
 
             SPEC_FILE += ['%files']

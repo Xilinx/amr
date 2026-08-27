@@ -110,13 +110,13 @@ static int do_cmd_cfgmem_flags_wr(struct app_option *options, int num_args, char
 	struct app_option *boot_device_type = NULL;
 	struct app_option *partition = NULL;
 	struct app_option *partition_flags = NULL;
+	struct ami_fpt_partition fpt_partition = { 0 };
 
 	/* Required data */
 	uint16_t bdf = 0;
 	ami_device *dev = NULL;
 	int selected_boot_device = 0;
 	uint32_t partition_number = 0;
-	struct ami_fpt_partition fpt_partition = { 0 };
 	uint32_t flags = 0;
 
 	/* Must have at least a device, boot device type, and partition number. */
@@ -177,19 +177,23 @@ static int do_cmd_cfgmem_flags_wr(struct app_option *options, int num_args, char
 		AMI_PCI_BUS(bdf), AMI_PCI_DEV(bdf), AMI_PCI_FUNC(bdf), partition_number, flags
 	);
 
+	/* Read current partition info */
 	if (ami_prog_get_fpt_partition(dev, selected_boot_device, partition_number, &fpt_partition) != AMI_STATUS_OK) {
+		APP_API_ERROR("could not read partition info");
+		goto fail;
+	}
+
+	/* Update only the flags field */
+	fpt_partition.flags = flags;
+
+	/* Write back the updated partition */
+	if (ami_prog_set_fpt_partition(dev, selected_boot_device, partition_number, &fpt_partition) != AMI_STATUS_OK) {
 		APP_API_ERROR("could not write partition flags");
 		goto fail;
 	}
 
-	fpt_partition.flags = flags;
-
-	if (ami_prog_set_fpt_partition(dev, selected_boot_device, partition_number, &fpt_partition) != AMI_STATUS_OK) {
-		APP_API_ERROR("could not write partition flags");
-	} else {
-		ret = AMI_STATUS_OK;
-		printf("OK - Partition flags written successfully\r\n");
-	}
+	ret = AMI_STATUS_OK;
+	printf("OK - Partition flags written successfully\r\n");
 
 fail:
 	ami_dev_delete(&dev);

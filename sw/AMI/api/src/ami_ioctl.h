@@ -26,7 +26,9 @@
 #define AMI_IOC_PDI_APU_PROGRAM_MAGIC	(0xCCCCCCCC)
 #define AMI_IOC_PDI_RPU_PROGRAM_MAGIC	(0xDDDDDDDD)
 #define AMI_IOC_SENSOR_STATUS_LEN	(40)
+#ifndef MD5_SIZE
 #define MD5_SIZE			(16)  /* MD5 checksum size in bytes */
+#endif
 
 /**
  * struct ami_ioc_data_payload - payload struct for dynamically sized ioctl data

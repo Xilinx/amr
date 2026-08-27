@@ -2,7 +2,7 @@
 /*
  * ami.c - This file contains the implementation of misc. API functions
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -307,6 +307,20 @@ int ami_get_driver_version(struct ami_version *ami_version)
 	if (!ami_version)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
 
+#ifdef AMI_USERSPACE_DRIVER_ONLY
+	/* Check for vfio-pci (pure userspace, no kernel module) */
+	if (access("/sys/bus/pci/drivers/vfio-pci", F_OK) == 0) {
+		/* VFIO userspace driver - return API version */
+		ami_version->major = GIT_TAG_VER_MAJOR;
+		ami_version->minor = GIT_TAG_VER_MINOR;
+		ami_version->patch = GIT_TAG_VER_PATCH;
+		ami_version->dev_commits = GIT_TAG_VER_DEV_COMMITS;
+		ami_version->status = GIT_STATUS;
+		return AMI_STATUS_OK;
+	}
+#endif
+
+	/* Try kernel driver version */
 	fd = open(AMI_DRIVER_VERSION, O_RDONLY | O_NONBLOCK);
 
 	if (fd != AMI_INVALID_FD) {

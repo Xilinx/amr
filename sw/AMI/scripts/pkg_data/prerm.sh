@@ -2,53 +2,43 @@
 set -e
 
 # SPDX-License-Identifier: GPL-2.0-only
-# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
 
 MOD_NAME="$1"
 MOD_VER_STR="$2"
 
-if [ "${MOD_NAME}" == "ami" ]; then
-    if lsmod | grep -wq "${MOD_NAME}"; then
-        echo "Unloading old ${MOD_NAME} driver"
-        rmmod "${MOD_NAME}"
-    else
-        echo "Module ${MOD_NAME} not loaded. Skipping 'rmmod'."
+echo "Removing ${MOD_NAME} ${MOD_VER_STR}"
+
+if [ "${MOD_NAME}" = "ami" ]; then
+    # Remove vfio-pci udev rules when removing ami kernel driver
+    if [ -f /etc/udev/rules.d/90-ami-vfio.rules ]; then
+        echo "Removing vfio-pci udev rules"
+        rm -f /etc/udev/rules.d/90-ami-vfio.rules
+        if command -v udevadm >/dev/null 2>&1; then
+            udevadm control --reload-rules 2>/dev/null || true
+        fi
     fi
+elif [ "${MOD_NAME}" = "libami" ]; then
+    echo "Removing source files from /usr/src/${MOD_NAME}-${MOD_VER_STR}"
+    rm -rf "/usr/src/${MOD_NAME}-${MOD_VER_STR}"
+elif [ "${MOD_NAME}" = "amitool" ]; then
+    echo "Removing source files from /usr/src/${MOD_NAME}-${MOD_VER_STR}"
+    rm -rf "/usr/src/${MOD_NAME}-${MOD_VER_STR}"
 
-    echo "Unregistering ${MOD_NAME} Linux kernel module sources ${MOD_VER_STR} from dkms"
-    dkms remove -m "${MOD_NAME}" -v "${MOD_VER_STR}" --all
-
-    if [ $? -ne 0 ]; then
-        echo "ERROR: dkms remove failed. Removal of ${MOD_NAME} failed"
-        exit 1
+    # Remove vfio-pci udev rules and systemd service when removing amitool with userspace driver
+    # Only remove if this was a VFIO installation (check for recovery tool)
+    if [ -f /usr/local/sbin/ami-vfio-recover ]; then
+        echo "Removing vfio-pci udev rules and services"
+        rm -f /etc/udev/rules.d/90-ami-vfio.rules
+        rm -f /etc/systemd/system/ami-vfio-recover.service
+        rm -f /usr/local/sbin/ami-vfio-recover
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl daemon-reload 2>/dev/null || true
+        fi
+        if command -v udevadm >/dev/null 2>&1; then
+            udevadm control --reload-rules 2>/dev/null || true
+        fi
     fi
-
-    # Remove kernel module files
-    find /lib/modules -type f -name "${MOD_NAME}.ko*" -delete
-
-    # Remove source files from /usr/src
-    echo "Removing source files from /usr/src/${MOD_NAME}-${MOD_VER_STR}"
-    rm -rf "/usr/src/${MOD_NAME}-${MOD_VER_STR}"
-
-    depmod -A
-
-elif [ "${MOD_NAME}" == "libami" ]; then
-    # Remove library files
-    find /usr/local/lib -type f -name "${MOD_NAME}.so*" -delete
-
-    # Remove source files
-    echo "Removing source files from /usr/src/${MOD_NAME}-${MOD_VER_STR}"
-    rm -rf "/usr/src/${MOD_NAME}-${MOD_VER_STR}"
-
-    # Remove include files
-    rm -rf "/usr/include/${MOD_NAME}"
-
-else
-    # Remove binary
-    find /usr/local/bin -type f -name "${MOD_NAME}" -delete
-
-    # Remove source files
-    echo "Removing source files from /usr/src/${MOD_NAME}-${MOD_VER_STR}"
-    rm -rf "/usr/src/${MOD_NAME}-${MOD_VER_STR}"
 fi
 
+echo "Pre-removal complete"

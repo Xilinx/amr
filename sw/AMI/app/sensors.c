@@ -1110,8 +1110,11 @@ int report_sensors(struct app_option *options)
 
 			if (ret != AMI_STATUS_OK) {
 				APP_API_ERROR("device has no sensor data");
-				ami_dev_delete(&dev);
-				break;
+				/* Skip this device and continue to next one */
+				ami_dev_delete(&prev);
+				prev = dev;
+				dev = NULL;
+				continue;
 			}
 
 			ret = print_sensor_data(
