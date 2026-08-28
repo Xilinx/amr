@@ -214,6 +214,41 @@ int iEVL_CreateRecord(EVLRecord** ppxRecord)
 }
 
 /**
+ * @brief   Destroy an Event Library Record
+ */
+int iEVL_DestroyRecord(EVLRecord** ppxRecord)
+{
+	int iStatus = ERROR;
+
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iIsInitialised) &&
+		(NULL != ppxRecord) && (NULL != *ppxRecord)) {
+		EVLRecord* pxRecord     = *ppxRecord;
+		EVLCallbackNode* pxNode = pxRecord->pxFirstBinding;
+
+		while (NULL != pxNode) {
+			EVLCallbackNode* pxNext = pxNode->pxNext;
+
+			vOSAL_MemFree((void**)&pxNode);
+			pxNode = pxNext;
+		}
+
+		if (NULL != pxRecord->pxMtx) {
+			if (OSAL_ERRORS_NONE != iOSAL_Mutex_Destroy(&pxRecord->pxMtx)) {
+				INC_ERROR_COUNTER(EVL_ERRORS_RECORD_MUTEX_RELEASED);
+			}
+		}
+
+		vOSAL_MemFree((void**)ppxRecord);
+		iStatus = OK;
+	} else {
+		INC_ERROR_COUNTER(EVL_ERRORS_VALIDATION);
+	}
+
+	return iStatus;
+}
+
+/**
  * @brief   Bind a callback into a module
  */
 int iEVL_BindCallback(EVLRecord* pxRecord, EVL_CALLBACK* pxNewCallback)

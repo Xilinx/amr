@@ -424,10 +424,35 @@ int iGetUuid(uint8_t* pucUuid);
  */
 static int iCheckSensorValid(uint16_t usSensorId);
 
+/**
+ * @brief   Release resources from a failed or partial initialisation
+ */
+static void vBMC_CleanupPartialInit(void);
+
 /******************************************************************************/
 /* Public Function implementations                                            */
 /******************************************************************************/
 
+
+/**
+ * @brief   Pre-allocate the BMC EVL record before heap-heavy drivers init
+ */
+int iBMC_AllocateEvlRecord(void)
+{
+	int iStatus = OK;
+
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (FALSE == pxThis->iInitialised) &&
+		(NULL == pxThis->pxEvlRecord)) {
+		if (OK != iEVL_CreateRecord(&pxThis->pxEvlRecord)) {
+			PLL_ERR(BMC_NAME, "Error pre-allocating EVLRecord\r\n");
+			INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED);
+			iStatus = ERROR;
+		}
+	}
+
+	return iStatus;
+}
 
 /**
  * @brief   Main initialisation point for the BMC Proxy Driver
@@ -461,94 +486,114 @@ int iBMC_Initialise(uint8_t ucProxyId,
 		pxThis->pxFwIf     = pxFwIf;
 		pxThis->ulFwIfPort = ulFwIfPort; /* The  Address */
 
-		/* initalise evl record*/
-		if (OK != iEVL_CreateRecord(&pxThis->pxEvlRecord)) {
-			PLL_ERR(BMC_NAME, "Error initialising EVLRecord\r\n");
-			INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED);
-		} else if (OSAL_ERRORS_NONE !=
-			iOSAL_Mutex_Create(&pxThis->pvOsalMutexHdl, "bmc_proxy mutex")) {
-			PLL_ERR(BMC_NAME, "Error initialising mutex\r\n");
-			INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_INIT_MUTEX_CREATE_FAILED)
-		} else if (OSAL_ERRORS_NONE !=
-			iOSAL_Semaphore_Create(&pxThis->pvOsalSemHdl, 1, 1, "BMC_Semaphore")) {
-			PLL_ERR(BMC_NAME, "Error initialising semaphore\r\n");
-			INC_ERROR_COUNTER(BMC_PROXY_ERRORS_CREATE_SEMAPHORE)
-		} else if (OSAL_ERRORS_NONE !=
-			iOSAL_Task_Create(&pxThis->pvOsalTaskHdl,
-				vProxyDriverTask,
-				ulTaskStack,
-				NULL,
-				ulTaskPrio,
-				"bmc_proxy task")) {
-			PLL_ERR(BMC_NAME, "Error initialising task\r\n");
-			INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_INIT_TASK_CREATE_FAILED)
-		} else {
-			/* Get UUID */
-			pvOSAL_MemCpy(pxThis->pucUuid, pucUuid, HAL_UUID_SIZE);
+		if ((FALSE == pxThis->iInitialised) &&
+			((NULL != pxThis->pvOsalMutexHdl) || (NULL != pxThis->pvOsalSemHdl) ||
+				(NULL != pxThis->pvOsalTaskHdl) || (NULL != pxThis->pxPdrTemperatureSensors))) {
+			PLL_WRN(BMC_NAME, "Cleaning up partial BMC init before retry\r\n");
+			vBMC_CleanupPartialInit();
+		}
 
-
-			/* Temperature PDR */
-			iStatus = iAllocateNumericSensorPDR(pxPdrTemperatureSensors,
-				iTotalPdrTemperature,
-				&pxThis->pxPdrTemperatureSensors,
-				&pxThis->iTotalPdrTemperature);
-
-			if (OK == iStatus) {
-				/* Voltage PDR */
-				iStatus = iAllocateNumericSensorPDR(pxPdrVoltageSensors,
-					iTotalPdrVoltage,
-					&pxThis->pxPdrVoltageSensors,
-					&pxThis->iTotalPdrVoltage);
+		if (NULL == pxThis->pxEvlRecord) {
+			if (OK != iEVL_CreateRecord(&pxThis->pxEvlRecord)) {
+				PLL_ERR(BMC_NAME, "Error initialising EVLRecord (malloc/mutex failed)\r\n");
+				INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_ERRORS_INIT_EVL_RECORD_FAILED);
 			}
+		}
 
-			if (OK == iStatus) {
-				/* Current PDR */
-				iStatus = iAllocateNumericSensorPDR(pxPdrCurrentSensors,
-					iTotalPdrCurrent,
-					&pxThis->pxPdrCurrentSensors,
-					&pxThis->iTotalPdrCurrent);
-			}
+		if (NULL != pxThis->pxEvlRecord) {
+			if (OSAL_ERRORS_NONE !=
+				iOSAL_Mutex_Create(&pxThis->pvOsalMutexHdl, "bmc_proxy mutex")) {
+				PLL_ERR(BMC_NAME, "Error initialising mutex\r\n");
+				vBMC_CleanupPartialInit();
+				INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_INIT_MUTEX_CREATE_FAILED)
+			} else if (OSAL_ERRORS_NONE !=
+				iOSAL_Semaphore_Create(&pxThis->pvOsalSemHdl, 1, 1, "BMC_Semaphore")) {
+				PLL_ERR(BMC_NAME, "Error initialising semaphore\r\n");
+				vBMC_CleanupPartialInit();
+				INC_ERROR_COUNTER(BMC_PROXY_ERRORS_CREATE_SEMAPHORE)
+			} else if (OSAL_ERRORS_NONE !=
+				iOSAL_Task_Create(&pxThis->pvOsalTaskHdl,
+					vProxyDriverTask,
+					ulTaskStack,
+					NULL,
+					ulTaskPrio,
+					"bmc_proxy task")) {
+				PLL_ERR(BMC_NAME, "Error initialising task\r\n");
+				vBMC_CleanupPartialInit();
+				INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_INIT_TASK_CREATE_FAILED)
+			} else {
+				/* Get UUID */
+				pvOSAL_MemCpy(pxThis->pucUuid, pucUuid, HAL_UUID_SIZE);
 
-			if (OK == iStatus) {
-				/* Power PDR */
-				iStatus = iAllocateNumericSensorPDR(pxPdrPowerSensors,
-					iTotalPdrPower,
-					&pxThis->pxPdrPowerSensors,
-					&pxThis->iTotalPdrPower);
-			}
 
-			if (OK == iStatus) {
-				/* Names PDR */
-				pxThis->pxPdrSensorNames = (PLDMNumericSensorNamePdr*)pvOSAL_MemAlloc(
-					sizeof(PLDMNumericSensorNamePdr) * iTotalPdrName);
-				if (NULL != pxThis->pxPdrSensorNames) {
-					pvOSAL_MemCpy(pxThis->pxPdrSensorNames,
-						pxPdrSensorNames,
-						sizeof(PLDMNumericSensorNamePdr) * iTotalPdrName);
-					pxThis->iTotalPdrName = iTotalPdrName;
-				} else {
-					iStatus = ERROR;
-					PLL_ERR(BMC_NAME, "pvOSAL_MemAlloc failed\r\n");
-					INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_ERRORS_MEM_ALLOC_FAILED)
+				/* Temperature PDR */
+				iStatus = iAllocateNumericSensorPDR(pxPdrTemperatureSensors,
+					iTotalPdrTemperature,
+					&pxThis->pxPdrTemperatureSensors,
+					&pxThis->iTotalPdrTemperature);
+
+				if (OK == iStatus) {
+					/* Voltage PDR */
+					iStatus = iAllocateNumericSensorPDR(pxPdrVoltageSensors,
+						iTotalPdrVoltage,
+						&pxThis->pxPdrVoltageSensors,
+						&pxThis->iTotalPdrVoltage);
 				}
-			}
 
-			if (OK == iStatus) {
-				/* Now open the FW_IF to receive data */
-				if (FW_IF_ERRORS_NONE != pxThis->pxFwIf->open(pxThis->pxFwIf)) {
-					PLL_ERR(BMC_NAME, "Error opening FW_IF\r\n");
-					INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_ERRORS_FW_IF_OPEN_FAILED)
-				} else {
-					pxThis->iInitialised = TRUE;
-					pxThis->xState       = MODULE_STATE_OK;
-					iStatus              = OK;
+				if (OK == iStatus) {
+					/* Current PDR */
+					iStatus = iAllocateNumericSensorPDR(pxPdrCurrentSensors,
+						iTotalPdrCurrent,
+						&pxThis->pxPdrCurrentSensors,
+						&pxThis->iTotalPdrCurrent);
+				}
 
-					/* Initialise anything required in MCTP or PLDM */
-					(void)pldm_command_init();
+				if (OK == iStatus) {
+					/* Power PDR */
+					iStatus = iAllocateNumericSensorPDR(pxPdrPowerSensors,
+						iTotalPdrPower,
+						&pxThis->pxPdrPowerSensors,
+						&pxThis->iTotalPdrPower);
+				}
 
-					INC_STAT_COUNTER(BMC_PROXY_STATS_CREATE_MUTEX)
-					INC_STAT_COUNTER(BMC_PROXY_STATS_CREATE_SEMAPHORE)
-					INC_STAT_COUNTER(BMC_PROXY_STATS_INIT_OVERALL_COMPLETE)
+				if (OK == iStatus) {
+					/* Names PDR */
+					pxThis->pxPdrSensorNames = (PLDMNumericSensorNamePdr*)pvOSAL_MemAlloc(
+						sizeof(PLDMNumericSensorNamePdr) * iTotalPdrName);
+					if (NULL != pxThis->pxPdrSensorNames) {
+						pvOSAL_MemCpy(pxThis->pxPdrSensorNames,
+							pxPdrSensorNames,
+							sizeof(PLDMNumericSensorNamePdr) * iTotalPdrName);
+						pxThis->iTotalPdrName = iTotalPdrName;
+					} else {
+						iStatus = ERROR;
+						PLL_ERR(BMC_NAME, "pvOSAL_MemAlloc failed\r\n");
+						INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_ERRORS_MEM_ALLOC_FAILED)
+					}
+				}
+
+				if (OK == iStatus) {
+					/* Now open the FW_IF to receive data */
+					if (FW_IF_ERRORS_NONE != pxThis->pxFwIf->open(pxThis->pxFwIf)) {
+						PLL_ERR(BMC_NAME, "Error opening FW_IF\r\n");
+						vBMC_CleanupPartialInit();
+						INC_ERROR_COUNTER_WITH_STATE(BMC_PROXY_ERRORS_FW_IF_OPEN_FAILED)
+					} else {
+						pxThis->iInitialised = TRUE;
+						pxThis->xState       = MODULE_STATE_OK;
+						iStatus              = OK;
+
+						/* Initialise anything required in MCTP or PLDM */
+						(void)pldm_command_init();
+
+						INC_STAT_COUNTER(BMC_PROXY_STATS_CREATE_MUTEX)
+						INC_STAT_COUNTER(BMC_PROXY_STATS_CREATE_SEMAPHORE)
+						INC_STAT_COUNTER(BMC_PROXY_STATS_INIT_OVERALL_COMPLETE)
+					}
+				}
+
+				if ((ERROR == iStatus) && (FALSE == pxThis->iInitialised)) {
+					vBMC_CleanupPartialInit();
 				}
 			}
 		}
@@ -787,6 +832,57 @@ static int iCheckSensorValid(uint16_t usSensorId)
 		}
 	}
 	return iStatus;
+}
+
+/**
+ * @brief   Release resources from a failed or partial initialisation
+ */
+static void vBMC_CleanupPartialInit(void)
+{
+	if (TRUE == pxThis->iInitialised) {
+		return;
+	}
+
+	if (NULL != pxThis->pxPdrTemperatureSensors) {
+		vOSAL_MemFree((void**)&pxThis->pxPdrTemperatureSensors);
+		pxThis->iTotalPdrTemperature = 0;
+	}
+
+	if (NULL != pxThis->pxPdrVoltageSensors) {
+		vOSAL_MemFree((void**)&pxThis->pxPdrVoltageSensors);
+		pxThis->iTotalPdrVoltage = 0;
+	}
+
+	if (NULL != pxThis->pxPdrCurrentSensors) {
+		vOSAL_MemFree((void**)&pxThis->pxPdrCurrentSensors);
+		pxThis->iTotalPdrCurrent = 0;
+	}
+
+	if (NULL != pxThis->pxPdrPowerSensors) {
+		vOSAL_MemFree((void**)&pxThis->pxPdrPowerSensors);
+		pxThis->iTotalPdrPower = 0;
+	}
+
+	if (NULL != pxThis->pxPdrSensorNames) {
+		vOSAL_MemFree((void**)&pxThis->pxPdrSensorNames);
+		pxThis->iTotalPdrName = 0;
+	}
+
+	if (NULL != pxThis->pvOsalTaskHdl) {
+		(void)iOSAL_Task_Delete(&pxThis->pvOsalTaskHdl);
+	}
+
+	if (NULL != pxThis->pvOsalSemHdl) {
+		(void)iOSAL_Semaphore_Destroy(&pxThis->pvOsalSemHdl);
+	}
+
+	if (NULL != pxThis->pvOsalMutexHdl) {
+		(void)iOSAL_Mutex_Destroy(&pxThis->pvOsalMutexHdl);
+	}
+
+	if (NULL != pxThis->pxEvlRecord) {
+		(void)iEVL_DestroyRecord(&pxThis->pxEvlRecord);
+	}
 }
 
 /**

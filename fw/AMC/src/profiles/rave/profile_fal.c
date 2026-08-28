@@ -84,7 +84,7 @@ static FWIfOspiCfg xOspiCfg = {
 	FW_IF_OSPI_STATE_INIT,
 };
 
-static FWIfOspiInitCfg myOspiIf = { HAL_OSPI_0_DEVICE_ID, HAL_OSPI_PAGE_SIZE };
+static FWIfOspiInitCfg myOspiIf = { HAL_OSPI_0_BASEADDR, HAL_OSPI_PAGE_SIZE };
 
 
 /******************************************************************************/

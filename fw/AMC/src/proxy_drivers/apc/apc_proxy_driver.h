@@ -23,6 +23,9 @@
 #define USER_PDI_POWERUP_LOADED      (0x1 << 16) /* Power on load user partition loaded */
 #define USER_PDI_POWERUP_ERROR       (0x2 << 16) /* Power on load user partition error */
 
+/* Additional data flag for EVLSignal when a PDI is loaded into PL */
+#define APC_PROXY_PDI_PL_LOADED (1)
+
 /******************************************************************************/
 /* Enums                                                                      */
 /******************************************************************************/

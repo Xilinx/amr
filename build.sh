@@ -22,7 +22,7 @@ SDT=""
 # Vivado designs repo. Defaults to the public GitHub mirror; pass -internal
 # to clone from the Xilinx gitenterprise mirror instead.
 HW_REPO_URL_PUBLIC="https://github.com/Xilinx/amr_vivado_designs.git"
-HW_REPO_URL_INTERNAL="https://gitenterprise.xilinx.com/PAEG/amr_vivado_designs.git"
+HW_REPO_URL_INTERNAL="git@github-amdeng:AMD-AECG-SSW-PUBLIC/amr_vivado_designs.git"
 HW_REPO_URL="${HW_REPO_URL_PUBLIC}"
 
 # Profile name -> repo-relative path to the Vivado platform directory

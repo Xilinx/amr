@@ -510,6 +510,46 @@ static uint32_t ulSmbusBlockIoClose(void* pvFwIf)
 }
 
 /**
+ * @brief   Runtime gate for incoming/outgoing SMBus byte tracing.
+ *          Toggled via vFW_IF_SMBUS_SetByteTrace (e.g. from the BMC debug menu).
+ */
+static uint8_t ucByteTraceEnabled = FALSE;
+
+/**
+ * @brief   Enable/disable hex tracing of incoming/outgoing SMBus bytes
+ */
+void vFW_IF_SMBUS_SetByteTrace(uint8_t ucEnable)
+{
+	ucByteTraceEnabled = (FALSE != ucEnable) ? TRUE : FALSE;
+}
+
+/**
+ * @brief   Get the current SMBus byte-tracing state
+ */
+uint8_t ucFW_IF_SMBUS_GetByteTrace(void)
+{
+	return ucByteTraceEnabled;
+}
+
+/**
+ * @brief   Hex-dump a buffer when byte tracing is enabled.
+ *          Emitted at LOGGING level so the gate flag is the only control -
+ *          no need to raise the global debug verbosity.
+ */
+static void vSmbusTraceBytes(const char* pcDir, const uint8_t* pucData, uint32_t ulLen)
+{
+	if ((TRUE == ucByteTraceEnabled) && (NULL != pucData) && (NULL != pcDir)) {
+		uint32_t i = 0;
+
+		PLL_LOG(FW_IF_SMBUS_BLOCK_IO_NAME, "%s (%u bytes): ", pcDir, (unsigned int)ulLen);
+		for (i = 0; i < ulLen; i++) {
+			vPLL_Output(PLL_OUTPUT_LEVEL_LOGGING, "%02x ", pucData[i]);
+		}
+		vPLL_Output(PLL_OUTPUT_LEVEL_LOGGING, "\r\n");
+	}
+}
+
+/**
  * @brief   Local implementation of FW_IF_write
  *
  * @param   pvFwIf          Pointer to this fw_if
@@ -566,6 +606,8 @@ static uint32_t ulSmbusBlockIoWrite(void* pvFwIf,
 
 				pucDataToSend[FAL_SMBUS_BLOCK_IO_DATA_SIZE_INDEX] = ulSize;
 				pvOSAL_MemCpy(&pucDataToSend[FAL_SMBUS_BLOCK_IO_PAYLOAD_INDEX], pucData, ulSize);
+
+				vSmbusTraceBytes("SMBUS TX (outgoing response)", pucData, ulSize);
 
 				if (SMBUS_ERROR !=
 					xSMBusControllerInitiateCommand(pxThis->pxSMBusProfile,
@@ -655,6 +697,8 @@ static uint32_t ulSmbusBlockIoRead(void* pvFwIf,
 					pxThis->pucCallBackWriteData,
 					pxThis->usCallBackWriteDataSize);
 				*pulSize = pxThis->usCallBackWriteDataSize;
+
+				vSmbusTraceBytes("SMBUS RX (incoming request)", pucData, *pulSize);
 
 				/* re-set values */
 				pvOSAL_MemSet(pxThis->pucCallBackWriteData, 0, pxThis->usCallBackWriteDataSize);

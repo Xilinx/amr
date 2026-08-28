@@ -236,4 +236,22 @@ int iFW_IF_SMBUS_PrintStatistics(void);
  */
 int iFW_IF_SMBUS_ClearStatistics(void);
 
+/**
+ *
+ * @brief    Enable/disable hex tracing of incoming/outgoing SMBus bytes
+ *
+ * @param    ucEnable            TRUE to enable tracing, FALSE to disable
+ *
+ * @return   N/A
+ */
+void vFW_IF_SMBUS_SetByteTrace(uint8_t ucEnable);
+
+/**
+ *
+ * @brief    Get the current SMBus byte-tracing state
+ *
+ * @return   TRUE if tracing is enabled, FALSE otherwise
+ */
+uint8_t ucFW_IF_SMBUS_GetByteTrace(void);
+
 #endif /* _FW_IF_SMBUS_H_ */

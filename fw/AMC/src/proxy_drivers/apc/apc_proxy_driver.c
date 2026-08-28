@@ -1246,6 +1246,13 @@ static void vProxyDriverTask(void* pArg)
 						xSignal.ucEventType = APC_PROXY_DRIVER_E_DOWNLOAD_BUSY;
 					}
 
+					/* Only a PL PDI load can add/change the SMBus IP in the PL.
+					 * APU/RPU images do not, so don't flag them for SMBus re-init. */
+					if ((APC_PROXY_DRIVER_E_DOWNLOAD_COMPLETE == xSignal.ucEventType) &&
+						(TRUE == xMBoxData.xDownloadImageData.iPdiProgram)) {
+						xSignal.ucAdditionalData = APC_PROXY_PDI_PL_LOADED;
+					}
+
 					if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {
 						INC_ERROR_COUNTER_WITH_STATE(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)
 					}
