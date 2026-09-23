@@ -37,6 +37,10 @@ extern bool ami_debug_enabled;
 
 #define BDF_STR_LEN (7 + 1)
 
+/* One device-map line: "bb:ss.f <minor> <hwmon_id>\n" + NUL.
+ * minor/hwmon_id are ints (up to 11 chars each), so 64 is comfortably safe. */
+#define MAP_ENTRY_STR_LEN 64
+
 #define XILINX_ENDPOINT_NAME_SIZE	30
 #define MD5_SIZE			16
 

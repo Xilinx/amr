@@ -1372,7 +1372,7 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 			memcpy_gcq_payload_to_device(amc_ctrl_ctxt,
 							payload_address,
 							data_buf,
-							data_size);
+							payload_size);
 			break;
 
 		case AMC_CMD_ID_SENSOR:
@@ -1439,7 +1439,7 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 					length);
 				payload_size = length;
 			}
-			memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+			memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, payload_size);
 		}
 		break;
 
@@ -1484,7 +1484,7 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 			if (req_type == AMC_PROXY_CMD_RW_REQUEST_WRITE)
 				/* Copy payload data to address */
-				memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+				memcpy_gcq_payload_to_device(amc_ctrl_ctxt, payload_address, data_buf, payload_size);
 		}
 		break;
 
@@ -1732,7 +1732,7 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 		case AMC_CMD_ID_SENSOR:
 			ret = amc_proxy_get_response_sensor(amc_proxy_cmd);
 			if (!ret)
-				memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+				memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, payload_size);
 			break;
 
 		case AMC_CMD_ID_DOWNLOAD_PDI:
@@ -1759,14 +1759,14 @@ int submit_gcq_command(struct amc_control_ctxt	*amc_ctrl_ctxt,
 			ret = amc_proxy_get_response_eeprom_read_write(amc_proxy_cmd);
 			if (!ret)
 				if (EEPROM_GET_TYPE(flags) == AMC_PROXY_CMD_RW_REQUEST_READ)
-					memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+					memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, payload_size);
 			break;
 
 		case AMC_CMD_ID_MODULE_READ_WRITE:
 			ret = amc_proxy_get_response_module_read_write(amc_proxy_cmd);
 			if (!ret)
 				if (MODULE_RW_TYPE(flags) == AMC_PROXY_CMD_RW_REQUEST_READ)
-					memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, data_size);
+					memcpy_gcq_payload_from_device(amc_ctrl_ctxt, payload_address, data_buf, payload_size);
 			break;
 
 		case AMC_CMD_ID_DEBUG_VERBOSITY:

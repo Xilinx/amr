@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This file contains the user API definitions for the sGCQ.
@@ -9,6 +9,7 @@
 
 #include "ami_gcq.h"
 #include <linux/delay.h>
+#include <linux/slab.h>
 #include <asm/io.h>
 
 
@@ -36,9 +37,6 @@
 
 #define GCQ_ALLOC_MAGIC                 (0x5847513F)
 #define GCQ_MIN_NUM_SLOTS               (2)
-#ifndef GCQ_MAX_INSTANCES
-#define GCQ_MAX_INSTANCES               (4)   /* Default value, but can be overridden by build environmental variable  */
-#endif
 
 /* Producer address offsets */
 #define GCQ_PRODUCER_SQ_TAIL_POINTER    (0x0000)  /* RW */
@@ -138,6 +136,7 @@ typedef struct GCQInstance
 {
 	uint32_t ulUpperFirewall;
 	bool     iInitialised;
+	bool     ucConsumerAttached;
 	uint64_t ullBaseAddr;
 	uint64_t ullRingAddr;
 	uint32_t ulConsumerSlotSize;
@@ -165,17 +164,18 @@ static bool iInitialised = false;
 /**
  * @struct  GCQPrivateData
  *
- * @brief   Structure to hold the driver's private data
+ * @brief   Structure to hold the driver's private data.
  *
- * @note    Initialisation status is checked per instance.
+ * @note    Each sGCQ instance (one per PCIe device/AMC) is now allocated
+ *          dynamically (see gcq_initialise()/gcq_close()) rather than being
+ *          stored here, so that the number of concurrently open instances
+ *          is not bounded by a fixed compile-time constant. This struct is
+ *          retained purely as a firewall/corruption-check canary for the
+ *          module as a whole.
  */
 typedef struct
 {
 	uint32_t    ulUpperFirewall;
-
-	bool        ucConsumerAttached;
-	GCQInstance xGCQInstance;
-
 	uint32_t    ulLowerFirewall;
 
 } GCQPrivateData;
@@ -188,10 +188,6 @@ typedef struct
 static GCQPrivateData xLocalData =
 {
 	GCQ_INSTANCE_UPPER_FIREWALL,	/* ulUpperFirewall */
-
-	false,		                   	/* ucConsumerAttached */
-	{ 0 },                  		/* xGCQInstances */
-
 	GCQ_INSTANCE_LOWER_FIREWALL  	/* ulLowerFirewall */
 };
 static GCQPrivateData *pxThis = &xLocalData;
@@ -404,14 +400,20 @@ static GCQ_ERRORS_TYPE gcq_initialise(GCQInstance **ppxGCQInstance,
 		if (NULL != *ppxGCQInstance)
 			xStatus = GCQ_ERRORS_INVALID_ARG;
 
-		/* Find the next free instance */
+		/*
+		 * Allocate a fresh instance for this device. Each PCIe device/AMC
+		 * gets its own independently-allocated GCQInstance so the number
+		 * of concurrently open sGCQ instances is limited only by available
+		 * kernel memory, not by a fixed-size pool - this is required to
+		 * support servers with more than a handful of cards installed.
+		 */
 		if (GCQ_ERRORS_NONE == xStatus) {
-			xStatus = GCQ_ERRORS_NO_FREE_INSTANCES;
+			GCQInstance *pxNewInstance = kzalloc(sizeof(*pxNewInstance), GFP_KERNEL);
 
-			/* Attempt to find an uninitialized sGCQ instance to use*/
-			if (false == pxThis->xGCQInstance.iInitialised) {
-				*ppxGCQInstance = &pxThis->xGCQInstance;
-				xStatus = GCQ_ERRORS_NONE;
+			if (NULL == pxNewInstance) {
+				xStatus = GCQ_ERRORS_NO_MEMORY;
+			} else {
+				*ppxGCQInstance = pxNewInstance;
 			}
 		}
 
@@ -434,6 +436,12 @@ static GCQ_ERRORS_TYPE gcq_initialise(GCQInstance **ppxGCQInstance,
 						GCQ_MIN_NUM_SLOTS);
 					xStatus = GCQ_ERRORS_INVALID_NUM_SLOTS;
 				}
+			}
+
+			/* Validation failed after allocation - release the instance */
+			if (GCQ_ERRORS_NONE != xStatus) {
+				kfree(*ppxGCQInstance);
+				*ppxGCQInstance = NULL;
 			}
 		}
 
@@ -590,7 +598,7 @@ static GCQ_ERRORS_TYPE gcq_attach_consumer(GCQInstance *pxGCQInstance)
 			gcq_fast_forward(&pxGCQInstance->xGCQCq);
 
 			/* Set flag to show now attached */
-			pxThis->ucConsumerAttached = true;
+			pxGCQInstance->ucConsumerAttached = true;
 			pxGCQInstance->xState = GCQ_STATE_ATTACHED;
 			GCQ_DEBUG("Attached ok!\r\n");
 		}
@@ -627,7 +635,8 @@ static GCQ_ERRORS_TYPE xGCQConsumeData(GCQInstance *pxGCQInstance,
 			(false == pxGCQInstance->iInitialised))
 			xStatus = GCQ_ERRORS_INVALID_INSTANCE;
 
-		if (false == pxThis->ucConsumerAttached)
+		if ((NULL != pxGCQInstance) &&
+			(false == pxGCQInstance->ucConsumerAttached))
 			xStatus = GCQ_ERRORS_CONSUMER_NOT_ATTACHED;
 
 		if (NULL == pucData)
@@ -827,6 +836,16 @@ uint32_t gcq_close(void *pvFWIf)
 		return GCQ_ERRORS_NOT_SUPPORTED;
 
 	xStatus = gcq_deinitialise(pxGCQInstance);
+
+	/*
+	 * The instance is dynamically allocated per-device by gcq_initialise()
+	 * (see gcq_open()) - release it here and clear the caller's handle so
+	 * it cannot be used again after being freed.
+	 */
+	if (GCQ_ERRORS_NONE == xStatus) {
+		kfree(pxGCQInstance);
+		pxCfg->pvGCQInstance = NULL;
+	}
 
 	return xStatus;
 }

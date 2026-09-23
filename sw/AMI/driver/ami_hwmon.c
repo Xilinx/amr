@@ -1042,7 +1042,7 @@ static ssize_t sensor_label_show(struct device *dev, struct device_attribute *da
 		SENSOR_ATTR_LABEL, sensor_da->index, &label_addr);
 
 	if (label_addr)
-		return sprintf(buf, "%s\n", (char*)label_addr);
+		return snprintf(buf, PAGE_SIZE, "%s\n", (char *)label_addr);
 
 	return 0;
 }

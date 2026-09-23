@@ -1008,7 +1008,9 @@ static int do_bar_transaction(struct pci_dev	*dev,
 
 	bar = &(pf_dev->pcie_config->header->bar[bar_idx]);
 
-	if ((bar->len == 0) || ((offset + num) > bar->len)) {
+	if ((bar->len == 0) ||
+	    (num > bar->len / sizeof(uint32_t)) ||
+	    (offset > bar->len - ((uint64_t)num * sizeof(uint32_t)))) {
 		DEV_VDBG(dev, "bar_idx = %u bar_len = %u offset = %u num = %u val = %u",
 			bar_idx, (uint32_t)bar->len, (uint32_t)offset, num, *val);
 		return -EFAULT;  /* Bad address */

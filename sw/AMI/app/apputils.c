@@ -164,6 +164,10 @@ int find_parent_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE])
 	}
 
 	boot_hdr = (PdiBootHeader*)malloc(sizeof(PdiBootHeader));
+	if (!boot_hdr) {
+		ret = EXIT_FAILURE;
+		goto exit;
+	}
 
 	/* Boot Header Table Extraction */
 	ret = fread(boot_hdr, 1, sizeof(PdiBootHeader), fp);
@@ -189,6 +193,10 @@ int find_parent_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE])
 	if ((fseek(fp, offset, SEEK_SET)) == 0)
 	{
 		img_hdr_table = (PdiImageHeaderTable*)malloc(sizeof(PdiImageHeaderTable));
+		if (!img_hdr_table) {
+			ret = EXIT_FAILURE;
+			goto exit;
+		}
 
 		ret = fread(img_hdr_table, 1, sizeof(PdiImageHeaderTable), fp);
 		if ((img_hdr_table->version != VERSION_v1_00) &&
@@ -229,6 +237,10 @@ int find_parent_uuid(const char pdi[PATH_MAX], char uuid[AMI_LOGIC_UUID_SIZE])
 	{
 		offset = img_hdr_table->firstImageHeaderWordOffset * 4;
 		img_hdr = (PdiImageHeader*)malloc(sizeof(PdiImageHeader));
+		if (!img_hdr) {
+			ret = EXIT_FAILURE;
+			goto exit;
+		}
 		if ((fseek(fp, offset, SEEK_SET)) == 0)
 		{
 			ret = fread(img_hdr, 1, sizeof(PdiImageHeader), fp);
@@ -363,9 +375,6 @@ int read_hex_data(const char *fname, void **values, uint32_t *num_values,
 			buf[n_lines_done++] = (uint32_t)strtoul(line, NULL, 0);
 		}
 
-		if (line)
-			free(line);
-
 		/* Allocate output buffer and populate values */
 		switch (value_size) {
 			case sizeof(uint8_t):
@@ -421,6 +430,9 @@ int read_hex_data(const char *fname, void **values, uint32_t *num_values,
 exit:
 	if (file)
 		fclose(file);
+
+	if (line)
+		free(line);
 
 	if (buf)
 		free(buf);

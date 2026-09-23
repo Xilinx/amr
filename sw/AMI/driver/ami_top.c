@@ -2,7 +2,7 @@
 /*
  * ami_top.c - This file contains the main entry point for the AMI driver.
  *
- * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 #include <linux/module.h>
@@ -150,8 +150,8 @@ static void amc_event_cb(enum amc_event_id id, void *data)
 
 int my_krealloc(void **buf, int old_size, int new_size, gfp_t flags)
 {
-	void *tmp = NULL;
-	int tmp_size = 0;
+	void *new_buf = NULL;
+	int copy_size = 0;
 
 	if (!buf || (new_size <= 0) || (old_size < 0))
 		return -EINVAL;
@@ -160,34 +160,20 @@ int my_krealloc(void **buf, int old_size, int new_size, gfp_t flags)
 		*buf = kmalloc(new_size, flags);
 		if (!(*buf))
 			return -ENOMEM;
-		else
-			return SUCCESS;
+		return SUCCESS;
 	}
 
-	if (old_size < new_size)
-		tmp_size = old_size;
-	else
-		tmp_size = new_size;
-
-	tmp = kmalloc(tmp_size, flags);
-	if (!tmp)
+	/* Allocate the new buffer before freeing the old one, so a failed
+	 * allocation leaves the caller's original buffer intact. */
+	new_buf = kmalloc(new_size, flags);
+	if (!new_buf)
 		return -ENOMEM;
 
-	memcpy(tmp, *buf, tmp_size);
+	copy_size = (old_size < new_size) ? old_size : new_size;
+	memcpy(new_buf, *buf, copy_size);
 
 	kfree(*buf);
-	*buf = NULL;
-
-	*buf = kmalloc(new_size, flags);
-	if (!(*buf)) {
-		kfree(tmp);
-		return -ENOMEM;
-	}
-
-	memcpy(*buf, tmp, tmp_size);
-
-	kfree(tmp);
-	tmp = NULL;
+	*buf = new_buf;
 
 	return SUCCESS;
 }
@@ -542,11 +528,15 @@ void pcie_device_remove(struct pci_dev *dev)
 	}
 
 	pci_disable_device(dev);                        /* Disable bus mastering regardless of the refcount */
-	kill_pf_dev_apps(pf_dev, SIGBUS);               /* Kill any applications that may still be running */
-	if (down_interruptible(&pf_dev->remove_sema)) { /* Wait until the refcount reaches 0 */
-		PR_DBG("PCIe device remove error");
+
+	if (pf_dev) {
+		kill_pf_dev_apps(pf_dev, SIGBUS);               /* Kill any applications that may still be running */
+		if (down_interruptible(&pf_dev->remove_sema)) { /* Wait until the refcount reaches 0 */
+			PR_DBG("PCIe device remove error");
+		}
+		delete_pf_dev_data(pf_dev, false);              /* Safe to delete data */
 	}
-	delete_pf_dev_data(pf_dev, false);              /* Safe to delete data */
+
 	DEV_INFO(dev, "Successfully removed PCIe device");
 }
 
@@ -782,7 +772,7 @@ static int create_map_str(char **map_str, int *map_str_sz)
 	int num_entries = 0;
 	struct pci_dev *pci = NULL;
 	struct pf_dev_struct *pf_dev = NULL;
-	char temp[BDF_STR_LEN + 11] = { 0 };  /* +11 for " %d %d\n\0" (3 digits) */
+	char temp[MAP_ENTRY_STR_LEN] = { 0 };
 	char *map = NULL;
 	int map_sz = 1;
 
@@ -800,7 +790,8 @@ static int create_map_str(char **map_str, int *map_str_sz)
 	while ((pci = pci_get_device(PCIE_VENDOR_ID, PCIE_DEVICE_ID, pci)) != NULL) {
 		if ((pci->driver) && (strcmp(pci->driver->name, DEFAULT_DEVICE_NAME) == 0)) {
 			pf_dev = pci_get_drvdata(pci);
-			sprintf(temp,
+			snprintf(temp,
+				sizeof(temp),
 				"%02x:%02x.%1x %d %d\n",
 				pci->bus->number,
 				PCI_SLOT(pci->devfn),
@@ -808,7 +799,10 @@ static int create_map_str(char **map_str, int *map_str_sz)
 				MINOR(pf_dev->cdev.cdev_num),
 				pf_dev->hwmon_id);
 
-			strconcat(&map, temp, &map_sz);
+			if (strconcat(&map, temp, &map_sz)) {
+				ret = -ENOMEM;
+				goto fail;
+			}
 			num_entries++;
 		}
 	}
@@ -822,9 +816,15 @@ static int create_map_str(char **map_str, int *map_str_sz)
 		goto fail;
 	}
 
-	sprintf(temp, "%d\n", num_entries);
-	strconcat(map_str, temp, map_str_sz);
-	strconcat(map_str, map, map_str_sz);
+	snprintf(temp, sizeof(temp), "%d\n", num_entries);
+	if (strconcat(map_str, temp, map_str_sz)) {
+		ret = -ENOMEM;
+		goto fail;
+	}
+	if (strconcat(map_str, map, map_str_sz)) {
+		ret = -ENOMEM;
+		goto fail;
+	}
 	kfree(map);
 	return SUCCESS;
 
@@ -861,7 +861,9 @@ static ssize_t devices_show(struct device_driver *drv, char *buf)
 	ret = create_map_str(&map_str, &map_str_sz);
 
 	if (!ret && map_str) {
-		n = sprintf(buf, "%s", map_str);
+		n = snprintf(buf, PAGE_SIZE, "%s", map_str);
+		if (n >= PAGE_SIZE)
+			n = PAGE_SIZE - 1;
 		kfree(map_str);
 	}
 

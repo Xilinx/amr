@@ -2,7 +2,7 @@
 /*
  * test_printer.c - Unit test file for printer.c
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -389,7 +389,6 @@ void test_happy_gen_json_data(void **state)
 void test_fail_gen_json_data(void **state)
 {
 	/* Failure path - invalid `out` argument */
-	will_return(__wrap_json_mkobject, NULL);
 	assert_int_equal(
 		gen_json_data(
 			NULL, 0, 0, populate_values, NULL, NULL
@@ -434,16 +433,13 @@ void test_fail_print_json_obj(void **state)
 void test_happy_print_json_data(void **state)
 {
 	/* Need to execute happy path for both `gen_json_data` and `print_json_obj`. */
-	JsonNode node1 = { 0 };
-	JsonNode node2 = { 0 };
+	JsonNode node = { 0 };
 	char *json = calloc(3, sizeof(char));
 	strcpy(json, "a");
 	assert_non_null(json);
 
-	/* parent node inside print_json_data */
-	will_return(__wrap_json_mkobject, &node1);
 	/* gen_json_data setup */
-	will_return(__wrap_json_mkobject, &node2);
+	will_return(__wrap_json_mkobject, &node);
 	will_return(populate_values, EXIT_SUCCESS);
 	/* print_json_obj setup */
 	will_return(__wrap_json_stringify, json);
@@ -460,8 +456,9 @@ void test_happy_print_json_data(void **state)
 
 void test_fail_print_json_data(void **state)
 {
+	JsonNode node = { 0 };
+
 	/* Failure path - invalid `stream` argument */
-	will_return(__wrap_json_mkobject, NULL);
 	assert_int_equal(
 		print_json_data(
 			NULL, 0, 0, NULL, populate_values, NULL
@@ -470,8 +467,7 @@ void test_fail_print_json_data(void **state)
 	);
 
 	/* Failure path - gen_json_data fails */
-	will_return(__wrap_json_mkobject, NULL);
-	will_return(__wrap_json_mkobject, NULL);
+	will_return(__wrap_json_mkobject, &node);
 	will_return(populate_values, EXIT_FAILURE);
 	expect_function_call(__wrap_json_delete);
 	assert_int_equal(
@@ -481,11 +477,8 @@ void test_fail_print_json_data(void **state)
 		EXIT_FAILURE
 	);
 
-	/* Failure path - print_json_obj fails */
+	/* Failure path - json_mkobject fails */
 	will_return(__wrap_json_mkobject, NULL);
-	will_return(__wrap_json_mkobject, NULL);
-	will_return(populate_values, EXIT_SUCCESS);
-	expect_function_call(__wrap_json_delete);
 	assert_int_equal(
 		print_json_data(
 			NULL, 0, 0, stdout, populate_values, NULL

@@ -863,7 +863,8 @@ int amc_proxy_init(uint8_t proxy_id, GCQCfg *gcq_handle)
 
 		if (!amc_proxy_entry) {
 			PR_ERR("Unable to allocate memory for amc context");
-			return -EINVAL;
+			gcq_close(gcq_handle);
+			return -ENOMEM;
 		}
 		amc_proxy_entry->inst.gcq_handle = gcq_handle;
 		amc_proxy_entry->inst.proxy_id = proxy_id;
@@ -881,6 +882,8 @@ int amc_proxy_init(uint8_t proxy_id, GCQCfg *gcq_handle)
 		if (IS_ERR(amc_proxy_entry->inst.response_thread)) {
 			PR_ERR("Unable to create the %s thread", ap_thread_name);
 			ret = PTR_ERR(amc_proxy_entry->inst.response_thread);
+			kfree(amc_proxy_entry);
+			gcq_close(gcq_handle);
 		} else {
 			PR_INFO("Successfully created %s kernel thread", ap_thread_name);
 			amc_proxy_entry->inst.response_thread_created = true;

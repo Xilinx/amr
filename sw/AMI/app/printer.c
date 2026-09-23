@@ -2,7 +2,7 @@
 /*
  * printer.c - This file contains utilities for printing formatted output
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -210,7 +210,7 @@ delete_rows:
 			if (!rows[i])
 				continue;
 
-			for (j = 0; j < 3; j++) {
+			for (j = 0; j < n_fields; j++) {
 				if (rows[i][j])
 					free(rows[i][j]);
 			}
@@ -241,19 +241,26 @@ int gen_json_data(ami_device *dev, int n_fields, int n_rows,
 	app_value_builder populate_values, void *data, JsonNode **out)
 {
 	int ret = EXIT_FAILURE;
-	JsonNode *parent = json_mkobject();
+	JsonNode *parent = NULL;
 
 	if (!out)
 		return EXIT_FAILURE;
 
 	/* Note that `dev`, and `data` may be NULL */
 
+	parent = json_mkobject();
+	if (!parent)
+		return EXIT_FAILURE;
+
 	/* Add data to parent. */
 	ret = populate_values(dev, parent, &n_rows, &n_fields,
 		APP_OUT_FORMAT_JSON, data);
 
-	if (ret == EXIT_SUCCESS)
+	if (ret == EXIT_SUCCESS) {
 		*out = parent;
+	} else {
+		json_delete(parent);
+	}
 
 	return ret;
 }
@@ -285,7 +292,7 @@ int print_json_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
 	app_value_builder populate_values, void *data)
 {
 	int ret = EXIT_FAILURE;
-	JsonNode *parent = json_mkobject();
+	JsonNode *parent = NULL;
 
 	/* Note that `dev`, and `data` may be NULL */
 
@@ -305,7 +312,8 @@ int print_json_data(ami_device *dev, int n_fields, int n_rows, FILE *stream,
 	if (ret == EXIT_SUCCESS)
 		ret = print_json_obj(parent, stream);
 
-	json_delete(parent);
+	if (parent)
+		json_delete(parent);
 	return ret;
 }
 

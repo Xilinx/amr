@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  * SPDX-License-Identifier: MIT
  *
  * This header file contains structures, type definitions and function declarations
@@ -78,6 +78,7 @@ typedef enum
 	GCQ_ERRORS_CONSUMER_NO_DATA_RECEIVED = 13,
 	GCQ_ERRORS_PRODUCER_NO_FREE_SLOTS    = 14,
 	GCQ_ERRORS_NOT_SUPPORTED             = 15,
+	GCQ_ERRORS_NO_MEMORY                 = 16,
 
 	MAX_GCQ_ERRORS_TYPE
 

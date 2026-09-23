@@ -2,7 +2,7 @@
 /*
  * ami_sensor.c - This file contains the implementation of sensor related logic
  *
- * Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+ * Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
 /* Standard includes */
@@ -622,6 +622,29 @@ static int populate_device_sensors(ami_device *dev, struct ami_sensor_data *data
 			break;
 
 		next = next->next;
+	}
+
+	if (ret != AMI_STATUS_OK) {
+		struct ami_sensor_data *d = data;
+		struct ami_sensor *s = dev->sensors;
+
+		while (d) {
+			struct ami_sensor_data *dnext = d->next;
+
+			free(d);
+			d = dnext;
+		}
+
+		while (s) {
+			struct ami_sensor *snext = s->next;
+
+			free(s->sensor_data);
+			free(s);
+			s = snext;
+		}
+
+		dev->sensors = NULL;
+		dev->num_sensors = 0;
 	}
 
 	return ret;

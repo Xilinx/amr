@@ -127,6 +127,30 @@ static enum gcq_submit_cmd_flags get_flags_for_repo(enum gcq_sdr_repo_type repo_
 }
 
 /**
+ * copy_bdinfo_field() - Parse one BDINFO TLV into a field_info struct.
+ * @field: Destination field.
+ * @sdr_buf: Raw SDR buffer.
+ * @buf_index: Parse index; advanced by the firmware-reported length.
+ *
+ * Cap field->len at SDR_VALUE_MAX_LEN so a large firmware length cannot
+ * overflow field->bytes. Advance the index by the original length so later
+ * fields stay aligned.
+ */
+static void copy_bdinfo_field(struct field_info *field, const uint8_t *sdr_buf,
+			      int *buf_index)
+{
+	uint8_t wire_len = 0;
+
+	field->type = sdr_buf[(*buf_index)++];
+	field->len = sdr_buf[(*buf_index)++];
+	wire_len = field->len;
+	if (field->len > SDR_VALUE_MAX_LEN)
+		field->len = SDR_VALUE_MAX_LEN;
+	memcpy(field->bytes, &sdr_buf[*buf_index], field->len);
+	*buf_index += wire_len;
+}
+
+/**
  * parse_sdr() - Parse an SDR from the raw byte buffer.
  * @amc_ctrl_ctxt: Pointer to top level AMC struct.
  * @sdr_buf: Raw data buffer, including header.
@@ -173,6 +197,9 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 									   sizeof(struct fpt_partition),
 									   GFP_KERNEL);
 
+				if (!repo->fpt.partition_primary)
+					return -ENOMEM;
+
 				for (i = 0; i < repo->fpt.hdr_primary.num_entries; i++) {
 					/* type */
 					memcpy(&repo->fpt.partition_primary[i].type,
@@ -218,6 +245,9 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 									     repo->fpt.hdr_secondary.num_entries *
 									     sizeof(struct fpt_partition),
 									     GFP_KERNEL);
+
+				if (!repo->fpt.partition_secondary)
+					return -ENOMEM;
 
 				for (i = 0; i < repo->fpt.hdr_secondary.num_entries; i++) {
 					/* type */
@@ -266,128 +296,61 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				return -ENOMEM;
 
 			/* eeprom version */
-			repo->bd_info->eeprom_version.type = sdr_buf[buf_index++];
-			repo->bd_info->eeprom_version.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->eeprom_version.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->eeprom_version.len);
-			buf_index += repo->bd_info->eeprom_version.len;
+			copy_bdinfo_field(&repo->bd_info->eeprom_version, sdr_buf, &buf_index);
 
 			/* product name */
-			repo->bd_info->product_name.type = sdr_buf[buf_index++];
-			repo->bd_info->product_name.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->product_name.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->product_name.len);
-			buf_index += repo->bd_info->product_name.len;
+			copy_bdinfo_field(&repo->bd_info->product_name, sdr_buf, &buf_index);
 
 			/* board revsion */
-			repo->bd_info->board_rev.type = sdr_buf[buf_index++];
-			repo->bd_info->board_rev.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->board_rev.bytes, &sdr_buf[buf_index], repo->bd_info->board_rev.len);
-			buf_index += repo->bd_info->board_rev.len;
+			copy_bdinfo_field(&repo->bd_info->board_rev, sdr_buf, &buf_index);
 
 			/* board serial */
-			repo->bd_info->board_serial.type = sdr_buf[buf_index++];
-			repo->bd_info->board_serial.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->board_serial.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->board_serial.len);
-			buf_index += repo->bd_info->board_serial.len;
+			copy_bdinfo_field(&repo->bd_info->board_serial, sdr_buf, &buf_index);
 
 			/* mac address count */
-			repo->bd_info->mac_addr_count.type = sdr_buf[buf_index++];
-			repo->bd_info->mac_addr_count.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->mac_addr_count.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->mac_addr_count.len);
-			buf_index += repo->bd_info->mac_addr_count.len;
+			copy_bdinfo_field(&repo->bd_info->mac_addr_count, sdr_buf, &buf_index);
 
 			/* first mac address */
-			repo->bd_info->first_mac_addr.type = sdr_buf[buf_index++];
-			repo->bd_info->first_mac_addr.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->first_mac_addr.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->first_mac_addr.len);
-			buf_index += repo->bd_info->first_mac_addr.len;
+			copy_bdinfo_field(&repo->bd_info->first_mac_addr, sdr_buf, &buf_index);
 
 			/* active state */
-			repo->bd_info->active_state.type = sdr_buf[buf_index++];
-			repo->bd_info->active_state.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->active_state.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->active_state.len);
-			buf_index += repo->bd_info->active_state.len;
+			copy_bdinfo_field(&repo->bd_info->active_state, sdr_buf, &buf_index);
 
 			/* config mode */
-			repo->bd_info->config_mode.type = sdr_buf[buf_index++];
-			repo->bd_info->config_mode.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->config_mode.bytes, &sdr_buf[buf_index], repo->bd_info->config_mode.len);
-			buf_index += repo->bd_info->config_mode.len;
+			copy_bdinfo_field(&repo->bd_info->config_mode, sdr_buf, &buf_index);
 
 			/* manufacturing date */
-			repo->bd_info->manufacturing_date.type = sdr_buf[buf_index++];
-			repo->bd_info->manufacturing_date.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->manufacturing_date.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->manufacturing_date.len);
-			buf_index += repo->bd_info->manufacturing_date.len;
+			copy_bdinfo_field(&repo->bd_info->manufacturing_date, sdr_buf, &buf_index);
 
 			/* part number */
-			repo->bd_info->part_number.type = sdr_buf[buf_index++];
-			repo->bd_info->part_number.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->part_number.bytes, &sdr_buf[buf_index], repo->bd_info->part_number.len);
-			buf_index += repo->bd_info->part_number.len;
+			copy_bdinfo_field(&repo->bd_info->part_number, sdr_buf, &buf_index);
 
 			/* uuid */
-			repo->bd_info->uuid.type = sdr_buf[buf_index++];
-			repo->bd_info->uuid.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->uuid.bytes, &sdr_buf[buf_index], repo->bd_info->uuid.len);
-			buf_index += repo->bd_info->uuid.len;
+			copy_bdinfo_field(&repo->bd_info->uuid, sdr_buf, &buf_index);
 
 			/* pcie_id */
-			repo->bd_info->pcie_id.type = sdr_buf[buf_index++];
-			repo->bd_info->pcie_id.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->pcie_id.bytes, &sdr_buf[buf_index], repo->bd_info->pcie_id.len);
-			buf_index += repo->bd_info->pcie_id.len;
+			copy_bdinfo_field(&repo->bd_info->pcie_id, sdr_buf, &buf_index);
 
 			/* power mode */
-			repo->bd_info->power_mode.type = sdr_buf[buf_index++];
-			repo->bd_info->power_mode.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->power_mode.bytes, &sdr_buf[buf_index], repo->bd_info->power_mode.len);
+			copy_bdinfo_field(&repo->bd_info->power_mode, sdr_buf, &buf_index);
 			/*
 			 * default power value of zero (75W) overridden when length of data
 			 * is zero so that app can display 'N/A'
 			 */
 			if (repo->bd_info->power_mode.len == 0)
 				repo->bd_info->power_mode.bytes[0] = DEFAULT_BDINFO_POWER;
-			buf_index += repo->bd_info->power_mode.len;
 
 			/* memory size */
-			repo->bd_info->memory_size.type = sdr_buf[buf_index++];
-			repo->bd_info->memory_size.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->memory_size.bytes, &sdr_buf[buf_index], repo->bd_info->memory_size.len);
-			buf_index += repo->bd_info->memory_size.len;
+			copy_bdinfo_field(&repo->bd_info->memory_size, sdr_buf, &buf_index);
 
 			/* oem id */
-			repo->bd_info->oem_id.type = sdr_buf[buf_index++];
-			repo->bd_info->oem_id.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->oem_id.bytes, &sdr_buf[buf_index], repo->bd_info->oem_id.len);
-			buf_index += repo->bd_info->oem_id.len;
+			copy_bdinfo_field(&repo->bd_info->oem_id, sdr_buf, &buf_index);
 
 			/* capability */
-			repo->bd_info->capability.type = sdr_buf[buf_index++];
-			repo->bd_info->capability.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->capability.bytes, &sdr_buf[buf_index], repo->bd_info->capability.len);
-			buf_index += repo->bd_info->capability.len;
+			copy_bdinfo_field(&repo->bd_info->capability, sdr_buf, &buf_index);
 
 			/* mfg part number */
-			repo->bd_info->mfg_part_number.type = sdr_buf[buf_index++];
-			repo->bd_info->mfg_part_number.len = sdr_buf[buf_index++];
-			memcpy(&repo->bd_info->mfg_part_number.bytes,
-			       &sdr_buf[buf_index],
-			       repo->bd_info->mfg_part_number.len);
-			buf_index += repo->bd_info->mfg_part_number.len;
+			copy_bdinfo_field(&repo->bd_info->mfg_part_number, sdr_buf, &buf_index);
 			break;
 		}
 
@@ -406,6 +369,8 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				return -ENOMEM;
 
 			for (i = 0; i < repo->num_records; i++) {
+				uint8_t value_wire_len = 0;
+
 				rec = repo->records + i;
 
 				rec->id = sdr_buf[buf_index++];
@@ -414,22 +379,39 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				rec->name_type = sdr_buf[buf_index] >> SDR_TYPE_POS;
 				rec->name_len = sdr_buf[buf_index] & SDR_LENGTH_MASK;
 				buf_index++;
-				memcpy(rec->name, &sdr_buf[buf_index], rec->name_len);
-				buf_index += rec->name_len;
+				{
+					uint8_t name_wire_len = rec->name_len;
+
+					if (rec->name_len >= SDR_VALUE_MAX_LEN)
+						rec->name_len = SDR_VALUE_MAX_LEN - 1;
+					memcpy(rec->name, &sdr_buf[buf_index], rec->name_len);
+					rec->name[rec->name_len] = '\0';
+					buf_index += name_wire_len;
+				}
 
 				/* Value */
 				rec->value_type = sdr_buf[buf_index] >> SDR_TYPE_POS;
 				rec->value_len = sdr_buf[buf_index] & SDR_LENGTH_MASK;
+				value_wire_len = rec->value_len;
+				if (rec->value_len > SDR_THRESHOLD_MAX_LEN)
+					rec->value_len = SDR_THRESHOLD_MAX_LEN;
 				buf_index++;
 				memcpy(rec->value, &sdr_buf[buf_index], rec->value_len);
-				buf_index += rec->value_len;
+				buf_index += value_wire_len;
 
 				/* Unit */
 				rec->unit_type = sdr_buf[buf_index] >> SDR_TYPE_POS;
 				rec->unit_len = sdr_buf[buf_index] & SDR_LENGTH_MASK;
 				buf_index++;
-				memcpy(rec->unit, &sdr_buf[buf_index], rec->unit_len);
-				buf_index += rec->unit_len;
+				{
+					uint8_t unit_wire_len = rec->unit_len;
+
+					if (rec->unit_len >= SDR_VALUE_MAX_LEN)
+						rec->unit_len = SDR_VALUE_MAX_LEN - 1;
+					memcpy(rec->unit, &sdr_buf[buf_index], rec->unit_len);
+					rec->unit[rec->unit_len] = '\0';
+					buf_index += unit_wire_len;
+				}
 
 				rec->unit_mod = sdr_buf[buf_index++];
 				rec->threshold_support = sdr_buf[buf_index++];
@@ -437,49 +419,49 @@ static int parse_sdr(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				/* Lower fatal */
 				if (rec->threshold_support & THRESHOLD_LOWER_FATAL_MASK) {
 					memcpy(rec->lower_fatal_limit, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				/* Lower critical */
 				if (rec->threshold_support & THRESHOLD_LOWER_CRITICAL_MASK) {
 					memcpy(rec->lower_crit_limit, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				/* Lower warning */
 				if (rec->threshold_support & THRESHOLD_LOWER_WARNING_MASK) {
 					memcpy(rec->lower_warn_limit, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				/* Upper fatal */
 				if (rec->threshold_support & THRESHOLD_UPPER_FATAL_MASK) {
 					memcpy(rec->upper_fatal_limit, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				/* Upper critical */
 				if (rec->threshold_support & THRESHOLD_UPPER_CRITICAL_MASK) {
 					memcpy(rec->upper_crit_limit, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				/* Upper warning */
 				if (rec->threshold_support & THRESHOLD_UPPER_WARNING_MASK) {
 					memcpy(rec->upper_warn_limit, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				rec->sensor_status = sdr_buf[buf_index++];
 
 				if (rec->threshold_support & THRESHOLD_SENSOR_AVG_MASK) {
 					memcpy(rec->avg, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				if (rec->threshold_support & THRESHOLD_SENSOR_MAX_MASK) {
 					memcpy(rec->max, &sdr_buf[buf_index], rec->value_len);
-					buf_index += rec->value_len;
+					buf_index += value_wire_len;
 				}
 
 				/* Min is not supported. */
@@ -888,6 +870,7 @@ static int get_all_sensors(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	int rid = 0, sid = 0, i = 0;
 	uint8_t size = 0;
 	uint8_t val_len = 0;
+	uint8_t val_wire_len = 0;
 	int num_sensor = 0;
 	int buf_index = 0, rec_start_buf_index = 0;
 	struct sdr_record *rec = NULL;
@@ -939,6 +922,9 @@ static int get_all_sensors(struct amc_control_ctxt	*amc_ctrl_ctxt,
 
 	while (buf_index < rec_start_buf_index + size) {
 		val_len = sdr_raw_buf[buf_index++];
+		val_wire_len = val_len;
+		if (val_len > SDR_THRESHOLD_MAX_LEN)
+			val_len = SDR_THRESHOLD_MAX_LEN;
 		rec = find_sdr_record(sensor_repo, 1, rid, num_sensor);
 
 		if (!rec) {
@@ -946,7 +932,7 @@ static int get_all_sensors(struct amc_control_ctxt	*amc_ctrl_ctxt,
 			 * Each record contains len (1), value (len), max (len),
 			 * average (len), status (1).
 			 */
-			buf_index += (SDR_PARSE_BUF_STATUS_INDEX * val_len) + 1;
+			buf_index += (SDR_PARSE_BUF_STATUS_INDEX * val_wire_len) + 1;
 			num_sensor++;
 			continue;
 		}
@@ -974,7 +960,7 @@ static int get_all_sensors(struct amc_control_ctxt	*amc_ctrl_ctxt,
 				break;
 			}
 
-			buf_index += val_len;
+			buf_index += val_wire_len;
 		}
 
 		rec->sensor_status = sdr_raw_buf[buf_index++];

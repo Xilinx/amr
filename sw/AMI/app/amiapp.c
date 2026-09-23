@@ -380,6 +380,11 @@ int main(int argc, char *argv[])
 				struct app_option *option = \
 					(struct app_option*)calloc(1, sizeof *option);
 
+				if (!option) {
+					ret = EXIT_FAILURE;
+					goto cleanup;
+				}
+
 				option->long_ind = long_ind;
 				option->val = opt;
 				option->arg = optarg;
@@ -426,14 +431,17 @@ int main(int argc, char *argv[])
 		);
 	}
 
-	/* Cleanup. */
-	struct app_option *next_opt = NULL;
-	options_tail = options_head;
+cleanup:
+	{
+		struct app_option *next_opt = NULL;
 
-	while (options_tail) {
-		next_opt = options_tail->next;
-		free(options_tail);
-		options_tail = next_opt;
+		options_tail = options_head;
+
+		while (options_tail) {
+			next_opt = options_tail->next;
+			free(options_tail);
+			options_tail = next_opt;
+		}
 	}
 
 	return ret;
