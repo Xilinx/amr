@@ -88,6 +88,7 @@ static uint64_t ami_monotonic_ms(void);
 static bool vfio_amc_magic_valid(uint32_t magic);
 static void ami_format_logic_uuid(const uint8_t uuid[16], char out[33]);
 static void vfio_try_cache_info_from_bar(ami_device *dev);
+static bool amc_version_is_compatible(uint8_t major, uint8_t minor);
 
 /**
  * open_sysfs() - Open a sysfs node for either reading or writing (or both).
@@ -159,6 +160,49 @@ static int pci_rescan(void);
 static bool vfio_amc_magic_valid(uint32_t magic)
 {
 	return (magic == AMC_MAGIC_NUMBER);
+}
+
+/**
+ * struct amc_compat_entry - a single AMC version entry in the compatibility table.
+ * @major: AMC major version.
+ * @minor: AMC minor version.
+ */
+struct amc_compat_entry {
+	uint8_t major;
+	uint8_t minor;
+};
+
+/*
+ * Table of AMC firmware versions considered compatible with this AMI build
+ * (GIT_TAG_VER_MAJOR.GIT_TAG_VER_MINOR, see ami_api_version.h). Patch version
+ * is intentionally not compared.
+ *
+ * NOTE: Keep this table in sync with the equivalent table in
+ * driver/ami_amc_control.c (amc_compat_table).
+ */
+static const struct amc_compat_entry amc_compat_table[] = {
+	{ 3, 1 }, /* AMC 3.1.0 */
+	{ 3, 0 }, /* AMC 3.0.0 */
+	{ 2, 0 }, /* AMC 2.0.0 */
+};
+
+/**
+ * amc_version_is_compatible() - look up an AMC version in the compatibility table.
+ * @major: the AMC major version number
+ * @minor: the AMC minor version number
+ *
+ * Return: true if the given AMC version is listed as compatible.
+ */
+static bool amc_version_is_compatible(uint8_t major, uint8_t minor)
+{
+	size_t i;
+
+	for (i = 0; i < (sizeof(amc_compat_table) / sizeof(amc_compat_table[0])); i++) {
+		if ((amc_compat_table[i].major == major) && (amc_compat_table[i].minor == minor))
+			return true;
+	}
+
+	return false;
 }
 
 /*
@@ -622,9 +666,9 @@ int ami_open_cdev(ami_device *dev)
 					dev->amc_ver_patch = amc_pat;
 					dev->amc_ver_cache_ms = ami_monotonic_ms();
 
-					/* Major version defines the command interface;
-					 * start the heartbeat for any compatible AMC. */
-					if (amc_maj == GIT_TAG_VER_MAJOR) {
+					/* Start the heartbeat for any AMC version listed
+					 * in the compatibility table. */
+					if (amc_version_is_compatible(amc_maj, amc_min)) {
 						(void)gcq_userspace_start_heartbeat(dev->gcq_ctx);
 					}
 				}
@@ -1858,16 +1902,13 @@ int ami_dev_get_state(ami_device *dev, char buf[AMI_DEV_STATE_SIZE])
 		}
 
 		/*
-		 * Determine state based on version compatibility.
-		 * The command structure is tied to the major version only;
-		 * minor/patch bumps don't change the AMC command interface, so
-		 * any AMC sharing this AMI's major version is READY (e.g. AMC
-		 * 3.0.0 against AMI 3.1.0).
+		 * Determine state based on version compatibility against the
+		 * amc_compat_table (major.minor match; patch is ignored).
 		 */
-		if (ver.major != GIT_TAG_VER_MAJOR) {
-			strncpy(buf, "COMPAT", AMI_DEV_STATE_SIZE - 1);
-		} else {
+		if (amc_version_is_compatible(ver.major, ver.minor)) {
 			strncpy(buf, "READY", AMI_DEV_STATE_SIZE - 1);
+		} else {
+			strncpy(buf, "COMPAT", AMI_DEV_STATE_SIZE - 1);
 		}
 
 		return AMI_STATUS_OK;

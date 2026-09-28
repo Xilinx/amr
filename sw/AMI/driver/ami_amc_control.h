@@ -38,6 +38,11 @@
 #define AMC_LOG_ENTRY_SIZE	(96)
 #define AMC_LOG_MAX_RECS	(50)
 
+/* Magic number written by AMC firmware at the base of the shared memory
+ * region once it has finished initialising - shared with ami_vsec.c so it
+ * can gate its own readback of this same structure. */
+#define AMC_GCQ_MAGIC_NO	(0x564D5230)
+
 /*
  * Response format:
  * Length byte : Description

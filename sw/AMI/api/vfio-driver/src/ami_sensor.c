@@ -571,16 +571,14 @@ static int find_sensor_by_name(ami_device *dev, const char *name,
 {
 	int ret = AMI_STATUS_ERROR;
 
-	/* Cache last value */
-	static ami_device *last_dev = NULL;
-	static struct ami_sensor *last = NULL;
-
 	if (!dev || !dev->sensors || !name || !sensor)
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
 
-	/* Check cached value. */
-	if (last && (last_dev == dev) && (strcmp(last->name, name) == 0)) {
-		*sensor = last;
+	/* Check per-device cached value (dev->last_sensor). See the field
+	 * comment in ami_device_internal.h for why this must be per-device
+	 * rather than a shared/static cache. */
+	if (dev->last_sensor && (strcmp(dev->last_sensor->name, name) == 0)) {
+		*sensor = dev->last_sensor;
 		ret = AMI_STATUS_OK;
 	} else {
 		struct ami_sensor *next = dev->sensors;
@@ -588,8 +586,7 @@ static int find_sensor_by_name(ami_device *dev, const char *name,
 		while (next) {
 			if (strcmp(next->name, name) == 0) {
 				*sensor = next;
-				last = next;
-				last_dev = dev;
+				dev->last_sensor = next;
 				ret = AMI_STATUS_OK;
 				break;
 			}
@@ -1139,6 +1136,7 @@ int ami_sensor_discover(ami_device *dev)
 		dev->sensors = sensor_list;
 		dev->num_sensors = unique_sensors;
 		dev->num_total_sensors = total_measurements;
+		dev->last_sensor = NULL; /* invalidate cache - list rebuilt above */
 
 		if (unique_sensors == 0) {
 			if (log)

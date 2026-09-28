@@ -64,6 +64,18 @@ struct ami_device {
 	int                 num_sensors;
 	int                 num_total_sensors;
 	struct ami_sensor  *sensors;
+	struct ami_sensor  *last_sensor;       /* Per-device "last found sensor"
+	                                         * cache used by find_sensor_by_name()
+	                                         * to skip the linear search on
+	                                         * repeated lookups of the same
+	                                         * sensor. Must live here (per
+	                                         * device), not as a process-wide
+	                                         * static: a shared cache would let
+	                                         * concurrent lookups on two
+	                                         * different devices for a sensor
+	                                         * with the same name (e.g.
+	                                         * "temp1") race and hand back the
+	                                         * wrong device's sensor pointer. */
 	char                cdev_name[AMI_DEV_NAME_MAX];
 
 	/* Userspace GCQ support */

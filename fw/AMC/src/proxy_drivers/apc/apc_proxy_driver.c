@@ -16,6 +16,7 @@
 #include "profile_hal.h"
 #include "apc_proxy_driver.h"
 #include "ami_proxy_driver.h"
+#include "i2c.h"
 
 
 /******************************************************************************/
@@ -119,6 +120,7 @@
 	DO(APC_PROXY_ERRORS_IMAGE_COPY_FAILED)                 \
 	DO(APC_PROXY_ERRORS_PARTITION_SELECTION_FAILED)        \
 	DO(APC_PROXY_ERRORS_POR_FAILED)                        \
+	DO(APC_PROXY_ERRORS_I2C_QUIESCE_FAILED)                \
 	DO(APC_PROXY_ERRORS_COPY_BUFFER_CREATION_FAILED)       \
 	DO(APC_PROXY_ERRORS_RAISE_EVENT_FAILED)                \
 	DO(APC_PROXY_ERRORS_VALIDATION_FAILED)                 \
@@ -1372,11 +1374,39 @@ static void vProxyDriverTask(void* pArg)
 
 				iOSAL_Task_SleepMs(APC_POR_DELAY_MS);
 
+				/*
+				 * Quiesce I2C before triggering the reset. XPm_SystemShutdown()
+				 * resets the PS I2C controllers immediately; if a transaction is
+				 * still in flight when that happens, a slave can be left holding
+				 * SDA low, wedging the bus until an AC power cycle (CR-1281230).
+				 * Block here until any in-flight transaction completes so the
+				 * bus is idle at reset time. Proceed with the reset regardless
+				 * of the outcome - reset is still the primary recovery
+				 * mechanism and must not be blocked indefinitely.
+				 */
+				if (OK != iI2C_Quiesce()) {
+					PLL_ERR(APC_NAME,
+						"Error: iI2C_Quiesce() failed, proceeding with POR anyway\r\n");
+					INC_ERROR_COUNTER(APC_PROXY_ERRORS_I2C_QUIESCE_FAILED)
+				}
+
 				PLL_INF(APC_NAME, "Triggering system POR via XilPM\r\n");
 				if (XST_SUCCESS !=
 					XPm_SystemShutdown(PM_SHUTDOWN_TYPE_RESET, PM_SHUTDOWN_SUBTYPE_RST_SYSTEM)) {
 					PLL_ERR(APC_NAME, "ERROR: XPm_SystemShutdown POR failed\r\n");
 					INC_ERROR_COUNTER(APC_PROXY_ERRORS_POR_FAILED)
+
+					/*
+					 * The reset did not actually happen, so the AMC is
+					 * still running on this same instance - release the
+					 * I2C mutexes taken by iI2C_Quiesce() so I2C keeps
+					 * working instead of being left locked out until the
+					 * next successful reset.
+					 */
+					if (OK != iI2C_Resume()) {
+						PLL_ERR(APC_NAME, "Error: iI2C_Resume() failed\r\n");
+					}
+
 					xSignal.ucEventType = APC_PROXY_DRIVER_E_POR_FAILED;
 
 					if (OK != iEVL_RaiseEvent(pxThis->pxEvlRecord, &xSignal)) {

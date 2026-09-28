@@ -44,6 +44,15 @@
 #define AMI_DEBUG_INPUT_LIMIT	(2)
 #define AMI_NUM_EMPTY_SDR		(2)
 
+/*
+ * Sensor discovery immediately following a POR/hot-reset (e.g. triggered by
+ * device_boot) can transiently fail if the AMC firmware has not yet finished
+ * bringing up its sensor subsystem. Retry the whole discovery pass a bounded
+ * number of times before permanently marking the device PF_DEV_STATE_INIT_ERROR.
+ */
+#define SENSOR_DISCOVERY_RETRY_COUNT      (3)
+#define SENSOR_DISCOVERY_RETRY_DELAY_MS   (1000)
+
 static struct drv_cdev_struct driver_dev = { { 0 } };  /* Global device */
 static unsigned pf_dev_index = DEFAULT_CDEV_BASEMINOR;
 
@@ -320,7 +329,25 @@ static int create_pf_dev_data(struct pci_dev *dev)
 		 * happen. NOTE: Both, the sensor data and hwmon data use managed
 		 * memory so no cleanup is necessary.
 		 */
-		if (!discover_sensors(pf_dev, &empty_sdr_count)) {
+		int discover_attempt = 0;
+		int discover_ret = 0;
+
+		for (discover_attempt = 0; discover_attempt < SENSOR_DISCOVERY_RETRY_COUNT;
+		     discover_attempt++) {
+			empty_sdr_count = 0;
+			discover_ret = discover_sensors(pf_dev, &empty_sdr_count);
+			if (!discover_ret)
+				break;
+
+			if (discover_attempt < (SENSOR_DISCOVERY_RETRY_COUNT - 1)) {
+				DEV_INFO(dev,
+					"Sensor discovery failed (attempt %d/%d), retrying...",
+					discover_attempt + 1, SENSOR_DISCOVERY_RETRY_COUNT);
+				msleep(SENSOR_DISCOVERY_RETRY_DELAY_MS);
+			}
+		}
+
+		if (!discover_ret) {
 			ret = register_hwmon(&dev->dev, pf_dev);
 			if (ret)
 				goto remove_pf_dev;

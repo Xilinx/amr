@@ -8,9 +8,9 @@
 #ifndef _AMI_VERSION_H_
 #define _AMI_VERSION_H_
 
-#define GIT_TAG                   "3.0.0"
+#define GIT_TAG                   "3.1.0"
 #define GIT_TAG_VER_MAJOR         (3)
-#define GIT_TAG_VER_MINOR         (0)
+#define GIT_TAG_VER_MINOR         (1)
 #define GIT_TAG_VER_PATCH         (0)
 #define GIT_TAG_VER_DEV_COMMITS   (0)
 

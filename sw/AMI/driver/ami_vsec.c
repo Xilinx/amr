@@ -5,6 +5,8 @@
  * Copyright (C) 2023 - 2026 Advanced Micro Devices, Inc. All rights reserved.
  */
 
+#include <linux/delay.h>
+
 #include "ami_vsec.h"
 #include "ami_pci_dbg.h"
 #include "ami_amc_control.h"
@@ -14,10 +16,23 @@
  * No need to check the vendor ID is PCIE_VENDOR_ID_XILINX here prior to VSEC
  * discovery as only Xilinx card are used in MODULE_DEVICE_TABLE */
 
+/*
+ * Immediately after a POR (e.g. triggered by a device_boot partition
+ * select), the PCIe link can retrain and get re-enumerated by the kernel's
+ * hotplug handler within about a second - well before the AMC firmware has
+ * finished bringing up the logic behind this BAR. A readback that lands
+ * too early sees all-1s (invalid magic number). Retry with a delay instead
+ * of failing on the very first read, mirroring the budget used by
+ * gcq_attach_consumer() for the equivalent problem later in bring-up.
+ */
+#define VSEC_MAGIC_MAX_ATTEMPTS  (30)   /* Roughly 30 seconds */
+#define VSEC_MAGIC_RETRY_MS      (1000)
+
 static int read_logic_uuid(struct pci_dev *dev, endpoints_struct *endpoints)
 {
 	int ret = 0;
 	int i = 0;
+	int attempt = 0;
 	void __iomem *virt_addr = NULL;
 	struct amc_shared_mem shared_mem;
 
@@ -52,9 +67,24 @@ static int read_logic_uuid(struct pci_dev *dev, endpoints_struct *endpoints)
 		goto release_bar;
 	}
 	virt_addr += XILINX_SGCQ_SIZE_BYTES;
-	memcpy_fromio(&shared_mem,
-			virt_addr,
-			sizeof(struct amc_shared_mem));
+
+	do {
+		memcpy_fromio(&shared_mem,
+				virt_addr,
+				sizeof(struct amc_shared_mem));
+
+		if (shared_mem.amc_magic_no == AMC_GCQ_MAGIC_NO)
+			break;
+
+		attempt++;
+		if (attempt >= VSEC_MAGIC_MAX_ATTEMPTS) {
+			DEV_ERR(dev, "AMC magic number not found in %s after %d ms",
+				endpoints->gcq.name, attempt * VSEC_MAGIC_RETRY_MS);
+			ret = -EIO;
+			goto release_bar;
+		}
+		msleep(VSEC_MAGIC_RETRY_MS);
+	} while (1);
 
 	if ((shared_mem.uuid.amc_uuid_off + shared_mem.uuid.amc_uuid_len)
 		> endpoints->gcq.bar_len) {

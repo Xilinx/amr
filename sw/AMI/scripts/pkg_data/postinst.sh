@@ -124,13 +124,21 @@ if [ "${MOD_NAME}" = "ami" ]; then
 
     depmod -A
 
+    # Unconditionally remove any existing registration for the exact
+    # module/version we are about to (re)install, regardless of what the
+    # generic cleanup loop above found. `dkms status` and `dkms add` can
+    # disagree on whether ami/${MOD_VER_STR} is already registered (observed
+    # with dkms 3.0.x): the loop above walks `dkms status -m ami` and can
+    # come up empty while `dkms add` still rejects the same version moments
+    # later as a duplicate. This matters most during iterative development,
+    # where the same version string can get rebuilt/reinstalled multiple
+    # times without a version bump.
+    dkms remove -m "${MOD_NAME}" -v "${MOD_VER_STR}" --all 2>/dev/null || true
+
     # Add and install new DKMS module
     echo "Adding ${MOD_NAME} ${MOD_VER_STR} to DKMS"
-    # Check if already added (from previous failed install attempt)
-    if dkms status -m "${MOD_NAME}" -v "${MOD_VER_STR}" 2>/dev/null | grep -q "added"; then
-        echo "${MOD_NAME} ${MOD_VER_STR} already added to DKMS, skipping add step"
-    elif ! dkms add -m "${MOD_NAME}" -v "${MOD_VER_STR}" 2>&1; then
-        # If add fails, check if it's because module already exists
+    if ! dkms add -m "${MOD_NAME}" -v "${MOD_VER_STR}" 2>&1; then
+        # If add still fails, check if it's because the module already exists
         if dkms status -m "${MOD_NAME}" -v "${MOD_VER_STR}" 2>/dev/null | grep -q "${MOD_NAME}"; then
             echo "${MOD_NAME} ${MOD_VER_STR} already in DKMS tree, continuing"
         else
@@ -140,7 +148,13 @@ if [ "${MOD_NAME}" = "ami" ]; then
     fi
 
     echo "Installing ${MOD_NAME} ${MOD_VER_STR} with DKMS"
-    if ! dkms install -m "${MOD_NAME}" -v "${MOD_VER_STR}"; then
+    # --force guarantees a genuine rebuild even if DKMS believes a module
+    # with this exact (module, version, kernel) triple is already installed
+    # - which can happen after the add-time collision above, where a stale
+    # build for the same version string (but different source) would
+    # otherwise be silently reused instead of being rebuilt from the source
+    # just installed under /usr/src/${MOD_NAME}-${MOD_VER_STR}.
+    if ! dkms install -m "${MOD_NAME}" -v "${MOD_VER_STR}" --force; then
         echo "ERROR: dkms install failed"
         exit 1
     fi

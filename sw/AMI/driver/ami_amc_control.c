@@ -42,12 +42,24 @@ static DEFINE_XARRAY_ALLOC(cid_xarray);
 #define REQUEST_HEARTBEAT_TIMEOUT       (msecs_to_jiffies(500))     /* 0.5 seconds */
 #define HEARTBEAT_REQUEST_INTERVAL      (500)
 #define LOGGING_SLEEP_INTERVAL          (500)
+/*
+ * The sGCQ version request is the very first real command sent to the AMC
+ * after a (re)probe. Immediately after a PCIe hot-unplug/replug (e.g. as
+ * triggered by device_boot), the link/AMC firmware can occasionally need a
+ * little longer to be ready to service commands than the fixed delays in
+ * userspace allow for - particularly when multiple cards are hot-plugged
+ * concurrently and contend for a shared upstream PCIe bridge during
+ * rescan. Retry a bounded number of times rather than failing setup_amc()
+ * (and leaving the device stuck in PF_DEV_STATE_NO_AMC) on a single
+ * transient failure.
+ */
+#define GCQ_VERSION_MAX_ATTEMPTS        (10)
+#define GCQ_VERSION_RETRY_DELAY_MS      (1000)
 
 
 /* AMC Identify Command Version Major and Minor Numbers */
 #define AMC_GCQ_IDENTIFY_CMD_MAJOR      (1)
 #define AMC_GCQ_IDENTIFY_CMD_MINOR      (0)
-#define AMC_GCQ_MAGIC_NO                (0x564D5230)
 #define VERSION_BUF_SIZE                (8)
 
 /* Number of permitted failures before raising a fatal event */
@@ -753,6 +765,49 @@ static int check_gcq_supported_version(struct amc_control_ctxt	*amc_ctrl_ctxt,
 }
 
 /**
+ * struct amc_compat_entry - a single AMC version entry in the compatibility table.
+ * @major: AMC major version.
+ * @minor: AMC minor version.
+ */
+struct amc_compat_entry {
+	uint16_t major;
+	uint16_t minor;
+};
+
+/*
+ * Table of AMC firmware versions considered compatible with this AMI build
+ * (AMI_VER_MAJOR.AMI_VER_MINOR, see ami_top.h). Patch version and dev-commit
+ * count are intentionally not compared.
+ *
+ * NOTE: Keep this table in sync with the equivalent table in
+ * api/vfio-driver/src/ami_device.c (amc_compat_table).
+ */
+static const struct amc_compat_entry amc_compat_table[] = {
+	{ 3, 1 }, /* AMC 3.1.0 */
+	{ 3, 0 }, /* AMC 3.0.0 */
+	{ 2, 0 }, /* AMC 2.0.0 */
+};
+
+/**
+ * amc_version_is_compatible() - look up an AMC version in the compatibility table.
+ * @major: the AMC major version number
+ * @minor: the AMC minor version number
+ *
+ * Return: true if the given AMC version is listed as compatible.
+ */
+static bool amc_version_is_compatible(const uint16_t major, const uint16_t minor)
+{
+	size_t i;
+
+	for (i = 0; i < ARRAY_SIZE(amc_compat_table); i++) {
+		if ((amc_compat_table[i].major == major) && (amc_compat_table[i].minor == minor))
+			return true;
+	}
+
+	return false;
+}
+
+/**
  * check_amc_supported_version() - check if the AMC version is valid.
  * @amc_ctrl_ctxt: AMC data struct instance.
  * @major: the AMC major version number
@@ -770,7 +825,7 @@ static int check_amc_supported_version(struct amc_control_ctxt	*amc_ctrl_ctxt,
 	if (!amc_ctrl_ctxt)
 		return -EINVAL;
 
-	if ((AMI_VER_MAJOR == major) && (AMI_VER_MINOR == minor)) {
+	if (amc_version_is_compatible(major, minor)) {
 		AMI_INFO(amc_ctrl_ctxt, "AMC Supported Version : %d.%d", major, minor);
 		return SUCCESS;
 	}
@@ -1918,7 +1973,17 @@ int setup_amc(struct pci_dev		*dev,
 		goto fail;
 	}
 
-	ret = get_gcq_version(amc_ctxt, version_buf);
+	{
+		int attempts = 0;
+
+		do {
+			ret = get_gcq_version(amc_ctxt, version_buf);
+			attempts++;
+			if (!ret || (attempts >= GCQ_VERSION_MAX_ATTEMPTS))
+				break;
+			msleep(GCQ_VERSION_RETRY_DELAY_MS);
+		} while (1);
+	}
 	if (ret) {
 		ret = -EIO;
 		goto fail;

@@ -200,6 +200,14 @@ struct gcq_metal_ctx_internal
     pthread_t       log_thread;
     volatile bool   log_running;
     uint32_t        last_log_index;  /* Last seen log ring write index */
+    bool            log_idx_warned;  /* One-time "invalid PCI data read"
+                                      * warning latch for this device. Must
+                                      * be per-context: log_drain_lock is
+                                      * per-context too, so a function-local
+                                      * static bool shared by every device
+                                      * would be "protected" by a different
+                                      * lock instance per caller, giving no
+                                      * real cross-device mutual exclusion. */
 
     /* AMC magic wait: 0 = fail immediately if not ready (for overview/enum) */
     uint32_t        amc_wait_sec;    /* Max seconds to wait for AMC ready */
@@ -231,6 +239,17 @@ static bool gcq_amc_magic_valid(uint32_t magic)
 }
 
 static sigjmp_buf s_sigbus_jmp;
+/*
+ * sigaction() disposition and s_sigbus_jmp are both process-wide state
+ * (signal handling is not per-thread). If two threads (e.g. servicing two
+ * different cards) entered gcq_read_amc_shared_mem() concurrently, one
+ * thread's sigaction() restore could uninstall the handler while the other
+ * thread is still relying on it, or a SIGBUS could siglongjmp into the
+ * wrong thread's stack/register state - undefined behaviour, likely a
+ * crash. Serialise the whole install/read/restore sequence with this lock
+ * so only one thread is ever inside it at a time.
+ */
+static pthread_mutex_t s_sigbus_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static bool gcq_fw_log_stderr_enabled(void)
 {
@@ -284,12 +303,10 @@ static void dump_amc_log(gcq_metal_ctx *ctx)
     __sync_synchronize();
 
     if (current_log_idx > AMC_LOG_MAX_RECS) {
-        static bool warned;
-
-        if (!warned) {
+        if (!ctx->log_idx_warned) {
             fprintf(stderr,
                     "[GCQ] Logging thread error - invalid PCI data read!\n");
-            warned = true;
+            ctx->log_idx_warned = true;
         }
         pthread_mutex_unlock(&ctx->log_drain_lock);
         return;
@@ -444,6 +461,8 @@ static bool gcq_read_amc_shared_mem(gcq_metal_ctx *ctx)
     sigemptyset(&sa_new.sa_mask);
     sa_new.sa_flags = 0;
 
+    pthread_mutex_lock(&s_sigbus_lock);
+
     sigaction(SIGBUS, &sa_new, &sa_old);
 
     if (sigsetjmp(s_sigbus_jmp, 1) != 0) {
@@ -453,6 +472,7 @@ static bool gcq_read_amc_shared_mem(gcq_metal_ctx *ctx)
                 "[GCQ] SIGBUS reading BAR0+AMC_SHARED_MEM_OFFSET — PCIe device not "
                 "responding (firmware not loaded or card needs cold reboot)\n");
         memset(&ctx->amc_shared_mem, 0xff, sizeof(ctx->amc_shared_mem));
+        pthread_mutex_unlock(&s_sigbus_lock);
         return false;
     }
 
@@ -464,6 +484,7 @@ static bool gcq_read_amc_shared_mem(gcq_metal_ctx *ctx)
     __sync_synchronize();
 
     sigaction(SIGBUS, &sa_old, NULL);
+    pthread_mutex_unlock(&s_sigbus_lock);
     return true;
 }
 
@@ -471,7 +492,17 @@ static bool gcq_read_amc_shared_mem(gcq_metal_ctx *ctx)
 /* Global Variables                                                           */
 /******************************************************************************/
 
-static bool g_gcq_initialized = false;
+/*
+ * Reference count, not a bool. gcq_userspace_init()/deinit() are called once
+ * per ami_device open/close, but a single process can have multiple devices
+ * (cards) open concurrently (e.g. enumeration, or a multi-card management
+ * process). With a plain bool, closing ANY one device would clear the flag
+ * and make gcq_userspace_create_context() spuriously fail
+ * (GCQ_ERRORS_DRIVER_NOT_INITIALISED) for every other still-open device in
+ * the same process. The refcount ensures the shared state is only torn down
+ * once the last open device in this process closes.
+ */
+static int g_gcq_refcount = 0;
 static pthread_mutex_t g_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /******************************************************************************/
@@ -525,68 +556,45 @@ static void gcq_cq_discard_slots(GCQRing *ring, uint32_t max_slots);
 static void gcq_cq_sync_consumer(gcq_metal_ctx *ctx, GCQRing *ring);
 
 /**
- * Fast-forward to current firmware position (from ami_gcq.c)
+ * Fast-forward to current firmware position (from ami_gcq.c:299-305)
  *
- * For SQ (we produce): Set our produced = firmware's consumed
+ * For SQ (we produce): adopt hardware's current producer register value
+ * and firmware's current consumed value, read-only (see function body).
  * For CQ (we consume): Set our consumed = firmware's produced
  */
 static void gcq_fast_forward_sq(gcq_metal_ctx *ctx, GCQRing *ring)
 {
-    uint32_t fw_consumed = 0;
-    uint32_t hw_produced = 0;
-    uint32_t gap;
-    int attempts = 0;
-    int max_attempts;
-
     (void)ctx;
 
     /*
-     * Host is SQ producer: do not run ahead of firmware consumer.
-     * If hw_produced > fw_consumed, slots are still in flight — wait for them.
+     * Match the kernel driver's gcq_fast_forward() (ami_gcq.c:299-305)
+     * exactly: adopt whatever the hardware SQ tail-pointer register
+     * currently reports as produced, and whatever firmware currently
+     * reports as consumed (header field). A non-zero gap between them is
+     * a normal, valid ring state — it just means some previously-produced
+     * commands are still in flight / not yet drained by firmware — and is
+     * NOT something to wait out or "fix" here.
      *
-     * CRITICAL FIX: The original 10ms timeout (1000 attempts × 10us) was too short
-     * when reopening device after PDI programming. Firmware might still be processing
-     * thousands of chunks, and we need to wait for it to fully drain before syncing.
-     *
-     * Strategy: Use adaptive timeout based on queue backlog:
-     * - Small gap (<=10): Wait up to 100ms (normal device open case)
-     * - Large gap (>10): Wait up to 5 seconds (post-PDI-programming case)
+     * A prior version of this function busy-waited for the gap to reach
+     * zero and then forcibly rewrote the hardware producer register down
+     * to fw_consumed regardless of whether the wait converged. That
+     * register is a monotonically-increasing counter owned by the SQ
+     * producer (host) role; rewinding it backward desyncs the ring's
+     * slot indexing from firmware's own internal bookkeeping, so every
+     * subsequent command's slot index falls behind what firmware has
+     * already seen and never gets recognised as new — firmware then never
+     * responds to anything (surfacing as e.g. "GET_SDR: No response from
+     * firmware"). This was masked on firmware where the gap happens to be
+     * 0 at attach time (no rewind occurs), but broke unconditionally on
+     * AMC 2.0.0, which has a small, legitimate non-zero gap at attach that
+     * never closes. Simply reading (not writing) both values, like the
+     * kernel driver does, avoids this entirely.
      */
-    fw_consumed = gcq_read32((void *)ring->ullRingConsumedAddr);
-    hw_produced = gcq_read32((void *)ring->ullRingProducedAddr);
-    gap = hw_produced - fw_consumed;
+    ring->ulRingProduced = gcq_read32((void *)ring->ullRingProducedAddr);
+    ring->ulRingConsumed = gcq_read32((void *)ring->ullRingConsumedAddr);
 
-    if (gap > 10) {
-        /* Large backlog detected - give firmware up to 5 seconds to drain */
-        max_attempts = 500000;  /* 5 seconds max */
-        fprintf(stderr, "[GCQ] Large SQ backlog detected (%u entries), waiting for firmware to drain...\n", gap);
-    } else {
-        /* Normal case - quick sync */
-        max_attempts = 10000;  /* 100ms max */
-    }
-
-    while (attempts < max_attempts) {
-        fw_consumed = gcq_read32((void *)ring->ullRingConsumedAddr);
-        hw_produced = gcq_read32((void *)ring->ullRingProducedAddr);
-        if (hw_produced == fw_consumed)
-            break;
-        usleep(10);  /* 10us polling interval */
-        attempts++;
-    }
-
-    fw_consumed = gcq_read32((void *)ring->ullRingConsumedAddr);
-    ring->ulRingProduced = fw_consumed;
-
-    /* Publish next SQ slot index to hardware */
-    gcq_write32((void *)ring->ullRingProducedAddr, fw_consumed);
-
-    if (attempts >= max_attempts && hw_produced != fw_consumed) {
-        fprintf(stderr, "[GCQ] WARNING: SQ sync timeout after %d attempts, gap still %u\n",
-                attempts, hw_produced - fw_consumed);
-    }
-
-    GCQ_DEBUG("  Sync SQ: produced=consumed=%u (hw was %u, gap was %u, attempts=%d)\n",
-              fw_consumed, hw_produced, gap, attempts);
+    GCQ_DEBUG("  Fast-forward SQ: produced=%u consumed=%u\n",
+              ring->ulRingProduced, ring->ulRingConsumed);
 }
 
 static void gcq_fast_forward_cq(gcq_metal_ctx *ctx, GCQRing *ring)
@@ -916,30 +924,35 @@ uint32_t gcq_userspace_init(void)
 {
     pthread_mutex_lock(&g_init_lock);
 
-    if (g_gcq_initialized) {
-        pthread_mutex_unlock(&g_init_lock);
-        return GCQ_ERRORS_DRIVER_IN_USE;
-    }
+    if (g_gcq_refcount == 0)
+        openlog(AMI_SYSLOG_IDENT, LOG_PID | LOG_NDELAY, LOG_USER);
 
-    g_gcq_initialized = true;
-    openlog(AMI_SYSLOG_IDENT, LOG_PID | LOG_NDELAY, LOG_USER);
+    g_gcq_refcount++;
     pthread_mutex_unlock(&g_init_lock);
 
-    GCQ_DEBUG("GCQ userspace driver initialized\n");
+    GCQ_DEBUG("GCQ userspace driver initialized (refcount=%d)\n", g_gcq_refcount);
     return GCQ_ERRORS_NONE;
 }
 
 /**
- * Tear down global GCQ driver state so the next open starts clean.
+ * Drop a reference on the global GCQ driver state, taken by
+ * gcq_userspace_init(). Only tears down (closelog) once the last
+ * reference in this process is dropped, so other concurrently-open
+ * devices in the same process are unaffected.
  */
 uint32_t gcq_userspace_deinit(void)
 {
     pthread_mutex_lock(&g_init_lock);
-    g_gcq_initialized = false;
-    closelog();
+
+    if (g_gcq_refcount > 0)
+        g_gcq_refcount--;
+
+    if (g_gcq_refcount == 0)
+        closelog();
+
     pthread_mutex_unlock(&g_init_lock);
 
-    GCQ_DEBUG("GCQ userspace driver deinitialized\n");
+    GCQ_DEBUG("GCQ userspace driver deinitialized (refcount=%d)\n", g_gcq_refcount);
     return GCQ_ERRORS_NONE;
 }
 
@@ -954,9 +967,12 @@ uint32_t gcq_userspace_create_context(gcq_metal_ctx **ctx_out, int uio_num, bool
         return GCQ_ERRORS_INVALID_ARG;
     }
 
-    if (!g_gcq_initialized) {
+    pthread_mutex_lock(&g_init_lock);
+    if (g_gcq_refcount == 0) {
+        pthread_mutex_unlock(&g_init_lock);
         return GCQ_ERRORS_DRIVER_NOT_INITIALISED;
     }
+    pthread_mutex_unlock(&g_init_lock);
 
     /* Allocate context */
     ctx = (gcq_metal_ctx *)calloc(1, sizeof(gcq_metal_ctx));
@@ -1320,15 +1336,44 @@ uint32_t gcq_userspace_open(gcq_metal_ctx *ctx, const GCQCfg *cfg)
     }
     GCQ_DEBUG("✓ AMC device ready\n");
 
-    /* Step 8: Calculate GCQ ring buffer address (from ami_amc_control.c:372-374)
-     * WORKAROUND: Firmware has bug writing shared memory structure, hardcode known offset
-     * The GCQ header magic at BAR0+AMC_GCQ_RING_OFFSET is correct, so we know GCQ is there
+    /* Step 8: Calculate GCQ ring buffer address (from ami_amc_control.c:384-386)
+     *
+     * The kernel driver always trusts the firmware-reported ring_buf_off
+     * from the shared-memory partition table:
+     *     gcq_ring_buf_base_virt_addr = gcq_payload_base_virt_addr + ring_buf_off
+     * and this is required for portability across AMC firmware versions —
+     * different AMC builds are free to place the GCQ ring at different
+     * offsets, and the partition table is how they advertise it.
+     *
+     * A prior version of this code unconditionally hardcoded the offset to
+     * AMC_SHARED_MEM_OFFSET (BAR0+AMC_GCQ_RING_OFFSET) to work around one
+     * specific AMC build that wrote a bogus ring_buf_off. That hardcoding
+     * broke any other firmware (e.g. AMC 2.0.0) reporting a different,
+     * *correct* ring_buf_off, causing GCQ to read the ring header from the
+     * wrong location and IDENTIFY to fail (surfacing as NO_AMC) even though
+     * the kernel driver — which always uses the dynamic value — reports the
+     * same card as READY. Prefer the dynamic value, matching the kernel
+     * driver, and only fall back to the legacy hardcoded offset if the
+     * firmware value is clearly bogus (zero or outside the mapped BAR).
      */
-    ctx->gcq_ring_buf_base_virt_addr =
-        (char *)ctx->gcq_payload_base_virt_addr + AMC_SHARED_MEM_OFFSET;  /* GCQ at BAR0+AMC_GCQ_RING_OFFSET */
+    {
+        uint32_t fw_ring_off = ctx->amc_shared_mem.ring_buf.ring_buf_off;
+        bool fw_ring_off_valid = (fw_ring_off != 0) &&
+            ((uint64_t)fw_ring_off + sizeof(GCQHeader) < ctx->bar_size);
 
-    GCQ_DEBUG("gcq_ring_buf_base_virt_addr = %p (using hardcoded offset AMC_SHARED_MEM_OFFSET)\n",
-              ctx->gcq_ring_buf_base_virt_addr);
+        if (fw_ring_off_valid) {
+            ctx->gcq_ring_buf_base_virt_addr =
+                (char *)ctx->gcq_payload_base_virt_addr + fw_ring_off;
+            GCQ_DEBUG("gcq_ring_buf_base_virt_addr = %p (firmware ring_buf_off=0x%x)\n",
+                      ctx->gcq_ring_buf_base_virt_addr, fw_ring_off);
+        } else {
+            ctx->gcq_ring_buf_base_virt_addr =
+                (char *)ctx->gcq_payload_base_virt_addr + AMC_SHARED_MEM_OFFSET;
+            GCQ_DEBUG("gcq_ring_buf_base_virt_addr = %p "
+                      "(fallback: firmware ring_buf_off=0x%x looked invalid)\n",
+                      ctx->gcq_ring_buf_base_virt_addr, fw_ring_off);
+        }
+    }
 
     /* Step 9: Read number of slots from GCQ header (don't calculate!)
      * Use volatile reads like kernel driver's memcpy_fromio()

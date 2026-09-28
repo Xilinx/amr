@@ -7,6 +7,7 @@
 
 /* Standard includes */
 #include <sys/ioctl.h>
+#include <sys/file.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -223,6 +224,59 @@ int ami_prog_update_fpt(ami_device *dev, const char *path, uint8_t boot_device,
 #define POR_RESCAN_DELAY_MS	(15000)
 #define POR_POST_RESCAN_MS	(5000)
 
+/*
+ * The AMC firmware/PCIe link may occasionally need more time to come back up
+ * than the fixed delays above allow for. Rather than giving up after a single
+ * rescan attempt, retry the rescan + re-acquire cycle a bounded number of
+ * times before reporting failure.
+ */
+#define POR_REACQUIRE_RETRY_COUNT	(5)
+#define POR_REACQUIRE_RETRY_DELAY_MS	(2000)
+
+/*
+ * /sys/bus/pci/rescan is a single, system-wide trigger - not scoped to any
+ * one card's bus/bridge. Writing to it is a synchronous kernel call: the
+ * write() does not return until the kernel has finished walking the PCI
+ * tree and (re)allocating bridge resources for anything newly present.
+ *
+ * If two ami_tool processes each running device_boot for a different card
+ * write to it at (or close to) the same time, the kernel can end up doing
+ * two concurrent bus rescans that contend over the same upstream bridge's
+ * resource window - this is what produces
+ * "pcieport ...: bridge window ... can't assign; no space" and can leave
+ * one card's re-enumeration in a bad state.
+ *
+ * Serialise just the rescan trigger itself (not the whole device_boot
+ * call) across all processes on the host using an flock() on a fixed
+ * lock file, so at most one process is ever inside the kernel's rescan
+ * path at a time. Every other part of device_boot (remove, sleeps,
+ * reacquire retries) remains fully concurrent across cards.
+ */
+#define PCI_RESCAN_LOCK_FILE	"/var/lock/ami-pci-rescan.lock"
+
+static void pci_rescan_bus(void)
+{
+	int lock_fd = AMI_INVALID_FD;
+	int rescan_fd = AMI_INVALID_FD;
+
+	lock_fd = open(PCI_RESCAN_LOCK_FILE, O_CREAT | O_RDWR, 0666);
+	if (lock_fd >= 0) {
+		/* Blocks here until any other process's rescan completes. */
+		flock(lock_fd, LOCK_EX);
+	}
+
+	rescan_fd = open("/sys/bus/pci/rescan", O_WRONLY);
+	if (rescan_fd >= 0) {
+		write(rescan_fd, "1", 1);
+		close(rescan_fd);
+	}
+
+	if (lock_fd >= 0) {
+		flock(lock_fd, LOCK_UN);
+		close(lock_fd);
+	}
+}
+
 static void pci_remove_all_pf(uint8_t bus, uint8_t dev_num)
 {
 	DIR *pci_dir = NULL;
@@ -263,7 +317,7 @@ int ami_prog_device_boot(struct ami_device **dev, uint32_t partition)
 	struct ami_ioc_data_payload payload = { 0 };
 	uint16_t saved_bdf = 0;
 	int cdev_fd = AMI_INVALID_FD;
-	int rescan_fd = AMI_INVALID_FD;
+	int attempt = 0;
 
 	if (!dev || !(*dev))
 		return AMI_API_ERROR(AMI_ERROR_EINVAL);
@@ -294,17 +348,50 @@ int ami_prog_device_boot(struct ami_device **dev, uint32_t partition)
 
 		ami_msleep(POR_RESCAN_DELAY_MS);
 
-		/* Rescan the PCI bus so the host re-enumerates the device. */
-		rescan_fd = open("/sys/bus/pci/rescan", O_WRONLY);
-		if (rescan_fd >= 0) {
-			write(rescan_fd, "1", 1);
-			close(rescan_fd);
-			ami_msleep(POR_POST_RESCAN_MS);
-		}
+		/*
+		 * Rescan the PCI bus so the host re-enumerates the device, then
+		 * try to re-acquire the device handle. If the device isn't found
+		 * yet (link/firmware not fully up), retry rather than giving up
+		 * after a single fixed-length wait.
+		 *
+		 * Finding the cdev is not sufficient: the kernel driver's probe()
+		 * binds successfully even when the AMC/GCQ bring-up inside it
+		 * fails (e.g. because of a transient PCIe re-enumeration race
+		 * when multiple cards are hot-plugged concurrently), leaving the
+		 * device in PF_DEV_STATE_NO_AMC while still "present" on the bus.
+		 * Explicitly check the driver-reported state and keep retrying
+		 * the rescan cycle until the device is fully READY, rather than
+		 * declaring success as soon as the cdev shows up.
+		 */
+		for (attempt = 0; attempt < POR_REACQUIRE_RETRY_COUNT; attempt++) {
+			char state_buf[AMI_DEV_STATE_SIZE] = { 0 };
 
-		/* Re-acquire the device handle by BDF. */
-		ret = ami_dev_find_next(dev, AMI_PCI_BUS(saved_bdf),
-			AMI_PCI_DEV(saved_bdf), AMI_PCI_FUNC(saved_bdf), NULL);
+			pci_rescan_bus();
+
+			ami_msleep(POR_POST_RESCAN_MS);
+
+			ret = ami_dev_find_next(dev, AMI_PCI_BUS(saved_bdf),
+				AMI_PCI_DEV(saved_bdf), AMI_PCI_FUNC(saved_bdf), NULL);
+
+			if (ret == AMI_STATUS_OK) {
+				if ((ami_dev_get_state(*dev, state_buf) == AMI_STATUS_OK) &&
+					(strcmp(state_buf, AMI_DEV_READY_STR) == 0)) {
+					break;
+				}
+
+				/*
+				 * Device is bound but not actually ready (e.g. NO_AMC
+				 * after a failed AMC/GCQ bring-up) - drop this handle
+				 * and retry the rescan cycle rather than returning a
+				 * false success.
+				 */
+				ami_dev_delete(dev);
+				ret = AMI_STATUS_ERROR;
+			}
+
+			if (attempt < (POR_REACQUIRE_RETRY_COUNT - 1))
+				ami_msleep(POR_REACQUIRE_RETRY_DELAY_MS);
+		}
 	}
 	return ret;
 }

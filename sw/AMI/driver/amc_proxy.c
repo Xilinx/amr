@@ -524,6 +524,22 @@ struct amc_proxy_list_entry {
 /*Global list of proxy instances */
 LIST_HEAD(amc_proxy_list_head);
 
+/*
+ * Serialises all add/remove/traversal access to amc_proxy_list_head.
+ *
+ * amc_proxy_init()/amc_proxy_close() are invoked from PCI probe/remove
+ * (e.g. during a device_boot-triggered PCI hot-unplug/replug of one card),
+ * and can therefore run concurrently with find_matching_gcq_proxy_instance()
+ * lookups triggered by in-flight commands on any OTHER card. Without this
+ * lock, a concurrent list_del()+kfree() (amc_proxy_close) racing against a
+ * list_for_each_safe() traversal (find_matching_gcq_proxy_instance) is a
+ * classic unsynchronised-linked-list use-after-free.
+ *
+ * Every caller of find_matching_gcq_proxy_instance() must hold this mutex
+ * for as long as it uses the returned entry.
+ */
+static DEFINE_MUTEX(amc_proxy_list_lock);
+
 
 /*****************************************************************************/
 /* Local Functions                                                           */
@@ -807,6 +823,9 @@ static int complete_response_thread(void *data)
 /**
  * find_matching_gcq_proxy_instance() - Find matching proxy list entry
  *
+ * Caller MUST hold amc_proxy_list_lock before calling this, and must keep
+ * holding it for as long as the returned entry is used.
+ *
  * gcq: sGCQ consumer configuration
  *
  * Loop around the global proxy instance list looking for a matching entry
@@ -891,14 +910,16 @@ int amc_proxy_init(uint8_t proxy_id, GCQCfg *gcq_handle)
 
 		if (!ret) {
 			PR_DBG("list entry update\n");
+			mutex_lock(&amc_proxy_list_lock);
 			/* Add entry onto the global instance list */
 			list_add_tail(&amc_proxy_entry->list, &amc_proxy_list_head);
 
-			/* Start response & heartbeat threads */
-			wake_up_process(amc_proxy_entry->inst.response_thread);
-
 			/* Set flag to indicate all initialisation has completed */
 			amc_proxy_entry->inst.initialised = true;
+			mutex_unlock(&amc_proxy_list_lock);
+
+			/* Start response & heartbeat threads */
+			wake_up_process(amc_proxy_entry->inst.response_thread);
 		}
 
 	} else {
@@ -921,12 +942,14 @@ int amc_proxy_bind_callback(GCQCfg *gcq_handle, amc_proxy_event_callback *event_
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(gcq_handle);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 		PR_DBG("callback attached\n");
 		amc_ctxt->inst.event_cb = event_cb;
 		ret = 0;
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	PR_DBG("ret = %d\n",ret);
 
 	return ret;
@@ -941,6 +964,25 @@ int amc_proxy_close(const GCQCfg *gcq_handle)
 	int ret = -EPERM;
 	struct amc_proxy_list_entry *amc_ctxt = NULL;
 	struct list_head *pos = NULL, *next = NULL;
+	bool found = false;
+
+	/*
+	 * Only the lookup + unlink need to happen under the lock. Once an
+	 * entry is unlinked from amc_proxy_list_head, no subsequent
+	 * find_matching_gcq_proxy_instance() call (from any other card) can
+	 * find it, and every other caller's lookup+use of an entry happens
+	 * entirely while holding this same lock - so once we've unlinked
+	 * amc_ctxt and released the lock, no one else can be holding a
+	 * reference to it. That makes it safe to do the drain/kthread_stop/
+	 * gcq_close/kfree sequence below without the lock held.
+	 *
+	 * This matters because the drain loop can run for as long as the
+	 * longest command timeout still in flight on this card (up to
+	 * REQUEST_COPY_TIMEOUT = 60 minutes for a partition copy). Holding
+	 * the global lock across that whole wait would otherwise stall every
+	 * other card's command traffic for the same duration.
+	 */
+	mutex_lock(&amc_proxy_list_lock);
 	list_for_each_safe(pos, next, &amc_proxy_list_head) {
 
 		amc_ctxt = list_entry(pos, struct amc_proxy_list_entry, list);
@@ -949,38 +991,43 @@ int amc_proxy_close(const GCQCfg *gcq_handle)
 		if (amc_ctxt && amc_ctxt->inst.initialised) {
 
 			if (amc_ctxt->inst.gcq_handle == gcq_handle) {
-
-				/*
-				 * Drain the submitted command queue before killing
-				 * the worker thread
-				 */
-				while (submitted_cmds_empty(&amc_ctxt->inst) != true) {
-					msleep(AMC_PROXY_MSLEEP_1S);
-					submitted_cmds_drain(&amc_ctxt->inst);
-				}
-
-				if (amc_ctxt->inst.response_thread_created == true)
-				{
-					ret = kthread_stop(amc_ctxt->inst.response_thread);
-					if (!ret) {
-						ret = gcq_close(amc_ctxt->inst.gcq_handle);
-						if (ret) {
-							PR_ERR("close request failed: %d", ret);
-							ret = -EIO;
-						}
-					} else {
-						PR_ERR("kthread_stop() failed for thread: %d", ret);
-					}
-				}
 				amc_ctxt->inst.initialised = false;
-
-				/* Remove from list and free the memory */
 				list_del(&amc_ctxt->list);
-				kfree(amc_ctxt);
+				found = true;
 				break;
 			}
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
+
+	if (!found)
+		return ret;
+
+	/*
+	 * Drain the submitted command queue before killing the worker
+	 * thread. amc_ctxt is already unlinked above, so no other card's
+	 * lookup can reach it from this point on.
+	 */
+	while (submitted_cmds_empty(&amc_ctxt->inst) != true) {
+		msleep(AMC_PROXY_MSLEEP_1S);
+		submitted_cmds_drain(&amc_ctxt->inst);
+	}
+
+	if (amc_ctxt->inst.response_thread_created == true)
+	{
+		ret = kthread_stop(amc_ctxt->inst.response_thread);
+		if (!ret) {
+			ret = gcq_close(amc_ctxt->inst.gcq_handle);
+			if (ret) {
+				PR_ERR("close request failed: %d", ret);
+				ret = -EIO;
+			}
+		} else {
+			PR_ERR("kthread_stop() failed for thread: %d", ret);
+		}
+	}
+
+	kfree(amc_ctxt);
 	return ret;
 }
 
@@ -996,11 +1043,13 @@ int amc_proxy_request_abort(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 		/* Remove the command from the submitted queue */
 		remove_submitted_cmd(&amc_ctxt->inst, cmd);
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1016,6 +1065,7 @@ int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1039,6 +1089,7 @@ int amc_proxy_request_identity(struct amc_proxy_cmd_struct *cmd)
 			ret = -EIO;
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1055,6 +1106,7 @@ int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1086,6 +1138,7 @@ int amc_proxy_request_sensor(struct amc_proxy_cmd_struct *cmd,
 			ret = -EIO;
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1102,6 +1155,7 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1148,6 +1202,7 @@ int amc_proxy_request_pdi_download(struct amc_proxy_cmd_struct *cmd,
 			ret = -EIO;
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1164,6 +1219,7 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1190,6 +1246,7 @@ int amc_proxy_request_device_boot(struct amc_proxy_cmd_struct *cmd,
 			ret = -EIO;
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1206,6 +1263,7 @@ int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1236,6 +1294,7 @@ int amc_proxy_request_partition_copy(struct amc_proxy_cmd_struct *cmd,
 			ret = -EIO;
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1251,6 +1310,7 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
 	if (!cmd || !heartbeat) {
 		return -EINVAL;
 	}
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1277,6 +1337,7 @@ int amc_proxy_request_heartbeat(struct amc_proxy_cmd_struct *cmd,
 			ret = -EIO;
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1293,6 +1354,7 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1319,6 +1381,7 @@ int amc_proxy_request_eeprom_read_write(struct amc_proxy_cmd_struct *cmd,
 			ret = -EIO;
 		}
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1335,6 +1398,7 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1364,6 +1428,7 @@ int amc_proxy_request_module_read_write(struct amc_proxy_cmd_struct *cmd,
 		}
 	}
 
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1379,6 +1444,7 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1406,6 +1472,7 @@ int amc_proxy_request_debug_verbosity(struct amc_proxy_cmd_struct *cmd, uint8_t 
 		}
 	}
 
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1422,6 +1489,7 @@ int amc_proxy_request_set_fpt_partition(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1455,6 +1523,7 @@ int amc_proxy_request_set_fpt_partition(struct amc_proxy_cmd_struct *cmd,
 		}
 	}
 
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1471,6 +1540,7 @@ int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1490,6 +1560,7 @@ int amc_proxy_get_response_identity(struct amc_proxy_cmd_struct *cmd,
 
 		ret = 0;
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1505,10 +1576,12 @@ int amc_proxy_get_response_set_fpt_partition(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1524,6 +1597,7 @@ int amc_proxy_get_response_sensor(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 
@@ -1531,6 +1605,7 @@ int amc_proxy_get_response_sensor(struct amc_proxy_cmd_struct *cmd)
 			(struct amc_proxy_cmd_resp_sensor_payload *)&cmd->cmd_response;
 		ret = sensor_payload->result;
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1546,6 +1621,7 @@ int amc_proxy_get_response_pdi_download(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised) {
 		/* Payload is currently unused. */
@@ -1555,6 +1631,7 @@ int amc_proxy_get_response_pdi_download(struct amc_proxy_cmd_struct *cmd)
 
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1570,9 +1647,11 @@ int amc_proxy_get_response_device_boot(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised)
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+	mutex_unlock(&amc_proxy_list_lock);
 
 	return ret;
 }
@@ -1589,9 +1668,11 @@ int amc_proxy_get_response_partition_copy(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised)
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+	mutex_unlock(&amc_proxy_list_lock);
 
 	return ret;
 }
@@ -1609,6 +1690,7 @@ int amc_proxy_get_response_heartbeat(struct amc_proxy_cmd_struct *cmd,
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised)
 	{
@@ -1618,6 +1700,7 @@ int amc_proxy_get_response_heartbeat(struct amc_proxy_cmd_struct *cmd,
 		heartbeat->request_id = heartbeat_payload->request_id;
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
 	}
+	mutex_unlock(&amc_proxy_list_lock);
 	return ret;
 }
 
@@ -1633,9 +1716,11 @@ int amc_proxy_get_response_eeprom_read_write(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised)
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+	mutex_unlock(&amc_proxy_list_lock);
 
 	return ret;
 }
@@ -1652,9 +1737,11 @@ int amc_proxy_get_response_module_read_write(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised)
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+	mutex_unlock(&amc_proxy_list_lock);
 
 	return ret;
 }
@@ -1671,9 +1758,11 @@ int amc_proxy_get_response_debug_verbosity(struct amc_proxy_cmd_struct *cmd)
 		return -EINVAL;
 	}
 
+	mutex_lock(&amc_proxy_list_lock);
 	amc_ctxt = find_matching_gcq_proxy_instance(cmd->cmd_gcq_cfg);
 	if (amc_ctxt && amc_ctxt->inst.initialised)
 		ret = amc_result_to_linux_errno(cmd->cmd_response_code);
+	mutex_unlock(&amc_proxy_list_lock);
 
 	return ret;
 }

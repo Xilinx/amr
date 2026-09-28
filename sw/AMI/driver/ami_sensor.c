@@ -605,6 +605,15 @@ long make_val(enum sdr_value_type type, uint8_t size, uint8_t *data)
 }
 
 /*
+ * SDR fetches performed during device probe can transiently fail if the
+ * AMC firmware has not yet finished initialising its sensor subsystem
+ * (e.g. immediately after a POR/hot-reset triggered by device_boot).
+ * Retry each repo a bounded number of times before treating it as fatal.
+ */
+#define SDR_FETCH_RETRY_COUNT     (3)
+#define SDR_FETCH_RETRY_DELAY_MS  (200)
+
+/*
  * Note that board info is static throughout the lifetime of a device.
  * It only needs to be read once, at the sensor discover stage.
  */
@@ -636,6 +645,7 @@ int discover_sensors(struct pf_dev_struct *pf_dev, int *empty_sdr_count)
 {
 	int i = 0;
 	int ret = 0;
+	int attempt = 0;
 
 	if (!pf_dev || !empty_sdr_count)
 		return -EINVAL;
@@ -649,8 +659,23 @@ int discover_sensors(struct pf_dev_struct *pf_dev, int *empty_sdr_count)
 		return -ENOMEM;
 
 	for (i = 0; i < NUM_SENSOR_REPOS; i++) {
-		ret = get_sdr(pf_dev->amc_ctrl_ctxt, discovery_repos[i],
-				&pf_dev->sensor_repos[i]);
+		for (attempt = 0; attempt < SDR_FETCH_RETRY_COUNT; attempt++) {
+			ret = get_sdr(pf_dev->amc_ctrl_ctxt, discovery_repos[i],
+					&pf_dev->sensor_repos[i]);
+
+			/* Success, legitimately empty, or OOM: no point retrying. */
+			if ((ret == SUCCESS) || (ret == -ENODATA) || (ret == -ENOMEM))
+				break;
+
+			if (attempt < (SDR_FETCH_RETRY_COUNT - 1)) {
+				AMI_WARN(pf_dev->amc_ctrl_ctxt,
+					"Failed to fetch %s SDR (attempt %d/%d), retrying...",
+					sdr_repo_type_to_str(discovery_repos[i]),
+					attempt + 1,
+					SDR_FETCH_RETRY_COUNT);
+				msleep(SDR_FETCH_RETRY_DELAY_MS);
+			}
+		}
 
 	if (ret == -ENODATA) {
 			*empty_sdr_count += 1;
@@ -783,6 +808,8 @@ void delete_sensors(struct pf_dev_struct *pf_dev)
 		delete_repo_records(pf_dev, &(pf_dev->sensor_repos[i]));
 
 	devm_kfree(&(pf_dev->pci->dev), pf_dev->sensor_repos);
+	pf_dev->sensor_repos = NULL;
+	pf_dev->num_sensor_repos = 0;
 }
 
 /**

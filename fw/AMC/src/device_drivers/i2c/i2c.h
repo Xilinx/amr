@@ -59,6 +59,29 @@ typedef struct {
 int iI2C_ReInit(uint8_t ucDeviceId);
 
 /**
+ * @brief   Quiesce all I2C instances ahead of a system reset.
+ *
+ * Blocks until any in-flight transaction on each instance completes, and
+ * holds the instance mutexes so no new transaction can start, ensuring the
+ * bus is left idle when the reset actually occurs. Should be called
+ * immediately before triggering a system reset/POR.
+ *
+ * @return  OK                  All instances quiesced successfully.
+ *          ERROR               Timed out quiescing at least one instance.
+ */
+int iI2C_Quiesce(void);
+
+/**
+ * @brief   Resume normal I2C operation after a quiesce that was not
+ *          followed by an actual system reset (e.g. XPm_SystemShutdown()
+ *          itself failed). Releases the mutexes taken by iI2C_Quiesce().
+ *
+ * @return  OK                  All instances resumed successfully.
+ *          ERROR               Failed to release at least one instance.
+ */
+int iI2C_Resume(void);
+
+/**
  * @brief   Initialises the I2C driver.
  *
  * @param   pxI2cCfg            The configuration parameters for all I2C devices

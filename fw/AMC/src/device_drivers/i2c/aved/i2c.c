@@ -35,8 +35,9 @@
 #define I2C_DEBUG_DATA_READ  (0)
 #define I2C_DEBUG_DATA_WRITE (1)
 
-#define I2C_WAIT_TIMEOUT_MS  (100)
-#define I2C_RESET_TIMEOUT_MS (100)
+#define I2C_WAIT_TIMEOUT_MS     (100)
+#define I2C_RESET_TIMEOUT_MS    (100)
+#define I2C_QUIESCE_TIMEOUT_MS  (500)
 
 /* Stat & Error definitions */
 #define I2C_STATS(DO)               \
@@ -48,6 +49,7 @@
 	DO(I2C_STATS_TAKE_MUTEX)        \
 	DO(I2C_STATS_RELEASE_MUTEX)     \
 	DO(I2C_STATS_REINIT_SUCCESSFUL) \
+	DO(I2C_STATS_BUS_RECOVERY_SUCCESSFUL) \
 	DO(I2C_STATS_MAX)
 
 #define I2C_ERRORS(DO)                                  \
@@ -67,6 +69,8 @@
 	DO(I2C_ERRORS_WAIT_FOR_BUS_IDLE_FAILED)             \
 	DO(I2C_ERRORS_WAIT_FOR_BUS_IDLE_TIMED_OUT)          \
 	DO(I2C_ERRORS_REINIT_FAILED)                        \
+	DO(I2C_ERRORS_BUS_RECOVERY_FAILED)                  \
+	DO(I2C_ERRORS_QUIESCE_FAILED)                       \
 	DO(I2C_ERRORS_MAX)
 
 #define PRINT_STAT_COUNTER(x) \
@@ -253,6 +257,31 @@ int iI2C_ReInit(uint8_t ucDeviceId)
 		XIicPs* pxIicInstance    = &pxThis->xIicProfile[ucDeviceId].xIicInstance;
 
 		/*
+		 * If a prior transfer was interrupted mid-transaction (e.g. by a PDI
+		 * reload/hot-reset), a slave may be left holding SDA low, wedging the
+		 * bus. Detect this and clock out the standard 9 SCL recovery pulses
+		 * (+ STOP) before re-initialising the controller, otherwise every
+		 * transfer after re-init will simply time out against the same
+		 * wedged slave. XIicPs_BusRecovery() requires the controller to be
+		 * in master mode; force that bit directly since XIicPs_CfgInitialize()
+		 * below resets the control register anyway.
+		 */
+		if (TRUE == XIicPs_BusIsBusy(pxIicInstance)) {
+			uint32_t ulCrVal = XIicPs_ReadReg(pxIicInstance->Config.BaseAddress, XIICPS_CR_OFFSET);
+
+			XIicPs_WriteReg(pxIicInstance->Config.BaseAddress,
+				XIICPS_CR_OFFSET,
+				(ulCrVal | XIICPS_CR_MS_MASK));
+
+			if (XST_SUCCESS != XIicPs_BusRecovery(pxIicInstance)) {
+				PLL_ERR(I2C_NAME, "Error XIicPs_BusRecovery() failed\r\n");
+				INC_ERROR_COUNTER(I2C_ERRORS_BUS_RECOVERY_FAILED)
+			} else {
+				INC_STAT_COUNTER(I2C_STATS_BUS_RECOVERY_SUCCESSFUL)
+			}
+		}
+
+		/*
 		 * Initial clk value set and used to test if Fscl input is out of range
 		 */
 		XIicPs_Config xEngineCfg = {
@@ -280,6 +309,86 @@ int iI2C_ReInit(uint8_t ucDeviceId)
 		}
 	} else {
 		INC_ERROR_COUNTER(I2C_ERRORS_VALIDATION_FAILED)
+	}
+
+	return iStatus;
+}
+
+/**
+ * @brief   Quiesce all I2C instances ahead of a system reset.
+ */
+int iI2C_Quiesce(void)
+{
+	int iStatus = OK;
+
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised)) {
+		int i           = 0;
+		int iTakenCount = 0;
+
+		/*
+		 * Take every I2C instance's mutex. This blocks here until any
+		 * transaction currently in flight completes (releasing its
+		 * mutex), and prevents any new transaction from starting while
+		 * held, guaranteeing the bus is left idle for the imminent reset
+		 * instead of being interrupted mid-transaction, which is what
+		 * wedges a slave in the first place (CR-1281230).
+		 *
+		 * The mutexes are intentionally left held on success - the
+		 * caller is about to reset the system, at which point all this
+		 * state is wiped anyway. If the reset does not actually happen,
+		 * the caller must call iI2C_Resume() to release them and restore
+		 * normal I2C operation.
+		 */
+		for (i = 0; i < I2C_NUM_INSTANCES; i++) {
+			if (OSAL_ERRORS_NONE ==
+				iOSAL_Mutex_Take(pxThis->xIicProfile[i].pvOsalMutexHdl,
+					I2C_QUIESCE_TIMEOUT_MS)) {
+				iTakenCount++;
+			} else {
+				PLL_ERR(I2C_NAME, "Error taking mutex to quiesce I2C device %d\r\n", i);
+				INC_ERROR_COUNTER(I2C_ERRORS_QUIESCE_FAILED)
+				iStatus = ERROR;
+				break;
+			}
+		}
+
+		/* Roll back on partial failure so I2C is left fully usable */
+		if (OK != iStatus) {
+			for (i = 0; i < iTakenCount; i++) {
+				iOSAL_Mutex_Release(pxThis->xIicProfile[i].pvOsalMutexHdl);
+			}
+		}
+	} else {
+		INC_ERROR_COUNTER(I2C_ERRORS_VALIDATION_FAILED)
+		iStatus = ERROR;
+	}
+
+	return iStatus;
+}
+
+/**
+ * @brief   Resume normal I2C operation after a quiesce that was not
+ *          followed by an actual system reset.
+ */
+int iI2C_Resume(void)
+{
+	int iStatus = OK;
+
+	if ((UPPER_FIREWALL == pxThis->ulUpperFirewall) &&
+		(LOWER_FIREWALL == pxThis->ulLowerFirewall) && (TRUE == pxThis->iInitialised)) {
+		int i = 0;
+
+		for (i = 0; i < I2C_NUM_INSTANCES; i++) {
+			if (OSAL_ERRORS_NONE !=
+				iOSAL_Mutex_Release(pxThis->xIicProfile[i].pvOsalMutexHdl)) {
+				PLL_ERR(I2C_NAME, "Error releasing mutex to resume I2C device %d\r\n", i);
+				iStatus = ERROR;
+			}
+		}
+	} else {
+		INC_ERROR_COUNTER(I2C_ERRORS_VALIDATION_FAILED)
+		iStatus = ERROR;
 	}
 
 	return iStatus;
@@ -363,6 +472,37 @@ int iI2C_Init(I2CConfig* pxI2cCfg, uint16_t usBusIdleWaitMs)
 						pxI2cCfg[i].ullBaseAddress,
 						pxI2cCfg[i].ulInputClockHz);
 					iStatus = OK;
+
+					/*
+					 * XPm_SystemShutdown() (the reset device_boot triggers)
+					 * resets the PS I2C controller and all AMC firmware state,
+					 * but does NOT power-cycle the downstream I2C slaves
+					 * (EEPROM, PMBus sensors). If a transaction was interrupted
+					 * mid-byte at the moment of reset, a slave can be left
+					 * holding SDA low - a wedge that survives the reset and is
+					 * still present here, on this fresh boot, even though the
+					 * controller has just been (re-)configured successfully.
+					 * Detect and clear it now: the very first thing to use
+					 * this bus is the one-shot, never-retried board-info
+					 * EEPROM read at startup, so if the bus is still wedged
+					 * at this point that read - and therefore board-info
+					 * discovery for this entire boot - fails permanently.
+					 */
+					if (TRUE == XIicPs_BusIsBusy(pxIicInstance)) {
+						uint32_t ulCrVal = XIicPs_ReadReg(
+							pxIicInstance->Config.BaseAddress, XIICPS_CR_OFFSET);
+
+						XIicPs_WriteReg(pxIicInstance->Config.BaseAddress,
+							XIICPS_CR_OFFSET,
+							(ulCrVal | XIICPS_CR_MS_MASK));
+
+						if (XST_SUCCESS != XIicPs_BusRecovery(pxIicInstance)) {
+							PLL_ERR(I2C_NAME, "Error XIicPs_BusRecovery() failed\r\n");
+							INC_ERROR_COUNTER(I2C_ERRORS_BUS_RECOVERY_FAILED)
+						} else {
+							INC_STAT_COUNTER(I2C_STATS_BUS_RECOVERY_SUCCESSFUL)
+						}
+					}
 				} else {
 					PLL_ERR(I2C_NAME, "Error XIicPs_SetSClk() failed: %d\r\n", iI2cStatus);
 					INC_ERROR_COUNTER(I2C_ERRORS_XIIC_PS_SET_CLK_FAILED)
@@ -599,8 +739,8 @@ int iI2C_Recv(uint8_t ucDeviceId, uint8_t ucAddr, uint8_t* pucDataBuff, uint32_t
 				} else {
 					INC_ERROR_COUNTER(I2C_ERRORS_MUTEX_TAKE_FAILED)
 				}
-				ucTryCount++;
 			}
+			ucTryCount++;
 		}
 	} else {
 		INC_ERROR_COUNTER(I2C_ERRORS_VALIDATION_FAILED)

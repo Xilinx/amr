@@ -21,7 +21,7 @@ SCRIPTS_DIR="$ROOT_DIR/scripts"
 # Build output directory created where script is invoked from
 CWD="$(pwd)"
 BUILD_DIR="$CWD/build_ami"
-BUILD_VERSION="3.0.0"
+BUILD_VERSION="3.1.0"
 
 # Default driver profile: ami (kernel)
 DRIVER_PROFILE="ami"

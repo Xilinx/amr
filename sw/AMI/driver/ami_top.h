@@ -23,9 +23,9 @@
 
 
 /* Driver version numbers */
-#define AMI_VER			"3.0.0"
+#define AMI_VER			"3.1.0"
 #define AMI_VER_MAJOR	(3)
-#define AMI_VER_MINOR	(0)
+#define AMI_VER_MINOR	(1)
 #define AMI_VER_PATCH	(0)
 
 /**
