@@ -356,7 +356,7 @@ def main(args):
             # Create specfile
             SPEC_FILE =  []
             SPEC_FILE += ['# Turn off the brp-python-bytecompile script']
-            SPEC_FILE += ["%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*\$!!g')"]
+            SPEC_FILE += [r"%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*\$!!g')"]
             SPEC_FILE += ['']
             SPEC_FILE += ['Name: '                 + config['pkg']['name']]
             SPEC_FILE += ['Version: '              + config['pkg']['version']]
