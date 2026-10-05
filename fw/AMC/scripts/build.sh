@@ -50,7 +50,7 @@ function print_help() {
     echo "     if both XSA and SDT are provided, then the SDT will be used to generate the BSP"
     echo
     echo "E.g.: To build from scratch:"
-    echo " ./scripts/build_amc.sh -xsa /path/to/example.xsa -profile <v80|rave>"
+    echo " ./scripts/build_amc.sh -xsa /path/to/example.xsa -profile <rave|v80>"
     echo
     echo "========================================================================================="
 }
@@ -76,7 +76,7 @@ while [ $# -gt 0 ]; do
         shift  ### shift to next passed variable (-xsa *) ###
 
         ### handle empty string ###
-        if [ "$1" = "" ]; then
+        if [ -z "${1:-}" ]; then
             echo "Error: Invalid xsa"
             exit 1
         fi
@@ -91,12 +91,16 @@ while [ $# -gt 0 ]; do
         ;;
     -profile)
         shift
+        if [ -z "${1:-}" ]; then
+            echo "Error: Invalid profile"
+            exit 1
+        fi
         PROFILE=$1
         echo "Using profile=${PROFILE}"
         ;;
     -sdt)
         shift
-        if [ -z "$1" ]; then
+        if [ -z "${1:-}" ]; then
             echo "Error: Invalid sdt"
             exit 1
         fi
@@ -111,6 +115,9 @@ while [ $# -gt 0 ]; do
         echo "Using sdt=${SDT}"
         ;;
     *)
+        CMAKE_PARAMS="${CMAKE_PARAMS} $1"
+        echo "Passing to CMake: $1"
+        ;;
     esac
     shift ### shift to next passed option ###
 done
@@ -153,6 +160,19 @@ function build_bsp() {
     empyro config_bsp -d amc_bsp -st freertos freertos_support_static_allocation:true
     empyro config_bsp -d amc_bsp -st freertos freertos_tick_rate:1000
     empyro config_bsp -d amc_bsp -st freertos freertos_total_heap_size:131072
+
+    # Set TTC0 timer for freertos
+    if [ ! -f "${SDT_DIR}/pcw.dtsi" ]; then
+        echo "ERROR: ${SDT_DIR}/pcw.dtsi not found" >&2
+        exit 1
+    fi
+    TTC0_TIMER=$(sed -n '/&ttc0[[:space:]]*{/,/^[[:space:]]*};/{s/.*xlnx,name[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/;T;p;q}' "${SDT_DIR}/pcw.dtsi")
+    if [ -z "${TTC0_TIMER}" ]; then
+        echo "ERROR: TTC0 (&ttc0 xlnx,name) not found in ${SDT_DIR}/pcw.dtsi" >&2
+        exit 1
+    fi
+    empyro config_bsp -d amc_bsp -st xiltimer "XILTIMER_tick_timer:${TTC0_TIMER}"
+    empyro config_bsp -d amc_bsp -st xiltimer XILTIMER_sleep_timer:Default
     empyro build_bsp  -d amc_bsp
 
     sed -i "s/#define XPS_BOARD_EMB-PLUS-VPR-4616/#define XPS_BOARD_EMB_PLUS_VPR_4616/g" amc_bsp/include/xparameters.h
