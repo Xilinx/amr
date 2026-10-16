@@ -599,8 +599,7 @@
               "RPU0_TCMB_mem",
               "RPU0_TCMB_mem_lockstep",
               "RPU0_dCACHE_mem",
-              "RPU0_iCACHE_mem",
-              "SPI0"
+              "RPU0_iCACHE_mem"
             ],
             "flags": {"requested": true},
             "SMIDs": ["RPU0"]
@@ -664,7 +663,7 @@
           },
           {
             "name": "access_apu_subsys",
-            "destinations": ["PMC_RTC", "TTC2", "TTC3", "UART1"],
+            "destinations": ["LPD_GPIO", "PMC_RTC", "SPI0", "TTC2", "TTC3", "UART1"],
             "flags": {"requested": true},
             "SMIDs": ["APU"]
           },
